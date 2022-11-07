@@ -24,19 +24,16 @@ public abstract class User extends Model {
     @Getter
     protected Album _images;
     @Getter
-    protected List<Album> _music;
-    @Getter
     protected List<Rating> _ratings;
     @Getter
     protected List<Event> _events;
     @Getter
     protected List<ChatRoom> _chatRooms;
 
-    // Constructor for from database
-    public User(String id, String username, String title, String firstName, String lastName, String password,
-                String email, Album images, List<Album> music, List<Rating> ratings, List<Event> events,
+    public User(long id, String username, String firstName, String lastName, String password,
+                String email, Album images, List<Rating> ratings, List<Event> events,
                 List<ChatRoom> chatRooms, LocalDateTime timestamp) {
-        super(id,title,timestamp);
+        super(id,username,timestamp);
         _username = username;
         _firstName = firstName;
         _lastName = lastName;
@@ -44,15 +41,13 @@ public abstract class User extends Model {
         _password = password;
         _email = email;
         _images = images;
-        _music = music;
         _ratings = ratings;
         _events = events;
         _chatRooms = chatRooms;
     }
 
-    // Constructor add to database
-    public User(String username, String title, String firstName, String lastName, String password, String email) {
-        super(title);
+    public User(String username, String firstName, String lastName, String password, String email) {
+        super(username);
         _username = username;
         _firstName = firstName;
         _lastName = lastName;
@@ -60,7 +55,6 @@ public abstract class User extends Model {
         _password = password;
         _email = email;
         _images = new Album();
-        _music = new Liszt<>();
         _ratings = new Liszt<>();
         _events = new Liszt<>();
         _chatRooms = new Liszt<>();
@@ -76,21 +70,9 @@ public abstract class User extends Model {
         _images.add(url);
         return _images;
     }
-    public Album add(String url, String albumId) {
-        for (int i = 0; i < _music.size(); i++) {
-            if (_music.get(i).get_id().equals(albumId)) {
-                _music.get(i).add(url);
-                return _music.get(i);
-            }
-        }
-        return null;
-    }
     public List<Rating> add(Rating rating) {
-        if (!_ratings.contains(rating)) {
-            _ratings.add(rating);
-        } else {
-            edit(rating);
-        }
+        if (!_ratings.contains(rating)) _ratings.add(rating);
+        else edit(rating);
         return _ratings;
     }
     public List<Event> add(Event event) {
@@ -102,47 +84,36 @@ public abstract class User extends Model {
         return _chatRooms;
     }
 
-    // Remove methods
     public Album remove(String url) {
         _images.remove(url);
         return _images;
     }
-    public Album remove(String url,String albumId) {
-        for (Album album : _music) {
-            if (album.get_id().equals(albumId)) {
-                album.remove(url);
-                return album;
-            }
-        }
-        return null;
-    }
     public List<Event> remove(Event event) {
-        for (int i = 0; i < _events.size(); i++) {
-            if (_events.get(i).get_id().equals(event.get_id())) {
+        for (int i = 1; i <= _events.size(); i++)
+            if (_events.get(i).get_id() == event.get_id()) {
                 _events.remove(_events.get(i));
                 break;
             }
-        }
+
         return _events;
     }
     public List<ChatRoom> remove(ChatRoom chatRoom) {
-        for (int i = 0; i < _chatRooms.size(); i++) {
-            if (_chatRooms.get(i).get_id().equals(chatRoom.get_id())) {
+        for (int i = 1; i <= _chatRooms.size(); i++)
+            if (_chatRooms.get(i).get_id() == chatRoom.get_id()) {
                 _chatRooms.remove(_chatRooms.get(i));
                 break;
             }
-        }
+
         return _chatRooms;
     }
 
-    // Edit methods
     public List<Rating> edit(Rating rating) {
-        for (int i = 0; i < _ratings.size(); i++) {
+        for (int i = 1; i <= _ratings.size(); i++)
             if (_ratings.get(i).get_ratingId().equals(rating.get_ratingId())) {
                 _ratings.set(i,rating);
                 break;
             }
-        }
+
         return _ratings;
     }
 }

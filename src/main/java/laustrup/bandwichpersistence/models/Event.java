@@ -19,7 +19,7 @@ import java.util.*;
 @NoArgsConstructor @ToString
 public class Event extends Model {
 
-    @Getter @Setter
+    @Getter
     private LocalDateTime _beginning, _end;
     @Getter
     private double _length;

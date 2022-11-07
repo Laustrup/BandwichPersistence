@@ -12,19 +12,17 @@ import lombok.ToString;
 public class Rating {
 
     @Getter
-    private String _ratingId, _userId;
+    private long _ratingId, _userId;
     @Getter @Setter
     private double _value;
 
-    // Constructor for database
-    public Rating(String ratingId, String userId, double value) {
+    public Rating(long ratingId, long userId, double value) {
         _ratingId = ratingId;
         _userId = userId;
         _value = value;
     }
 
-    // Constructor for creating
-    public Rating(double value, String userId) {
+    public Rating(double value, long userId) {
         _value = value;
         _userId = userId;
     }

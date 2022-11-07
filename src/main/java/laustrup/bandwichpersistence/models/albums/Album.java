@@ -13,7 +13,7 @@ import java.util.List;
 public class Album {
 
     @Getter
-    public String _id;
+    public long _id;
     @Getter @Setter
     public String _title;
     @Getter
@@ -26,7 +26,7 @@ public class Album {
     public LocalDateTime _timestamp;
 
     // Constructor for from database
-    public Album(String id, String title, List<String> urls, User author, AlbumKind type, LocalDateTime timestamp) {
+    public Album(long id, String title, List<String> urls, User author, AlbumKind type, LocalDateTime timestamp) {
         _id = id;
         _title = title;
         _urls = urls;
@@ -37,7 +37,6 @@ public class Album {
 
     // Constructor to add database
     public Album(String title, List<String> urls, User author, AlbumKind type) {
-        _id = IdService.getInstance().createId();
         _title = title;
         _urls = urls;
         _author = author;

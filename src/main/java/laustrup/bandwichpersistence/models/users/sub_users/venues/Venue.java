@@ -1,4 +1,8 @@
 package laustrup.bandwichpersistence.models.users.sub_users.venues;
 
-public class Venue {
+import laustrup.bandwichpersistence.models.users.User;
+
+public class Venue extends User {
+
+
 }
