@@ -5,6 +5,7 @@ import laustrup.bandwichpersistence.models.Model;
 import laustrup.bandwichpersistence.models.Rating;
 import laustrup.bandwichpersistence.models.albums.Album;
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
+import laustrup.bandwichpersistence.services.TimeService;
 import laustrup.bandwichpersistence.utilities.Liszt;
 
 import lombok.Getter;
@@ -19,25 +20,27 @@ import java.util.List;
 public abstract class User extends Model {
 
     @Getter @Setter
-    protected String _username,_firstName,_lastName,_password,_email;
+    protected String _username,_firstName,_lastName, _description, _password,_email;
     protected String _fullName;
+    protected Double _answeringTime;
     @Getter
     protected Album _images;
     @Getter
-    protected List<Rating> _ratings;
+    protected Liszt<Rating> _ratings;
     @Getter
-    protected List<Event> _events;
+    protected Liszt<Event> _events;
     @Getter
-    protected List<ChatRoom> _chatRooms;
+    protected Liszt<ChatRoom> _chatRooms;
 
-    public User(long id, String username, String firstName, String lastName, String password,
-                String email, Album images, List<Rating> ratings, List<Event> events,
-                List<ChatRoom> chatRooms, LocalDateTime timestamp) {
+    public User(long id, String username, String firstName, String lastName, String description, String password,
+                String email, Album images, Liszt<Rating> ratings, Liszt<Event> events,
+                Liszt<ChatRoom> chatRooms, LocalDateTime timestamp) {
         super(id,username,timestamp);
         _username = username;
         _firstName = firstName;
         _lastName = lastName;
         get_fullName();
+        _description = description;
         _password = password;
         _email = email;
         _images = images;
@@ -46,14 +49,16 @@ public abstract class User extends Model {
         _chatRooms = chatRooms;
     }
 
-    public User(String username, String firstName, String lastName, String password, String email) {
+    public User(String username, String firstName, String lastName, String description, String password, String email) {
         super(username);
         _username = username;
         _firstName = firstName;
         _lastName = lastName;
         get_fullName();
+        _description = description;
         _password = password;
         _email = email;
+
         _images = new Album();
         _ratings = new Liszt<>();
         _events = new Liszt<>();
@@ -65,7 +70,6 @@ public abstract class User extends Model {
         return _fullName;
     }
 
-    // Add methods
     public Album add(String url) {
         _images.add(url);
         return _images;
@@ -89,31 +93,42 @@ public abstract class User extends Model {
         return _images;
     }
     public List<Event> remove(Event event) {
-        for (int i = 1; i <= _events.size(); i++)
+        for (int i = 1; i <= _events.size(); i++) {
             if (_events.get(i).get_id() == event.get_id()) {
                 _events.remove(_events.get(i));
                 break;
             }
+        }
 
         return _events;
     }
     public List<ChatRoom> remove(ChatRoom chatRoom) {
-        for (int i = 1; i <= _chatRooms.size(); i++)
+        for (int i = 1; i <= _chatRooms.size(); i++) {
             if (_chatRooms.get(i).get_id() == chatRoom.get_id()) {
                 _chatRooms.remove(_chatRooms.get(i));
                 break;
             }
+        }
 
         return _chatRooms;
     }
 
     public List<Rating> edit(Rating rating) {
-        for (int i = 1; i <= _ratings.size(); i++)
-            if (_ratings.get(i).get_ratingId().equals(rating.get_ratingId())) {
+        for (int i = 1; i <= _ratings.size(); i++) {
+            if (_ratings.get(i).get_ratingId() == rating.get_ratingId()) {
                 _ratings.set(i,rating);
                 break;
             }
+        }
 
         return _ratings;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public Double get_answeringTime() {
+        _answeringTime = TimeService.get_instance().getAnswerTimes(_chatRooms);
     }
 }

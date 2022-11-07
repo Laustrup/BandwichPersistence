@@ -5,6 +5,7 @@ import laustrup.bandwichpersistence.models.Rating;
 import laustrup.bandwichpersistence.models.albums.Album;
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.models.users.sub_users.MusicalUser;
+import laustrup.bandwichpersistence.utilities.Liszt;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -19,14 +20,14 @@ public class Artist extends MusicalUser {
     private List<Band> _bands;
 
     public Artist(long id, String username, String firstName, String lastName, String password, String email, Album images,
-                  List<Rating> ratings, List<Event> events, List<ChatRoom> chatRooms, LocalDateTime timestamp,
-                  List<Album> music, List<Band> bands) {
+                  Liszt<Rating> ratings, Liszt<Event> events, Liszt<ChatRoom> chatRooms, LocalDateTime timestamp,
+                  Liszt<Album> music, Liszt<Band> bands) {
         super(id, username, firstName, lastName, password, email, images, ratings, events, chatRooms, timestamp, music);
         _bands = bands;
     }
 
     public Artist(String username, String firstName, String lastName, String password, String email,
-                  List<Album> music, List<Band> bands) {
+                  Liszt<Album> music, Liszt<Band> bands) {
         super(username, firstName, lastName, password, email, music);
         _bands = bands;
     }

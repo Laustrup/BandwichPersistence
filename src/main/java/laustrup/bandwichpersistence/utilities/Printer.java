@@ -20,7 +20,7 @@ public class Printer implements IPrinter {
     public static Printer _instance = null;
 
     public static Printer get_instance() {
-        if (_instance ==null) {
+        if (_instance == null) {
             _instance = new Printer();
         }
         return _instance;

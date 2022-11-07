@@ -5,6 +5,7 @@ import laustrup.bandwichpersistence.models.Rating;
 import laustrup.bandwichpersistence.models.albums.Album;
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.models.users.User;
+import laustrup.bandwichpersistence.utilities.Liszt;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -15,18 +16,24 @@ import java.util.List;
 public abstract class MusicalUser extends User {
 
     @Getter
-    private List<Album> _music;
+    protected List<Album> _music;
 
-    public MusicalUser(long id, String username, String firstName, String lastName, String password, String email,
-                       Album images, List<Rating> ratings, List<Event> events, List<ChatRoom> chatRooms,
-                       LocalDateTime timestamp, List<Album> music) {
-        super(id, username, firstName, lastName, password, email, images, ratings, events, chatRooms, timestamp);
+    public MusicalUser(long id, String username, String firstName, String lastName, String description, String password,
+                       String email, Album images, Liszt<Rating> ratings, Liszt<Event> events, Liszt<ChatRoom> chatRooms,
+                       LocalDateTime timestamp, Liszt<Album> music) {
+        super(id, username, firstName, lastName, description, password, email, images, ratings, events, chatRooms, timestamp);
         _music = music;
     }
 
-    public MusicalUser(String username, String firstName, String lastName, String password, String email, List<Album> music) {
-        super(username, firstName, lastName, password, email);
+    public MusicalUser(String username, String firstName, String lastName, String description, String password,
+                       String email, Liszt<Album> music) {
+        super(username, firstName, lastName, description, password, email);
         _music = music;
+
+        _images = new Album();
+        _ratings = new Liszt<>();
+        _events = new Liszt<>();
+        _chatRooms = new Liszt<>();
     }
 
     public Album add(String url, long albumId) {
