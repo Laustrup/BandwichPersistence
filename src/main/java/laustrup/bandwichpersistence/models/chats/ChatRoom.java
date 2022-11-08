@@ -10,8 +10,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.InputMismatchException;
 import java.util.List;
 
 @NoArgsConstructor @ToString
@@ -23,8 +23,14 @@ public class ChatRoom extends Model {
     private User _responsible;
     @Getter
     private Liszt<User> _participants;
+
+    /**
+     * The amount of time it takes, before the responsible have answered the chatroom,
+     * measured from the first message.
+     * Is calculated in minutes.
+     */
     @Getter
-    private Double _answeringTime;
+    private Long _answeringTime;
     @Getter
     private boolean _answered;
 
@@ -106,21 +112,19 @@ public class ChatRoom extends Model {
         return false;
     }
 
+    //TODO NEEDS TESTS
     /**
      * Calculates the time it took the responsible to answer.
      * Should be used only in local method isTheChatRoomAnswered().
      * @return The amount of hours it took the responsible to answer,
      * if ChatRoom is not answered, it will return null.
      */
-    private Double calculateAnsweringTime() {
+    private Long calculateAnsweringTime() {
         if (_answered) {
-            try {
-                _answeringTime = TimeService.get_instance().calculateDateDifferences(_mails.get(1).get_timestamp(),
-                        _mails.get(_responsible.toString()).get_timestamp());
-                return _answeringTime;
-            } catch (InputMismatchException e) {
-                Printer.get_instance().print("First mail of chatroom " + _title + " is after responsible answer!", e);
-            }
+
+            _answeringTime = Duration.between(_mails.get(1).get_timestamp(),
+                    _mails.get(_responsible.toString()).get_timestamp()).toMinutes();
+            return _answeringTime;
         }
         return null;
     }

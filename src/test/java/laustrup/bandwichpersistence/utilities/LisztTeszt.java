@@ -1,5 +1,6 @@
 package laustrup.bandwichpersistence.utilities;
 
+import laustrup.bandwichpersistence.JTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -8,14 +9,14 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class LisztTeszt {
+class LisztTeszt extends JTest {
 
     private List<Object> liszt;
 
     @ParameterizedTest
     @CsvSource(value = {"true", "false"}, delimiter = '|')
     public void constructorTest(boolean isEmptyDataTemplate) {
-        // Act
+        // ACT
         if (isEmptyDataTemplate) {
             liszt = new Liszt<>();
 

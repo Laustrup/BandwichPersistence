@@ -5,6 +5,7 @@ import laustrup.bandwichpersistence.models.Model;
 import laustrup.bandwichpersistence.models.Rating;
 import laustrup.bandwichpersistence.models.albums.Album;
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
+import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
 import laustrup.bandwichpersistence.services.TimeService;
 import laustrup.bandwichpersistence.utilities.Liszt;
 
@@ -16,13 +17,26 @@ import lombok.ToString;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * An abstract class, which is meant to be extended to a user type of object.
+ * It extends from Model class.
+ * Can calculate full name from first- and last name.
+ */
 @NoArgsConstructor @ToString
 public abstract class User extends Model {
 
     @Getter @Setter
-    protected String _username,_firstName,_lastName, _description, _password,_email;
+    protected String _username,_firstName,_lastName, _description, _password;
+    @Getter
+    protected ContactInfo _contactInfo;
     protected String _fullName;
-    protected Double _answeringTime;
+
+    /**
+     * The amount of time it takes, before the responsible have answered the chatroom,
+     * measured from the first message.
+     * Is calculated in minutes.
+     */
+    protected Long _answeringTime;
     @Getter
     protected Album _images;
     @Getter
@@ -33,7 +47,7 @@ public abstract class User extends Model {
     protected Liszt<ChatRoom> _chatRooms;
 
     public User(long id, String username, String firstName, String lastName, String description, String password,
-                String email, Album images, Liszt<Rating> ratings, Liszt<Event> events,
+                ContactInfo contactInfo, Album images, Liszt<Rating> ratings, Liszt<Event> events,
                 Liszt<ChatRoom> chatRooms, LocalDateTime timestamp) {
         super(id,username,timestamp);
         _username = username;
@@ -42,14 +56,15 @@ public abstract class User extends Model {
         get_fullName();
         _description = description;
         _password = password;
-        _email = email;
+        _contactInfo = contactInfo;
         _images = images;
         _ratings = ratings;
         _events = events;
         _chatRooms = chatRooms;
     }
 
-    public User(String username, String firstName, String lastName, String description, String password, String email) {
+    public User(String username, String firstName, String lastName, String description, String password,
+                ContactInfo contactInfo) {
         super(username);
         _username = username;
         _firstName = firstName;
@@ -57,7 +72,7 @@ public abstract class User extends Model {
         get_fullName();
         _description = description;
         _password = password;
-        _email = email;
+        _contactInfo = contactInfo;
 
         _images = new Album();
         _ratings = new Liszt<>();
@@ -124,11 +139,8 @@ public abstract class User extends Model {
         return _ratings;
     }
 
-    /**
-     *
-     * @return
-     */
-    public Double get_answeringTime() {
-        _answeringTime = TimeService.get_instance().getAnswerTimes(_chatRooms);
+    public Long get_answeringTime() {
+        _answeringTime = TimeService.get_instance().getTotalAnswerTimes(_chatRooms);
+        return _answeringTime;
     }
 }

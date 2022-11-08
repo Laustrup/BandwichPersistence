@@ -4,6 +4,7 @@ import laustrup.bandwichpersistence.models.Event;
 import laustrup.bandwichpersistence.models.Rating;
 import laustrup.bandwichpersistence.models.albums.Album;
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
+import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
 import laustrup.bandwichpersistence.models.users.sub_users.MusicalUser;
 import laustrup.bandwichpersistence.utilities.Liszt;
 import lombok.Getter;
@@ -19,16 +20,17 @@ public class Artist extends MusicalUser {
     @Getter
     private List<Band> _bands;
 
-    public Artist(long id, String username, String firstName, String lastName, String password, String email, Album images,
-                  Liszt<Rating> ratings, Liszt<Event> events, Liszt<ChatRoom> chatRooms, LocalDateTime timestamp,
-                  Liszt<Album> music, Liszt<Band> bands) {
-        super(id, username, firstName, lastName, password, email, images, ratings, events, chatRooms, timestamp, music);
+    public Artist(long id, String username, String firstName, String lastName, String description, String password,
+                  ContactInfo contactInfo, Album images, Liszt<Rating> ratings, Liszt<Event> events,
+                  Liszt<ChatRoom> chatRooms, LocalDateTime timestamp, Liszt<Album> music, List<Band> bands) {
+        super(id, username, firstName, lastName, description, password, contactInfo, images, ratings,
+                events, chatRooms, timestamp, music);
         _bands = bands;
     }
 
-    public Artist(String username, String firstName, String lastName, String password, String email,
-                  Liszt<Album> music, Liszt<Band> bands) {
-        super(username, firstName, lastName, password, email, music);
+    public Artist(String username, String firstName, String lastName, String description, String password,
+                  ContactInfo contactInfo, Liszt<Album> music, List<Band> bands) {
+        super(username, firstName, lastName, description, password, contactInfo, music);
         _bands = bands;
     }
 
