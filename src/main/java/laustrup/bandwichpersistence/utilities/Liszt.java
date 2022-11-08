@@ -23,16 +23,21 @@ public class Liszt<E> implements List<E>, ILiszt<E> {
 
     public Liszt() { this(false); }
     public Liszt(boolean isLinked) {
+        _data = (E[]) new Object[0];
         _isLinked = isLinked;
+        _destinationKeys = new String[0];
+
         if (isLinked) _map = new LinkedHashMap<>(); else _map = new HashMap<>();
         if (isLinked) _destinations = new LinkedHashMap<>(); else _destinations = new HashMap<>();
     }
     public Liszt(E[] data) { this(data,false); }
     public Liszt(E[] data, boolean isLinked) {
         _isLinked = isLinked;
+        _destinationKeys = new String[0];
+
         if (isLinked) _map = new LinkedHashMap<>(); else _map = new HashMap<>();
         if (isLinked) _destinations = new LinkedHashMap<>(); else _destinations = new HashMap<>();
-        this._data = data;
+        _data = data;
     }
 
     @Override public int size() { return _data.length; }
@@ -79,32 +84,36 @@ public class Liszt<E> implements List<E>, ILiszt<E> {
     public boolean add(E[] elements) {
         try { handleElements(elements); }
         catch (Exception e) {
-            Printer.get_instance().print("Couldn't add element of " + e + " to Liszt...",e);
+            Printer.get_instance().print("Couldn't add element of to Liszt...", e);
             return false;
         }
 
         return true;
     }
-    public E[] addGet(E[] elements) {
-        try { handleElements(elements); }
-        catch (Exception e) {
-            Printer.get_instance().print("Couldn't add element of " + e + " to Liszt...",e);
-            return null;
-        }
-
-        return _data;
-    }
     private void handleElements(E[] elements) {
         Object[] storage = new Object[_data.length + elements.length];
 
         for (int i = 0; i < storage.length; i++) {
-            if (i != _data.length-1) { storage[i] = _data[i]; }
-            else { storage[i] = addElementToDestination(elements[i - _data.length]); }
+            if (i <= _data.length && _data.length != 0) {
+                storage[i] = _data[i];
+            }
+            else {
+                String length = String.valueOf(_data.length - i);
+                storage[i] = addElementToDestination(elements[_data.length - i]);
+            }
         }
 
         _data = (E[]) storage;
         insertDestinationsIntoMap();
     }
+
+    /**
+     * Adds the element to destination, before it's either added to data or map.
+     * This is for the reason, to prevent two of the same keyes in maps,
+     * if element's toString() already is a key, it will at its hashcode.
+     * @param element An element that is wished to be added.
+     * @return The same element of the input.
+     */
     private E addElementToDestination(E element) {
         String key;
 
@@ -116,12 +125,18 @@ public class Liszt<E> implements List<E>, ILiszt<E> {
 
         return element;
     }
-    private String[] addDestinationKey(String element) {
+
+    /**
+     * Adds the potential key to the destinationKeys.
+     * @param key The potential key of an element.
+     * @return The destinationKeys
+     */
+    private String[] addDestinationKey(String key) {
         String[] storage = new String[_destinationKeys.length+1];
 
         for (int i = 0; i < storage.length; i++) {
-            if (i != _destinationKeys.length-1) { storage[i] = _destinationKeys[i]; }
-            else { storage[i] = element; }
+            if (i <= _destinationKeys.length && _destinationKeys.length != 0) { storage[i] = _destinationKeys[i]; }
+            else { storage[i] = key; }
         }
         _destinationKeys = storage;
 

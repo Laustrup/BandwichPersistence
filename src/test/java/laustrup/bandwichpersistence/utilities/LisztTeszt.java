@@ -19,12 +19,14 @@ class LisztTeszt extends JTest {
         // ACT
         if (isEmptyDataTemplate) {
             liszt = new Liszt<>();
+            calculatePerformance();
 
             // Assert
             assertTrue(liszt.isEmpty());
         }
         else {
             liszt = new Liszt(new Object[]{true,false});
+            calculatePerformance();
 
             // Assert
             assertEquals(true,liszt.get(1));
@@ -40,10 +42,11 @@ class LisztTeszt extends JTest {
         Object element = 666;
 
         // Act
-        liszt.add(element.toString());
+        begin();
+        liszt.add(element);
 
         // Assert
-        assertEquals(element.toString(),liszt.stream().findFirst().toString());
+        assertEquals(element,liszt.get(1));
     }
 
     @ParameterizedTest
