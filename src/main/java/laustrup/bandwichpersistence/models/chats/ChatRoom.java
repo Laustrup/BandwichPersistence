@@ -3,9 +3,8 @@ package laustrup.bandwichpersistence.models.chats;
 import laustrup.bandwichpersistence.models.Model;
 import laustrup.bandwichpersistence.models.chats.messages.Mail;
 import laustrup.bandwichpersistence.models.users.User;
-import laustrup.bandwichpersistence.services.TimeService;
 import laustrup.bandwichpersistence.utilities.Liszt;
-import laustrup.bandwichpersistence.utilities.Printer;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -112,7 +111,6 @@ public class ChatRoom extends Model {
         return false;
     }
 
-    //TODO NEEDS TESTS
     /**
      * Calculates the time it took the responsible to answer.
      * Should be used only in local method isTheChatRoomAnswered().

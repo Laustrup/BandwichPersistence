@@ -19,16 +19,15 @@ public abstract class MusicalUser extends User {
     @Getter
     protected List<Album> _music;
 
-    public MusicalUser(long id, String username, String firstName, String lastName, String description, String password,
+    public MusicalUser(long id, String username, String firstName, String lastName, String description,
                        ContactInfo contactInfo, Album images, Liszt<Rating> ratings, Liszt<Event> events, Liszt<ChatRoom> chatRooms,
                        LocalDateTime timestamp, Liszt<Album> music) {
-        super(id, username, firstName, lastName, description, password, contactInfo, images, ratings, events, chatRooms, timestamp);
+        super(id, username, firstName, lastName, description, contactInfo, images, ratings, events, chatRooms, timestamp);
         _music = music;
     }
 
-    public MusicalUser(String username, String firstName, String lastName, String description, String password,
-                       ContactInfo contactInfo, Liszt<Album> music) {
-        super(username, firstName, lastName, description, password, contactInfo);
+    public MusicalUser(String username, String firstName, String lastName, String description, Liszt<Album> music) {
+        super(username, firstName, lastName, description);
         _music = music;
 
         _images = new Album();

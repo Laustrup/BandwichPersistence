@@ -1,6 +1,7 @@
 package laustrup.bandwichpersistence.utilities;
 
 import java.util.*;
+import java.util.function.Predicate;
 
 /**
  * Implements a List of element E in an append way of adding elements.
@@ -164,6 +165,26 @@ public class Liszt<E> implements List<E>, ILiszt<E> {
         }
         catch (Exception e) {
             Printer.get_instance().print("Couldn't remove object " + object + "...", e);
+            return false;
+        }
+
+        return true;
+    }
+
+    public boolean remove(E[] elements) {
+        Object[] storage = new Object[_data.length - elements.length];
+
+        try {
+            for (int i = 0; i < storage.length; i++) {
+                if (Arrays.stream(elements).noneMatch((Predicate<? super E>) _data[i]))
+                    storage[i] = _data[i];
+            }
+            _data = (E[]) storage;
+            for (E element : elements)
+                if (!_map.remove(element.toString(),element)) { _map.remove(element.hashCode()); }
+        }
+        catch (Exception e) {
+            Printer.get_instance().print("Couldn't remove object an object in remove multiple elements...", e);
             return false;
         }
 

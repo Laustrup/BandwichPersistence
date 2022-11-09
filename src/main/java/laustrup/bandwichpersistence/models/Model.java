@@ -14,18 +14,26 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public abstract class Model {
 
+    /**
+     * The identification value in the database for a specific entity.
+     * Must be unique.
+     */
     @Getter
     protected long _id;
+
+    /**
+     * The name for an enitity or model.
+     * Can be of different purposes,
+     * such as username or simply for naming a unit.
+     */
     @Getter @Setter
     protected String _title;
+
+    /**
+     * Specifies the time this entity was created.
+     */
     @Getter
     protected LocalDateTime _timestamp;
-
-    public Model(long id, String title) {
-        _id = id;
-        _title = title;
-        _timestamp = LocalDateTime.now();
-    }
 
     public Model(String title) {
         _title = title;

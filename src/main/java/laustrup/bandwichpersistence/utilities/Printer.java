@@ -30,6 +30,22 @@ public class Printer implements IPrinter {
     @Override public void print(String content,Exception ex) { System.err.println(_border + content + "\n\n" + ex + _border); }
 
     @Override
+    public void print(Object[] array) {
+        String content = "{ ";
+
+        for (int i = 0; i < array.length; i++) {
+            content += array[i].toString();
+
+            if (i > array.length - 1)
+                content += " | ";
+        }
+
+        content += " }";
+        print(content);
+    }
+
+
+    @Override
     public void compare(Collection<Object> objects, Collection<Double[]> values) {
         if (objects.size()==values.size()) {
             Object[] convertedObjects = objects.toArray();

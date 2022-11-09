@@ -22,6 +22,14 @@ public interface IPrinter {
     void print(String content,Exception ex);
 
     /**
+     * Prints an arrays content as well as its curly brackets.
+     * Splits with | and the content is printed as its toString().
+     * Will be printed in normal text with normal colour.
+     * @param array The specific array, that is wished to be printed
+     */
+    void print(Object[] array);
+
+    /**
      * Compares objects with values.
      * Objects and values must be in same order.
      * The length of both Collections must be the same.

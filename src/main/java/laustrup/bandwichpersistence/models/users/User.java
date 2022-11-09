@@ -26,10 +26,10 @@ import java.util.List;
 public abstract class User extends Model {
 
     @Getter @Setter
-    protected String _username,_firstName,_lastName, _description, _password;
+    protected String _username,_firstName,_lastName, _description;
+    protected String _fullName;
     @Getter
     protected ContactInfo _contactInfo;
-    protected String _fullName;
 
     /**
      * The amount of time it takes, before the responsible have answered the chatroom,
@@ -46,7 +46,7 @@ public abstract class User extends Model {
     @Getter
     protected Liszt<ChatRoom> _chatRooms;
 
-    public User(long id, String username, String firstName, String lastName, String description, String password,
+    public User(long id, String username, String firstName, String lastName, String description,
                 ContactInfo contactInfo, Album images, Liszt<Rating> ratings, Liszt<Event> events,
                 Liszt<ChatRoom> chatRooms, LocalDateTime timestamp) {
         super(id,username,timestamp);
@@ -54,25 +54,21 @@ public abstract class User extends Model {
         _firstName = firstName;
         _lastName = lastName;
         get_fullName();
-        _description = description;
-        _password = password;
         _contactInfo = contactInfo;
+        _description = description;
         _images = images;
         _ratings = ratings;
         _events = events;
         _chatRooms = chatRooms;
     }
 
-    public User(String username, String firstName, String lastName, String description, String password,
-                ContactInfo contactInfo) {
+    public User(String username, String firstName, String lastName, String description) {
         super(username);
         _username = username;
         _firstName = firstName;
         _lastName = lastName;
         get_fullName();
         _description = description;
-        _password = password;
-        _contactInfo = contactInfo;
 
         _images = new Album();
         _ratings = new Liszt<>();
