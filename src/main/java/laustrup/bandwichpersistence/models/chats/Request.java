@@ -32,6 +32,18 @@ public class Request {
     @Getter @Setter
     private Plato _approved;
 
+    /**
+     * This message will be shown for the user, in order to inform of the request.
+     */
+    @Getter @Setter
+    private String _message;
+
+    public Request(User user, Event event, Plato approved, String message) {
+        _user = user;
+        _event = event;
+        _approved = approved;
+        _message = message;
+    }
     public Request(User user, Event event, Plato approved) {
         _user = user;
         _event = event;

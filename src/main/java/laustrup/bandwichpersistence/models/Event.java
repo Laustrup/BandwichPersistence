@@ -1,5 +1,6 @@
 package laustrup.bandwichpersistence.models;
 
+import laustrup.bandwichpersistence.models.chats.Request;
 import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
@@ -7,6 +8,7 @@ import laustrup.bandwichpersistence.models.users.sub_users.MusicalUser;
 import laustrup.bandwichpersistence.models.users.sub_users.participants.Participant;
 import laustrup.bandwichpersistence.models.users.sub_users.venues.Venue;
 import laustrup.bandwichpersistence.utilities.Liszt;
+import laustrup.bandwichpersistence.utilities.Plato;
 import laustrup.bandwichpersistence.utilities.Printer;
 
 import lombok.*;
@@ -54,19 +56,19 @@ public class Event extends Model {
      * This Event is paid or voluntary.
      */
     @Getter @Setter
-    private boolean _isVoluntary;
+    private Plato _voluntary;
 
     /**
      * If this is a public Event, other Users can view and interact with it.
      */
-    @Getter @Setter
-    private boolean _isPublic;
+    @Getter
+    private Plato _public;
 
     /**
      * This is marked if there is no more tickets to sell.
      */
     @Getter @Setter
-    private boolean _isSoldOut;
+    private Plato _soldOut;
 
     /**
      * This is the address or place, whether the Event will be held.
@@ -100,15 +102,21 @@ public class Event extends Model {
     /**
      * The gigs with times and acts of the Event.
      */
-    @Getter @Setter
+    @Getter
     private Liszt<Gig> _gigs;
 
     /**
      * This venue is the ones responsible for the Event,
      * perhaps even the place it is held, but not necessarily.
      */
-    @Getter @Setter
+    @Getter
     private Venue _venue;
+
+    /**
+     * These requests are needed to make sure, everyone wants to be a part of the Event.
+     */
+    @Getter
+    private Liszt<Request> _requests;
 
     /**
      * The people that will participate in the Event,
@@ -138,10 +146,12 @@ public class Event extends Model {
     }
 
     public Event(long id, String title, LocalDateTime timestamp, LocalDateTime openDoors,
-                 boolean isVoluntary, boolean isPublic, boolean isSoldOut, String location, double price,
-                 String ticketsURL, ContactInfo contactInfo, Liszt<Gig> gigs, Venue venue,
+                 Plato isVoluntary, Plato isPublic, Plato isSoldOut, String location, double price,
+                 String ticketsURL, ContactInfo contactInfo, Liszt<Gig> gigs, Venue venue, Liszt<Request> requests,
                  Liszt<Participation> participations, Liszt<Bulletin> bulletins) throws InputMismatchException {
         super(id, title, timestamp);
+
+        _gigs = gigs;
 
         try {
             calculateTime();
@@ -154,13 +164,12 @@ public class Event extends Model {
         else
             throw new InputMismatchException();
 
-        _isVoluntary = isVoluntary;
-        _isPublic = isPublic;
-        _isSoldOut = isSoldOut;
+        _voluntary = isVoluntary;
+        _public = isPublic;
+        _soldOut = isSoldOut;
         _price = price;
         _ticketsURL = ticketsURL;
         _contactInfo = contactInfo;
-        _gigs = gigs;
         _venue = venue;
 
         if (location == null || location.isEmpty())
@@ -168,6 +177,7 @@ public class Event extends Model {
         else
             _location = location;
 
+        _requests = requests;
         _participations = participations;
         _bulletins = bulletins;
     }
@@ -175,17 +185,19 @@ public class Event extends Model {
     /**
      * Adds the given Gig to gigs of current Event.
      * @param gig Determines a specific Gig of one MusicalUser for a specific time.
-     * @return All the Gigs of the current event.
+     * @return All the Gigs of the current Event.
      */
     public Liszt<Gig> addGig(Gig gig) { return addGigs(new Gig[]{gig}); }
 
     /**
      * Adds multiple given Gigs to the Liszt of Gigs in the current Event.
      * @param gigs Determines some specific Gigs of one MusicalUser for a specific time.
-     * @return All the Gigs of the current event.
+     * @return All the Gigs of the current Event.
      */
     public Liszt<Gig> addGigs(Gig[] gigs) {
         _gigs.add(gigs);
+        addRequests(createRequests(gigs));
+
         try {
             calculateTime();
         } catch (InputMismatchException e) {
@@ -196,18 +208,108 @@ public class Event extends Model {
     }
 
     /**
-     * Adds the given Participation to participations of current event.
+     * Removes the given Gig from gigs of current Event.
+     * @param gig Determines a specific gig, that is wished to be removed.
+     * @return All the gigs of the current Event.
+     */
+    public Liszt<Gig> removeGig(Gig gig) { return removeGigs(new Gig[]{gig}); }
+
+    /**
+     * Removes some given Gigs from the Liszt of gigs from current Event.
+     * Also removes the Requests of the given Gigs.
+     * @param gigs Determines some specific gigs, that is wished to be removed.
+     * @return All the Gigs of the current Event.
+     */
+    public Liszt<Gig> removeGigs(Gig[] gigs) {
+        _gigs.remove(gigs);
+        for (Gig gig : gigs) { _requests.remove(gig); }
+
+        return _gigs;
+    }
+
+    /**
+     * Adds the given Request to requests of current Event.
+     * @param request Determines a specific Request, that is wished to be added.
+     * @return All the Requests of the current Event.
+     */
+    private Liszt<Request> addRequest(Request request) { return addRequests(new Request[]{request}); }
+
+    /**
+     * Adds some given Requests to the Liszt of requests from current Event.
+     * @param requests Determines some specific requests, that is wished to be added.
+     * @return All the requests of the current Event.
+     */
+    private Liszt<Request> addRequests(Request[] requests) {
+        _requests.add(requests);
+        return _requests;
+    }
+
+    /**
+     * Creates some requests for the gigs that are about to be created to this Event.
+     * Must be done after add of gigs.
+     * @param gigs The gigs that are about to be created a Request for the current gig.
+     * @return All the requests of this Event.
+     */
+    private Request[] createRequests(Gig[] gigs) {
+        Request[] requests = new Request[gigs.length];
+        boolean shouldBeApproved = _public.get_truth() && venueHasApproved();
+
+        for (int i = 0; i < requests.length; i++) {
+            if (shouldBeApproved) {
+                requests[i] = new Request(gigs[i].get_act(),this, new Plato(true));
+            } else {
+                requests[i] = new Request(gigs[i].get_act(),this, new Plato(Plato.Argument.UNDEFINED));
+            }
+        }
+
+        return requests;
+    }
+
+    /**
+     * Checks if the Venue has approved the Request.
+     * @return True if the venue has approved.
+     */
+    public boolean venueHasApproved() {
+        for (Request request : _requests) {
+            if (request.get_user().getClass() == Venue.class && request.get_approved().get_truth())
+                return true;
+        }
+        return false;
+    }
+
+    /**
+     * Sets the Venue and also replaces the request of former Venue to a new request.
+     * This means that the Event will become private instead of public, since the
+     * Venue needs to approve the Event, in order to host it.
+     * @param venue The Venue, that is wished to be set, as the Events new Venue.
+     * @return The Venue that is set of the Event.
+     */
+    public Venue set_venue(Venue venue) {
+        for (Request request : _requests) {
+            if (request.get_user().get_id() == _venue.get_id())
+                _requests.remove(request);
+        }
+
+        _requests.add(new Request(venue, this, new Plato(Plato.Argument.UNDEFINED)));
+        _public.set_argument(true);
+        _venue = venue;
+
+        return _venue;
+    }
+
+    /**
+     * Adds the given Participation to participations of current Event.
      * @param participation Determines a specific participant, that is wished to be added.
-     * @return All the Participations of the current event.
+     * @return All the Participations of the current Event.
      */
     public Liszt<Participation> addParticipation(Participation participation) {
         return addParticpations(new Participation[]{participation});
     }
 
     /**
-     * Adds some given Participations to the Liszt of participations from current event.
+     * Adds some given Participations to the Liszt of participations from current Event.
      * @param participations Determines some specific participants, that is wished to be added.
-     * @return All the Participations of the current event.
+     * @return All the Participations of the current Event.
      */
     public Liszt<Participation> addParticpations(Participation[] participations) {
         _participations.add(participations);
@@ -215,18 +317,18 @@ public class Event extends Model {
     }
 
     /**
-     * Removes the given Participation from participations of current event.
+     * Removes the given Participation from participations of current Event.
      * @param participation Determines a specific participant, that is wished to be removed.
-     * @return All the Participations of the current event.
+     * @return All the Participations of the current Event.
      */
     public Liszt<Participation> removeParticipation(Participation participation) {
         return removeParticpations(new Participation[]{participation});
     }
 
     /**
-     * Removes some given Participations from the Liszt of participations from current event.
+     * Removes some given Participations from the Liszt of participations from current Event.
      * @param participations Determines some specific participants, that is wished to be removed.
-     * @return All the Participations of the current event.
+     * @return All the Participations of the current Event.
      */
     public Liszt<Participation> removeParticpations(Participation[] participations) {
         _participations.remove(participations);
@@ -234,18 +336,18 @@ public class Event extends Model {
     }
 
     /**
-     * Adds the given Bulletin to bulletins of current event.
+     * Adds the given Bulletin to bulletins of current Event.
      * @param bulletin Determines a specific bulletin, that is wished to be added.
-     * @return All the bulletins of the current event.
+     * @return All the bulletins of the current Event.
      */
     public Liszt<Bulletin> addBulletin(Bulletin bulletin) {
         return addBulletins(new Bulletin[]{bulletin});
     }
 
     /**
-     * Adds some given Bulletins to the Liszt of bulletins from current event.
+     * Adds some given Bulletins to the Liszt of bulletins from current Event.
      * @param bulletins Determines some specific bulletins, that is wished to be added.
-     * @return All the bulletins of the current event.
+     * @return All the bulletins of the current Event.
      */
     public Liszt<Bulletin> addBulletins(Bulletin[] bulletins) {
         _bulletins.add(bulletins);
@@ -253,18 +355,18 @@ public class Event extends Model {
     }
 
     /**
-     * Removes the given Bulletin from bulletins of current event.
+     * Removes the given Bulletin from bulletins of current Event.
      * @param bulletin Determines a specific bulletin, that is wished to be removed.
-     * @return All the bulletins of the current event.
+     * @return All the bulletins of the current Event.
      */
     public Liszt<Bulletin> removeBulletin(Bulletin bulletin) {
         return removeBulletins(new Bulletin[]{bulletin});
     }
 
     /**
-     * Removes some given Bulletins from the Liszt of bulletins from current event.
+     * Removes some given Bulletins from the Liszt of bulletins from current Event.
      * @param bulletins Determines some specific bulletins, that is wished to be removed.
-     * @return All the bulletins of the current event.
+     * @return All the bulletins of the current Event.
      */
     public Liszt<Bulletin> removeBulletins(Bulletin[] bulletins) {
         _bulletins.remove(bulletins);
