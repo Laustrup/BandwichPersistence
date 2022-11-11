@@ -49,4 +49,6 @@ public class Request {
         _event = event;
         _approved = approved;
     }
+
+    public void approve() { _approved.set_argument(true); }
 }

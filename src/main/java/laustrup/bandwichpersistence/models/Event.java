@@ -136,7 +136,7 @@ public class Event extends Model {
 
         _gigs = new Liszt<>();
         if (user.getClass() == MusicalUser.class)
-            _gigs.add(new Gig((MusicalUser) user, null, null));
+            _gigs.add(new Gig(new MusicalUser[]{(MusicalUser) user}, null, null));
         else _venue = (Venue) user;
 
         _participations = new Liszt<>();
@@ -256,13 +256,20 @@ public class Event extends Model {
 
         for (int i = 0; i < requests.length; i++) {
             if (shouldBeApproved) {
-                requests[i] = new Request(gigs[i].get_act(),this, new Plato(true));
+                for (User user : gigs[i]._act)
+                    requests[i] = new Request(user,this, new Plato(true));
             } else {
-                requests[i] = new Request(gigs[i].get_act(),this, new Plato(Plato.Argument.UNDEFINED));
+                for (User user : gigs[i]._act)
+                    requests[i] = new Request(user,this, new Plato(Plato.Argument.UNDEFINED));
             }
         }
 
         return requests;
+    }
+
+    public Request acceptRequest(Request request) {
+        _requests.get(request.toString()).approve();
+        return _requests.get(request.toString());
     }
 
     /**
@@ -402,9 +409,9 @@ public class Event extends Model {
     @Data @ToString
     public class Gig {
         /**
-         * This act is of a Gig and can both be assigned as an artist or a band.
+         * This act is of a Gig and can both be assigned as artists or bands.
          */
-        private MusicalUser _act;
+        private MusicalUser[] _act;
 
         /**
          * The start of the Gig, where the act will begin.
@@ -416,7 +423,7 @@ public class Event extends Model {
          */
         private LocalDateTime _end;
 
-        public Gig(MusicalUser act, LocalDateTime start, LocalDateTime end) {
+        public Gig(MusicalUser[] act, LocalDateTime start, LocalDateTime end) {
             _act = act;
             _start = start;
             _end = end;

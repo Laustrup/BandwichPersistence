@@ -8,7 +8,7 @@ import java.util.Random;
 /**
  * A utility class, that behaves as a boolean, but with extra features.
  * Is named after the philosopher Plato ironically,
- * since he said there are only two sides of everything.
+ * because of Plato's duality.
  * Instead of just being true or false, it has more values, such as undefined.
  * Uses an enum for identifying those values.
  * Can also be null, since it's a class object.
@@ -48,7 +48,7 @@ public class Plato implements IPlato {
 
     /**
      * Checks if the argument is true or not.
-     * @return An boolean version of argument.
+     * @return A boolean version of argument.
      */
     public boolean translateArgument() { return _argument == Argument.TRUE; }
 
@@ -62,7 +62,7 @@ public class Plato implements IPlato {
      * Gets the boolean value of the Plato class.
      * @return Both truth and argument should be of value true.
      */
-    public boolean get_truth() { return _truth && _argument == Argument.TRUE; }
+    public boolean get_truth() { return _truth && (_argument == Argument.TRUE || _argument == Argument.ABOVE_HALF); }
 
     public Plato() { this(Argument.UNDEFINED); }
     public Plato(Argument argument) { set_argument(argument); }
@@ -83,7 +83,7 @@ public class Plato implements IPlato {
      * @return The calculated truth.
      */
     private Boolean determineTruth() {
-        _truth = _argument == Argument.TRUE;
+        _truth = _argument == Argument.TRUE || _argument == Argument.ABOVE_HALF;
         return _truth;
     }
 
@@ -93,6 +93,8 @@ public class Plato implements IPlato {
     public enum Argument {
         TRUE,
         FALSE,
-        UNDEFINED
+        UNDEFINED,
+        ABOVE_HALF,
+        BELOW_HALF
     }
 }
