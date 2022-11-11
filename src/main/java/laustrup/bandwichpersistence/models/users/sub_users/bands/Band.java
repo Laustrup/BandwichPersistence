@@ -6,7 +6,7 @@ import laustrup.bandwichpersistence.models.albums.Album;
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
 import laustrup.bandwichpersistence.models.users.sub_users.MusicalUser;
-import laustrup.bandwichpersistence.models.users.sub_users.audiences.Participant;
+import laustrup.bandwichpersistence.models.users.sub_users.participants.Participant;
 import laustrup.bandwichpersistence.utilities.Liszt;
 
 import lombok.Getter;

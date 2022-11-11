@@ -4,10 +4,11 @@ import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
 import laustrup.bandwichpersistence.models.users.sub_users.MusicalUser;
-import laustrup.bandwichpersistence.models.users.sub_users.audiences.Participant;
+import laustrup.bandwichpersistence.models.users.sub_users.participants.Participant;
 import laustrup.bandwichpersistence.models.users.sub_users.venues.Venue;
 import laustrup.bandwichpersistence.utilities.Liszt;
 import laustrup.bandwichpersistence.utilities.Printer;
+
 import lombok.*;
 
 import java.time.Duration;
@@ -20,23 +21,105 @@ import java.util.*;
 @NoArgsConstructor @ToString
 public class Event extends Model {
 
+    /**
+     * Is when the participants can enter the event,
+     * not necessarily the same time as when the gigs start.
+     * It must be before or same time as the gigs start.
+     */
     @Getter
-    private LocalDateTime _openDoors, _start, _end;
+    private LocalDateTime _openDoors;
+
+    /**
+     * This DateTime is determining when the first gig will start.
+     * Is being calculated automatically.
+     */
+    @Getter
+    private LocalDateTime _start;
+
+    /**
+     * This DateTime is determining when the last gig will end.
+     * Is being calculated automatically.
+     */
+    @Getter
+    private LocalDateTime _end;
+
+    /**
+     * The amount of time it will take the gigs in total.
+     * Is being calculated automatically.
+     */
     @Getter
     private long _length;
+
+    /**
+     * This Event is paid or voluntary.
+     */
     @Getter @Setter
-    private boolean _isVoluntary, _isPublic, _isSoldOut;
+    private boolean _isVoluntary;
+
+    /**
+     * If this is a public Event, other Users can view and interact with it.
+     */
     @Getter @Setter
-    private String _location, _ticketsURL;
+    private boolean _isPublic;
+
+    /**
+     * This is marked if there is no more tickets to sell.
+     */
+    @Getter @Setter
+    private boolean _isSoldOut;
+
+    /**
+     * This is the address or place, whether the Event will be held.
+     * Will be used to be search at in Google Maps.
+     */
+    @Getter @Setter
+    private String _location;
+
+    /**
+     * The cost of a ticket.
+     * Can be multiple prices for tickets, but this is just meant as the cheapest.
+     */
+    @Getter @Setter
+    private double _price;
+
+    /**
+     * A link for where the tickets can be sold.
+     * This might be altered later on,
+     * since it is wished to be sold through Bandwich.
+     * If the field isn't touched, it will use the Venue's location.
+     */
+    @Getter @Setter
+    private String _ticketsURL;
+
+    /**
+     * Different information of contacting.
+     */
     @Getter
     private ContactInfo _contactInfo;
+
+    /**
+     * The gigs with times and acts of the Event.
+     */
     @Getter @Setter
     private Liszt<Gig> _gigs;
+
+    /**
+     * This venue is the ones responsible for the Event,
+     * perhaps even the place it is held, but not necessarily.
+     */
     @Getter @Setter
     private Venue _venue;
+
+    /**
+     * The people that will participate in the Event,
+     * not including venues or acts.
+     */
     @Getter
     private Liszt<Participation> _participations;
 
+    /**
+     * Post from different people, that will mention contents.
+     */
     @Getter
     private Liszt<Bulletin> _bulletins;
 
@@ -55,9 +138,9 @@ public class Event extends Model {
     }
 
     public Event(long id, String title, LocalDateTime timestamp, LocalDateTime openDoors,
-                 boolean isVoluntary, boolean isPublic, boolean isSoldOut, String location, String ticketsURL,
-                 ContactInfo contactInfo, Liszt<Gig> gigs, Venue venue,
-                 Liszt<Participation> participations, Liszt<Bulletin> bulletins) {
+                 boolean isVoluntary, boolean isPublic, boolean isSoldOut, String location, double price,
+                 String ticketsURL, ContactInfo contactInfo, Liszt<Gig> gigs, Venue venue,
+                 Liszt<Participation> participations, Liszt<Bulletin> bulletins) throws InputMismatchException {
         super(id, title, timestamp);
 
         try {
@@ -66,17 +149,25 @@ public class Event extends Model {
             Printer.get_instance().print("End date is before beginning date of " + _title + "...", e);
         }
 
-        if (_start.isAfter(_openDoors))
+        if (Duration.between(openDoors, _start).toMinutes() >= 0)
             _openDoors = openDoors;
+        else
+            throw new InputMismatchException();
 
         _isVoluntary = isVoluntary;
         _isPublic = isPublic;
         _isSoldOut = isSoldOut;
-        _location = location;
+        _price = price;
         _ticketsURL = ticketsURL;
         _contactInfo = contactInfo;
         _gigs = gigs;
         _venue = venue;
+
+        if (location == null || location.isEmpty())
+            _location = venue.get_location();
+        else
+            _location = location;
+
         _participations = participations;
         _bulletins = bulletins;
     }
