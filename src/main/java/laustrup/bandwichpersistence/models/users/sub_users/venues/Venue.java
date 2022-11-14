@@ -26,20 +26,20 @@ public class Venue extends User {
     @Getter @Setter
     private int _size;
 
-    public Venue(long id, String username, String firstName, String lastName, String description,
+    public Venue(long id, String username, String description,
                  ContactInfo contactInfo, Album images, Liszt<Rating> ratings, Liszt<Event> events,
                  Liszt<ChatRoom> chatRooms, LocalDateTime timestamp, String location, String gearDescription,
                  Liszt<Event> event, int size) {
-        super(id, username, firstName, lastName, description, contactInfo, images, ratings, events, chatRooms, timestamp);
+        super(id, username, new String(), new String(), description, contactInfo, images, ratings, events, chatRooms, timestamp);
         _location = location;
         _gearDescription = gearDescription;
         _events = events;
         _size = size;
     }
 
-    public Venue(String username, String firstName, String lastName, String description,
+    public Venue(String username, String description,
                  String location, String gearDescription, int size) {
-        super(username, firstName, lastName, description);
+        super(username, new String(), new String(), description);
         _location = location;
         _gearDescription = gearDescription;
         _events = new Liszt<>();

@@ -11,13 +11,21 @@ import lombok.ToString;
 public class ContactInfo {
 
     @Getter @Setter
-    private String _email, _phoneNumber;
+    private String _email;
+
+    @Getter
+    private PhoneNumber _phoneNumber;
+
     @Getter @Setter
     private Address _address;
 
-    public ContactInfo(String email, String phoneNumber, Address address) {
+    @Getter
+    private Country _country;
+
+    public ContactInfo(String email, PhoneNumber phoneNumber, Address address, Country country) {
         _email = email;
         _phoneNumber = phoneNumber;
         _address = address;
+        _country = country;
     }
 }

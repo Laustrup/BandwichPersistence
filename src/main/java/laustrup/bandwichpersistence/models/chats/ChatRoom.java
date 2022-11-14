@@ -19,9 +19,10 @@ public class ChatRoom extends Model {
     @Getter
     private Liszt<Mail> _mails;
     @Getter
-    private User _responsible;
-    @Getter
     private Liszt<User> _participants;
+
+    @Getter
+    private User _responsible;
 
     /**
      * The amount of time it takes, before the responsible have answered the chatroom,
@@ -33,20 +34,21 @@ public class ChatRoom extends Model {
     @Getter
     private boolean _answered;
 
-    public ChatRoom(long id, String title, Liszt<Mail> mails, User responsible, Liszt<User> participants, LocalDateTime timestamp) {
+    public ChatRoom(long id, String title, Liszt<Mail> mails, Liszt<User> participants, User responsible, LocalDateTime timestamp) {
         super(id, title, timestamp);
         _mails = mails;
-        _responsible = responsible;
         _participants = participants;
+        _responsible = responsible;
 
         isTheChatRoomAnswered();
     }
 
-    public ChatRoom(String title, User responsible, Liszt<User> participants) {
+    public ChatRoom(String title, Liszt<User> participants, User responsible) {
         super(title);
         _mails = new Liszt<>();
-        _responsible = responsible;
         _participants = participants;
+        _responsible = responsible;
+
         isTheChatRoomAnswered();
     }
 

@@ -33,5 +33,8 @@ public class Participant extends User {
         _followings = followings;
     }
 
-
+    public Liszt<User> add(User following) {
+        _followings.add(following);
+        return _followings;
+    }
 }

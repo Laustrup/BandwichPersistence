@@ -267,6 +267,12 @@ public class Event extends Model {
         return requests;
     }
 
+    /**
+     * Accepts the request by using a toString() to find the Request.
+     * Afterwards using the approve() method to set approved to true.
+     * @param request The Request that is wished to have its approved set to true.
+     * @return The request that is changed.
+     */
     public Request acceptRequest(Request request) {
         _requests.get(request.toString()).approve();
         return _requests.get(request.toString());

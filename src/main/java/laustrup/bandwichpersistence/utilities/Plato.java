@@ -50,7 +50,7 @@ public class Plato implements IPlato {
      * Checks if the argument is true or not.
      * @return A boolean version of argument.
      */
-    public boolean translateArgument() { return _argument == Argument.TRUE; }
+    public boolean translateArgument() { return _argument == Argument.TRUE || _argument == Argument.BELOW_HALF; }
 
     /**
      * Will only be true, if argument is TRUE.
@@ -91,10 +91,10 @@ public class Plato implements IPlato {
      * Contains the different value options for a Plato class.
      */
     public enum Argument {
-        TRUE,
         FALSE,
+        TRUE,
         UNDEFINED,
-        ABOVE_HALF,
-        BELOW_HALF
+        BELOW_HALF,
+        ABOVE_HALF
     }
 }

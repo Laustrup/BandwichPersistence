@@ -1,6 +1,7 @@
 package laustrup.bandwichpersistence.models.albums;
 
 import laustrup.bandwichpersistence.models.users.User;
+import laustrup.bandwichpersistence.utilities.Liszt;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,7 +18,7 @@ public class Album {
     @Getter @Setter
     public String _title;
     @Getter
-    public List<String> _urls;
+    public Liszt<String> _endpoints;
     @Getter
     public User _author;
     @Getter
@@ -26,19 +27,19 @@ public class Album {
     public LocalDateTime _timestamp;
 
     // Constructor for from database
-    public Album(long id, String title, List<String> urls, User author, AlbumKind type, LocalDateTime timestamp) {
+    public Album(long id, String title, Liszt<String> urls, User author, AlbumKind type, LocalDateTime timestamp) {
         _id = id;
         _title = title;
-        _urls = urls;
+        _endpoints = urls;
         _author = author;
         _type = type;
         _timestamp = timestamp;
     }
 
     // Constructor to add database
-    public Album(String title, List<String> urls, User author, AlbumKind type) {
+    public Album(String title, Liszt<String> endpoints, User author, AlbumKind type) {
         _title = title;
-        _urls = urls;
+        _endpoints = endpoints;
         _author = author;
         _type = type;
         _timestamp = LocalDateTime.now();
@@ -46,13 +47,13 @@ public class Album {
 
     // Add methods
     public List<String> add(String url) {
-        _urls.add(url);
-        return _urls;
+        _endpoints.add(url);
+        return _endpoints;
     }
 
     // Remove methods
     public List<String> remove(String url) {
-        _urls.remove(url);
-        return _urls;
+        _endpoints.remove(url);
+        return _endpoints;
     }
 }

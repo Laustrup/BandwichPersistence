@@ -26,19 +26,20 @@ public class Band extends MusicalUser {
     @Getter
     private Liszt<Participant> _fans;
 
-    public Band(long id, String username, String firstName, String lastName, String description,
+
+    public Band(long id, String username, String description,
                 ContactInfo contactInfo, Album images, Liszt<Rating> ratings, Liszt<Event> events,
                 Liszt<ChatRoom> chatRooms, LocalDateTime timestamp, Liszt<Album> music, Liszt<Artist> members,
                 String runner, Liszt<Participant> fans) {
-        super(id, username, firstName, lastName, description, contactInfo, images, ratings, events, chatRooms, timestamp, music);
+        super(id, username, new String(), new String(), description, contactInfo, images, ratings, events, chatRooms, timestamp, music);
         _members = members;
         _runner = runner;
         _fans = fans;
     }
 
-    public Band(String username, String firstName, String lastName, String description,
+    public Band(String username, String description,
                 Liszt<Album> music, Liszt<Artist> members) {
-        super(username, firstName, lastName, description, music);
+        super(username, new String(), new String(), description, music);
         _members = members;
         _fans = new Liszt<>();
     }
