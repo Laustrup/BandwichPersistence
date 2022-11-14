@@ -4,9 +4,11 @@ import laustrup.bandwichpersistence.models.Event;
 import laustrup.bandwichpersistence.models.Rating;
 import laustrup.bandwichpersistence.models.albums.Album;
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
+import laustrup.bandwichpersistence.models.chats.messages.Message;
 import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
-import laustrup.bandwichpersistence.models.users.sub_users.MusicalUser;
+import laustrup.bandwichpersistence.models.users.sub_users.Performer;
 import laustrup.bandwichpersistence.models.users.sub_users.participants.Participant;
+import laustrup.bandwichpersistence.models.users.sub_users.subscriptions.Subscription;
 import laustrup.bandwichpersistence.utilities.Liszt;
 
 import lombok.Getter;
@@ -15,32 +17,59 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
+import java.util.InputMismatchException;
 
+/**
+ * Extends performer and contains Artists as members
+ */
 @NoArgsConstructor @ToString
-public class Band extends MusicalUser {
+public class Band extends Performer {
 
+    /**
+     * Contains all the Artists, that are members of this band.
+     *
+     */
     @Getter
     private Liszt<Artist> _members;
+
+    /**
+     * A description of the gear, that the band possesses and what they require for an Event.
+     */
     @Getter @Setter
     private String _runner;
+
+    /**
+     * All the participants that are following this Band, is included here.
+     */
     @Getter
     private Liszt<Participant> _fans;
 
-
     public Band(long id, String username, String description,
                 ContactInfo contactInfo, Album images, Liszt<Rating> ratings, Liszt<Event> events,
-                Liszt<ChatRoom> chatRooms, LocalDateTime timestamp, Liszt<Album> music, Liszt<Artist> members,
-                String runner, Liszt<Participant> fans) {
-        super(id, username, new String(), new String(), description, contactInfo, images, ratings, events, chatRooms, timestamp, music);
-        _members = members;
+                Liszt<ChatRoom> chatRooms, Liszt<Message> messages, Subscription subscription, LocalDateTime timestamp,
+                Liszt<Album> music, Liszt<Artist> members, String runner, Liszt<Participant> fans)
+            throws InputMismatchException {
+        super(id, username, null, null, description, contactInfo, images, ratings,
+                events, chatRooms, messages, subscription, timestamp, music);
+
+        if (_members.size() > 0)
+            _members = members;
+        else
+            throw new InputMismatchException();
+
         _runner = runner;
         _fans = fans;
     }
 
-    public Band(String username, String description,
-                Liszt<Album> music, Liszt<Artist> members) {
-        super(username, new String(), new String(), description, music);
-        _members = members;
+    public Band(String username, String description, Subscription subscription,
+                Liszt<Album> music, Liszt<Artist> members) throws InputMismatchException {
+        super(username, null, null, description, subscription, music);
+
+        if (_members.size() > 0)
+            _members = members;
+        else
+            throw new InputMismatchException();
+
         _fans = new Liszt<>();
     }
 

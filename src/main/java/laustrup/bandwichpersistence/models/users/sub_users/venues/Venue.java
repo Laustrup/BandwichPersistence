@@ -4,9 +4,11 @@ import laustrup.bandwichpersistence.models.Event;
 import laustrup.bandwichpersistence.models.Rating;
 import laustrup.bandwichpersistence.models.albums.Album;
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
+import laustrup.bandwichpersistence.models.chats.messages.Message;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
-import laustrup.bandwichpersistence.models.users.sub_users.bands.Artist;
+import laustrup.bandwichpersistence.models.users.sub_users.subscriptions.Subscription;
+import laustrup.bandwichpersistence.models.users.sub_users.subscriptions.SubscriptionOffer;
 import laustrup.bandwichpersistence.utilities.Liszt;
 
 import lombok.Getter;
@@ -16,11 +18,23 @@ import lombok.ToString;
 
 import java.time.LocalDateTime;
 
+/**
+ * A Venue can be the host to an Event and contains different information about
+ * itself and the opportunities for Events.
+ * Extends from User, which means it also contains ChatRooms and other alike attributes.
+ */
 @NoArgsConstructor @ToString
 public class Venue extends User {
 
+    /**
+     * The location that the Venue is located at, which could be an address or simple a place.
+     *
+     */
     @Getter @Setter
-    private String _location, _gearDescription;
+    private String _location;
+
+    @Getter @Setter
+    private String _gearDescription;
     @Getter
     private Liszt<Event> _events;
     @Getter @Setter
@@ -28,22 +42,41 @@ public class Venue extends User {
 
     public Venue(long id, String username, String description,
                  ContactInfo contactInfo, Album images, Liszt<Rating> ratings, Liszt<Event> events,
-                 Liszt<ChatRoom> chatRooms, LocalDateTime timestamp, String location, String gearDescription,
-                 Liszt<Event> event, int size) {
-        super(id, username, new String(), new String(), description, contactInfo, images, ratings, events, chatRooms, timestamp);
-        _location = location;
+                 Liszt<ChatRoom> chatRooms, Liszt<Message> messages, LocalDateTime timestamp,
+                 String location, String gearDescription, Subscription.Status subscriptionStatus,
+                 SubscriptionOffer subscriptionOffer, int size) {
+        super(id, username, null, null, description, contactInfo, images, ratings, events, chatRooms, messages,
+                new Subscription(new Venue(), Subscription.Type.FREEMIUM, subscriptionStatus, subscriptionOffer, null),
+                timestamp);
+
+        if (location == null)
+            _location = _contactInfo.getAddressInfo();
+        else
+            _location = location;
+
         _gearDescription = gearDescription;
         _events = events;
         _size = size;
+        _subscription.get_user().set_username(_username);
+        _subscription.get_user().set_description(_description);
     }
 
     public Venue(String username, String description,
-                 String location, String gearDescription, int size) {
-        super(username, new String(), new String(), description);
-        _location = location;
+                 String location, String gearDescription, SubscriptionOffer subscriptionOffer, int size) {
+        super(username, null, null, description,
+                new Subscription(new Venue(), Subscription.Type.FREEMIUM,
+                        Subscription.Status.ACCEPTED, subscriptionOffer, null));
+
+        if (location == null)
+            _location = _contactInfo.getAddressInfo();
+        else
+            _location = location;
+
         _gearDescription = gearDescription;
         _events = new Liszt<>();
         _size = size;
+        _subscription.get_user().set_username(_username);
+        _subscription.get_user().set_description(_description);
     }
 
     /**

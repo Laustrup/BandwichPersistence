@@ -4,8 +4,10 @@ import laustrup.bandwichpersistence.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.utilities.Liszt;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * This service is created for the purposes of managing time issues.
@@ -48,6 +50,16 @@ public class TimeService {
     }
 
     /**
+     * Will create a random DateTime from between 2020 -> 2030.
+     * @return A LocalDateTime that has been randomly generated.
+     */
+    public LocalDateTime generateRandom() {
+        return LocalDateTime.from(LocalDate.ofEpochDay(ThreadLocalRandom.current().nextLong(
+                LocalDate.of(2020, 1, 1).toEpochDay(),
+                LocalDate.of(2029, 12, 31).toEpochDay())));
+    }
+
+    /**
      * Sums up the values that are in the input.
      * @param answeringTimes An ArrayList of Longs, that is calculated as minutes for the responsibles of ChatRooms to answer.
      * @return The sums of the ArrayList in the input. If it's empty, it will return 0.
@@ -58,4 +70,5 @@ public class TimeService {
 
         return total;
     }
+
 }

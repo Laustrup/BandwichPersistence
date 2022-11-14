@@ -1,6 +1,7 @@
 package laustrup.bandwichpersistence.models;
 
 import laustrup.bandwichpersistence.models.users.User;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;

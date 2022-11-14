@@ -5,7 +5,9 @@ import laustrup.bandwichpersistence.models.Model;
 import laustrup.bandwichpersistence.models.Rating;
 import laustrup.bandwichpersistence.models.albums.Album;
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
+import laustrup.bandwichpersistence.models.chats.messages.Message;
 import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
+import laustrup.bandwichpersistence.models.users.sub_users.subscriptions.Subscription;
 import laustrup.bandwichpersistence.services.TimeService;
 import laustrup.bandwichpersistence.utilities.Liszt;
 
@@ -93,9 +95,25 @@ public abstract class User extends Model {
     @Getter
     protected Liszt<ChatRoom> _chatRooms;
 
+    /**
+     * All the Messages of this user, both sent and unsent.
+     */
+    @Getter
+    protected Liszt<Message> _messages;
+
+    /**
+     * This subscription defines details of subscription,
+     * including its status.
+     * Only Artists and Bands can have a premium membership,
+     * since they are the only paying users.
+     */
+    @Getter
+    protected Subscription _subscription;
+
     public User(long id, String username, String firstName, String lastName, String description,
                 ContactInfo contactInfo, Album images, Liszt<Rating> ratings, Liszt<Event> events,
-                Liszt<ChatRoom> chatRooms, LocalDateTime timestamp) {
+                Liszt<ChatRoom> chatRooms, Liszt<Message> messages, Subscription subscription,
+                LocalDateTime timestamp) {
         super(id,username + "-" + id,timestamp);
         _username = username;
         _firstName = firstName;
@@ -107,9 +125,11 @@ public abstract class User extends Model {
         _ratings = ratings;
         _events = events;
         _chatRooms = chatRooms;
+        _messages = messages;
+        _subscription = subscription;
     }
 
-    public User(String username, String firstName, String lastName, String description) {
+    public User(String username, String firstName, String lastName, String description, Subscription subscription) {
         super(username);
         _username = username;
         _firstName = firstName;
@@ -121,6 +141,8 @@ public abstract class User extends Model {
         _ratings = new Liszt<>();
         _events = new Liszt<>();
         _chatRooms = new Liszt<>();
+        _messages = new Liszt<>();
+        _subscription = subscription;
     }
 
     /**
@@ -130,6 +152,16 @@ public abstract class User extends Model {
     public String get_fullName() {
         _fullName = _firstName + " " + _lastName;
         return _fullName;
+    }
+
+    /**
+     * Sets the status of the subscription.
+     * @param status The status that is wished to be set as the status of the Subscription.
+     * @return The Subscription of the User.
+     */
+    public Subscription changeSubscriptionStatus(Subscription.Status status) {
+        _subscription.set_status(status);
+        return _subscription;
     }
 
     /**
@@ -147,7 +179,7 @@ public abstract class User extends Model {
      * @param rating A Rating object, that is wished to be added to this User.
      * @return All the Ratings of this User.
      */
-    public List<Rating> add(Rating rating) {
+    public Liszt<Rating> add(Rating rating) {
         if (!_ratings.contains(rating)) _ratings.add(rating);
         else edit(rating);
         return _ratings;
@@ -158,7 +190,7 @@ public abstract class User extends Model {
      * @param event An Event object, that is wished to be added to this User.
      * @return All the Events of this User.
      */
-    public List<Event> add(Event event) {
+    public Liszt<Event> add(Event event) {
         _events.add(event);
         return _events;
     }
@@ -168,9 +200,29 @@ public abstract class User extends Model {
      * @param chatRoom A ChatRoom object, that is wished to be added to this User.
      * @return All the ChatRooms of this User.
      */
-    public List<ChatRoom> add(ChatRoom chatRoom) {
+    public Liszt<ChatRoom> add(ChatRoom chatRoom) {
         _chatRooms.add(chatRoom);
         return _chatRooms;
+    }
+
+    /**
+     * Will add a Message to this User.
+     * @param message A Message object, that is wished to be added to this User.
+     * @return All the Messages of this User.
+     */
+    public Liszt<Message> add(Message message) {
+        _messages.add(message);
+        return _messages;
+    }
+
+    /**
+     * Removes a Message of this User.
+     * @param message A Message object, that is wished to be removed from this User.
+     * @return All the Messages of this User.
+     */
+    public Liszt<Message> remove(Message message) {
+        _messages.remove(message);
+        return _messages;
     }
 
     /**
@@ -220,7 +272,7 @@ public abstract class User extends Model {
      * @param rating An updated Rating object, that is wished to be set as the new Rating of this User.
      * @return All the Ratings of this User.
      */
-    public List<Rating> edit(Rating rating) {
+    public Liszt<Rating> edit(Rating rating) {
         for (int i = 1; i <= _ratings.size(); i++) {
             if (_ratings.get(i).get_ratingId() == rating.get_ratingId()) {
                 _ratings.set(i,rating);
@@ -229,6 +281,22 @@ public abstract class User extends Model {
         }
 
         return _ratings;
+    }
+
+    /**
+     * Edits a Message of this User.
+     * @param message An updated Message object, that is wished to be set as the new Message of this User.
+     * @return All the Messages of this User.
+     */
+    public Liszt<Message> edit(Message message) {
+        for (int i = 1; i <= _messages.size(); i++) {
+            if (_messages.get(i).get_id() == message.get_id()) {
+                _messages.set(i, message);
+                break;
+            }
+        }
+
+        return _messages;
     }
 
     /**

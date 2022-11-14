@@ -4,8 +4,10 @@ import laustrup.bandwichpersistence.models.Event;
 import laustrup.bandwichpersistence.models.Rating;
 import laustrup.bandwichpersistence.models.albums.Album;
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
+import laustrup.bandwichpersistence.models.chats.messages.Message;
 import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
-import laustrup.bandwichpersistence.models.users.sub_users.MusicalUser;
+import laustrup.bandwichpersistence.models.users.sub_users.Performer;
+import laustrup.bandwichpersistence.models.users.sub_users.subscriptions.Subscription;
 import laustrup.bandwichpersistence.utilities.Liszt;
 
 import lombok.Getter;
@@ -15,27 +17,38 @@ import lombok.ToString;
 
 import java.time.LocalDateTime;
 
+/**
+ * An Artist can either be a solo Performer or member of a Band, which changes the Subscription, if it ain't freemium.
+ * Extends from Performer.
+ */
 @NoArgsConstructor @ToString
-public class Artist extends MusicalUser {
+public class Artist extends Performer {
 
+    /**
+     * The Bands that the Artist is a member of.
+     */
     @Getter
     private Liszt<Band> _bands;
+
+    /**
+     * A description of the gear, that the Artist possesses and what they require for an Event.
+     */
     @Getter @Setter
     private String _runner;
 
     public Artist(long id, String username, String firstName, String lastName, String description,
                   ContactInfo contactInfo, Album images, Liszt<Rating> ratings, Liszt<Event> events,
-                  Liszt<ChatRoom> chatRooms, LocalDateTime timestamp, Liszt<Album> music, Liszt<Band> bands,
-                  String runner) {
+                  Liszt<ChatRoom> chatRooms, Liszt<Message> messages, Subscription subscription,
+                  LocalDateTime timestamp, Liszt<Album> music, Liszt<Band> bands, String runner) {
         super(id, username, firstName, lastName, description, contactInfo, images, ratings,
-                events, chatRooms, timestamp, music);
+                events, chatRooms, messages, subscription, timestamp, music);
         _bands = bands;
         _runner = runner;
     }
 
-    public Artist(String username, String firstName, String lastName, String description,
+    public Artist(String username, String firstName, String lastName, String description, Subscription subscription,
                   Liszt<Album> music, Liszt<Band> bands, String runner) {
-        super(username, firstName, lastName, description, music);
+        super(username, firstName, lastName, description, subscription, music);
         _bands = bands;
         _runner = runner;
     }

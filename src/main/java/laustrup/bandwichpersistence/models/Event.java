@@ -4,7 +4,7 @@ import laustrup.bandwichpersistence.models.chats.Request;
 import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
-import laustrup.bandwichpersistence.models.users.sub_users.MusicalUser;
+import laustrup.bandwichpersistence.models.users.sub_users.Performer;
 import laustrup.bandwichpersistence.models.users.sub_users.participants.Participant;
 import laustrup.bandwichpersistence.models.users.sub_users.venues.Venue;
 import laustrup.bandwichpersistence.utilities.Liszt;
@@ -135,8 +135,8 @@ public class Event extends Model {
         super(title);
 
         _gigs = new Liszt<>();
-        if (user.getClass() == MusicalUser.class)
-            _gigs.add(new Gig(new MusicalUser[]{(MusicalUser) user}, null, null));
+        if (user.getClass() == Performer.class)
+            _gigs.add(new Gig(new Performer[]{(Performer) user}, null, null));
         else _venue = (Venue) user;
 
         _participations = new Liszt<>();
@@ -417,7 +417,7 @@ public class Event extends Model {
         /**
          * This act is of a Gig and can both be assigned as artists or bands.
          */
-        private MusicalUser[] _act;
+        private Performer[] _act;
 
         /**
          * The start of the Gig, where the act will begin.
@@ -429,7 +429,7 @@ public class Event extends Model {
          */
         private LocalDateTime _end;
 
-        public Gig(MusicalUser[] act, LocalDateTime start, LocalDateTime end) {
+        public Gig(Performer[] act, LocalDateTime start, LocalDateTime end) {
             _act = act;
             _start = start;
             _end = end;
