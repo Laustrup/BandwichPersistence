@@ -33,10 +33,21 @@ public class Venue extends User {
     @Getter @Setter
     private String _location;
 
+    /**
+     * The description of the gear that the Venue posses.
+     */
     @Getter @Setter
     private String _gearDescription;
+
+    /**
+     * All the Events that this Venue has planned.
+     */
     @Getter
     private Liszt<Event> _events;
+
+    /**
+     * The size of the stage and room, that Events can be held at.
+     */
     @Getter @Setter
     private int _size;
 

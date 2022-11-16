@@ -19,12 +19,14 @@ DROP TABLE IF EXISTS bulletins;
 DROP TABLE IF EXISTS mails;
 DROP TABLE IF EXISTS chatters;
 DROP TABLE IF EXISTS chat_rooms;
+DROP TABLE IF EXISTS followings;
 DROP TABLE IF EXISTS participations;
 DROP TABLE IF EXISTS acts;
 DROP TABLE IF EXISTS gigs;
 DROP TABLE IF EXISTS `events`;
 DROP TABLE IF EXISTS venues;
 DROP TABLE IF EXISTS gear;
+DROP TABLE IF EXISTS band_members;
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS cards;
 
@@ -57,6 +59,15 @@ CREATE TABLE users(
     
     PRIMARY KEY(id),
     FOREIGN KEY(card_id) REFERENCES cards(id)
+);
+
+CREATE TABLE band_members(
+    artist_id BIGINT(20) NOT NULL,
+    band_id BIGINT(20) NOT NULL,
+
+    PRIMARY KEY(artist_id, band_id),
+    FOREIGN KEY(artist_id) REFERENCES users(id),
+    FOREIGN KEY(band_id) REFERENCES users(id)
 );
 
 CREATE TABLE gear(
@@ -127,6 +138,15 @@ CREATE TABLE participations(
     PRIMARY KEY(event_id, participant_id),
     FOREIGN KEY(event_id) REFERENCES events(id),
     FOREIGN KEY(participant_id) REFERENCES users(id)
+);
+
+CREATE TABLE followings(
+    follower_id BIGINT(20) NOT NULL,
+    lead_id BIGINT(20) NOT NULL,
+
+    PRIMARY KEY(follower_id,lead_id),
+    FOREIGN KEY(follower_id) REFERENCES users(id),
+    FOREIGN KEY(lead_id) REFERENCES users(id)
 );
 
 CREATE TABLE chat_rooms(
