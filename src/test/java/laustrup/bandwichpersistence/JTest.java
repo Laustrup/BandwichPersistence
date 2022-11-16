@@ -1,10 +1,14 @@
 package laustrup.bandwichpersistence;
 
+import laustrup.bandwichpersistence.models.users.User;
+import laustrup.bandwichpersistence.models.users.sub_users.participants.Participant;
 import laustrup.bandwichpersistence.utilities.Printer;
 import org.junit.jupiter.api.BeforeEach;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Adds a few functions to test methods to reuse.
@@ -19,13 +23,22 @@ public abstract class JTest {
     protected LocalDateTime _start;
 
     /**
+     * Contains different generated items to use for testing.
+     * Are being reset for each method.
+     */
+    protected TestItems _items;
+
+    /**
      * Will automatically begin the time of start.
      * Uses the @BeforeEach notation.
      * If there is an ARRANGE, please use begin() before ACT,
      * in order not to get an untrustworthy performance time result.
      */
     @BeforeEach
-    public void setup() { begin(); }
+    public void setup() {
+        _items = new TestItems();
+        begin();
+    }
 
     /**
      * Sets the start time of ACT for measuring of performance time.
@@ -45,5 +58,12 @@ public abstract class JTest {
                 " in milliseconds and " + (performance / 1000) + " in minutes." );
 
         return performance;
+    }
+
+    protected void compare(Participant expected, Participant actual) {
+    }
+
+    private void compare(User expected, User actual) {
+        assertEquals(expected.,);
     }
 }

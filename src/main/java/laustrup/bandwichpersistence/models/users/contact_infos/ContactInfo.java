@@ -1,14 +1,17 @@
 package laustrup.bandwichpersistence.models.users.contact_infos;
 
+import laustrup.bandwichpersistence.models.Model;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+
+import java.time.LocalDateTime;
 
 /**
  * Contains information that people need in order to contact the User.
  */
 @ToString
-public class ContactInfo {
+public class ContactInfo extends Model {
 
     /**
      * The email that the User wants to be contacted through outside the application.
@@ -34,11 +37,21 @@ public class ContactInfo {
     @Getter
     private Country _country;
 
-    public ContactInfo(String email, Phone phone, Address address, Country country) {
+    public ContactInfo(long id, String email, Phone phone, Address address, Country country, LocalDateTime timestamp) {
+        super(id, "Contact-info: "+id, timestamp);
         _email = email;
         _phone = phone;
         _address = address;
         _country = country;
+    }
+
+    public ContactInfo(String email, Phone phone, Address address, Country country) {
+        super();
+        _email = email;
+        _phone = phone;
+        _address = address;
+        _country = country;
+        _title = getAddressInfo();
     }
 
     /**

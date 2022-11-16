@@ -1,5 +1,6 @@
 package laustrup.bandwichpersistence.models.albums;
 
+import laustrup.bandwichpersistence.models.Model;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.utilities.Liszt;
 import lombok.Getter;
@@ -11,12 +12,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @NoArgsConstructor @ToString
-public class Album {
+public class Album extends Model {
 
-    @Getter
-    public long _id;
-    @Getter @Setter
-    public String _title;
     @Getter
     public Liszt<String> _endpoints;
     @Getter
@@ -28,21 +25,18 @@ public class Album {
 
     // Constructor for from database
     public Album(long id, String title, Liszt<String> urls, User author, AlbumKind type, LocalDateTime timestamp) {
-        _id = id;
-        _title = title;
+        super(id, title, timestamp);
         _endpoints = urls;
         _author = author;
         _type = type;
-        _timestamp = timestamp;
     }
 
     // Constructor to add database
     public Album(String title, Liszt<String> endpoints, User author, AlbumKind type) {
-        _title = title;
+        super(title);
         _endpoints = endpoints;
         _author = author;
         _type = type;
-        _timestamp = LocalDateTime.now();
     }
 
     // Add methods

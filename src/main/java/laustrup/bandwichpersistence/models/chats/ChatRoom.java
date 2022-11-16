@@ -54,7 +54,7 @@ public class ChatRoom extends Model {
     private boolean _answered;
 
     public ChatRoom(long id, String title, Liszt<Mail> mails, Liszt<User> chatters, User responsible, LocalDateTime timestamp) {
-        super(id, title, timestamp);
+        super(id, title.isEmpty() || title == null ? "ChatRoom-"+id : title, timestamp);
         _mails = mails;
         _chatters = chatters;
         _responsible = responsible;

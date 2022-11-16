@@ -387,6 +387,45 @@ public class Event extends Model {
     }
 
     /**
+     * Sets a Participation, by comparing the participants' ids.
+     * @param participation The Participation that is wished to be set.
+     * @return If the Participation is set successfully, it will return the Participation, else it will return null.
+     */
+    public Participation setParticipation(Participation participation) {
+        for (int i = 1; i <= _participations.size(); i++) {
+            if (_participations.get(i).get_participant().get_id() == participation.get_participant().get_id()) {
+                _participations.get(i).set_type(participation.get_type());
+                return _participations.get(i);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Will set the values of a Gig in the Event.
+     * @param gig The Gig, that is wished to be set.
+     * @return If the Gig is set successfully, it will return the Gig, else it will return null.
+     */
+    public Gig setGig(Gig gig) {
+        for (int i = 1; i <= _gigs.size(); i++) {
+            int sharedActs = 0;
+
+            for (int j = 0; j < _gigs.get(i).get_act().length; j++) {
+                for (Performer performer : gig.get_act()) {
+                    if (_gigs.get(i).get_act()[j].get_id() == performer.get_id()) {
+                        sharedActs++;
+                    }
+                }
+            }
+            if (sharedActs == _gigs.get(i).get_act().length) {
+                _gigs.get(i).set_start(gig.get_start());
+                _gigs.get(i).set_end(gig.get_end());
+            }
+        }
+        return null;
+    }
+
+    /**
      * Sets the beginning and end of the event to match all the current gigs.
      * Important to use after each change of gigs.
      * @return The calculated length between first beginning and latest end.
@@ -460,4 +499,5 @@ public class Event extends Model {
          */
         public enum ParticipationType { ACCEPTED, IN_DOUBT, CANCELED, INVITED }
     }
+
 }

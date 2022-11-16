@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.time.LocalDateTime;
 import java.util.InputMismatchException;
 
 /**
@@ -13,14 +14,7 @@ import java.util.InputMismatchException;
  * Is created by a user.
  */
 @ToString
-public class Rating {
-
-    /**
-     * The identification value in the database for a specific rating.
-     * Must be unique.
-     */
-    @Getter
-    private long _ratingId;
+public class Rating extends Model {
 
     /**
      * The id of the user, that has received this rating.
@@ -49,14 +43,19 @@ public class Rating {
     @Getter @Setter
     private String _comment;
 
-    public Rating(long ratingId, User appointed, User judge, int value) {
-        _ratingId = ratingId;
-        _appointed = appointed;
-        _judge = judge;
-        _value = value;
+    public Rating(int value, User appointed, User judge, LocalDateTime timestamp) throws InputMismatchException {
+        super(appointed.get_id(), judge.get_id(), appointed.get_id()+"-"+judge.get_id(), timestamp);
+        if (0 < value && value <= 5 ) {
+            _value = value;
+            _appointed = appointed;
+            _judge = judge;
+        }
+        else
+            throw new InputMismatchException();
     }
 
     public Rating(int value, User appointed, User judge) throws InputMismatchException {
+        super(appointed.get_username() + "-" + judge.get_username() + "-" + value);
         if (0 < value && value <= 5 ) {
             _value = value;
             _appointed = appointed;

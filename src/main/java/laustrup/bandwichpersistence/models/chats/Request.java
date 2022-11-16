@@ -1,6 +1,7 @@
 package laustrup.bandwichpersistence.models.chats;
 
 import laustrup.bandwichpersistence.models.Event;
+import laustrup.bandwichpersistence.models.Model;
 import laustrup.bandwichpersistence.models.users.User;
 
 import laustrup.bandwichpersistence.utilities.Plato;
@@ -9,11 +10,13 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.time.LocalDateTime;
+
 /**
  * Determines if a User have approved to be a part of the Event.
  */
 @ToString
-public class Request {
+public class Request extends Model {
 
     /**
      * The User that needs to approve the Event.
@@ -39,7 +42,8 @@ public class Request {
     @Getter @Setter
     private String _message;
 
-    public Request(User user, Event event, Plato approved, String message) {
+    public Request(User user, Event event, Plato approved, String message, LocalDateTime timestamp) {
+        super(user.get_id(), event.get_id(), "Request of " + user.get_username() + " to " + event.get_title(),timestamp);
         _user = user;
         _event = event;
         _approved = approved;

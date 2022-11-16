@@ -13,12 +13,12 @@ public class Bulletin extends Message {
     @Getter
     public Model _receiver;
 
-    public Bulletin(long id, User author, Model receiver, String content, boolean isEdited, boolean isPublic, LocalDateTime timestamp) {
-        super(id, author, content, isEdited, isPublic, timestamp);
+    public Bulletin(long id, User author, Model receiver, String content, boolean isSent, boolean isEdited, boolean isPublic, LocalDateTime timestamp) {
+        super(id, author, content, isSent, isEdited, isPublic, timestamp);
         _receiver = receiver;
     }
 
     public Bulletin(User author, String content) {
-        super(author, content);
+        super(author);
     }
 }

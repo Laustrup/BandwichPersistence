@@ -10,7 +10,7 @@ import java.util.InputMismatchException;
  * Contains different information about credit cards, that are needed for curtain subscriptions.
  */
 @ToString
-public class CardInformation {
+public class Card {
 
     /**
      * This id is the id from the database.
@@ -58,9 +58,9 @@ public class CardInformation {
     @Getter
     private int _controlDigits;
 
-    public CardInformation(long id, CreditCardType type, String owner, long numbers,
-                           int expirationMonth, int expirationYear,
-                           int controlDigits) throws InputMismatchException {
+    public Card(long id, CreditCardType type, String owner, long numbers,
+                int expirationMonth, int expirationYear,
+                int controlDigits) throws InputMismatchException {
         _id = id;
         _type = type;
         _owner = owner;
@@ -70,9 +70,9 @@ public class CardInformation {
         set_controlDigits(controlDigits);
     }
 
-    public CardInformation(CreditCardType type, String owner, long numbers,
-                           int expirationMonth, int expirationYear,
-                           int controlDigits) throws InputMismatchException {
+    public Card(CreditCardType type, String owner, long numbers,
+                int expirationMonth, int expirationYear,
+                int controlDigits) throws InputMismatchException {
         _type = type;
         _owner = owner;
         set_cardNumbers(numbers);

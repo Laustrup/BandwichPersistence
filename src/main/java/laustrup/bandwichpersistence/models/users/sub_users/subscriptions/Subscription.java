@@ -1,5 +1,6 @@
 package laustrup.bandwichpersistence.models.users.sub_users.subscriptions;
 
+import laustrup.bandwichpersistence.models.Model;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.sub_users.bands.Artist;
 import laustrup.bandwichpersistence.models.users.sub_users.bands.Band;
@@ -15,7 +16,7 @@ import java.time.LocalDateTime;
  * Only Artists and Bands can have a paying subscription.
  */
 @ToString
-public class Subscription {
+public class Subscription extends Model {
 
     /**
      * The User that uses this Subscription.
@@ -54,7 +55,17 @@ public class Subscription {
     @Getter
     private Long _cardId;
 
+    public Subscription(User user, Type type, Status status, SubscriptionOffer offer, Long cardId, LocalDateTime timestamp) {
+        super(user.get_id(), cardId, user.get_title() + "-Subscription: " + user.get_id(), timestamp);
+        _user = user;
+        _type = defineType(type);
+        _status = status;
+        _offer = offer;
+        _cardId = cardId;
+    }
+
     public Subscription(User user, Type type, Status status, SubscriptionOffer offer, Long cardId) {
+        super(user.get_title() + "-Subscription");
         _user = user;
         _type = defineType(type);
         _status = status;

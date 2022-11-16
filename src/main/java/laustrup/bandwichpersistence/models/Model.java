@@ -11,15 +11,23 @@ import java.time.LocalDateTime;
  * When it is created through a constructor, that doesn't ask for a DateTime.
  * It will use the DateTime of now.
  */
-@NoArgsConstructor
 public abstract class Model {
 
     /**
      * The identification value in the database for a specific entity.
-     * Must be unique.
+     * Must be unique, if there ain't other ids for this entity.
      */
     @Getter
     protected long _id;
+
+    /**
+     * Another identification value in the database for a specific entity.
+     * Must be unique with primary id.
+     * Is used for incidents, where there are an connection between two entities
+     * and they are both being used as primary keys
+     */
+    @Getter
+    protected Long _secondaryId;
 
     /**
      * The name for an enitity or model.
@@ -35,6 +43,8 @@ public abstract class Model {
     @Getter
     protected LocalDateTime _timestamp;
 
+    public Model() { _timestamp = LocalDateTime.now(); }
+
     public Model(String title) {
         _title = title;
         _timestamp = LocalDateTime.now();
@@ -46,4 +56,16 @@ public abstract class Model {
         _timestamp = timestamp;
     }
 
+    public Model(long id1, long id2, String title, LocalDateTime timestamp) {
+        _id = id1;
+        _secondaryId = id2;
+        _title = title;
+        _timestamp = timestamp;
+    }
+
+    /**
+     * Checks if secondary id is null.
+     * @return True if secondary id isn't null.
+     */
+    public boolean hasSecondaryId() { return _secondaryId != null; }
 }

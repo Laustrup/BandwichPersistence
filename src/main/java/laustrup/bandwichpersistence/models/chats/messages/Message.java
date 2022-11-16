@@ -47,7 +47,7 @@ public abstract class Message extends Model {
 
     public Message(long id, User author, String content, boolean isSent, boolean isEdited, boolean isPublic,
                    LocalDateTime timestamp) {
-        super(id,"Message-"+id,timestamp);
+        super(id, "Message-"+id,timestamp);
         _author = author;
         _content = content;
         _sent = isSent;

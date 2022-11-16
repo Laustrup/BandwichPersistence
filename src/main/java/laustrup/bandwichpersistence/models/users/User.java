@@ -274,7 +274,7 @@ public abstract class User extends Model {
      */
     public Liszt<Rating> edit(Rating rating) {
         for (int i = 1; i <= _ratings.size(); i++) {
-            if (_ratings.get(i).get_ratingId() == rating.get_ratingId()) {
+            if (_ratings.get(i).get_id() == rating.get_id()) {
                 _ratings.set(i,rating);
                 break;
             }
