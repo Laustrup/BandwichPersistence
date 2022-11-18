@@ -12,9 +12,12 @@ USE bandwich_db;
 DROP TABLE IF EXISTS contact_informations;
 DROP TABLE IF EXISTS subscriptions;
 DROP TABLE IF EXISTS album_endpoints;
+DROP TABLE IF EXISTS event_albums;
+DROP TABLE IF EXISTS user_albums;
 DROP TABLE IF EXISTS albums;
 DROP TABLE IF EXISTS ratings;
 DROP TABLE IF EXISTS requests;
+DROP TABLE IF EXISTS event_bulletins;
 DROP TABLE IF EXISTS bulletins;
 DROP TABLE IF EXISTS mails;
 DROP TABLE IF EXISTS chatters;
@@ -94,6 +97,9 @@ CREATE TABLE `events`(
     `start` DATETIME,
     `end` DATETIME,
 
+    `description` VARCHAR(1000),
+
+    is_cancelled BOOL,
     is_voluntary BOOL,
     is_public BOOL,
     is_sold_out BOOL,
@@ -194,6 +200,15 @@ CREATE TABLE bulletins(
     FOREIGN KEY(receiver_id) REFERENCES users(id)    
 );
 
+CREATE TABLE event_bulletins(
+    event_id BIGINT(20) NOT NULL,
+    bulletin_id BIGINT(20) NOT NULL,
+
+    PRIMARY KEY(event_id, bulletin_id),
+    FOREIGN KEY(event_id) REFERENCES events(id),
+    FOREIGN KEY(bulletin_id) REFERENCES bulletins(id),
+);
+
 CREATE TABLE requests(
     user_id BIGINT(20) NOT NULL,
     event_id BIGINT(20) NOT NULL,
@@ -218,13 +233,29 @@ CREATE TABLE ratings(
 CREATE TABLE albums(
     id BIGINT(20) NOT NULL AUTO_INCREMENT,
     title VARCHAR(100),
-    user_id BIGINT(20) NOT NULL,
     kind ENUM('IMAGE',
         'MUSIC') NOT NULL,
     `timestamp` DATETIME NOT NULL,
 
-    PRIMARY KEY(id),
-    FOREIGN KEY(user_id) REFERENCES users(id)
+    PRIMARY KEY(id)
+);
+
+CREATE TABLE user_albums(
+    user_id BIGINT(20) NOT NULL,
+    album_id BIGINT(20) NOT NULL,
+
+    PRIMARY KEY(user_id, album_id),
+    FOREIGN KEY(user_id) REFERENCES users(id),
+    FOREIGN KEY(album_id) REFERENCES albums(id)
+);
+
+CREATE TABLE event_albums(
+    event_id BIGINT(20) NOT NULL,
+    album_id BIGINT(20) NOT NULL,
+
+    PRIMARY KEY(event_id, album_id),
+    FOREIGN KEY(event_id) REFERENCES events(id),
+    FOREIGN KEY(album_id) REFERENCES albums(id)
 );
 
 CREATE TABLE album_endpoints(

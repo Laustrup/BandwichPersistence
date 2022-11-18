@@ -4,7 +4,9 @@ import laustrup.bandwichpersistence.models.Event;
 import laustrup.bandwichpersistence.models.Rating;
 import laustrup.bandwichpersistence.models.albums.Album;
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
+import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
 import laustrup.bandwichpersistence.models.chats.messages.Message;
+import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
 import laustrup.bandwichpersistence.models.users.sub_users.Performer;
 import laustrup.bandwichpersistence.models.users.sub_users.participants.Participant;
@@ -38,19 +40,15 @@ public class Band extends Performer {
     @Getter @Setter
     private String _runner;
 
-    /**
-     * All the participants that are following this Band, is included here.
-     */
-    @Getter
-    private Liszt<Participant> _fans;
-
     public Band(long id, String username, String description,
                 ContactInfo contactInfo, Album images, Liszt<Rating> ratings, Liszt<Event> events,
-                Liszt<ChatRoom> chatRooms, Liszt<Message> messages, Subscription subscription, LocalDateTime timestamp,
-                Liszt<Album> music, Liszt<Artist> members, String runner, Liszt<Participant> fans)
+                Liszt<ChatRoom> chatRooms, Liszt<Message> messages, Subscription subscription,
+                Liszt<Bulletin> bulletins, LocalDateTime timestamp,
+                Liszt<Album> music, Liszt<Artist> members, String runner,
+                Liszt<Participant> fans, Liszt<User> followings)
             throws InputMismatchException {
-        super(id, username, null, null, description, contactInfo, images, ratings,
-                events, chatRooms, messages, subscription, timestamp, music);
+        super(id, null, null, username, description, contactInfo, images, ratings, events, chatRooms, messages, subscription,
+                bulletins, timestamp, music, fans, followings);
 
         if (_members.size() > 0)
             _members = members;
@@ -58,19 +56,15 @@ public class Band extends Performer {
             throw new InputMismatchException();
 
         _runner = runner;
-        _fans = fans;
     }
 
-    public Band(String username, String description, Subscription subscription,
-                Liszt<Album> music, Liszt<Artist> members) throws InputMismatchException {
-        super(username, null, null, description, subscription, music);
+    public Band(String username, String description, Subscription subscription, Liszt<Artist> members) throws InputMismatchException {
+        super(username, null, null, description, subscription);
 
         if (_members.size() > 0)
             _members = members;
         else
             throw new InputMismatchException();
-
-        _fans = new Liszt<>();
     }
 
     /**
@@ -105,23 +99,6 @@ public class Band extends Performer {
     public Liszt<Artist> removeMembers(Artist[] artists) {
         _members.remove(artists);
         return _members;
-    }
-
-    /**
-     * Adds a Fan to the Liszt of fans.
-     * @param fan An object of Fan, that is wished to be added.
-     * @return The whole Liszt of fans.
-     */
-    public Liszt<Participant> addFan(Participant fan) { return addFans(new Participant[]{fan}); }
-
-    /**
-     * Adds Fans to the Liszt of fans.
-     * @param fans An array of fans, that is wished to be Added.
-     * @return The whole Liszt of fans.
-     */
-    public Liszt<Participant> addFans(Participant[] fans) {
-        _fans.add(fans);
-        return _fans;
     }
 
     /**

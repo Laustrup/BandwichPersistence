@@ -23,7 +23,7 @@ public class Card {
      * An enum of different credit card providers or brands.
      */
     @Getter @Setter
-    private CreditCardType _type;
+    private Type _type;
 
     /**
      * The owner of the credit card.
@@ -56,21 +56,21 @@ public class Card {
      * The three digits on the backside of the credit card.
      */
     @Getter
-    private int _controlDigits;
+    private int _cVV;
 
-    public Card(long id, CreditCardType type, String owner, long numbers,
+    public Card(long id, Type type, String owner, long numbers,
                 int expirationMonth, int expirationYear,
-                int controlDigits) throws InputMismatchException {
+                int cVV) throws InputMismatchException {
         _id = id;
         _type = type;
         _owner = owner;
         set_cardNumbers(numbers);
         set_expirationMonth(expirationMonth);
         _expirationYear = expirationYear;
-        set_controlDigits(controlDigits);
+        set_cVV(cVV);
     }
 
-    public Card(CreditCardType type, String owner, long numbers,
+    public Card(Type type, String owner, long numbers,
                 int expirationMonth, int expirationYear,
                 int controlDigits) throws InputMismatchException {
         _type = type;
@@ -78,7 +78,7 @@ public class Card {
         set_cardNumbers(numbers);
         set_expirationMonth(expirationMonth);
         _expirationYear = expirationYear;
-        set_controlDigits(controlDigits);
+        set_cVV(controlDigits);
     }
 
     /**
@@ -111,17 +111,17 @@ public class Card {
      * @return The updated control digits of current card.
      * @throws InputMismatchException Will be thrown, if the digit length of isn't 3.
      */
-    public int set_controlDigits(int digits) throws InputMismatchException {
-        if (digits <= 999 && digits > 0) _controlDigits = digits;
+    public int set_cVV(int digits) throws InputMismatchException {
+        if (digits <= 999 && digits > 0) _cVV = digits;
         else throw new InputMismatchException();
-        return _controlDigits;
+        return _cVV;
     }
 
     // TODO Add more types
     /**
      * Are a set of enums with values of different credit card providers.
      */
-    public enum CreditCardType {
+    public enum Type {
         VISA,
         AMERICAN_EXPRESS,
         DANCARD,

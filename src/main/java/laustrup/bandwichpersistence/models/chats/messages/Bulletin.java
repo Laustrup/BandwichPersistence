@@ -2,6 +2,7 @@ package laustrup.bandwichpersistence.models.chats.messages;
 
 import laustrup.bandwichpersistence.models.Model;
 import laustrup.bandwichpersistence.models.users.User;
+
 import lombok.Getter;
 import lombok.ToString;
 

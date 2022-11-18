@@ -4,9 +4,12 @@ import laustrup.bandwichpersistence.models.Event;
 import laustrup.bandwichpersistence.models.Rating;
 import laustrup.bandwichpersistence.models.albums.Album;
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
+import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
 import laustrup.bandwichpersistence.models.chats.messages.Message;
+import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
 import laustrup.bandwichpersistence.models.users.sub_users.Performer;
+import laustrup.bandwichpersistence.models.users.sub_users.participants.Participant;
 import laustrup.bandwichpersistence.models.users.sub_users.subscriptions.Subscription;
 import laustrup.bandwichpersistence.utilities.Liszt;
 
@@ -39,16 +42,17 @@ public class Artist extends Performer {
     public Artist(long id, String username, String firstName, String lastName, String description,
                   ContactInfo contactInfo, Album images, Liszt<Rating> ratings, Liszt<Event> events,
                   Liszt<ChatRoom> chatRooms, Liszt<Message> messages, Subscription subscription,
-                  LocalDateTime timestamp, Liszt<Album> music, Liszt<Band> bands, String runner) {
+                  Liszt<Bulletin> bulletins, LocalDateTime timestamp, Liszt<Album> music,
+                  Liszt<Band> bands, String runner, Liszt<Participant> fans, Liszt<User> followings) {
         super(id, username, firstName, lastName, description, contactInfo, images, ratings,
-                events, chatRooms, messages, subscription, timestamp, music);
+                events, chatRooms, messages, subscription, bulletins, timestamp, music, fans, followings);
         _bands = bands;
         _runner = runner;
     }
 
     public Artist(String username, String firstName, String lastName, String description, Subscription subscription,
-                  Liszt<Album> music, Liszt<Band> bands, String runner) {
-        super(username, firstName, lastName, description, subscription, music);
+                  Liszt<Band> bands, String runner) {
+        super(username, firstName, lastName, description, subscription);
         _bands = bands;
         _runner = runner;
     }

@@ -3,6 +3,7 @@ package laustrup.bandwichpersistence.models.albums;
 import laustrup.bandwichpersistence.models.Model;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.utilities.Liszt;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,7 +18,7 @@ public class Album extends Model {
     @Getter
     public Liszt<String> _endpoints;
     @Getter
-    public User _author;
+    public Model _author;
     @Getter
     public AlbumKind _type;
     @Getter
@@ -40,13 +41,15 @@ public class Album extends Model {
     }
 
     // Add methods
-    public List<String> add(String url) {
-        _endpoints.add(url);
+    public Liszt<String> add(String endpoint) { return add(new String[]{endpoint}); }
+
+    public Liszt<String> add(String[] endpoints) {
+        _endpoints.add(endpoints);
         return _endpoints;
     }
 
     // Remove methods
-    public List<String> remove(String url) {
+    public Liszt<String> remove(String url) {
         _endpoints.remove(url);
         return _endpoints;
     }

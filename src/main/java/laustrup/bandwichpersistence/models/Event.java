@@ -1,5 +1,6 @@
 package laustrup.bandwichpersistence.models;
 
+import laustrup.bandwichpersistence.models.albums.Album;
 import laustrup.bandwichpersistence.models.chats.Request;
 import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
 import laustrup.bandwichpersistence.models.users.User;
@@ -53,6 +54,12 @@ public class Event extends Model {
     private long _length;
 
     /**
+     * The description of the Event, that can be edited by Performers or Venue
+     */
+    @Getter @Setter
+    private String _description;
+
+    /**
      * This Event is paid or voluntary.
      */
     @Getter @Setter
@@ -63,6 +70,13 @@ public class Event extends Model {
      */
     @Getter
     private Plato _public;
+
+    /**
+     * Will be true, if this Event is cancelled.
+     * Can only be cancelled by the Venue.
+     */
+    @Getter
+    private Plato _cancelled;
 
     /**
      * This is marked if there is no more tickets to sell.
@@ -131,6 +145,12 @@ public class Event extends Model {
     @Getter
     private Liszt<Bulletin> _bulletins;
 
+    /**
+     * An Album of images, that can be used to promote this Event.
+     */
+    @Getter @Setter
+    private Album _images;
+
     public Event(String title, User user) {
         super(title);
 
@@ -141,16 +161,20 @@ public class Event extends Model {
 
         _participations = new Liszt<>();
         _bulletins = new Liszt<>();
+        _images = new Album();
 
         _length = 0;
+        _cancelled = new Plato();
     }
 
-    public Event(long id, String title, LocalDateTime timestamp, LocalDateTime openDoors,
+    public Event(long id, String title, String description, LocalDateTime openDoors,
                  Plato isVoluntary, Plato isPublic, Plato isSoldOut, String location, double price,
                  String ticketsURL, ContactInfo contactInfo, Liszt<Gig> gigs, Venue venue, Liszt<Request> requests,
-                 Liszt<Participation> participations, Liszt<Bulletin> bulletins) throws InputMismatchException {
+                 Liszt<Participation> participations, Liszt<Bulletin> bulletins, Album images, LocalDateTime timestamp)
+            throws InputMismatchException {
         super(id, title, timestamp);
 
+        _description = description;
         _gigs = gigs;
 
         try {
@@ -180,6 +204,9 @@ public class Event extends Model {
         _requests = requests;
         _participations = participations;
         _bulletins = bulletins;
+        _images = images;
+
+        _cancelled = new Plato();
     }
 
     /**
@@ -311,6 +338,18 @@ public class Event extends Model {
     }
 
     /**
+     * Will cancel the event, if it is the Venue in the input.
+     * @param venue Will check if this Venue has the same id as the Venue of this Event.
+     * @return The isCancelled Plato value.
+     */
+    public Plato changeCancelledStatus(Venue venue) {
+        if (venue.get_id() == _venue.get_id())
+            _cancelled.set_argument(!_cancelled.get_truth());
+
+        return _cancelled;
+    }
+
+    /**
      * Adds the given Participation to participations of current Event.
      * @param participation Determines a specific participant, that is wished to be added.
      * @return All the Participations of the current Event.
@@ -353,8 +392,8 @@ public class Event extends Model {
      * @param bulletin Determines a specific bulletin, that is wished to be added.
      * @return All the bulletins of the current Event.
      */
-    public Liszt<Bulletin> addBulletin(Bulletin bulletin) {
-        return addBulletins(new Bulletin[]{bulletin});
+    public Liszt<Bulletin> add(Bulletin bulletin) {
+        return add(new Bulletin[]{bulletin});
     }
 
     /**
@@ -362,9 +401,43 @@ public class Event extends Model {
      * @param bulletins Determines some specific bulletins, that is wished to be added.
      * @return All the bulletins of the current Event.
      */
-    public Liszt<Bulletin> addBulletins(Bulletin[] bulletins) {
+    public Liszt<Bulletin> add(Bulletin[] bulletins) {
         _bulletins.add(bulletins);
         return _bulletins;
+    }
+
+    /**
+     * Adds an image to the Event in the sense of an endpoint, used for getting the file elsewhere.
+     * @param endpoint The endpoint, for retrieving the file.
+     * @return The whole Album of the Event.
+     */
+    public Album addImage(String endpoint) { return addImages(new String[]{endpoint}); }
+
+    /**
+     * Adds some images to the Event in the sense of some endpoints, used for getting the files elsewhere.
+     * @param endpoints The endpoints, for retrieving the files.
+     * @return The whole Album of the Event.
+     */
+    public Album addImages(String[] endpoints) {
+        _images.add(endpoints);
+        return _images;
+    }
+
+    /**
+     * Removes an image of the Event in the sense of an endpoint, used for getting the file elsewhere.
+     * @param endpoint The endpoint, for retrieving the file.
+     * @return The whole Album of the Event.
+     */
+    public Album removeImage(String endpoint) { return removeImages(new String[]{endpoint}); }
+
+    /**
+     * Removes some images of the Event in the sense of some endpoints, used for getting the files elsewhere.
+     * @param endpoints The endpoints, for retrieving the files.
+     * @return The whole Album of the Event.
+     */
+    public Album removeImages(String[] endpoints) {
+        _images.add(endpoints);
+        return _images;
     }
 
     /**

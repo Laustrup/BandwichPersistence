@@ -4,9 +4,11 @@ import laustrup.bandwichpersistence.models.Event;
 import laustrup.bandwichpersistence.models.Rating;
 import laustrup.bandwichpersistence.models.albums.Album;
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
+import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
 import laustrup.bandwichpersistence.models.chats.messages.Message;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
+import laustrup.bandwichpersistence.models.users.sub_users.participants.Participant;
 import laustrup.bandwichpersistence.models.users.sub_users.subscriptions.Subscription;
 import laustrup.bandwichpersistence.utilities.Liszt;
 
@@ -20,7 +22,7 @@ import java.time.LocalDateTime;
  * Extends from User.
  */
 @NoArgsConstructor
-public abstract class Performer extends User {
+public abstract class Performer extends Participant {
 
     /**
      * Contains the music Albums of the Performer.
@@ -28,23 +30,27 @@ public abstract class Performer extends User {
     @Getter
     protected Liszt<Album> _music;
 
+    /**
+     * All the participants that are following this Performer, is included here.
+     */
+    @Getter
+    protected Liszt<Participant> _fans;
+
     public Performer(long id, String username, String firstName, String lastName, String description,
                      ContactInfo contactInfo, Album images, Liszt<Rating> ratings, Liszt<Event> events,
                      Liszt<ChatRoom> chatRooms, Liszt<Message> messages, Subscription subscription,
-                     LocalDateTime timestamp, Liszt<Album> music) {
+                     Liszt<Bulletin> bulletins, LocalDateTime timestamp, Liszt<Album> music,
+                     Liszt<Participant> fans, Liszt<User> followings) {
         super(id, username, firstName, lastName, description, contactInfo, images, ratings, events,
-                chatRooms, messages, subscription, timestamp);
+                chatRooms, messages, subscription, bulletins, timestamp, followings);
         _music = music;
+        _fans = fans;
     }
 
-    public Performer(String username, String firstName, String lastName, String description, Subscription subscription, Liszt<Album> music) {
+    public Performer(String username, String firstName, String lastName, String description, Subscription subscription) {
         super(username, firstName, lastName, description, subscription);
-        _music = music;
-
-        _images = new Album();
-        _ratings = new Liszt<>();
-        _events = new Liszt<>();
-        _chatRooms = new Liszt<>();
+        _music = new Liszt<>();
+        _fans = new Liszt<>();
     }
 
     /**
@@ -102,5 +108,22 @@ public abstract class Performer extends User {
             }
         }
         return null;
+    }
+
+    /**
+     * Adds a Fan to the Liszt of fans.
+     * @param fan An object of Fan, that is wished to be added.
+     * @return The whole Liszt of fans.
+     */
+    public Liszt<Participant> addFan(Participant fan) { return addFans(new Participant[]{fan}); }
+
+    /**
+     * Adds Fans to the Liszt of fans.
+     * @param fans An array of fans, that is wished to be Added.
+     * @return The whole Liszt of fans.
+     */
+    public Liszt<Participant> addFans(Participant[] fans) {
+        _fans.add(fans);
+        return _fans;
     }
 }

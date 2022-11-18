@@ -4,6 +4,7 @@ import laustrup.bandwichpersistence.models.Event;
 import laustrup.bandwichpersistence.models.Rating;
 import laustrup.bandwichpersistence.models.albums.Album;
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
+import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
 import laustrup.bandwichpersistence.models.chats.messages.Message;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
@@ -28,7 +29,6 @@ public class Venue extends User {
 
     /**
      * The location that the Venue is located at, which could be an address or simple a place.
-     *
      */
     @Getter @Setter
     private String _location;
@@ -55,10 +55,10 @@ public class Venue extends User {
                  ContactInfo contactInfo, Album images, Liszt<Rating> ratings, Liszt<Event> events,
                  Liszt<ChatRoom> chatRooms, Liszt<Message> messages, LocalDateTime timestamp,
                  String location, String gearDescription, Subscription.Status subscriptionStatus,
-                 SubscriptionOffer subscriptionOffer, int size) {
+                 SubscriptionOffer subscriptionOffer, Liszt<Bulletin> bulletins, int size) {
         super(id, username, null, null, description, contactInfo, images, ratings, events, chatRooms, messages,
                 new Subscription(new Venue(), Subscription.Type.FREEMIUM, subscriptionStatus, subscriptionOffer, null),
-                timestamp);
+                bulletins, timestamp);
 
         if (location == null)
             _location = _contactInfo.getAddressInfo();

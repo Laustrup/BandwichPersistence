@@ -5,6 +5,7 @@ import laustrup.bandwichpersistence.models.Model;
 import laustrup.bandwichpersistence.models.Rating;
 import laustrup.bandwichpersistence.models.albums.Album;
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
+import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
 import laustrup.bandwichpersistence.models.chats.messages.Message;
 import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
 import laustrup.bandwichpersistence.models.users.sub_users.subscriptions.Subscription;
@@ -110,10 +111,13 @@ public abstract class User extends Model {
     @Getter
     protected Subscription _subscription;
 
+    @Getter
+    protected Liszt<Bulletin> _bulletins;
+
     public User(long id, String username, String firstName, String lastName, String description,
                 ContactInfo contactInfo, Album images, Liszt<Rating> ratings, Liszt<Event> events,
                 Liszt<ChatRoom> chatRooms, Liszt<Message> messages, Subscription subscription,
-                LocalDateTime timestamp) {
+                Liszt<Bulletin> bulletins, LocalDateTime timestamp) {
         super(id,username + "-" + id,timestamp);
         _username = username;
         _firstName = firstName;
@@ -127,6 +131,7 @@ public abstract class User extends Model {
         _chatRooms = chatRooms;
         _messages = messages;
         _subscription = subscription;
+        _bulletins = bulletins;
     }
 
     public User(String username, String firstName, String lastName, String description, Subscription subscription) {
@@ -142,6 +147,8 @@ public abstract class User extends Model {
         _events = new Liszt<>();
         _chatRooms = new Liszt<>();
         _messages = new Liszt<>();
+        _bulletins = new Liszt<>();
+
         _subscription = subscription;
     }
 
