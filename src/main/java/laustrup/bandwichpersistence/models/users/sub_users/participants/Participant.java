@@ -1,6 +1,6 @@
 package laustrup.bandwichpersistence.models.users.sub_users.participants;
 
-import laustrup.bandwichpersistence.models.Event;
+import laustrup.bandwichpersistence.models.events.Event;
 import laustrup.bandwichpersistence.models.Rating;
 import laustrup.bandwichpersistence.models.albums.Album;
 import laustrup.bandwichpersistence.models.chats.ChatRoom;

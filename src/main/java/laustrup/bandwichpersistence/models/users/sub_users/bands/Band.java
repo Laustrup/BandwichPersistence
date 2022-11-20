@@ -1,6 +1,7 @@
 package laustrup.bandwichpersistence.models.users.sub_users.bands;
 
-import laustrup.bandwichpersistence.models.Event;
+import laustrup.bandwichpersistence.models.chats.Request;
+import laustrup.bandwichpersistence.models.events.Event;
 import laustrup.bandwichpersistence.models.Rating;
 import laustrup.bandwichpersistence.models.albums.Album;
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
@@ -45,10 +46,10 @@ public class Band extends Performer {
                 Liszt<ChatRoom> chatRooms, Liszt<Message> messages, Subscription subscription,
                 Liszt<Bulletin> bulletins, LocalDateTime timestamp,
                 Liszt<Album> music, Liszt<Artist> members, String runner,
-                Liszt<Participant> fans, Liszt<User> followings)
+                Liszt<Participant> fans, Liszt<User> followings, Liszt<Request> requests)
             throws InputMismatchException {
         super(id, null, null, username, description, contactInfo, images, ratings, events, chatRooms, messages, subscription,
-                bulletins, timestamp, music, fans, followings);
+                bulletins, timestamp, music, fans, followings, requests);
 
         if (_members.size() > 0)
             _members = members;

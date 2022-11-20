@@ -6,11 +6,9 @@ import laustrup.bandwichpersistence.utilities.Liszt;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @NoArgsConstructor @ToString
 public class Album extends Model {
@@ -20,24 +18,24 @@ public class Album extends Model {
     @Getter
     public Model _author;
     @Getter
-    public AlbumKind _type;
+    public Kind _kind;
     @Getter
     public LocalDateTime _timestamp;
 
     // Constructor for from database
-    public Album(long id, String title, Liszt<String> urls, User author, AlbumKind type, LocalDateTime timestamp) {
+    public Album(long id, String title, Liszt<String> urls, User author, Kind kind, LocalDateTime timestamp) {
         super(id, title, timestamp);
         _endpoints = urls;
         _author = author;
-        _type = type;
+        _kind = kind;
     }
 
     // Constructor to add database
-    public Album(String title, Liszt<String> endpoints, User author, AlbumKind type) {
+    public Album(String title, Liszt<String> endpoints, User author, Kind kind) {
         super(title);
         _endpoints = endpoints;
         _author = author;
-        _type = type;
+        _kind = kind;
     }
 
     // Add methods
@@ -53,4 +51,6 @@ public class Album extends Model {
         _endpoints.remove(url);
         return _endpoints;
     }
+
+    public enum Kind { IMAGE,MUSIC; }
 }

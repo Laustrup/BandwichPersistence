@@ -1,6 +1,7 @@
 package laustrup.bandwichpersistence.models.users.sub_users.venues;
 
-import laustrup.bandwichpersistence.models.Event;
+import laustrup.bandwichpersistence.models.chats.Request;
+import laustrup.bandwichpersistence.models.events.Event;
 import laustrup.bandwichpersistence.models.Rating;
 import laustrup.bandwichpersistence.models.albums.Album;
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
@@ -51,11 +52,17 @@ public class Venue extends User {
     @Getter @Setter
     private int _size;
 
+    /**
+     * The Requests requested for this Venue.
+     */
+    @Getter
+    private Liszt<Request> _requests;
+
     public Venue(long id, String username, String description,
                  ContactInfo contactInfo, Album images, Liszt<Rating> ratings, Liszt<Event> events,
                  Liszt<ChatRoom> chatRooms, Liszt<Message> messages, LocalDateTime timestamp,
                  String location, String gearDescription, Subscription.Status subscriptionStatus,
-                 SubscriptionOffer subscriptionOffer, Liszt<Bulletin> bulletins, int size) {
+                 SubscriptionOffer subscriptionOffer, Liszt<Bulletin> bulletins, int size, Liszt<Request> requests) {
         super(id, username, null, null, description, contactInfo, images, ratings, events, chatRooms, messages,
                 new Subscription(new Venue(), Subscription.Type.FREEMIUM, subscriptionStatus, subscriptionOffer, null),
                 bulletins, timestamp);
@@ -70,6 +77,7 @@ public class Venue extends User {
         _size = size;
         _subscription.get_user().set_username(_username);
         _subscription.get_user().set_description(_description);
+        _requests = requests;
     }
 
     public Venue(String username, String description,
@@ -85,39 +93,74 @@ public class Venue extends User {
 
         _gearDescription = gearDescription;
         _events = new Liszt<>();
+        _requests = new Liszt<>();
         _size = size;
         _subscription.get_user().set_username(_username);
         _subscription.get_user().set_description(_description);
     }
 
     /**
-     * Adds an Event to the Liszt of events.
+     * Adds an Event to the Liszt of Events.
      * @param event An object of Event, that is wished to be added.
-     * @return The whole Liszt of events.
+     * @return The whole Liszt of Events.
      */
-    public Liszt<Event> addEvent(Event event) { return addEvents(new Event[]{event}); }
+    public Liszt<Event> add(Event event) { return add(new Event[]{event}); }
 
     /**
-     * Adds Events to the Liszt of events.
+     * Adds Events to the Liszt of Events.
      * @param events An array of events, that is wished to be added.
-     * @return The whole Liszt of events.
+     * @return The whole Liszt of Events.
      */
-    public Liszt<Event> addEvents(Event[] events) {
+    public Liszt<Event> add(Event[] events) {
         _events.add(events);
         return _events;
     }
 
     /**
-     * Removes an Event of the Liszt of events.
+     * Adds a Request to the Liszt of Requests.
+     * @param request An object of Request, that is wished to be added.
+     * @return The whole Liszt of Requests.
+     */
+    public Liszt<Request> add(Request request) { return add(new Request[]{request}); }
+
+    /**
+     * Adds Requests to the Liszt of Requests.
+     * @param requests An array of Requests, that is wished to be added.
+     * @return The whole Liszt of Requests.
+     */
+    public Liszt<Request> add(Request[] requests) {
+        _requests.add(requests);
+        return _requests;
+    }
+
+    /**
+     * Removes a Request of the Liszt of Requests.
+     * @param request An object of Request, that is wished to be removed.
+     * @return The whole Liszt of Requests.
+     */
+    public Liszt<Request> remove(Request request) { return remove(new Request[]{request}); }
+
+    /**
+     * Removes Requests of the Liszt of Requests.
+     * @param requests An array of Requests, that is wished to be removed.
+     * @return The whole Liszt of Requests.
+     */
+    public Liszt<Request> remove(Request[] requests) {
+        _requests.remove(requests);
+        return _requests;
+    }
+
+    /**
+     * Removes an Event of the Liszt of Events.
      * @param event An object of Event, that is wished to be removed.
-     * @return The whole Liszt of events.
+     * @return The whole Liszt of Events.
      */
     public Liszt<Event> removeEvent(Event event) { return removeEvents(new Event[]{event}); }
 
     /**
-     * Removes Events of the Liszt of events.
+     * Removes Events of the Liszt of Events.
      * @param events An array of events, that is wished to be removed.
-     * @return The whole Liszt of events.
+     * @return The whole Liszt of Events.
      */
     public Liszt<Event> removeEvents(Event[] events) {
         _events.remove(events);

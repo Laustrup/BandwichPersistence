@@ -63,7 +63,9 @@ public abstract class JTest {
     protected void compare(Participant expected, Participant actual) {
     }
 
+    /*
     private void compare(User expected, User actual) {
         assertEquals(expected.,);
     }
+     */
 }

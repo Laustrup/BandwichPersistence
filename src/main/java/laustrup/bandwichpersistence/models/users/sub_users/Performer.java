@@ -1,6 +1,7 @@
 package laustrup.bandwichpersistence.models.users.sub_users;
 
-import laustrup.bandwichpersistence.models.Event;
+import laustrup.bandwichpersistence.models.chats.Request;
+import laustrup.bandwichpersistence.models.events.Event;
 import laustrup.bandwichpersistence.models.Rating;
 import laustrup.bandwichpersistence.models.albums.Album;
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
@@ -36,21 +37,29 @@ public abstract class Performer extends Participant {
     @Getter
     protected Liszt<Participant> _fans;
 
+    /**
+     * The Requests requested for this Performer.
+     */
+    @Getter
+    protected Liszt<Request> _requests;
+
     public Performer(long id, String username, String firstName, String lastName, String description,
                      ContactInfo contactInfo, Album images, Liszt<Rating> ratings, Liszt<Event> events,
                      Liszt<ChatRoom> chatRooms, Liszt<Message> messages, Subscription subscription,
                      Liszt<Bulletin> bulletins, LocalDateTime timestamp, Liszt<Album> music,
-                     Liszt<Participant> fans, Liszt<User> followings) {
+                     Liszt<Participant> fans, Liszt<User> followings, Liszt<Request> requests) {
         super(id, username, firstName, lastName, description, contactInfo, images, ratings, events,
                 chatRooms, messages, subscription, bulletins, timestamp, followings);
         _music = music;
         _fans = fans;
+        _requests = requests;
     }
 
     public Performer(String username, String firstName, String lastName, String description, Subscription subscription) {
         super(username, firstName, lastName, description, subscription);
         _music = new Liszt<>();
         _fans = new Liszt<>();
+        _requests = new Liszt<>();
     }
 
     /**
@@ -125,5 +134,39 @@ public abstract class Performer extends Participant {
     public Liszt<Participant> addFans(Participant[] fans) {
         _fans.add(fans);
         return _fans;
+    }
+
+    /**
+     * Adds a Request to the Liszt of Requests.
+     * @param request An object of Request, that is wished to be added.
+     * @return The whole Liszt of Requests.
+     */
+    public Liszt<Request> add(Request request) { return add(new Request[]{request}); }
+
+    /**
+     * Adds Requests to the Liszt of Requests.
+     * @param requests An array of Requests, that is wished to be added.
+     * @return The whole Liszt of Requests.
+     */
+    public Liszt<Request> add(Request[] requests) {
+        _requests.add(requests);
+        return _requests;
+    }
+
+    /**
+     * Removes a Request of the Liszt of Requests.
+     * @param request An object of Request, that is wished to be removed.
+     * @return The whole Liszt of Requests.
+     */
+    public Liszt<Request> remove(Request request) { return remove(new Request[]{request}); }
+
+    /**
+     * Removes Requests of the Liszt of Requests.
+     * @param requests An array of Requests, that is wished to be removed.
+     * @return The whole Liszt of Requests.
+     */
+    public Liszt<Request> remove(Request[] requests) {
+        _requests.remove(requests);
+        return _requests;
     }
 }

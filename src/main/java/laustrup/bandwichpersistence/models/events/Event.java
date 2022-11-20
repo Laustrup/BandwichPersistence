@@ -1,12 +1,12 @@
-package laustrup.bandwichpersistence.models;
+package laustrup.bandwichpersistence.models.events;
 
+import laustrup.bandwichpersistence.models.Model;
 import laustrup.bandwichpersistence.models.albums.Album;
 import laustrup.bandwichpersistence.models.chats.Request;
 import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
 import laustrup.bandwichpersistence.models.users.sub_users.Performer;
-import laustrup.bandwichpersistence.models.users.sub_users.participants.Participant;
 import laustrup.bandwichpersistence.models.users.sub_users.venues.Venue;
 import laustrup.bandwichpersistence.utilities.Liszt;
 import laustrup.bandwichpersistence.utilities.Plato;
@@ -223,7 +223,7 @@ public class Event extends Model {
      */
     public Liszt<Gig> addGigs(Gig[] gigs) {
         _gigs.add(gigs);
-        addRequests(createRequests(gigs));
+        add(createRequests(gigs));
 
         try {
             calculateTime();
@@ -259,14 +259,14 @@ public class Event extends Model {
      * @param request Determines a specific Request, that is wished to be added.
      * @return All the Requests of the current Event.
      */
-    private Liszt<Request> addRequest(Request request) { return addRequests(new Request[]{request}); }
+    public Liszt<Request> add(Request request) { return add(new Request[]{request}); }
 
     /**
      * Adds some given Requests to the Liszt of requests from current Event.
      * @param requests Determines some specific requests, that is wished to be added.
      * @return All the requests of the current Event.
      */
-    private Liszt<Request> addRequests(Request[] requests) {
+    public Liszt<Request> add(Request[] requests) {
         _requests.add(requests);
         return _requests;
     }
@@ -283,10 +283,10 @@ public class Event extends Model {
 
         for (int i = 0; i < requests.length; i++) {
             if (shouldBeApproved) {
-                for (User user : gigs[i]._act)
+                for (User user : gigs[i].get_act())
                     requests[i] = new Request(user,this, new Plato(true));
             } else {
-                for (User user : gigs[i]._act)
+                for (User user : gigs[i].get_act())
                     requests[i] = new Request(user,this, new Plato(Plato.Argument.UNDEFINED));
             }
         }
@@ -511,66 +511,14 @@ public class Event extends Model {
 
             if (_gigs.size() > 1)
                 for (Gig gig : _gigs) {
-                    if (gig._start.isBefore(_start)) _start = gig.get_start();
-                    if (gig._end.isAfter(_end)) _end = gig.get_end();
+                    if (gig.get_start().isBefore(_start)) _start = gig.get_start();
+                    if (gig.get_end().isAfter(_end)) _end = gig.get_end();
                 }
 
             _length = Duration.between(_start, _end).toMillis();
             return _length;
         }
         throw new InputMismatchException();
-    }
-
-    /**
-     * Determines a specific gig of one band for a specific time.
-     */
-    @Data @ToString
-    public class Gig {
-        /**
-         * This act is of a Gig and can both be assigned as artists or bands.
-         */
-        private Performer[] _act;
-
-        /**
-         * The start of the Gig, where the act will begin.
-         */
-        private LocalDateTime _start;
-
-        /**
-         * The end of the Gig, where the act will end.
-         */
-        private LocalDateTime _end;
-
-        public Gig(Performer[] act, LocalDateTime start, LocalDateTime end) {
-            _act = act;
-            _start = start;
-            _end = end;
-        }
-    }
-
-    /**
-     * Determines type of which a Participant is participating in an Event.
-     */
-    @Data @ToString
-    public class Participation {
-        /**
-         * The Participant of the participation.
-         */
-        private Participant _participant;
-        /**
-         * The type of which participant is participating in the participation.
-         */
-        private ParticipationType _type;
-
-        public Participation(Participant participant, ParticipationType type) {
-            _participant = participant;
-            _type = type;
-        }
-
-        /**
-         * Each Participation have four different choices of participating.
-         */
-        public enum ParticipationType { ACCEPTED, IN_DOUBT, CANCELED, INVITED }
     }
 
 }
