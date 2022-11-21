@@ -51,9 +51,8 @@ public class Band extends Performer {
         super(id, null, null, username, description, contactInfo, images, ratings, events, chatRooms, messages, subscription,
                 bulletins, timestamp, music, fans, followings, requests);
 
-        if (_members.size() > 0)
-            _members = members;
-        else
+        _members = members;
+        if (_members.size() <= 0)
             throw new InputMismatchException();
 
         _runner = runner;

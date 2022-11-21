@@ -1,17 +1,16 @@
 package laustrup.bandwichpersistence.utilities;
 
 import laustrup.bandwichpersistence.JTest;
+import laustrup.bandwichpersistence.models.users.sub_users.bands.Band;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class LisztTeszt extends JTest {
 
-    private List<Object> liszt;
+    private Liszt<Object> liszt;
 
     @ParameterizedTest
     @CsvSource(value = {"true", "false"}, delimiter = '|')
@@ -36,7 +35,7 @@ class LisztTeszt extends JTest {
     }
 
     @Test
-    public void addSingleTest() {
+    public void canAddSingleElement() {
         // Arrange
         liszt = new Liszt<>();
         Object element = 666;
@@ -50,15 +49,23 @@ class LisztTeszt extends JTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {}, delimiter = '|')
-    public void addArrayTest(Object[] elements) {
+    @CsvSource(value = {"true","false"}, delimiter = '|')
+    public void canAddAnArray(boolean constructorWithArgument) {
         // Arrange
-        liszt = new Liszt<>();
+        if (constructorWithArgument) begin();
+        liszt = constructorWithArgument ?
+                new Liszt<>(_items.get_bands())
+                : new Liszt<>();
 
         // Act
-        liszt.add(elements);
+        if (!constructorWithArgument) {
+            begin();
+            liszt.add(_items.get_bands());
+        }
+        calculatePerformance();
 
         // Assert
-        for (int i = 0; i < elements.length; i++) { assertEquals(elements[i],liszt.get(1)); }
+        for (Band band : _items.get_bands())
+            assertEquals(band.toString(),liszt.get(band.toString()).toString());
     }
 }

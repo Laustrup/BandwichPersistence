@@ -196,10 +196,7 @@ public class Event extends Model {
         _contactInfo = contactInfo;
         _venue = venue;
 
-        if (location == null || location.isEmpty())
-            _location = venue.get_location();
-        else
-            _location = location;
+        _location = location == null || location.isEmpty() ? venue.get_location() : location;
 
         _requests = requests;
         _participations = participations;
@@ -505,9 +502,10 @@ public class Event extends Model {
      * @throws InputMismatchException In case that the end is before the beginning.
      */
     private long calculateTime() throws InputMismatchException {
+        _start = _gigs.get(1).get_start();
+        _end = _gigs.get(1).get_end();
+
         if (_end.isAfter(_start)) {
-            _start = _gigs.get(1).get_start();
-            _end = _gigs.get(1).get_end();
 
             if (_gigs.size() > 1)
                 for (Gig gig : _gigs) {
@@ -518,6 +516,9 @@ public class Event extends Model {
             _length = Duration.between(_start, _end).toMillis();
             return _length;
         }
+
+        _start = null;
+        _end = null;
         throw new InputMismatchException();
     }
 

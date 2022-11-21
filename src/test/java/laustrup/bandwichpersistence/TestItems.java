@@ -140,7 +140,7 @@ public class TestItems extends JTest {
 
     @Test
     public void itemTest() {
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 1; i++) {
             try {
                 // ARRANGE
                 begin();
@@ -170,31 +170,28 @@ public class TestItems extends JTest {
     private void setupPhoneNumbers() {
         _phones = new Phone[_phoneNumberAmount];
 
-        for (int i = 0; i < _phones.length; i++) {
+        for (int i = 0; i < _phones.length; i++)
             _phones[i] = new Phone(_countries[_random.nextInt(_countries.length)],
                     _random.nextInt(89999999)+10000000, _random.nextBoolean());
-        }
     }
 
     private void setupaddresses() {
         _addresses = new Address[_addressAmount];
 
-        for (int i = 0; i < _addresses.length; i++) {
+        for (int i = 0; i < _addresses.length; i++)
             _addresses[i] = new Address("Nørrevang " + _random.nextInt(100),
                     _random.nextInt(10) + (_random.nextBoolean() ? ". tv." : ". th."),
                     String.valueOf(_random.nextInt(8999)+1000), "Holbæk");
-        }
     }
 
     private void setupContactInfo() {
         _contactInfo = new ContactInfo[_contactInfoAmount];
 
-        for (int i = 0; i < _contactInfo.length; i++) {
+        for (int i = 0; i < _contactInfo.length; i++)
             _contactInfo[i] = new ContactInfo("cool@gmail.com",
                     _phones[_random.nextInt(_phones.length)],
                     _addresses[_random.nextInt(_addresses.length)],
                     _countries[_random.nextInt(_countries.length)]);
-        }
     }
 
     private void setupAlbums() {
@@ -207,7 +204,7 @@ public class TestItems extends JTest {
             if (i == 1)
                 kind = Album.Kind.IMAGE;
 
-            _albums[0] = new Album(i+1, kind == Album.Kind.MUSIC ? "Debut album" : "Gig photos",
+            _albums[i] = new Album(i+1, kind == Album.Kind.MUSIC ? "Debut album" : "Gig photos",
                     new Liszt<>(new String[]{kind == Album.Kind.MUSIC ? "MusicEndpoint" : "PhotoEndpoint"},false),
                     new Participant(), kind, LocalDateTime.now());
         }
@@ -248,7 +245,7 @@ public class TestItems extends JTest {
             _artists[i] = new Artist(id, gender ? "Hansinator "+id : "Ursulanator "+id,
                     gender ? "Hans "+id : "Ursula "+id, "Hansen "+id, "Description "+id,
                     _contactInfo[_random.nextInt(_contactInfo.length)], images.get(_random.nextInt(images.size())+1),
-                    randomizeRatings(), new Liszt<>(), new Liszt<>(), new Liszt<>(), setupSubscription(), new Liszt<>(),
+                    randomizeRatings(), new Liszt<>(), new Liszt<>(), new Liszt<>(), setupSubscription(new Artist()), new Liszt<>(),
                     LocalDateTime.now(), sortMusicAlbums(),new Liszt<>(), "Gear "+id, new Liszt<>(), new Liszt<>(),
                     new Liszt<>());
         }
@@ -261,30 +258,26 @@ public class TestItems extends JTest {
         for (int i = 0; i < _bands.length; i++) {
             int id = i+1;
             Liszt<Artist> members = new Liszt<>();
-            int memberAmount = _random.nextInt(_artists.length)+1;
+            int memberAmount = _random.nextInt(_artists.length-1)+1;
             Set<Integer> alreadyTakenIndexes = new HashSet<>();
 
             for (int j = 0; j < memberAmount; j++) {
-                int index = _random.nextInt(_artists.length)+1;
+                int index = _random.nextInt(_artists.length);
 
-                while (alreadyTakenIndexes.contains(index)) {
-                    index = _random.nextInt(_artists.length)+1;
-                }
+                while (alreadyTakenIndexes.contains(index)) index = _random.nextInt(_artists.length);
                 alreadyTakenIndexes.add(index);
 
                 members.add(_artists[index]);
             }
 
             Liszt<Participant> fans = new Liszt<>();
-            int fanAmount = _random.nextInt(_artists.length)+1;
+            int fanAmount = _random.nextInt(_participants.length);
             alreadyTakenIndexes = new HashSet<>();
 
             for (int j = 0; j < fanAmount; j++) {
-                int index = _random.nextInt(_participants.length)+1;
+                int index = _random.nextInt(_participants.length);
 
-                while (alreadyTakenIndexes.contains(index)) {
-                    index = _random.nextInt(_participants.length)+1;
-                }
+                while (alreadyTakenIndexes.contains(index)) index = _random.nextInt(_participants.length);
                 alreadyTakenIndexes.add(index);
 
                 fans.add(_participants[index]);
@@ -292,25 +285,18 @@ public class TestItems extends JTest {
 
             _bands[i] = new Band(id, "Band "+id, "Description "+id,
                     _contactInfo[_random.nextInt(_contactInfo.length)], images.get(_random.nextInt(images.size())+1),
-                    randomizeRatings(), new Liszt<>(), new Liszt<>(), new Liszt<>(), setupSubscription(), new Liszt<>(),
+                    randomizeRatings(), new Liszt<>(), new Liszt<>(), new Liszt<>(), setupSubscription(new Band()), new Liszt<>(),
                     LocalDateTime.now(), sortMusicAlbums(), members, "Gear "+id,fans, new Liszt<>(), new Liszt<>());
-            _bands[i].set_username(_bands[i].get_username());
-            _bands[i].set_description(_bands[i].get_description());
 
-            for (Artist artist : _bands[i].get_members()) {
-                _artists[(int) (artist.get_id()-1)].addBand(_bands[i]);
-            }
-
-            for (Participant participant : _bands[i].get_fans()) {
-                _participants[(int) (participant.get_id() - 1)].add(_bands[i]);
-            }
+            for (Artist artist : _bands[i].get_members()) _artists[(int) (artist.get_id()-1)].addBand(_bands[i]);
+            for (Participant participant : _bands[i].get_fans()) _participants[(int) (participant.get_id() - 1)].add(_bands[i]);
         }
     }
 
-    private Subscription setupSubscription() {
+    private Subscription setupSubscription(User user) {
         Subscription.Type type = _random.nextBoolean() ? Subscription.Type.PREMIUM_ARTIST : Subscription.Type.PREMIUM_BAND;
         type = _random.nextBoolean() ? type : Subscription.Type.FREEMIUM;
-        return new Subscription(null, type, Subscription.Status.ACCEPTED, new SubscriptionOffer(TimeService.get_instance().generateRandom(),
+        return new Subscription(user, type, Subscription.Status.ACCEPTED, new SubscriptionOffer(TimeService.get_instance().generateRandom(),
                 _random.nextBoolean() ? SubscriptionOffer.Type.SALE : SubscriptionOffer.Type.FREE_TRIAL,
                 _random.nextDouble(1)), _random.nextBoolean() ? _random.nextLong(101) : null);
     }
@@ -348,12 +334,12 @@ public class TestItems extends JTest {
                     _contactInfo[_random.nextInt(_contactInfo.length)],
                     generateGigs(startOfLatestGig, gigAmount, gigLengths),
                     _venues[_random.nextInt(_venues.length)], new Liszt<>(), generateParticipations(), new Liszt<>(),
-                    images.get(_random.nextInt(images.size())), LocalDateTime.now());
+                    images.get(_random.nextInt(images.size())+1), LocalDateTime.now());
 
             for (Gig gig : _events[i].get_gigs())
-                _events[i].add((Request[]) generateRequests(gig.get_act(), _events[i]).toArray());
+                _events[i].add(generateRequests(gig.get_act(), _events[i]));
 
-            _events[i].add((Bulletin[]) generateBulletins(_events[i]).toArray());
+            _events[i].add(generateBulletins(_events[i]));
 
             setPerformersForEvents(_events[i]);
         }
@@ -414,9 +400,9 @@ public class TestItems extends JTest {
         return performers;
     }
 
-    private Liszt<Request> generateRequests(Performer[] performers, Event event) {
-        Liszt<Request> requests = new Liszt<>();
-        for (Performer performer : performers) { requests.add(new Request(performer, event, generatePlato())); }
+    private Request[] generateRequests(Performer[] performers, Event event) {
+        Request[] requests = new Request[performers.length];
+        for (int i = 0; i < performers.length; i++) { requests[i] = new Request(performers[i], event, generatePlato()); }
 
         return requests;
     }
@@ -448,14 +434,13 @@ public class TestItems extends JTest {
         };
     }
 
-    public Liszt<Bulletin> generateBulletins(Model model) {
-        Liszt<Bulletin> bulletins = new Liszt<>();
-        int amount = _random.nextInt(101);
+    public Bulletin[] generateBulletins(Model model) {
+        Bulletin[] bulletins = new Bulletin[_random.nextInt(101)];
 
-        for (int i = 0; i < amount; i++) {
+        for (int i = 0; i < bulletins.length; i++) {
             long id = i+1;
-            bulletins.add(new Bulletin(id, generateUser(), model, "Content "+id, _random.nextBoolean(),
-                    _random.nextBoolean(), _random.nextBoolean(), LocalDateTime.now()));
+            bulletins[i] = new Bulletin(id, generateUser(), model, "Content "+id, _random.nextBoolean(),
+                    _random.nextBoolean(), _random.nextBoolean(), LocalDateTime.now());
         }
 
         return bulletins;
@@ -477,17 +462,15 @@ public class TestItems extends JTest {
         for (int i = 0; i < _chatRooms.length; i++) {
             int id = i+1;
             Liszt<User> members = new Liszt<>();
-            int memberAmount = _random.nextInt(_venues.length+_artists.length)+1;
+            int memberAmount = _random.nextInt(_venues.length+_artists.length - 1) + 1;
             Set<User> memberSet = new HashSet<>();
 
             for (int j = 0; j < memberAmount; j++) {
                 User user;
 
                 do {
-                    if (_random.nextBoolean())
-                        user = _artists[_random.nextInt(_artists.length)];
-                    else
-                        user = _artists[_random.nextInt(_artists.length)];
+                    user = _random.nextBoolean() ? _artists[_random.nextInt(_artists.length)] :
+                            _venues[_random.nextInt(_venues.length)];
                 } while (memberSet.contains(user));
                 memberSet.add(user);
 
@@ -495,8 +478,8 @@ public class TestItems extends JTest {
             }
 
             _chatRooms[i] = new ChatRoom(id, "Chatroom "+id,
-                    generateMails(members.get(_random.nextInt(members.size()))), members,
-                    members.get(_random.nextInt(members.size())), LocalDateTime.now()
+                    generateMails(members.get(_random.nextInt(members.size())+1)), members,
+                    members.get(_random.nextInt(members.size())+1), LocalDateTime.now()
             );
         }
     }
@@ -523,31 +506,24 @@ public class TestItems extends JTest {
         Liszt<Rating> ratings = new Liszt<>();
         int amount = _random.nextInt(_ratings.length)+1;
 
-        for (int i = 0; i < amount; i++) {
-            ratings.add(_ratings[_random.nextInt(_ratings.length)]);
-        }
+        for (int i = 0; i < amount; i++) ratings.add(_ratings[_random.nextInt(_ratings.length)]);
 
         return ratings;
     }
 
     private Liszt<Album> sortMusicAlbums() {
         Liszt<Album> music = new Liszt<>();
-
-        for (Album album : _albums) {
-            if (album.get_kind() == Album.Kind.MUSIC)
-                music.add(album);
-        }
+        for (Album album : _albums)
+            if (album.get_kind() == Album.Kind.MUSIC) music.add(album);
 
         return music;
     }
 
     private Liszt<Album> sortImageAlbums() {
         Liszt<Album> images = new Liszt<>();
-
-        for (Album album : _albums) {
+        for (Album album : _albums)
             if (album.get_kind() == Album.Kind.IMAGE)
                 images.add(album);
-        }
 
         return images;
     }

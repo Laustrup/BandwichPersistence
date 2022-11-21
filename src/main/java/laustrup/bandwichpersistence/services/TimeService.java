@@ -54,9 +54,10 @@ public class TimeService {
      * @return A LocalDateTime that has been randomly generated.
      */
     public LocalDateTime generateRandom() {
-        return LocalDateTime.from(LocalDate.ofEpochDay(ThreadLocalRandom.current().nextLong(
+        return LocalDate.ofEpochDay(ThreadLocalRandom.current().nextLong(
                 LocalDate.of(2020, 1, 1).toEpochDay(),
-                LocalDate.of(2029, 12, 31).toEpochDay())));
+                LocalDate.of(2029, 12, 31).toEpochDay()))
+                .atStartOfDay();
     }
 
     /**

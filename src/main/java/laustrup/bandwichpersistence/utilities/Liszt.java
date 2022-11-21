@@ -38,7 +38,9 @@ public class Liszt<E> implements List<E>, ILiszt<E> {
 
         if (isLinked) _map = new LinkedHashMap<>(); else _map = new HashMap<>();
         if (isLinked) _destinations = new LinkedHashMap<>(); else _destinations = new HashMap<>();
-        _data = data;
+        _data = (E[]) new Object[0];
+
+        add(data);
     }
 
     @Override public int size() { return _data.length; }
@@ -85,7 +87,9 @@ public class Liszt<E> implements List<E>, ILiszt<E> {
     public boolean add(E[] elements) {
         try { handleElements(elements); }
         catch (Exception e) {
-            Printer.get_instance().print("Couldn't add element of to Liszt...", e);
+            if (elements.length>1)
+                Printer.get_instance().print("Couldn't add elements of " + Arrays.toString(elements) + " to Liszt...", e);
+            else Printer.get_instance().print("Couldn't add element of " + Arrays.toString(elements) + " to Liszt...", e);
             return false;
         }
 
@@ -95,13 +99,8 @@ public class Liszt<E> implements List<E>, ILiszt<E> {
         Object[] storage = new Object[_data.length + elements.length];
 
         for (int i = 0; i < storage.length; i++) {
-            if (i <= _data.length && _data.length != 0) {
-                storage[i] = _data[i];
-            }
-            else {
-                String length = String.valueOf(_data.length - i);
-                storage[i] = addElementToDestination(elements[_data.length - i]);
-            }
+            if (i <= _data.length && _data.length != 0) storage[i] = _data[i];
+            else storage[i] = addElementToDestination(elements[i-_data.length]);
         }
 
         _data = (E[]) storage;
@@ -116,10 +115,7 @@ public class Liszt<E> implements List<E>, ILiszt<E> {
      * @return The same element of the input.
      */
     private E addElementToDestination(E element) {
-        String key;
-
-        if (_map.containsKey(element.toString())) { key = String.valueOf(element.hashCode()); }
-        else { key = element.toString(); }
+        String key = _map.containsKey(element.toString()) ? String.valueOf(element.hashCode()) : element.toString();
 
         _destinations.put(key,element);
         addDestinationKey(key);
@@ -136,8 +132,8 @@ public class Liszt<E> implements List<E>, ILiszt<E> {
         String[] storage = new String[_destinationKeys.length+1];
 
         for (int i = 0; i < storage.length; i++) {
-            if (i <= _destinationKeys.length && _destinationKeys.length != 0) { storage[i] = _destinationKeys[i]; }
-            else { storage[i] = key; }
+            if (i < _destinationKeys.length) storage[i] = _destinationKeys[i];
+            else storage[i] = key;
         }
         _destinationKeys = storage;
 

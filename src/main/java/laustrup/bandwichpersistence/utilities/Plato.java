@@ -1,6 +1,7 @@
 package laustrup.bandwichpersistence.utilities;
 
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 import java.util.Random;
@@ -22,6 +23,12 @@ public class Plato implements IPlato {
      */
     @Getter
     private Argument _argument;
+
+    /**
+     * Contains information, that can be written about actions or statuses.
+     */
+    @Getter @Setter
+    private String _message;
 
     /**
      * Sets the argument and also calculates truth.

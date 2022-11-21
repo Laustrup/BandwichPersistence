@@ -26,8 +26,10 @@ public class Printer implements IPrinter {
         return _instance;
     }
 
-    @Override public void print(String content) { System.out.println(_border + content + _border); }
-    @Override public void print(String content,Exception ex) { System.err.println(_border + content + "\n\n" + ex + _border); }
+    @Override
+    public void print(String content) { System.out.println(_border + content + _border); }
+    @Override
+    public void print(String content, Exception ex) { System.err.println(_border + content + "\n\n" + ex + _border); }
 
     @Override
     public void print(Object[] array) {
