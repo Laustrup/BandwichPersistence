@@ -328,7 +328,7 @@ public class TestItems extends JTest {
             LocalDateTime startOfLatestGig = TimeService.get_instance().generateRandom();
 
             _events[i] = new Event(id,"Event title " + id, "Event description " + id,
-                    startOfLatestGig.minusMinutes(gigAmount*gigAmount).minusHours(1),
+                    startOfLatestGig.minusMinutes(gigAmount*gigAmount).minusHours(2),
                     generatePlato(), generatePlato(), generatePlato(), "Location " + id,
                     _random.nextDouble(498)+1, "https://www.Billetlugen.dk/"+id,
                     _contactInfo[_random.nextInt(_contactInfo.length)],
@@ -468,23 +468,20 @@ public class TestItems extends JTest {
             for (int j = 0; j < memberAmount; j++) {
                 User user;
 
-                do {
-                    user = _random.nextBoolean() ? _artists[_random.nextInt(_artists.length)] :
-                            _venues[_random.nextInt(_venues.length)];
-                } while (memberSet.contains(user));
+                do { user = generateUser(); } while (memberSet.contains(user));
                 memberSet.add(user);
 
                 members.add(user);
             }
 
             _chatRooms[i] = new ChatRoom(id, "Chatroom "+id,
-                    generateMails(members.get(_random.nextInt(members.size())+1)), members,
+                    generateMails(members), members,
                     members.get(_random.nextInt(members.size())+1), LocalDateTime.now()
             );
         }
     }
 
-    private Liszt<Mail> generateMails(User author) {
+    private Liszt<Mail> generateMails(Liszt<User> members) {
         Liszt<Mail> mails = new Liszt<>();
         int amount = _random.nextInt(101);
 
@@ -492,11 +489,10 @@ public class TestItems extends JTest {
             String content = new String();
             int contentAmount = _random.nextInt(101);
 
-            for (int j = 0; j < contentAmount; j++) {
-                content += "Hallo ";
-            }
-            mails.add(new Mail(i+1, new ChatRoom(), author, content, _random.nextBoolean(),
-                    _random.nextBoolean(), _random.nextBoolean(), LocalDateTime.now()));
+            for (int j = 0; j < contentAmount; j++) content += "Test ";
+
+            mails.add(new Mail(i+1, new ChatRoom(), members.get(_random.nextInt(members.size())+1),
+                    content, _random.nextBoolean(), _random.nextBoolean(), _random.nextBoolean(), LocalDateTime.now()));
         }
 
         return mails;

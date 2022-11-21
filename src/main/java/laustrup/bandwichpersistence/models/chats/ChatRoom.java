@@ -60,6 +60,7 @@ public class ChatRoom extends Model {
         _responsible = responsible;
 
         isTheChatRoomAnswered();
+        int i = 0;
     }
 
     public ChatRoom(String title, Liszt<User> chatters, User responsible) {
@@ -79,9 +80,8 @@ public class ChatRoom extends Model {
      */
     public List<Mail> add(Mail mail) {
         if (chatterExists(mail.get_author())) {
-            if (_mails.add(mail)) { if (mail.doSend()) edit(mail); }
-            if (!_answered)
-                isTheChatRoomAnswered();
+            if (_mails.add(mail)) if (mail.doSend()) edit(mail);
+            if (!_answered) isTheChatRoomAnswered();
         }
 
         return _mails;
@@ -168,18 +168,7 @@ public class ChatRoom extends Model {
      * In case return is true, it will also calculate answering time.
      * @return The boolean answer of whether the ChatRoom has been answered or not
      */
-    private boolean isTheChatRoomAnswered() {
-        for (Mail mail : _mails) {
-            if (mail.get_author().get_id() != _responsible.get_id()) {
-                _answered = true;
-                _answeringTime = calculateAnsweringTime();
-                return true;
-            }
-        }
-
-        _answered = false;
-        return false;
-    }
+    private boolean isTheChatRoomAnswered() { return findResponsibleAnswer()!=null; }
 
     /**
      * Calculates the time it took the responsible to answer.
@@ -190,9 +179,21 @@ public class ChatRoom extends Model {
     private Long calculateAnsweringTime() {
         if (_answered) {
             _answeringTime = Duration.between(_mails.get(1).get_timestamp(),
-                    _mails.get(_responsible.toString()).get_timestamp()).toMinutes();
+                    findResponsibleAnswer().get_timestamp()).toMinutes();
             return _answeringTime;
         }
+        return null;
+    }
+
+    /**
+     * Searches through the Mails and checks if the responsible have answered,
+     * @return If the responsible have answered, it will return that Mail, otherwise null.
+     */
+    private Mail findResponsibleAnswer() {
+        for (Mail mail : _mails)
+            if (mail.get_author().get_id() == _responsible.get_id())
+                return mail;
+
         return null;
     }
 }

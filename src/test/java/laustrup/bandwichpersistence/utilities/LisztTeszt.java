@@ -66,6 +66,9 @@ class LisztTeszt extends JTest {
 
         // Assert
         for (Band band : _items.get_bands())
-            assertEquals(band.toString(),liszt.get(band.toString()).toString());
+            assertEquals(band,liszt.get(band.toString()));
+
+        for (int i = 1; i <= _items.get_bands().length; i++)
+            assertEquals(_items.get_bands()[i-1], liszt.get(i));
     }
 }

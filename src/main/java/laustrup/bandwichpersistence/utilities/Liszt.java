@@ -98,9 +98,12 @@ public class Liszt<E> implements List<E>, ILiszt<E> {
     private void handleElements(E[] elements) {
         Object[] storage = new Object[_data.length + elements.length];
 
-        for (int i = 0; i < storage.length; i++) {
-            if (i <= _data.length && _data.length != 0) storage[i] = _data[i];
-            else storage[i] = addElementToDestination(elements[i-_data.length]);
+        for (int i = 0; i < _data.length; i++) storage[i] = _data[i];
+
+        int index = _data.length;
+        for (E element : elements) {
+            storage[index] = addElementToDestination(element);
+            index++;
         }
 
         _data = (E[]) storage;
