@@ -1,74 +1,166 @@
 package laustrup.bandwichpersistence.utilities;
 
 import laustrup.bandwichpersistence.JTest;
+import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.sub_users.bands.Band;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+
+import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class LisztTeszt extends JTest {
 
-    private Liszt<Object> liszt;
+    private Liszt<Object> _liszt;
 
     @ParameterizedTest
     @CsvSource(value = {"true", "false"}, delimiter = '|')
     public void constructorTest(boolean isEmptyDataTemplate) {
         // ACT
         if (isEmptyDataTemplate) {
-            liszt = new Liszt<>();
+            _liszt = new Liszt<>();
             calculatePerformance();
 
-            // Assert
-            assertTrue(liszt.isEmpty());
+            // ASSERT
+            assertTrue(_liszt.isEmpty());
         }
         else {
-            liszt = new Liszt(new Object[]{true,false});
+            _liszt = new Liszt(new Object[]{true,false});
             calculatePerformance();
 
-            // Assert
-            assertEquals(true,liszt.get(1));
-            assertEquals(false,liszt.get(2));
+            // ASSERT
+            assertEquals(true, _liszt.get(1));
+            assertEquals(false, _liszt.get(2));
         }
 
     }
 
     @Test
     public void canAddSingleElement() {
-        // Arrange
-        liszt = new Liszt<>();
+        // ARRANGE
+        _liszt = new Liszt<>();
         Object element = 666;
 
-        // Act
+        // ACT
         begin();
-        liszt.add(element);
+        _liszt.add(element);
 
-        // Assert
-        assertEquals(element,liszt.get(1));
+        // ASSERT
+        assertEquals(element, _liszt.get(1));
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"true","false"}, delimiter = '|')
+    @CsvSource(value = {"true","false"})
     public void canAddAnArray(boolean constructorWithArgument) {
-        // Arrange
+        // ARRANGE
         if (constructorWithArgument) begin();
-        liszt = constructorWithArgument ?
+        _liszt = constructorWithArgument ?
                 new Liszt<>(_items.get_bands())
                 : new Liszt<>();
 
-        // Act
+        // ACT
         if (!constructorWithArgument) {
             begin();
-            liszt.add(_items.get_bands());
+            _liszt.add(_items.get_bands());
         }
         calculatePerformance();
 
-        // Assert
+        // ASSERT
         for (Band band : _items.get_bands())
-            assertEquals(band,liszt.get(band.toString()));
+            assertEquals(band, _liszt.get(band.toString()));
 
         for (int i = 1; i <= _items.get_bands().length; i++)
-            assertEquals(_items.get_bands()[i-1], liszt.get(i));
+            assertEquals(_items.get_bands()[i-1], _liszt.get(i));
+    }
+
+    @Test
+    public void canRemove() {
+        //ARRANGE
+        User user = _items.generateUser();
+        _liszt = new Liszt<>(new Object[]{user});
+
+        // ACT
+        begin();
+        _liszt.remove(user);
+        calculatePerformance();
+
+        // ASSERT
+        assertFalse(_liszt.contains(user));
+        assertTrue(_liszt.isEmpty());
+    }
+
+    @Test
+    public void canRemoveMultiple() {
+        // ARRANGE
+        Band[] bands = _items.get_bands();
+        _liszt = new Liszt<>(bands);
+
+        // ACT
+        begin();
+        _liszt.remove(bands);
+        calculatePerformance();
+
+        // ASSERT
+        assertTrue(_liszt.isEmpty());
+    }
+
+    @Test
+    public void canReplaceByIndex() {
+        do {
+            // ARRANGE
+            Band[] bands = _items.get_bands();
+            int index = new Random().nextInt(bands.length);
+            _liszt = new Liszt<>(bands);
+
+            Band original = bands[index];
+            Band replacement = original;
+            replacement.set_description("This is a replacment!");
+
+            try {
+                // ACT
+                begin();
+                _liszt.replace(replacement, index + 1);
+                calculatePerformance();
+
+                // ASSERT
+                assertEquals(replacement, _liszt.get(replacement.toString()));
+                assertFalse(_liszt.contains(original.toString()) || _liszt.contains(original.hashCode()));
+
+                break;
+            } catch (ClassNotFoundException e) {
+                Printer.get_instance().print("Liszt can't find the object to replace...", e);
+            }
+        } while (true);
+    }
+
+    @Test
+    public void canReplaceByKey() {
+        do {
+            // ARRANGE
+            Band[] bands = _items.get_bands();
+            _liszt = new Liszt<>(bands);
+
+            Band original = bands[new Random().nextInt(bands.length)];
+            Band replacement = original;
+            replacement.set_description("This is a replacment!");
+
+            try {
+                // ACT
+                begin();
+                _liszt.replace(replacement,original.toString());
+                calculatePerformance();
+
+                // ASSERT
+                assertEquals(replacement, _liszt.get(replacement.toString()));
+                assertFalse(_liszt.contains(original.toString()) || _liszt.contains(original.hashCode()));
+
+                break;
+            } catch (ClassNotFoundException e) {
+                Printer.get_instance().print("Liszt can't find the object to replace...", e);
+            }
+        } while (true);
     }
 }

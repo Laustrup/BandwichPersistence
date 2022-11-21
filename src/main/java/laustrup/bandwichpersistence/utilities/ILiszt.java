@@ -1,8 +1,25 @@
 package laustrup.bandwichpersistence.utilities;
 
 import java.util.Collection;
+import java.util.InputMismatchException;
 
 public interface ILiszt<E> {
+
+    /**
+     * Puts an element replacement at the former element, which is replaced.
+     * @param replacement The new element, that is wished to be replaced.
+     * @param index The index the replacement will happen. Is counted as 1 being the first value
+     * @return All the data of the Liszt.
+     */
+    E[] replace(E replacement, int index) throws InputMismatchException, ClassNotFoundException;
+
+    /**
+     * Puts an element replacement at the former element, which is replaced.
+     * @param replacement The new element, that is wished to be replaced.
+     * @param original The original element, that will be replaced.
+     * @return All the data of the Liszt.
+     */
+    E[] replace(E replacement, E original) throws InputMismatchException, ClassNotFoundException;
 
     /**
      * Will add the input into the data array and map as well.

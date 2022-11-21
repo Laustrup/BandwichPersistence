@@ -50,8 +50,67 @@ public class Liszt<E> implements List<E>, ILiszt<E> {
     @Override public Object[] toArray() { return Arrays.stream(_data).toArray(); }
     @Override public <T> T[] toArray(T[] a) { return (T[]) Arrays.stream(_data).toArray(); }
 
+    @Override
+    public E[] replace(E replacement, int index) throws InputMismatchException, ClassNotFoundException {
+        if (index > 0) {
+            E element = (E) new Object();
+            boolean elementIsFound = false;
 
-    @Override public boolean add(E element) { return add((E[]) new Object[]{element}); }
+            for (int i = 0; i < _data.length; i++)
+                if (i + 1 == index) {
+                    element = _data[i];
+                    _data[i] = replacement;
+                    elementIsFound = true;
+                    break;
+                }
+
+            if (!elementIsFound)
+                throw new ClassNotFoundException();
+
+            _map.remove(element.toString());
+            if (_map.containsKey(replacement.toString()))
+                _map.put(String.valueOf(replacement.hashCode()), replacement);
+            else
+                _map.put(replacement.toString(), replacement);
+
+            return _data;
+        }
+        throw new InputMismatchException();
+    }
+
+    @Override
+    public E[] replace(E replacement, E original) throws InputMismatchException, ClassNotFoundException {
+        if (_map.containsKey(original.toString()) || _map.containsKey(String.valueOf(original.hashCode()))) {
+            boolean keyIsToString = _map.containsKey(original.toString());
+
+            E element = keyIsToString ? _map.get(original.toString())
+                    : _map.get(String.valueOf(original.hashCode()));
+            boolean elementIsFound = false;
+
+            if (element != null)
+                for (int i = 0; i < _data.length; i++)
+                    if (element.toString().equals(element.toString())) {
+                        _data[i] = replacement;
+                        elementIsFound = true;
+                        break;
+                    }
+
+            if (!elementIsFound) throw new ClassNotFoundException();
+
+            _map.remove(keyIsToString ? original.toString() : String.valueOf(original.hashCode()));
+
+            if (_map.containsKey(replacement.toString()))
+                _map.put(String.valueOf(replacement.hashCode()), replacement);
+            else
+                _map.put(replacement.toString(), replacement);
+
+            return _data;
+        }
+        throw new InputMismatchException();
+    }
+
+    @Override
+    public boolean add(E element) { return add((E[]) new Object[]{element}); }
 
     @Override
     public E addDda(E element) {
@@ -85,7 +144,7 @@ public class Liszt<E> implements List<E>, ILiszt<E> {
 
     @Override
     public boolean add(E[] elements) {
-        try { handleElements(elements); }
+        try { handleAdd(elements); }
         catch (Exception e) {
             if (elements.length>1)
                 Printer.get_instance().print("Couldn't add elements of " + Arrays.toString(elements) + " to Liszt...", e);
@@ -95,7 +154,7 @@ public class Liszt<E> implements List<E>, ILiszt<E> {
 
         return true;
     }
-    private void handleElements(E[] elements) {
+    private void handleAdd(E[] elements) {
         Object[] storage = new Object[_data.length + elements.length];
 
         for (int i = 0; i < _data.length; i++) storage[i] = _data[i];
@@ -205,7 +264,7 @@ public class Liszt<E> implements List<E>, ILiszt<E> {
     @Override
     public boolean addAll(Collection<? extends E> collection) {
         try {
-            handleElements((E[]) collection.toArray());
+            handleAdd((E[]) collection.toArray());
             return true;
         } catch (Exception e) {
             Printer.get_instance().print("Couldn't add all items...",e);

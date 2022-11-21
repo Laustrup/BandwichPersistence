@@ -103,7 +103,6 @@ public class TestItems extends JTest {
     public TestItems() { resetItems(); }
 
     public void resetItems() {
-
         // Lengths of collections
         _ratingAmount = 100;
         _participantAmount = 4;
@@ -150,12 +149,12 @@ public class TestItems extends JTest {
                 calculatePerformance();
 
                 // ASSERT
-                assertEquals(true, true);
+                assertTrue(true);
             } catch (Exception e) {
                 Printer.get_instance().print("Test items caught an Exception...", e);
 
                 // ASSERT
-                assertEquals(true, false);
+                assertTrue(false);
             }
         }
     }
@@ -328,7 +327,7 @@ public class TestItems extends JTest {
             LocalDateTime startOfLatestGig = TimeService.get_instance().generateRandom();
 
             _events[i] = new Event(id,"Event title " + id, "Event description " + id,
-                    startOfLatestGig.minusMinutes(gigAmount*gigAmount).minusHours(2),
+                    startOfLatestGig.minusMinutes(gigAmount*gigAmount).minusHours(5),
                     generatePlato(), generatePlato(), generatePlato(), "Location " + id,
                     _random.nextDouble(498)+1, "https://www.Billetlugen.dk/"+id,
                     _contactInfo[_random.nextInt(_contactInfo.length)],
