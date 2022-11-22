@@ -249,7 +249,7 @@ public abstract class User extends Model {
      */
     public List<Event> remove(Event event) {
         for (int i = 1; i <= _events.size(); i++) {
-            if (_events.get(i).get_id() == event.get_id()) {
+            if (_events.get(i).get_primaryId() == event.get_primaryId()) {
                 _events.remove(_events.get(i));
                 break;
             }
@@ -265,7 +265,7 @@ public abstract class User extends Model {
      */
     public List<ChatRoom> remove(ChatRoom chatRoom) {
         for (int i = 1; i <= _chatRooms.size(); i++) {
-            if (_chatRooms.get(i).get_id() == chatRoom.get_id()) {
+            if (_chatRooms.get(i).get_primaryId() == chatRoom.get_primaryId()) {
                 _chatRooms.remove(_chatRooms.get(i));
                 break;
             }
@@ -281,7 +281,7 @@ public abstract class User extends Model {
      */
     public Liszt<Rating> edit(Rating rating) {
         for (int i = 1; i <= _ratings.size(); i++) {
-            if (_ratings.get(i).get_id() == rating.get_id()) {
+            if (_ratings.get(i).get_primaryId() == rating.get_primaryId()) {
                 _ratings.set(i,rating);
                 break;
             }
@@ -297,7 +297,7 @@ public abstract class User extends Model {
      */
     public Liszt<Message> edit(Message message) {
         for (int i = 1; i <= _messages.size(); i++) {
-            if (_messages.get(i).get_id() == message.get_id()) {
+            if (_messages.get(i).get_primaryId() == message.get_primaryId()) {
                 _messages.set(i, message);
                 break;
             }

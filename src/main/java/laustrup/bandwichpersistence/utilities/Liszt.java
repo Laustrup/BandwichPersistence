@@ -1,5 +1,6 @@
 package laustrup.bandwichpersistence.utilities;
 
+import laustrup.bandwichpersistence.models.chats.Request;
 import lombok.Getter;
 
 import java.lang.reflect.ParameterizedType;
@@ -156,7 +157,8 @@ public class Liszt<E> implements List<E>, ILiszt<E> {
         return true;
     }
     private void handleAdd(E[] elements) {
-        Object[] storage = new Object[_data.length + elements.length];
+        elements = filterElements(elements);
+        E[] storage = (E[]) new Object[_data.length + elements.length];;
 
         for (int i = 0; i < _data.length; i++) storage[i] = _data[i];
 
@@ -166,8 +168,26 @@ public class Liszt<E> implements List<E>, ILiszt<E> {
             index++;
         }
 
-        _data = (E[]) storage;
+        _data = storage;
         insertDestinationsIntoMap();
+    }
+
+    private E[] filterElements(E[] elements) {
+        int length = 0;
+        for (int i = 0; i < elements.length; i++)
+            if (elements[i]!=null)
+                length++;
+
+        int index = 0;
+        E[] filtered = (E[]) new Object[length];
+        for (int i = 0; i < elements.length; i++) {
+            if (elements[i]!=null) {
+                filtered[index] = elements[i];
+                index++;
+            }
+        }
+
+        return filtered;
     }
 
     /**

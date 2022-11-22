@@ -24,8 +24,8 @@ import laustrup.bandwichpersistence.models.users.sub_users.venues.Venue;
 import laustrup.bandwichpersistence.services.TimeService;
 import laustrup.bandwichpersistence.utilities.Liszt;
 import laustrup.bandwichpersistence.utilities.Plato;
-
 import laustrup.bandwichpersistence.utilities.Printer;
+
 import lombok.Getter;
 import org.junit.jupiter.api.Test;
 
@@ -105,11 +105,11 @@ public class TestItems extends JTest {
     public void resetItems() {
         // Lengths of collections
         _ratingAmount = 100;
-        _participantAmount = 4;
-        _artistAmount = 10;
-        _bandAmount = 6;
+        _participantAmount = 10;
+        _artistAmount = 15;
+        _bandAmount = 10;
         _venueAmount = 3;
-        _eventAmount = 5;
+        _eventAmount = 8;
         _albumAmount = (_artistAmount + _bandAmount + _participantAmount) * 2;
         _addressAmount = _artistAmount + _participantAmount + _venueAmount + 5;
         _phoneNumberAmount = _artistAmount + _participantAmount + _venueAmount + 5;
@@ -287,8 +287,8 @@ public class TestItems extends JTest {
                     randomizeRatings(), new Liszt<>(), new Liszt<>(), new Liszt<>(), setupSubscription(new Band()), new Liszt<>(),
                     LocalDateTime.now(), sortMusicAlbums(), members, "Gear "+id,fans, new Liszt<>(), new Liszt<>());
 
-            for (Artist artist : _bands[i].get_members()) _artists[(int) (artist.get_id()-1)].addBand(_bands[i]);
-            for (Participant participant : _bands[i].get_fans()) _participants[(int) (participant.get_id() - 1)].add(_bands[i]);
+            for (Artist artist : _bands[i].get_members()) _artists[(int) (artist.get_primaryId()-1)].addBand(_bands[i]);
+            for (Participant participant : _bands[i].get_fans()) _participants[(int) (participant.get_primaryId() - 1)].add(_bands[i]);
         }
     }
 
@@ -364,23 +364,23 @@ public class TestItems extends JTest {
         for (Gig gig : event.get_gigs()) {
             for (Performer performer : gig.get_act()) {
                 if (performer.getClass() == Band.class) {
-                    _bands[(int) performer.get_id()-1].add(event);
-                    for (Artist artist : _bands[(int) performer.get_id()-1].get_members()) {
-                        _artists[(int) artist.get_id()-1].add(event);
+                    _bands[(int) performer.get_primaryId()-1].add(event);
+                    for (Artist artist : _bands[(int) performer.get_primaryId()-1].get_members()) {
+                        _artists[(int) artist.get_primaryId()-1].add(event);
                     }
                 }
                 else if (performer.getClass() == Artist.class)
-                    _artists[(int) performer.get_id()-1].add(event);
+                    _artists[(int) performer.get_primaryId()-1].add(event);
             }
         }
         for (Request request : event.get_requests()) {
             User user = request.get_user();
-            if (user.getClass() == Venue.class) _venues[(int) user.get_id()-1].add(request);
-            else if (user.getClass() == Artist.class) _artists[(int) user.get_id()-1].add(request);
+            if (user.getClass() == Venue.class) _venues[(int) user.get_primaryId()-1].add(request);
+            else if (user.getClass() == Artist.class) _artists[(int) user.get_primaryId()-1].add(request);
             else if (user.getClass() == Band.class) {
-                _bands[(int) user.get_id()-1].add(request);
+                _bands[(int) user.get_primaryId()-1].add(request);
                 for (Artist artist : ((Band) user).get_members())
-                    _artists[(int) artist.get_id()-1].add(request);
+                    _artists[(int) artist.get_primaryId()-1].add(request);
             }
         }
     }
@@ -390,8 +390,10 @@ public class TestItems extends JTest {
         Set<Performer> set = new HashSet<>();
 
         for (int i = 0; i < performers.length; i++) {
-            Performer performer = _random.nextBoolean() ? _bands[i] : _artists[i];
-            while (set.contains(performer)) performer = _random.nextBoolean() ? _bands[i] : _artists[i];
+            Performer performer = _random.nextBoolean() ? _bands[_random.nextInt(_bands.length)] :
+                    _artists[_random.nextInt(_artists.length)];
+            while (set.contains(performer)) performer = _random.nextBoolean() ? _bands[_random.nextInt(_bands.length)] :
+                    _artists[_random.nextInt(_artists.length)];
             set.add(performer);
             performers[i] = performer;
         }

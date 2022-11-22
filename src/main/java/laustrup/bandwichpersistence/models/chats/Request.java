@@ -43,13 +43,15 @@ public class Request extends Model {
     private String _message;
 
     public Request(User user, Event event, Plato approved, String message, LocalDateTime timestamp) {
-        super(user.get_id(), event.get_id(), "Request of " + user.get_username() + " to " + event.get_title(),timestamp);
+        super(user.get_primaryId(), event.get_primaryId(), "Request of " + user.get_username() + " to " + event.get_title(),timestamp);
         _user = user;
         _event = event;
         _approved = approved;
         _message = message;
     }
     public Request(User user, Event event, Plato approved) {
+        super(user.get_primaryId(), event.get_primaryId(), "Request of " + user.get_username() + " to " + event.get_title(),
+                LocalDateTime.now());
         _user = user;
         _event = event;
         _approved = approved;

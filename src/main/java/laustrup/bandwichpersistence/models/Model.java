@@ -17,7 +17,7 @@ public abstract class Model {
      * Must be unique, if there ain't other ids for this entity.
      */
     @Getter
-    protected long _id;
+    protected long _primaryId;
 
     /**
      * Another identification value in the database for a specific entity.
@@ -50,13 +50,13 @@ public abstract class Model {
     }
 
     public Model(long id, String title, LocalDateTime timestamp) {
-        _id = id;
+        _primaryId = id;
         _title = title;
         _timestamp = timestamp;
     }
 
     public Model(long id1, long id2, String title, LocalDateTime timestamp) {
-        _id = id1;
+        _primaryId = id1;
         _secondaryId = id2;
         _title = title;
         _timestamp = timestamp;

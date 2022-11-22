@@ -56,7 +56,7 @@ public class Subscription extends Model {
     private Long _cardId;
 
     public Subscription(User user, Type type, Status status, SubscriptionOffer offer, Long cardId, LocalDateTime timestamp) {
-        super(user.get_id(), cardId, user.get_title() + "-Subscription: " + user.get_id(), timestamp);
+        super(user.get_primaryId(), cardId, user.get_title() + "-Subscription: " + user.get_primaryId(), timestamp);
         _user = user;
         _type = defineType(type);
         _status = status;

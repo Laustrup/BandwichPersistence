@@ -5,7 +5,6 @@ import laustrup.bandwichpersistence.JTest;
 import laustrup.bandwichpersistence.models.chats.Request;
 import laustrup.bandwichpersistence.models.events.Event;
 import laustrup.bandwichpersistence.models.events.Gig;
-import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.sub_users.Performer;
 import laustrup.bandwichpersistence.services.TimeService;
 import laustrup.bandwichpersistence.utilities.Liszt;
@@ -33,12 +32,15 @@ public class EventTest extends JTest {
             Liszt<Gig> generatedGigs = _items.generateGigs(TimeService.get_instance().generateRandom(),
                     _random.nextInt(11), _random.nextInt(45));
 
+            while (generatedGigs==null) generatedGigs = _items.generateGigs(TimeService.get_instance().generateRandom(),
+                    _random.nextInt(11), _random.nextInt(45));
+
             boolean bothGigCollectionSharesGigs = false;
             for (Gig original : originals) {
                 for (Gig generated : generatedGigs) {
                     for (Performer originalAct : original.get_act()) {
                         for (Performer generatedAct : generated.get_act()) {
-                            if (originalAct.get_id() == generatedAct.get_id() &&
+                            if (originalAct.get_primaryId() == generatedAct.get_primaryId() &&
                                 original.get_start().isEqual(generated.get_start()) &&
                                 original.get_end().isEqual(generated.get_end())) {
                                 bothGigCollectionSharesGigs = true;
@@ -68,7 +70,8 @@ public class EventTest extends JTest {
                 assertTrue(originals.contains(gig) || generatedGigs.contains(gig));
 
             assertEquals(calculateEventLength(), _event.get_length());
-            assertTrue(requestsFitsGigs());
+            Printer.get_instance().print(Arrays.toString(_event.get_requests().toArray()));
+            assertTrue(requestsFitsGigs() && _event.get_requests().size() != 0);
         }
     }
     private long calculateEventLength() {
@@ -96,12 +99,15 @@ public class EventTest extends JTest {
         for (Gig gig : gigs) {
             for (Request request : requests) {
                 for (Performer performer : gig.get_act()) {
-                    if (request.get_user().get_id() == performer.get_id()) {
+                    if (request.get_user().get_primaryId() == performer.get_primaryId()) {
                         performerHasRequest = true;
                         break;
                     }
                 }
-                if (!performerHasRequest) return false;
+                if (!performerHasRequest) {
+                    Printer.get_instance().print(Arrays.toString(requests.toArray()));
+                    return false;
+                }
                 performerHasRequest = false;
             }
         }

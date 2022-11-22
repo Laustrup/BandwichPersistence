@@ -113,7 +113,7 @@ public class ChatRoom extends Model {
      */
     public boolean chatterExists(User chatter) {
         for (User user : _chatters) {
-            if (user.getClass() == chatter.getClass() && user.get_id() == chatter.get_id()) return true;
+            if (user.getClass() == chatter.getClass() && user.get_primaryId() == chatter.get_primaryId()) return true;
         }
         return false;
     }
@@ -125,7 +125,7 @@ public class ChatRoom extends Model {
      */
     public List<Mail> remove(Mail mail) {
         for (int i = 1; i <= _mails.size(); i++) {
-            if (_mails.get(i).get_id() == mail.get_id()) {
+            if (_mails.get(i).get_primaryId() == mail.get_primaryId()) {
                 _mails.remove(_mails.get(i));
                 break;
             }
@@ -140,7 +140,7 @@ public class ChatRoom extends Model {
      */
     public List<User> remove(User chatter) {
         for (int i = 1; i <= _chatters.size(); i++) {
-            if (_chatters.get(i).get_id() == chatter.get_id()) {
+            if (_chatters.get(i).get_primaryId() == chatter.get_primaryId()) {
                 _chatters.remove(_chatters.get(i));
                 break;
             }
@@ -155,7 +155,7 @@ public class ChatRoom extends Model {
      */
     public boolean edit(Mail mail) {
         for (int i = 1; i <= _mails.size(); i++) {
-            if (_mails.get(i).get_id() == mail.get_id())
+            if (_mails.get(i).get_primaryId() == mail.get_primaryId())
                 return mail == _mails.set(i, mail);
         }
         return false;
@@ -191,7 +191,7 @@ public class ChatRoom extends Model {
      */
     private Mail findResponsibleAnswer() {
         for (Mail mail : _mails)
-            if (mail.get_author().get_id() == _responsible.get_id())
+            if (mail.get_author().get_primaryId() == _responsible.get_primaryId())
                 return mail;
 
         return null;

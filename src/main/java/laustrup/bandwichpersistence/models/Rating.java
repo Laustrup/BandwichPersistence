@@ -44,7 +44,7 @@ public class Rating extends Model {
     private String _comment;
 
     public Rating(int value, User appointed, User judge, LocalDateTime timestamp) throws InputMismatchException {
-        super(appointed.get_id(), judge.get_id(), appointed.get_id()+"-"+judge.get_id(), timestamp);
+        super(appointed.get_primaryId(), judge.get_primaryId(), appointed.get_primaryId()+"-"+judge.get_primaryId(), timestamp);
         if (0 < value && value <= 5 ) {
             _value = value;
             _appointed = appointed;

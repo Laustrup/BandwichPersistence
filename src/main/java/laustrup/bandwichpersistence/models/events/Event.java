@@ -219,7 +219,9 @@ public class Event extends Model {
      * @return All the Gigs of the current Event.
      */
     public Liszt<Gig> add(Gig[] gigs) {
-        if (!_gigs.containsAll(List.of(gigs))) {
+        gigs = filterGigsThatDoNotExist(gigs);
+
+        if (gigs.length > 0) {
             _gigs.add(gigs);
             add(createRequests(gigs));
 
@@ -231,6 +233,35 @@ public class Event extends Model {
             }
         }
         return _gigs;
+    }
+
+    private Gig[] filterGigsThatDoNotExist(Gig[] gigs) {
+        Gig[] storage = new Gig[gigs.length];
+
+        for (int i = 0; i < gigs.length; i++)
+            for (Performer stranger : gigs[i].get_act())
+                for (Gig gig : _gigs)
+                    for (Performer performer : gig.get_act())
+                        if (stranger.get_primaryId() != performer.get_primaryId() &&
+                            !gigs[i].get_start().isEqual(gig.get_start()) &&
+                            !gigs[i].get_end().isEqual(gig.get_end()))
+                            storage[i] = gigs[i];
+
+        int length = 0;
+        for (int i = 0; i < storage.length; i++)
+            if (storage[i]!=null)
+                length++;
+
+        int index = 0;
+        Gig[] filtered = new Gig[length];
+        for (int i = 0; i < storage.length; i++) {
+            if (storage[i]!=null) {
+                filtered[index] = storage[i];
+                index++;
+            }
+        }
+
+        return filtered;
     }
 
     /**
@@ -267,9 +298,9 @@ public class Event extends Model {
      * @return All the requests of the current Event.
      */
     public Liszt<Request> add(Request[] requests) {
-        for (Request request : _requests)
+        for (Request request : requests)
             if (!_requests.contains(request))
-                _requests.add(requests);
+                _requests.add(request);
 
         return _requests;
     }
@@ -278,21 +309,22 @@ public class Event extends Model {
      * Creates some requests for the gigs that are about to be created to this Event.
      * Must be done after add of gigs.
      * @param gigs The gigs that are about to be created a Request for the current gig.
-     * @return All the requests of this Event.
+     * @return All the created Requests.
      */
     private Request[] createRequests(Gig[] gigs) {
         Request[] requests = new Request[gigs.length];
 
-        for (int i = 0; i < requests.length; i++) {
+        for (int i = 0; i < gigs.length; i++) {
             for (User user : gigs[i].get_act()) {
                 boolean requestAlreadyExist = false;
                 for (Request request : _requests) {
-                    if (request.get_user().get_id() == user.get_id()) {
+                    if (request.get_user().get_primaryId() == user.get_primaryId()) {
                         requestAlreadyExist = true;
                         break;
                     }
                 }
-                if (!requestAlreadyExist) requests[i] = new Request(user,this, new Plato());
+                if (!requestAlreadyExist)
+                    requests[i] = new Request(user,this, new Plato());
             }
         }
 
@@ -331,7 +363,7 @@ public class Event extends Model {
      */
     public Venue set_venue(Venue venue) {
         for (Request request : _requests)
-            if (request.get_user().get_id() == _venue.get_id())
+            if (request.get_user().get_primaryId() == _venue.get_primaryId())
                 _requests.remove(request);
 
         _requests.add(new Request(venue, this, new Plato(Plato.Argument.UNDEFINED)));
@@ -347,7 +379,7 @@ public class Event extends Model {
      * @return The isCancelled Plato value.
      */
     public Plato changeCancelledStatus(Venue venue) {
-        if (venue.get_id() == _venue.get_id())
+        if (venue.get_primaryId() == _venue.get_primaryId())
             _cancelled.set_argument(!_cancelled.get_truth());
 
         return _cancelled;
@@ -470,7 +502,7 @@ public class Event extends Model {
      */
     public Participation setParticipation(Participation participation) {
         for (int i = 1; i <= _participations.size(); i++) {
-            if (_participations.get(i).get_participant().get_id() == participation.get_participant().get_id()) {
+            if (_participations.get(i).get_participant().get_primaryId() == participation.get_participant().get_primaryId()) {
                 _participations.get(i).set_type(participation.get_type());
                 return _participations.get(i);
             }
@@ -489,7 +521,7 @@ public class Event extends Model {
 
             for (int j = 0; j < _gigs.get(i).get_act().length; j++) {
                 for (Performer performer : gig.get_act()) {
-                    if (_gigs.get(i).get_act()[j].get_id() == performer.get_id()) {
+                    if (_gigs.get(i).get_act()[j].get_primaryId() == performer.get_primaryId()) {
                         sharedActs++;
                     }
                 }

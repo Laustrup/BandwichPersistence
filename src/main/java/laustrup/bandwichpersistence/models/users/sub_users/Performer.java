@@ -95,7 +95,7 @@ public abstract class Performer extends Participant {
      */
     public Album add(String endpoint, long albumId) {
         for (int i = 1; i <= _music.size(); i++) {
-            if (_music.get(i).get_id() == albumId) {
+            if (_music.get(i).get_primaryId() == albumId) {
                 _music.get(i).add(endpoint);
                 return _music.get(i);
             }
@@ -111,7 +111,7 @@ public abstract class Performer extends Participant {
      */
     public Album remove(String endpoint, long albumId) {
         for (Album album : _music) {
-            if (album.get_id() == albumId) {
+            if (album.get_primaryId() == albumId) {
                 album.remove(endpoint);
                 return album;
             }
