@@ -1,5 +1,7 @@
 package laustrup.bandwichpersistence.utilities;
 
+import lombok.Getter;
+
 import java.util.*;
 import java.util.function.Predicate;
 
@@ -17,6 +19,7 @@ public class Liszt<E> implements List<E>, ILiszt<E> {
      * Contains all the elements that are inside the Liszt.
      * The data is in an array
      */
+    @Getter
     private E[] _data;
     private Map<String,E> _map, _destinations;
     private String[] _destinationKeys;

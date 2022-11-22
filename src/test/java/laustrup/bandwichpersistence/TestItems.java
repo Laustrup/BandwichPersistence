@@ -344,7 +344,7 @@ public class TestItems extends JTest {
         }
     }
 
-    private Liszt<Gig> generateGigs(LocalDateTime latestGig, int amount, int gigLengths) {
+    public Liszt<Gig> generateGigs(LocalDateTime latestGig, int amount, int gigLengths) {
         Liszt<Gig> gigs = new Liszt<>();
         LocalDateTime start = latestGig;
 

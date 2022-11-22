@@ -211,22 +211,24 @@ public class Event extends Model {
      * @param gig Determines a specific Gig of one MusicalUser for a specific time.
      * @return All the Gigs of the current Event.
      */
-    public Liszt<Gig> addGig(Gig gig) { return addGigs(new Gig[]{gig}); }
+    public Liszt<Gig> add(Gig gig) { return add(new Gig[]{gig}); }
 
     /**
      * Adds multiple given Gigs to the Liszt of Gigs in the current Event.
      * @param gigs Determines some specific Gigs of one MusicalUser for a specific time.
      * @return All the Gigs of the current Event.
      */
-    public Liszt<Gig> addGigs(Gig[] gigs) {
-        _gigs.add(gigs);
-        add(createRequests(gigs));
+    public Liszt<Gig> add(Gig[] gigs) {
+        if (!_gigs.containsAll(List.of(gigs))) {
+            _gigs.add(gigs);
+            add(createRequests(gigs));
 
-        try {
-            calculateTime();
-        } catch (InputMismatchException e) {
-            Printer.get_instance().print("End date is before beginning date of " + _title + "...", e);
-            _gigs.remove(gigs);
+            try {
+                calculateTime();
+            } catch (InputMismatchException e) {
+                Printer.get_instance().print("End date is before beginning date of " + _title + "...", e);
+                _gigs.remove(gigs);
+            }
         }
         return _gigs;
     }
@@ -247,6 +249,7 @@ public class Event extends Model {
     public Liszt<Gig> removeGigs(Gig[] gigs) {
         _gigs.remove(gigs);
         for (Gig gig : gigs) { _requests.remove(gig); }
+        calculateTime();
 
         return _gigs;
     }

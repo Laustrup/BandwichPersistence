@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -27,6 +28,11 @@ public abstract class JTest {
      * Are being reset for each method.
      */
     protected TestItems _items;
+
+    /**
+     * This Random is the java Random utility, that can be reused throughout tests.
+     */
+    protected Random _random = new Random();
 
     /**
      * Will automatically begin the time of start.

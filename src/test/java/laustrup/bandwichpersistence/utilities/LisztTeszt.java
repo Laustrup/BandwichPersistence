@@ -112,7 +112,7 @@ class LisztTeszt extends JTest {
         do {
             // ARRANGE
             Band[] bands = _items.get_bands();
-            int index = new Random().nextInt(bands.length);
+            int index = _random.nextInt(bands.length);
             _liszt = new Liszt<>(bands);
 
             Band original = bands[index];
@@ -143,7 +143,7 @@ class LisztTeszt extends JTest {
             Band[] bands = _items.get_bands();
             _liszt = new Liszt<>(bands);
 
-            Band original = bands[new Random().nextInt(bands.length)];
+            Band original = bands[_random.nextInt(bands.length)];
             Band replacement = original;
             replacement.set_description("This is a replacment!");
 
