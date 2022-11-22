@@ -15,6 +15,8 @@ import org.junit.jupiter.api.Test;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -70,10 +72,33 @@ public class EventTest extends JTest {
                 assertTrue(originals.contains(gig) || generatedGigs.contains(gig));
 
             assertEquals(calculateEventLength(), _event.get_length());
-            Printer.get_instance().print(Arrays.toString(_event.get_requests().toArray()));
-            assertTrue(requestsFitsGigs() && _event.get_requests().size() != 0);
+            assertTrue(requestsFitsGigs());
         }
     }
+    @Test
+    public void canRemoveGigs() {
+        // ARRANGE
+        _event = _items.get_events()[_random.nextInt(_items.get_eventAmount())];
+        Gig[] gigsToRemove = new Gig[_event.get_gigs().size()-1];
+        Set<Gig> gigSet = new HashSet<>();
+        for (int i = 0; i < gigsToRemove.length; i++) {
+            Gig gig = _event.get_gigs().get(_random.nextInt(_event.get_gigs().size()));
+            while (gigSet.contains(gig)) gig = _event.get_gigs().get(_random.nextInt(_event.get_gigs().size()));
+            gigSet.add(gig);
+
+            gigsToRemove[i] = gig;
+        }
+
+        // ACT
+        begin();
+        _event.remove(gigsToRemove);
+        calculatePerformance();
+
+        // ASSERT
+        assertEquals(calculateEventLength(), _event.get_length());
+        assertTrue(requestsFitsGigs());
+    }
+
     private long calculateEventLength() {
         long length = 0;
 
@@ -113,10 +138,5 @@ public class EventTest extends JTest {
         }
 
         return true;
-    }
-
-    @Test
-    public void canRemoveGigs() {
-
     }
 }

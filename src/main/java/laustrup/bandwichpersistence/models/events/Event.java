@@ -219,7 +219,7 @@ public class Event extends Model {
      * @return All the Gigs of the current Event.
      */
     public Liszt<Gig> add(Gig[] gigs) {
-        gigs = filterGigsThatDoNotExist(gigs);
+        gigs = filterGigs(gigs);
 
         if (gigs.length > 0) {
             _gigs.add(gigs);
@@ -235,7 +235,12 @@ public class Event extends Model {
         return _gigs;
     }
 
-    private Gig[] filterGigsThatDoNotExist(Gig[] gigs) {
+    /**
+     * Removes all the Gigs, that already exists in this Event.
+     * @param gigs The Gigs that should be filtered.
+     * @return The filtered Gigs.
+     */
+    private Gig[] filterGigs(Gig[] gigs) {
         Gig[] storage = new Gig[gigs.length];
 
         for (int i = 0; i < gigs.length; i++)
@@ -269,7 +274,7 @@ public class Event extends Model {
      * @param gig Determines a specific gig, that is wished to be removed.
      * @return All the gigs of the current Event.
      */
-    public Liszt<Gig> removeGig(Gig gig) { return removeGigs(new Gig[]{gig}); }
+    public Liszt<Gig> remove(Gig gig) { return remove(new Gig[]{gig}); }
 
     /**
      * Removes some given Gigs from the Liszt of gigs from current Event.
@@ -277,12 +282,36 @@ public class Event extends Model {
      * @param gigs Determines some specific gigs, that is wished to be removed.
      * @return All the Gigs of the current Event.
      */
-    public Liszt<Gig> removeGigs(Gig[] gigs) {
+    public Liszt<Gig> remove(Gig[] gigs) {
         _gigs.remove(gigs);
-        for (Gig gig : gigs) { _requests.remove(gig); }
+        for (Gig gig : gigs)
+            for (Performer performer : gig.get_act())
+                if (!isPerformerInOtherGigs(performer))
+                    removeRequest(performer);
+
         calculateTime();
 
         return _gigs;
+    }
+
+    private boolean isPerformerInOtherGigs(Performer performer) {
+        boolean isInOtherGig = false;
+        for (Gig gig : _gigs)
+            for (Performer gigPerformer : gig.get_act())
+                if (gigPerformer.get_primaryId() == performer.get_primaryId())
+                    isInOtherGig = true;
+
+        return isInOtherGig;
+    }
+
+    private Liszt<Request> removeRequest(Performer performer) {
+        for (int i = 1; i <= _requests.size(); i++) {
+            if (_requests.get(i).get_user().get_primaryId() == performer.get_primaryId()) {
+                _requests.remove(i);
+                break;
+            }
+        }
+        return _requests;
     }
 
     /**

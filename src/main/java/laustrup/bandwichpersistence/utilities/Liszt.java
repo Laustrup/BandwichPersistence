@@ -251,13 +251,14 @@ public class Liszt<E> implements List<E>, ILiszt<E> {
     }
 
     public boolean remove(E[] elements) {
+        elements = filterElements(elements);
         Object[] storage = new Object[_data.length - elements.length];
 
         try {
-            for (int i = 0; i < storage.length; i++) {
-                if (Arrays.stream(elements).noneMatch((Predicate<? super E>) _data[i]))
+            for (int i = 0; i < storage.length; i++)
+                if (contains(elements[i]))
                     storage[i] = _data[i];
-            }
+
             _data = (E[]) storage;
             for (E element : elements)
                 if (!_map.remove(element.toString(),element)) { _map.remove(element.hashCode()); }
