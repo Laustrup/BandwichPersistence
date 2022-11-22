@@ -267,7 +267,10 @@ public class Event extends Model {
      * @return All the requests of the current Event.
      */
     public Liszt<Request> add(Request[] requests) {
-        _requests.add(requests);
+        for (Request request : _requests)
+            if (!_requests.contains(request))
+                _requests.add(requests);
+
         return _requests;
     }
 
@@ -279,15 +282,17 @@ public class Event extends Model {
      */
     private Request[] createRequests(Gig[] gigs) {
         Request[] requests = new Request[gigs.length];
-        boolean shouldBeApproved = _public.get_truth() && venueHasApproved();
 
         for (int i = 0; i < requests.length; i++) {
-            if (shouldBeApproved) {
-                for (User user : gigs[i].get_act())
-                    requests[i] = new Request(user,this, new Plato(true));
-            } else {
-                for (User user : gigs[i].get_act())
-                    requests[i] = new Request(user,this, new Plato(Plato.Argument.UNDEFINED));
+            for (User user : gigs[i].get_act()) {
+                boolean requestAlreadyExist = false;
+                for (Request request : _requests) {
+                    if (request.get_user().get_id() == user.get_id()) {
+                        requestAlreadyExist = true;
+                        break;
+                    }
+                }
+                if (!requestAlreadyExist) requests[i] = new Request(user,this, new Plato());
             }
         }
 
@@ -310,10 +315,10 @@ public class Event extends Model {
      * @return True if the venue has approved.
      */
     public boolean venueHasApproved() {
-        for (Request request : _requests) {
+        for (Request request : _requests)
             if (request.get_user().getClass() == Venue.class && request.get_approved().get_truth())
                 return true;
-        }
+
         return false;
     }
 
@@ -325,10 +330,9 @@ public class Event extends Model {
      * @return The Venue that is set of the Event.
      */
     public Venue set_venue(Venue venue) {
-        for (Request request : _requests) {
+        for (Request request : _requests)
             if (request.get_user().get_id() == _venue.get_id())
                 _requests.remove(request);
-        }
 
         _requests.add(new Request(venue, this, new Plato(Plato.Argument.UNDEFINED)));
         _public.set_argument(true);
@@ -501,7 +505,7 @@ public class Event extends Model {
     /**
      * Sets the beginning and end of the event to match all the current gigs.
      * Important to use after each change of gigs.
-     * @return The calculated length between first beginning and latest end.
+     * @return The calculated length between first beginning and latest end in milliseconds.
      * @throws InputMismatchException In case that the end is before the beginning.
      */
     private long calculateTime() throws InputMismatchException {

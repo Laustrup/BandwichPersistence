@@ -401,7 +401,9 @@ public class TestItems extends JTest {
 
     private Request[] generateRequests(Performer[] performers, Event event) {
         Request[] requests = new Request[performers.length];
-        for (int i = 0; i < performers.length; i++) { requests[i] = new Request(performers[i], event, generatePlato()); }
+        for (int i = 0; i < performers.length; i++) {
+            requests[i] = new Request(performers[i], event, generatePlato());
+        }
 
         return requests;
     }

@@ -2,6 +2,7 @@ package laustrup.bandwichpersistence.utilities;
 
 import lombok.Getter;
 
+import java.lang.reflect.ParameterizedType;
 import java.util.*;
 import java.util.function.Predicate;
 
@@ -23,12 +24,10 @@ public class Liszt<E> implements List<E>, ILiszt<E> {
     private E[] _data;
     private Map<String,E> _map, _destinations;
     private String[] _destinationKeys;
-    private boolean _isLinked;
 
     public Liszt() { this(false); }
     public Liszt(boolean isLinked) {
         _data = (E[]) new Object[0];
-        _isLinked = isLinked;
         _destinationKeys = new String[0];
 
         if (isLinked) _map = new LinkedHashMap<>(); else _map = new HashMap<>();
@@ -36,7 +35,6 @@ public class Liszt<E> implements List<E>, ILiszt<E> {
     }
     public Liszt(E[] data) { this(data,false); }
     public Liszt(E[] data, boolean isLinked) {
-        _isLinked = isLinked;
         _destinationKeys = new String[0];
 
         if (isLinked) _map = new LinkedHashMap<>(); else _map = new HashMap<>();
@@ -123,13 +121,13 @@ public class Liszt<E> implements List<E>, ILiszt<E> {
 
     @Override
     public Liszt<E> addDdaForAll(E[] elements) {
-        if (add((E[]) elements)) return new Liszt<E>(elements, _isLinked);
+        if (add((E[]) elements)) return new Liszt<E>(elements, _map.getClass() == LinkedHashMap.class);
         return null;
     }
 
     @Override
     public Liszt<E> addDdas(E element) {
-        if (add((E[]) new Object[]{element})) new Liszt<E>((E[]) new Object[]{element}, _isLinked);
+        if (add((E[]) new Object[]{element})) new Liszt<E>((E[]) new Object[]{element}, _map.getClass() == LinkedHashMap.class);
         return null;
     }
 
@@ -362,5 +360,11 @@ public class Liszt<E> implements List<E>, ILiszt<E> {
     @Override
     public List<E> subList(int fromIndex, int toIndex) {
         return null;
+    }
+
+    @Override
+    public String toString() {
+        return "Liszt(size:"+size()+
+                ",map:"+(_map.getClass() == LinkedHashMap.class ? "Linked)" : "Unlinked)");
     }
 }
