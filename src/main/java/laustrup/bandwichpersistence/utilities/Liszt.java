@@ -44,7 +44,19 @@ public class Liszt<E> implements List<E>, ILiszt<E> {
 
     @Override public int size() { return _data.length; }
     @Override public boolean isEmpty() { return _data.length == 0 && _map.isEmpty(); }
-    @Override public boolean contains(Object object) { return object != null && _map.containsValue(object); }
+    @Override
+    public boolean contains(Object object) {
+        if (object != null) {
+            boolean exists = _map.containsValue(object);
+            if (!exists)
+                for (E data : _data)
+                    if (object == data)
+                        exists = true;
+
+            return exists;
+        }
+        return false;
+    }
     public boolean contains(String key) { return _map.containsKey(key); }
     @Override public Iterator<E> iterator() { return Arrays.stream(_data).iterator(); }
     @Override public Object[] toArray() { return Arrays.stream(_data).toArray(); }
@@ -63,15 +75,11 @@ public class Liszt<E> implements List<E>, ILiszt<E> {
                     elementIsFound = true;
                     break;
                 }
+            if (!elementIsFound) throw new ClassNotFoundException();
 
-            if (!elementIsFound)
-                throw new ClassNotFoundException();
-
-            _map.remove(element.toString());
-            if (_map.containsKey(replacement.toString()))
-                _map.put(String.valueOf(replacement.hashCode()), replacement);
-            else
-                _map.put(replacement.toString(), replacement);
+            _map.remove(_map.containsKey(element.toString()) ? element.toString() : String.valueOf(element.hashCode()));
+            _map.put(_map.containsKey(String.valueOf(replacement.hashCode())) ? String.valueOf(element.hashCode())
+                    : element.toString(), replacement);
 
             return _data;
         }
@@ -94,15 +102,11 @@ public class Liszt<E> implements List<E>, ILiszt<E> {
                         elementIsFound = true;
                         break;
                     }
-
             if (!elementIsFound) throw new ClassNotFoundException();
 
-            _map.remove(keyIsToString ? original.toString() : String.valueOf(original.hashCode()));
-
-            if (_map.containsKey(replacement.toString()))
-                _map.put(String.valueOf(replacement.hashCode()), replacement);
-            else
-                _map.put(replacement.toString(), replacement);
+            _map.remove(_map.containsKey(element.toString()) ? element.toString() : String.valueOf(element.hashCode()));
+            _map.put(_map.containsKey(String.valueOf(replacement.hashCode())) ? String.valueOf(element.hashCode())
+                    : element.toString(), replacement);
 
             return _data;
         }

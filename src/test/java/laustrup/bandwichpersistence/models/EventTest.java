@@ -6,17 +6,17 @@ import laustrup.bandwichpersistence.models.chats.Request;
 import laustrup.bandwichpersistence.models.events.Event;
 import laustrup.bandwichpersistence.models.events.Gig;
 import laustrup.bandwichpersistence.models.users.sub_users.Performer;
+import laustrup.bandwichpersistence.models.users.sub_users.venues.Venue;
 import laustrup.bandwichpersistence.services.TimeService;
 import laustrup.bandwichpersistence.utilities.Liszt;
 
 import laustrup.bandwichpersistence.utilities.Plato;
-import laustrup.bandwichpersistence.utilities.Printer;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -169,5 +169,44 @@ public class EventTest extends JTest {
         request.set_approved(new Plato(true));
         assertEquals(_event.get_requests().get(index).toString(), request.toString());
         assertTrue(_event.get_requests().get(index).get_approved().get_truth());
+    }
+
+    @Test
+    public void canSetVenue() {
+        for (int i = 0; i < 10; i++) {
+            // ARRANGE
+            _event = _items.get_events()[_random.nextInt(_items.get_eventAmount())];
+            Venue venue = _event.get_venue();
+            Venue newVenue = null;
+
+            do {
+                newVenue = _items.get_venues()[_random.nextInt(_items.get_venueAmount())];
+            } while (newVenue.get_primaryId() != venue.get_primaryId());
+
+            // ACT
+            begin();
+            _event.set_venue(newVenue);
+            calculatePerformance();
+
+            // ASSERT
+            assertEquals(newVenue, _event.get_venue());
+            assertFalse(_event.get_public().get_truth());
+            assertTrue(eventHasRequest(new Request(newVenue, _event, new Plato(Plato.Argument.UNDEFINED))));
+        }
+    }
+
+    private boolean eventHasRequest(Request request) {
+        boolean success = false;
+
+        success = _event.get_requests().contains(request);
+        if (!success)
+            success = _event.get_requests().contains(request.toString());
+        if (!success)
+            for (Request eventRequest : _event.get_requests())
+                if(eventRequest.get_primaryId() == request.get_primaryId() &&
+                        Objects.equals(eventRequest.get_secondaryId(), request.get_secondaryId()))
+                    success = true;
+
+        return success;
     }
 }

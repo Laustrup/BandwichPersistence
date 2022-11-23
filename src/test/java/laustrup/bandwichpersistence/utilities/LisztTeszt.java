@@ -115,7 +115,7 @@ class LisztTeszt extends JTest {
 
             Band original = bands[index];
             Band replacement = original;
-            replacement.set_description("This is a replacment!");
+            replacement.set_runner("This is a replacement!");
 
             try {
                 // ACT
@@ -124,6 +124,7 @@ class LisztTeszt extends JTest {
                 calculatePerformance();
 
                 // ASSERT
+                assertEquals(bands.length, _liszt.size());
                 assertEquals(replacement, _liszt.get(replacement.toString()));
                 assertFalse(_liszt.contains(original.toString()) || _liszt.contains(original.hashCode()));
 
@@ -143,17 +144,18 @@ class LisztTeszt extends JTest {
 
             Band original = bands[_random.nextInt(bands.length)];
             Band replacement = original;
-            replacement.set_description("This is a replacment!");
+            replacement.set_runner("This is a replacement!");
 
             try {
                 // ACT
                 begin();
-                _liszt.replace(replacement,original.toString());
+                _liszt.replace(replacement,original);
                 calculatePerformance();
 
                 // ASSERT
-                assertEquals(replacement, _liszt.get(replacement.toString()));
-                assertFalse(_liszt.contains(original.toString()) || _liszt.contains(original.hashCode()));
+                assertEquals(bands.length, _liszt.size());
+                assertTrue(_liszt.contains(replacement.toString()) || _liszt.contains(replacement.toString()));
+                assertFalse(_liszt.contains(original.toString()) || _liszt.contains(original.toString()));
 
                 break;
             } catch (ClassNotFoundException e) {

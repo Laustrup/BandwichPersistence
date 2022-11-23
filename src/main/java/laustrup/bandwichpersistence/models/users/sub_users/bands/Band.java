@@ -48,7 +48,7 @@ public class Band extends Performer {
                 Liszt<Album> music, Liszt<Artist> members, String runner,
                 Liszt<Participant> fans, Liszt<User> followings)
             throws InputMismatchException {
-        super(id, null, null, username, description, contactInfo, images, ratings, events, chatRooms, messages, subscription,
+        super(id, username, null, null, description, contactInfo, images, ratings, events, chatRooms, messages, subscription,
                 bulletins, timestamp, music, fans, followings);
 
         _members = members;

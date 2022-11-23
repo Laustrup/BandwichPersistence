@@ -407,13 +407,17 @@ public class Event extends Model {
      * @return The Venue that is set of the Event.
      */
     public Venue set_venue(Venue venue) {
-        for (Request request : _requests)
-            if (request.get_user().get_primaryId() == _venue.get_primaryId())
+        for (Request request : _requests) {
+            if (request.get_user().getClass() == Venue.class
+                    && request.get_user().get_primaryId() == _venue.get_primaryId()) {
                 _requests.remove(request);
+                break;
+            }
+        }
 
-        _requests.add(new Request(venue, this, new Plato(Plato.Argument.UNDEFINED)));
-        _public.set_argument(true);
+        _public.set_argument(false);
         _venue = venue;
+        _requests.add(new Request(venue, this, new Plato(Plato.Argument.UNDEFINED)));
 
         return _venue;
     }
