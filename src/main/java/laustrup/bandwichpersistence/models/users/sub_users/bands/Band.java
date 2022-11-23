@@ -46,10 +46,10 @@ public class Band extends Performer {
                 Liszt<ChatRoom> chatRooms, Liszt<Message> messages, Subscription subscription,
                 Liszt<Bulletin> bulletins, LocalDateTime timestamp,
                 Liszt<Album> music, Liszt<Artist> members, String runner,
-                Liszt<Participant> fans, Liszt<User> followings, Liszt<Request> requests)
+                Liszt<Participant> fans, Liszt<User> followings)
             throws InputMismatchException {
         super(id, null, null, username, description, contactInfo, images, ratings, events, chatRooms, messages, subscription,
-                bulletins, timestamp, music, fans, followings, requests);
+                bulletins, timestamp, music, fans, followings);
 
         _members = members;
         if (_members.size() <= 0)

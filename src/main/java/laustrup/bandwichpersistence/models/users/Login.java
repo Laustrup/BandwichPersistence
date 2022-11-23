@@ -57,7 +57,7 @@ public class Login {
                     containsSpecialCharacter = true;
 
                 try {
-                    int parse = Integer.parseInt(current);
+                    Integer.parseInt(current);
                     containsNumber = true;
                 } catch (Exception ignored) {}
 

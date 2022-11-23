@@ -214,7 +214,6 @@ public class TestItems extends JTest {
 
         for (int i = 0; i < _ratings.length; i++)
             _ratings[i] = new Rating(_random.nextInt(5)+1,new Band(), new Participant());
-
     }
 
     private void setupParticipants() {
@@ -285,7 +284,7 @@ public class TestItems extends JTest {
             _bands[i] = new Band(id, "Band "+id, "Description "+id,
                     _contactInfo[_random.nextInt(_contactInfo.length)], images.get(_random.nextInt(images.size())+1),
                     randomizeRatings(), new Liszt<>(), new Liszt<>(), new Liszt<>(), setupSubscription(new Band()), new Liszt<>(),
-                    LocalDateTime.now(), sortMusicAlbums(), members, "Gear "+id,fans, new Liszt<>(), new Liszt<>());
+                    LocalDateTime.now(), sortMusicAlbums(), members, "Gear "+id,fans, new Liszt<>());
 
             for (Artist artist : _bands[i].get_members()) _artists[(int) (artist.get_primaryId()-1)].addBand(_bands[i]);
             for (Participant participant : _bands[i].get_fans()) _participants[(int) (participant.get_primaryId() - 1)].add(_bands[i]);
@@ -375,13 +374,14 @@ public class TestItems extends JTest {
         }
         for (Request request : event.get_requests()) {
             User user = request.get_user();
-            if (user.getClass() == Venue.class) _venues[(int) user.get_primaryId()-1].add(request);
-            else if (user.getClass() == Artist.class) _artists[(int) user.get_primaryId()-1].add(request);
-            else if (user.getClass() == Band.class) {
-                _bands[(int) user.get_primaryId()-1].add(request);
+
+            if (user.getClass() == Venue.class)
+                _venues[(int) user.get_primaryId()-1].add(request);
+            else if (user.getClass() == Artist.class)
+                _artists[(int) user.get_primaryId()-1].add(request);
+            else if (user.getClass() == Band.class)
                 for (Artist artist : ((Band) user).get_members())
                     _artists[(int) artist.get_primaryId()-1].add(request);
-            }
         }
     }
 

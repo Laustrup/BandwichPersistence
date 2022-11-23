@@ -1,11 +1,8 @@
 package laustrup.bandwichpersistence.utilities;
 
-import laustrup.bandwichpersistence.models.chats.Request;
 import lombok.Getter;
 
-import java.lang.reflect.ParameterizedType;
 import java.util.*;
-import java.util.function.Predicate;
 
 /**
  * Implements a List of element E in an append way of adding elements.
