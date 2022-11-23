@@ -39,11 +39,11 @@ public abstract class Performer extends Participant {
 
     public Performer(long id, String username, String firstName, String lastName, String description,
                      ContactInfo contactInfo, Album images, Liszt<Rating> ratings, Liszt<Event> events,
-                     Liszt<ChatRoom> chatRooms, Liszt<Message> messages, Subscription subscription,
+                     Liszt<ChatRoom> chatRooms, Subscription subscription,
                      Liszt<Bulletin> bulletins, LocalDateTime timestamp, Liszt<Album> music,
                      Liszt<Participant> fans, Liszt<User> followings) {
         super(id, username, firstName, lastName, description, contactInfo, images, ratings, events,
-                chatRooms, messages, subscription, bulletins, timestamp, followings);
+                chatRooms, subscription, bulletins, timestamp, followings);
         _music = music;
         _fans = fans;
     }

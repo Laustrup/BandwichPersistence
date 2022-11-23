@@ -226,7 +226,7 @@ public class TestItems extends JTest {
             _participants[i] = new Participant(id, gender ? "Hansinator "+id : "Ursulanator "+id,
                     gender ? "Hans "+id : "Ursula "+id, "Hansen "+id, "Description "+id,
                     _contactInfo[_random.nextInt(_contactInfo.length)], images.get(_random.nextInt(images.size())+1),
-                    randomizeRatings(), new Liszt<>(), new Liszt<>(), new Liszt<>(), Subscription.Status.ACCEPTED,
+                    randomizeRatings(), new Liszt<>(), new Liszt<>(), Subscription.Status.ACCEPTED,
                     new SubscriptionOffer(TimeService.get_instance().generateRandom(),
                             _random.nextBoolean() ? SubscriptionOffer.Type.SALE : SubscriptionOffer.Type.FREE_TRIAL,
                             _random.nextDouble(1)), new Liszt<>(), LocalDateTime.now(), new Liszt<>());
@@ -243,7 +243,7 @@ public class TestItems extends JTest {
             _artists[i] = new Artist(id, gender ? "Hansinator "+id : "Ursulanator "+id,
                     gender ? "Hans "+id : "Ursula "+id, "Hansen "+id, "Description "+id,
                     _contactInfo[_random.nextInt(_contactInfo.length)], images.get(_random.nextInt(images.size())+1),
-                    randomizeRatings(), new Liszt<>(), new Liszt<>(), new Liszt<>(), setupSubscription(new Artist()), new Liszt<>(),
+                    randomizeRatings(), new Liszt<>(), new Liszt<>(), setupSubscription(new Artist()), new Liszt<>(),
                     LocalDateTime.now(), sortMusicAlbums(),new Liszt<>(), "Gear "+id, new Liszt<>(), new Liszt<>(),
                     new Liszt<>());
         }
@@ -283,7 +283,7 @@ public class TestItems extends JTest {
 
             _bands[i] = new Band(id, "Band "+id, "Description "+id,
                     _contactInfo[_random.nextInt(_contactInfo.length)], images.get(_random.nextInt(images.size())+1),
-                    randomizeRatings(), new Liszt<>(), new Liszt<>(), new Liszt<>(), setupSubscription(new Band()), new Liszt<>(),
+                    randomizeRatings(), new Liszt<>(), new Liszt<>(), setupSubscription(new Band()), new Liszt<>(),
                     LocalDateTime.now(), sortMusicAlbums(), members, "Gear "+id,fans, new Liszt<>());
 
             for (Artist artist : _bands[i].get_members()) _artists[(int) (artist.get_primaryId()-1)].addBand(_bands[i]);
@@ -307,7 +307,7 @@ public class TestItems extends JTest {
             int id = i+1;
             _venues[i] = new Venue(id, "Venue "+id, "Description "+id,
                     _contactInfo[_random.nextInt(_contactInfo.length)], images.get(_random.nextInt(images.size())+1),
-                    randomizeRatings(), new Liszt<>(), new Liszt<>(), new Liszt<>(), LocalDateTime.now(), "Location "+id,
+                    randomizeRatings(), new Liszt<>(), new Liszt<>(), LocalDateTime.now(), "Location "+id,
                     "Gear "+id, Subscription.Status.ACCEPTED,
                     new SubscriptionOffer(TimeService.get_instance().generateRandom(),
                             _random.nextBoolean() ? SubscriptionOffer.Type.SALE : SubscriptionOffer.Type.FREE_TRIAL,

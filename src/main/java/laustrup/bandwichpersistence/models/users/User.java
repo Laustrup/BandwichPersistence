@@ -97,12 +97,6 @@ public abstract class User extends Model {
     protected Liszt<ChatRoom> _chatRooms;
 
     /**
-     * All the Messages of this user, both sent and unsent.
-     */
-    @Getter
-    protected Liszt<Message> _messages;
-
-    /**
      * This subscription defines details of subscription,
      * including its status.
      * Only Artists and Bands can have a premium membership,
@@ -116,7 +110,7 @@ public abstract class User extends Model {
 
     public User(long id, String username, String firstName, String lastName, String description,
                 ContactInfo contactInfo, Album images, Liszt<Rating> ratings, Liszt<Event> events,
-                Liszt<ChatRoom> chatRooms, Liszt<Message> messages, Subscription subscription,
+                Liszt<ChatRoom> chatRooms, Subscription subscription,
                 Liszt<Bulletin> bulletins, LocalDateTime timestamp) {
         super(id,username + "-" + id,timestamp);
         _username = username;
@@ -129,7 +123,6 @@ public abstract class User extends Model {
         _ratings = ratings;
         _events = events;
         _chatRooms = chatRooms;
-        _messages = messages;
         _subscription = subscription;
         _bulletins = bulletins;
     }
@@ -146,7 +139,6 @@ public abstract class User extends Model {
         _ratings = new Liszt<>();
         _events = new Liszt<>();
         _chatRooms = new Liszt<>();
-        _messages = new Liszt<>();
         _bulletins = new Liszt<>();
 
         _subscription = subscription;
@@ -213,26 +205,6 @@ public abstract class User extends Model {
     }
 
     /**
-     * Will add a Message to this User.
-     * @param message A Message object, that is wished to be added to this User.
-     * @return All the Messages of this User.
-     */
-    public Liszt<Message> add(Message message) {
-        _messages.add(message);
-        return _messages;
-    }
-
-    /**
-     * Removes a Message of this User.
-     * @param message A Message object, that is wished to be removed from this User.
-     * @return All the Messages of this User.
-     */
-    public Liszt<Message> remove(Message message) {
-        _messages.remove(message);
-        return _messages;
-    }
-
-    /**
      * Removes an endpoint for an image file of this User.
      * @param endpoint An endpoint for a URL containing an image file, that is wished to be removed from this User.
      * @return The whole Album of this User.
@@ -288,22 +260,6 @@ public abstract class User extends Model {
         }
 
         return _ratings;
-    }
-
-    /**
-     * Edits a Message of this User.
-     * @param message An updated Message object, that is wished to be set as the new Message of this User.
-     * @return All the Messages of this User.
-     */
-    public Liszt<Message> edit(Message message) {
-        for (int i = 1; i <= _messages.size(); i++) {
-            if (_messages.get(i).get_primaryId() == message.get_primaryId()) {
-                _messages.set(i, message);
-                break;
-            }
-        }
-
-        return _messages;
     }
 
     /**

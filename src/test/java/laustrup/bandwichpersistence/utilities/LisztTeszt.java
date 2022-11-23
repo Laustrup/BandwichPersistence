@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
+import java.time.LocalDateTime;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class LisztTeszt extends JTest {
@@ -114,7 +116,12 @@ class LisztTeszt extends JTest {
             _liszt = new Liszt<>(bands);
 
             Band original = bands[index];
-            Band replacement = original;
+            Band replacement = new Band(original.get_primaryId(), original.get_username(),
+                    original.get_description(), original.get_contactInfo(),
+                    original.get_images(), original.get_ratings(), original.get_events(), original.get_chatRooms(),
+                    original.get_subscription(), original.get_bulletins(), original.get_timestamp(),
+                    original.get_music(), original.get_members(), original.get_runner(),
+                    original.get_fans(), original.get_followings());
             replacement.set_runner("This is a replacement!");
 
             try {
@@ -143,7 +150,12 @@ class LisztTeszt extends JTest {
             _liszt = new Liszt<>(bands);
 
             Band original = bands[_random.nextInt(bands.length)];
-            Band replacement = original;
+            Band replacement = new Band(original.get_primaryId(), original.get_username(),
+                    original.get_description(), original.get_contactInfo(),
+                    original.get_images(), original.get_ratings(), original.get_events(), original.get_chatRooms(),
+                    original.get_subscription(), original.get_bulletins(), original.get_timestamp(),
+                    original.get_music(), original.get_members(), original.get_runner(),
+                    original.get_fans(), original.get_followings());
             replacement.set_runner("This is a replacement!");
 
             try {

@@ -35,10 +35,10 @@ public class Participant extends User {
 
     public Participant(long id, String username, String firstName, String lastName, String description,
                        ContactInfo contactInfo, Album images, Liszt<Rating> ratings, Liszt<Event> events,
-                       Liszt<ChatRoom> chatRooms, Liszt<Message> messages, Subscription.Status subscriptionStatus,
+                       Liszt<ChatRoom> chatRooms, Subscription.Status subscriptionStatus,
                        SubscriptionOffer subscriptionOffer, Liszt<Bulletin> bulletins,
                        LocalDateTime timestamp, Liszt<User> followings) {
-        super(id, username, firstName, lastName, description, contactInfo, images, ratings, events, chatRooms, messages,
+        super(id, username, firstName, lastName, description, contactInfo, images, ratings, events, chatRooms,
                 new Subscription(new Participant(), Subscription.Type.FREEMIUM, subscriptionStatus, subscriptionOffer, null),
                 bulletins, timestamp);
         _followings = followings;
@@ -48,9 +48,9 @@ public class Participant extends User {
 
     public Participant(long id, String username, String firstName, String lastName, String description,
                        ContactInfo contactInfo, Album images, Liszt<Rating> ratings, Liszt<Event> events,
-                       Liszt<ChatRoom> chatRooms, Liszt<Message> messages, Subscription subscription,
+                       Liszt<ChatRoom> chatRooms, Subscription subscription,
                        Liszt<Bulletin> bulletins, LocalDateTime timestamp, Liszt<User> followings) {
-        super(id, username, firstName, lastName, description, contactInfo, images, ratings, events, chatRooms, messages,
+        super(id, username, firstName, lastName, description, contactInfo, images, ratings, events, chatRooms,
                 subscription, bulletins, timestamp);
         _followings = followings;
         _subscription.get_user().set_username(_username);

@@ -48,12 +48,12 @@ public class Artist extends Performer {
 
     public Artist(long id, String username, String firstName, String lastName, String description,
                   ContactInfo contactInfo, Album images, Liszt<Rating> ratings, Liszt<Event> events,
-                  Liszt<ChatRoom> chatRooms, Liszt<Message> messages, Subscription subscription,
+                  Liszt<ChatRoom> chatRooms, Subscription subscription,
                   Liszt<Bulletin> bulletins, LocalDateTime timestamp, Liszt<Album> music,
                   Liszt<Band> bands, String runner, Liszt<Participant> fans, Liszt<User> followings,
                   Liszt<Request> requests) {
         super(id, username, firstName, lastName, description, contactInfo, images, ratings,
-                events, chatRooms, messages, subscription, bulletins, timestamp, music, fans, followings);
+                events, chatRooms, subscription, bulletins, timestamp, music, fans, followings);
         _bands = bands;
         _runner = runner;
         _requests = requests;
