@@ -8,14 +8,17 @@
         <version>2.7.3</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
+
     <groupId>laustrup</groupId>
     <artifactId>BandwichPersistence</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
     <name>BandwichPersistence</name>
     <description>BandwichPersistence</description>
+
     <properties>
-        <java.version>17</java.version>
+        <java.version>18</java.version>
     </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework</groupId>

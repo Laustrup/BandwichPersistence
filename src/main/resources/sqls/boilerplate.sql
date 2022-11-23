@@ -45,7 +45,7 @@ CREATE TABLE cards(
     numbers BIGINT(16) NOT NULL,
     expiration_month INT(2) NOT NULL,
     expiration_year INT(2) NOT NULL,
-    control_digits INT(3) NOT NULL,
+    cvv INT(3) NOT NULL,
 
     PRIMARY KEY(id)
 );
@@ -54,14 +54,12 @@ CREATE TABLE users(
     id BIGINT(20) NOT NULL AUTO_INCREMENT,
     username VARCHAR(30) NOT NULL,
     `password` VARCHAR(30) NOT NULL,
-    first_name VARCHAR(20) NOT NULL,
-    last_name VARCHAR(40) NOT NULL,
+    first_name VARCHAR(20),
+    last_name VARCHAR(40),
     `description` VARCHAR(500),
     `timestamp` DATETIME NOT NULL,
-     card_id BIGINT(20),
     
-    PRIMARY KEY(id),
-    FOREIGN KEY(card_id) REFERENCES cards(id)
+    PRIMARY KEY(id)
 );
 
 CREATE TABLE band_members(
@@ -94,9 +92,6 @@ CREATE TABLE `events`(
     id BIGINT(20) NOT NULL AUTO_INCREMENT,
 
     open_doors DATETIME,
-    `start` DATETIME,
-    `end` DATETIME,
-
     `description` VARCHAR(1000),
 
     is_cancelled BOOL,
@@ -205,15 +200,15 @@ CREATE TABLE event_bulletins(
     bulletin_id BIGINT(20) NOT NULL,
 
     PRIMARY KEY(event_id, bulletin_id),
-    FOREIGN KEY(event_id) REFERENCES events(id),
-    FOREIGN KEY(bulletin_id) REFERENCES bulletins(id),
+    FOREIGN KEY(event_id) REFERENCES `events`(id),
+    FOREIGN KEY(bulletin_id) REFERENCES bulletins(id)
 );
 
 CREATE TABLE requests(
     user_id BIGINT(20) NOT NULL,
     event_id BIGINT(20) NOT NULL,
     is_approved BOOL,
-    message VARCHAR(250) NOT NULL,
+    message VARCHAR(250),
 
     PRIMARY KEY(user_id,event_id),
     FOREIGN KEY(user_id) REFERENCES users(id),
@@ -267,7 +262,6 @@ CREATE TABLE album_endpoints(
 );
 
 CREATE TABLE subscriptions(
-    id BIGINT(20) NOT NULL,
     user_id BIGINT(20) NOT NULL,
     subscription_status ENUM('ACCEPTED',
         'BLOCKED',
@@ -282,10 +276,9 @@ CREATE TABLE subscriptions(
     offer_expires DATETIME,
     offer_effect DOUBLE,
 
-    card_id BIGINT(8) NOT NULL,
-    PRIMARY KEY (user_id, card_id),
-    FOREIGN KEY(user_id) REFERENCES users(id),
-    FOREIGN KEY(card_id) REFERENCES cards(id)
+    card_id BIGINT(8),
+    PRIMARY KEY (user_id),
+    FOREIGN KEY(user_id) REFERENCES users(id)
 );
 
 CREATE TABLE contact_informations(
@@ -308,7 +301,3 @@ CREATE TABLE contact_informations(
     PRIMARY KEY(user_id),
     FOREIGN KEY(user_id) REFERENCES users(id)
 );
-
---------------------------------------------------------
--- Inserts default values into tables.
---------------------------------------------------------
