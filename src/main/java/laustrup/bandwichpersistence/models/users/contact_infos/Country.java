@@ -1,10 +1,12 @@
 package laustrup.bandwichpersistence.models.users.contact_infos;
 
 import lombok.Getter;
+import lombok.ToString;
 
 /**
  * An object with information about a curtain Country.
  */
+@ToString
 public class Country {
 
     /**

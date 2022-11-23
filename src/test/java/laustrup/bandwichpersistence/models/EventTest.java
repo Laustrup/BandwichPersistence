@@ -9,6 +9,7 @@ import laustrup.bandwichpersistence.models.users.sub_users.Performer;
 import laustrup.bandwichpersistence.services.TimeService;
 import laustrup.bandwichpersistence.utilities.Liszt;
 
+import laustrup.bandwichpersistence.utilities.Plato;
 import laustrup.bandwichpersistence.utilities.Printer;
 import org.junit.jupiter.api.Test;
 
@@ -77,26 +78,28 @@ public class EventTest extends JTest {
     }
     @Test
     public void canRemoveGigs() {
-        // ARRANGE
-        _event = _items.get_events()[_random.nextInt(_items.get_eventAmount())];
-        Gig[] gigsToRemove = new Gig[_event.get_gigs().size()-1];
-        Set<Gig> gigSet = new HashSet<>();
-        for (int i = 0; i < gigsToRemove.length; i++) {
-            Gig gig = _event.get_gigs().get(_random.nextInt(_event.get_gigs().size()));
-            while (gigSet.contains(gig)) gig = _event.get_gigs().get(_random.nextInt(_event.get_gigs().size()));
-            gigSet.add(gig);
+        for (int i = 0; i < 10; i++) {
+            // ARRANGE
+            _event = _items.get_events()[_random.nextInt(_items.get_eventAmount())];
+            Gig[] gigsToRemove = new Gig[_event.get_gigs().size()-1];
+            Set<Gig> gigSet = new HashSet<>();
+            for (int j = 0; j < gigsToRemove.length; j++) {
+                Gig gig = _event.get_gigs().get(_random.nextInt(_event.get_gigs().size())+1);
+                while (gigSet.contains(gig)) gig = _event.get_gigs().get(_random.nextInt(_event.get_gigs().size())+1);
+                gigSet.add(gig);
 
-            gigsToRemove[i] = gig;
+                gigsToRemove[j] = gig;
+            }
+
+            // ACT
+            begin();
+            _event.remove(gigsToRemove);
+            calculatePerformance();
+
+            // ASSERT
+            assertEquals(calculateEventLength(), _event.get_length());
+            assertTrue(requestsFitsGigs());
         }
-
-        // ACT
-        begin();
-        _event.remove(gigsToRemove);
-        calculatePerformance();
-
-        // ASSERT
-        assertEquals(calculateEventLength(), _event.get_length());
-        assertTrue(requestsFitsGigs());
     }
 
     private long calculateEventLength() {
@@ -112,9 +115,7 @@ public class EventTest extends JTest {
             if (gig.get_end().isAfter(end)) end = gig.get_end();
         }
 
-        length = Duration.between(start, end).toMillis();
-
-        return length;
+        return Duration.between(start, end).toMillis();
     }
     private boolean requestsFitsGigs() {
         Liszt<Request> requests = _event.get_requests();
@@ -123,20 +124,50 @@ public class EventTest extends JTest {
 
         for (Gig gig : gigs) {
             for (Request request : requests) {
-                for (Performer performer : gig.get_act()) {
-                    if (request.get_user().get_primaryId() == performer.get_primaryId()) {
-                        performerHasRequest = true;
-                        break;
+                if (gig.get_act().length>0) {
+                    for (Performer performer : gig.get_act()) {
+                        if (request.get_user().get_primaryId() == performer.get_primaryId()) {
+                            performerHasRequest = true;
+                            break;
+                        }
                     }
+                    if (!performerHasRequest) return false;
+                    performerHasRequest = false;
                 }
-                if (!performerHasRequest) {
-                    Printer.get_instance().print(Arrays.toString(requests.toArray()));
-                    return false;
-                }
-                performerHasRequest = false;
             }
         }
 
         return true;
+    }
+
+    @Test
+    public void canAcceptRequest() {
+        // ARRANGE
+        _event = _items.get_events()[_random.nextInt(_items.get_eventAmount())];
+        Request request = null;
+        int index = 0;
+
+        do {
+            for (int i = 1; i <= _event.get_requests().size(); i++) {
+                if (!_event.get_requests().get(i).get_approved().get_truth()) {
+                    request = _event.get_requests().get(i);
+                    index = i;
+                }
+            }
+
+            if (request == null)
+                _event = _items.get_events()[_random.nextInt(_items.get_eventAmount())];
+
+        } while (request == null);
+
+        // ACT
+        begin();
+        _event.acceptRequest(request);
+        calculatePerformance();
+
+        // ASSERT
+        request.set_approved(new Plato(true));
+        assertEquals(_event.get_requests().get(index).toString(), request.toString());
+        assertTrue(_event.get_requests().get(index).get_approved().get_truth());
     }
 }

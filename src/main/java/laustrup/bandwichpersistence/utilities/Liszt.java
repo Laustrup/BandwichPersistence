@@ -45,6 +45,7 @@ public class Liszt<E> implements List<E>, ILiszt<E> {
     @Override public int size() { return _data.length; }
     @Override public boolean isEmpty() { return _data.length == 0 && _map.isEmpty(); }
     @Override public boolean contains(Object object) { return object != null && _map.containsValue(object); }
+    public boolean contains(String key) { return _map.containsKey(key); }
     @Override public Iterator<E> iterator() { return Arrays.stream(_data).iterator(); }
     @Override public Object[] toArray() { return Arrays.stream(_data).toArray(); }
     @Override public <T> T[] toArray(T[] a) { return (T[]) Arrays.stream(_data).toArray(); }
@@ -339,8 +340,10 @@ public class Liszt<E> implements List<E>, ILiszt<E> {
 
     @Override
     public E set(int index, E element) {
-        _data[index] = element;
-        return _data[index];
+        _data[index-1] = element;
+        addElementToDestination(element);
+        insertDestinationsIntoMap();
+        return _data[index-1];
     }
 
     @Override

@@ -364,11 +364,27 @@ public class Event extends Model {
      * Accepts the request by using a toString() to find the Request.
      * Afterwards using the approve() method to set approved to true.
      * @param request The Request that is wished to have its approved set to true.
-     * @return The request that is changed.
+     * @return The Request that is changed. If it is not changed, it returns null.
      */
     public Request acceptRequest(Request request) {
-        _requests.get(request.toString()).approve();
-        return _requests.get(request.toString());
+        Request edited = null;
+
+        try {
+            edited = new Request(request.get_user(), request.get_event(), new Plato(true));
+            _requests.replace(edited, request);
+            edited = _requests.get(_requests.contains(request.toString()) ? request.toString() : String.valueOf(request.hashCode()));
+        } catch (ClassNotFoundException e) {
+            Printer.get_instance().print("Couldn't accept request " + request.get_title() + " for " + _title + "...", e);
+        } catch (InputMismatchException e) {
+            for (int i = 1; i <= _requests.size(); i++) {
+                if (_requests.get(i).get_primaryId() == request.get_primaryId() &&
+                        Objects.equals(_requests.get(i).get_secondaryId(), request.get_secondaryId())) {
+                    edited = new Request(request.get_user(), request.get_event(), new Plato(true));
+                    _requests.set(i, edited);
+                }
+            }
+        }
+        return edited;
     }
 
     /**
