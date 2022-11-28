@@ -111,11 +111,12 @@ CREATE TABLE `events`(
 );
 
 CREATE TABLE gigs(
+    id BIGINT(20) NOT NULL AUTO_INCREMENT,
     event_id BIGINT(20) NOT NULL,
     `start` DATETIME,
     `end` DATETIME,
 
-    PRIMARY KEY(event_id),
+    PRIMARY KEY(id),
     FOREIGN KEY(event_id) REFERENCES events(id)
 );
 
@@ -125,7 +126,7 @@ CREATE TABLE acts(
 
     PRIMARY KEY(user_id, gig_id),
     FOREIGN KEY(user_id) REFERENCES users(id),
-    FOREIGN KEY(gig_id) REFERENCES gigs(event_id)
+    FOREIGN KEY(gig_id) REFERENCES gigs(id)
 );
 
 CREATE TABLE participations(
@@ -257,7 +258,7 @@ CREATE TABLE album_endpoints(
     album_id BIGINT(20) NOT NULL,
     `value` VARCHAR(100) NOT NULL,
 
-    PRIMARY KEY(album_id),
+    PRIMARY KEY(album_id, `value`),
     FOREIGN KEY(album_id) REFERENCES albums(id)
 );
 
