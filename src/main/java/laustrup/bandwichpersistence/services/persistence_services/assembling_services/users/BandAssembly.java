@@ -13,6 +13,7 @@ import laustrup.bandwichpersistence.models.users.sub_users.participants.Particip
 import laustrup.bandwichpersistence.models.users.sub_users.subscriptions.Subscription;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.ModelAssembly;
 import laustrup.bandwichpersistence.utilities.Liszt;
+import laustrup.bandwichpersistence.utilities.Plato;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -67,10 +68,76 @@ public class BandAssembly {
         Liszt<User> followings = new Liszt<>();
 
         do {
+            ratings = handleRatings(set, ratings);
+            events = handleEvents(set, events);
+            chatRooms = handleChatRooms(set, chatRooms);
+            bulletins = handleBulletins(set, bulletins);
 
         } while (set.next());
 
         return new Band(id,username,description,contactInfo,images,ratings,events,chatRooms,subscription,bulletins,
                 timestamp,music,members,runner,fans,followings);
+    }
+
+    private Liszt<Rating> handleRatings(ResultSet set, Liszt<Rating> ratings) throws SQLException {
+        String table = "ratings";
+        Rating rating = new Rating(set.getInt(table+".`value`"),
+                set.getLong(table+".appointed_id"),
+                set.getLong(table+".judge_id"),
+                set.getTimestamp(table+".`timestamp`").toLocalDateTime());
+
+        if (!ratings.contains(rating.toString()))
+            ratings.add(rating);
+
+        return ratings;
+    }
+
+    //TODO Finish values
+    private Liszt<Event> handleEvents(ResultSet set, Liszt<Event> events) throws SQLException {
+        String table = "`events`";
+        Event event = new Event(set.getLong(table+".id"),
+                set.getString(table+".title"),
+                set.getString(table+".description"),
+                set.getTimestamp(table+".open_doors").toLocalDateTime(),
+                new Plato(Plato.Argument.valueOf(set.getString(table+".is_voluntary"))),
+                new Plato(Plato.Argument.valueOf(set.getString(table+".is_public"))),
+                new Plato(Plato.Argument.valueOf(set.getString(table+".is_cancelled"))),
+                new Plato(Plato.Argument.valueOf(set.getString(table+".is_sold_out"))),
+                set.getString(table+".location"),set.getDouble(table+".price"),
+                set.getString(table+".tickets_url"),null,new Liszt<>(),null,new Liszt<>(),
+                new Liszt<>(),new Liszt<>(),new Album(),set.getTimestamp(table+".timestamp").toLocalDateTime());
+
+        if (!events.contains(event.toString()))
+            events.add(event);
+
+        return events;
+    }
+
+    //TODO Finish values
+    private Liszt<ChatRoom> handleChatRooms(ResultSet set, Liszt<ChatRoom> chatRooms) throws SQLException {
+        String table = "chat_rooms";
+        ChatRoom chatRoom = new ChatRoom(set.getLong(table+".id"),
+                set.getString(table+".title"),
+                set.getTimestamp(table+".`timestamp`").toLocalDateTime());
+
+        if (!chatRooms.contains(chatRoom))
+            chatRooms.add(chatRoom);
+
+        return chatRooms;
+    }
+
+    //TODO Finish values
+    private Liszt<Bulletin> handleBulletins(ResultSet set, Liszt<Bulletin> bulletins) throws SQLException {
+        String table = "bulletins";
+
+        Bulletin bulletin = new Bulletin(set.getLong(table+".id"),
+                set.getString(table+".content"),set.getBoolean(table+".is_sent"),
+                set.getBoolean(table+".is_edited"), set.getBoolean(table+".is_public"),
+                set.getTimestamp(table+".`timestamp`").toLocalDateTime());
+
+        if (!bulletins.contains(bulletin))
+            bulletins.add(bulletin);
+
+        return bulletins;
     }
 }

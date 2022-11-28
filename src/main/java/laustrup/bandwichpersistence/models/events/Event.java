@@ -168,7 +168,7 @@ public class Event extends Model {
     }
 
     public Event(long id, String title, String description, LocalDateTime openDoors,
-                 Plato isVoluntary, Plato isPublic, Plato isSoldOut, String location, double price,
+                 Plato isVoluntary, Plato isPublic, Plato isCancelled, Plato isSoldOut, String location, double price,
                  String ticketsURL, ContactInfo contactInfo, Liszt<Gig> gigs, Venue venue, Liszt<Request> requests,
                  Liszt<Participation> participations, Liszt<Bulletin> bulletins, Album images, LocalDateTime timestamp)
             throws InputMismatchException {
@@ -190,6 +190,7 @@ public class Event extends Model {
 
         _voluntary = isVoluntary;
         _public = isPublic;
+        _cancelled = isCancelled;
         _soldOut = isSoldOut;
         _price = price;
         _ticketsURL = ticketsURL;
@@ -203,7 +204,6 @@ public class Event extends Model {
         _bulletins = bulletins;
         _images = images;
 
-        _cancelled = new Plato();
     }
 
     /**

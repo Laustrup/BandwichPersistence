@@ -60,7 +60,12 @@ public class ChatRoom extends Model {
         _responsible = responsible;
 
         isTheChatRoomAnswered();
-        int i = 0;
+    }
+
+    public ChatRoom(long id, String title, LocalDateTime timestamp) {
+        super(id, title.isEmpty() || title == null ? "ChatRoom-"+id : title, timestamp);
+        _mails = new Liszt<>();
+        _chatters = new Liszt<>();
     }
 
     public ChatRoom(String title, Liszt<User> chatters, User responsible) {

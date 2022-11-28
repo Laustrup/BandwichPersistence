@@ -327,7 +327,7 @@ public class TestItems extends JTest {
 
             _events[i] = new Event(id,"Event title " + id, "Event description " + id,
                     startOfLatestGig.minusMinutes(gigAmount*gigAmount).minusHours(5),
-                    generatePlato(), generatePlato(), generatePlato(), "Location " + id,
+                    generatePlato(), generatePlato(), generatePlato(), generatePlato(), "Location " + id,
                     _random.nextDouble(498)+1, "https://www.Billetlugen.dk/"+id,
                     _contactInfo[_random.nextInt(_contactInfo.length)],
                     generateGigs(startOfLatestGig, gigAmount, gigLengths),

@@ -13,7 +13,6 @@ import java.util.InputMismatchException;
  * Can be added to a model to indicate the rating that the model is appreciated.
  * Is created by a user.
  */
-@ToString
 public class Rating extends Model {
 
     /**
@@ -44,12 +43,20 @@ public class Rating extends Model {
     private String _comment;
 
     public Rating(int value, User appointed, User judge, LocalDateTime timestamp) throws InputMismatchException {
-        super(appointed.get_primaryId(), judge.get_primaryId(), appointed.get_primaryId()+"-"+judge.get_primaryId(), timestamp);
+        super(appointed.get_primaryId(), judge.get_primaryId(), appointed.get_username()+"-"+judge.get_username(), timestamp);
         if (0 < value && value <= 5 ) {
             _value = value;
             _appointed = appointed;
             _judge = judge;
         }
+        else
+            throw new InputMismatchException();
+    }
+
+    public Rating(int value, long appointedId, long judgeId, LocalDateTime timestamp) throws InputMismatchException {
+        super(appointedId, judgeId, appointedId+"-"+judgeId, timestamp);
+        if (0 < value && value <= 5 )
+            _value = value;
         else
             throw new InputMismatchException();
     }
@@ -79,5 +86,21 @@ public class Rating extends Model {
             throw new InputMismatchException();
 
         return _value;
+    }
+
+    @Override
+    public String toString() {
+        if (_appointed == null || _judge == null)
+            return "Rating(value:" + _value +
+                    ",appointed:" + _primaryId +
+                    ",judge:" + _secondaryId +
+                    ",timestamp" + _timestamp +
+                    ")";
+        else
+            return "Rating(value:" + _value +
+                    ",appointed:" + _appointed.get_title() +
+                    ",judge:" + _judge.get_title() +
+                    ",timestamp" + _timestamp +
+                    ")";
     }
 }

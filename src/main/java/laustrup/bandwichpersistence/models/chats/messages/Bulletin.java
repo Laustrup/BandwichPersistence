@@ -19,6 +19,10 @@ public class Bulletin extends Message {
         _receiver = receiver;
     }
 
+    public Bulletin(long id, String content, boolean isSent, boolean isEdited, boolean isPublic, LocalDateTime timestamp) {
+        super(id, null, content, isSent, isEdited, isPublic, timestamp);
+    }
+
     public Bulletin(User author, String content) {
         super(author);
     }

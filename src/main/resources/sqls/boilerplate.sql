@@ -94,14 +94,33 @@ CREATE TABLE venues(
 
 CREATE TABLE `events`(
     id BIGINT(20) NOT NULL AUTO_INCREMENT,
+    title VARCHAR(60) NOT NULL,
 
     open_doors DATETIME,
     `description` VARCHAR(1000),
 
-    is_cancelled BOOL,
-    is_voluntary BOOL,
-    is_public BOOL,
-    is_sold_out BOOL,
+    is_cancelled ENUM(
+        'FALSE',
+        'TRUE',
+        'UNDEFINED'
+        ),
+    is_voluntary ENUM(
+        'FALSE',
+        'TRUE',
+        'UNDEFINED'
+        ),
+    is_public ENUM(
+        'FALSE',
+        'TRUE',
+        'UNDEFINED'
+        ),
+    is_sold_out ENUM(
+        'FALSE',
+        'TRUE',
+        'UNDEFINED',
+        'BELOW_HALF',
+        'ABOVE_HALF'
+        ),
 
     location VARCHAR(50) NOT NULL,
     price DOUBLE,
@@ -157,7 +176,9 @@ CREATE TABLE followings(
 
 CREATE TABLE chat_rooms(
     id BIGINT(20) NOT NULL AUTO_INCREMENT,
+    title VARCHAR(50) NOT NULL,
     responsible_id BIGINT(20) NOT NULL,
+    `timestamp` DATETIME NOT NULL,
 
     PRIMARY KEY(id),
     FOREIGN KEY(responsible_id) REFERENCES users(id)
@@ -194,6 +215,7 @@ CREATE TABLE bulletins(
     is_edited BOOL,
     is_public BOOL NOT NULL,
     receiver_id BIGINT(20) NOT NULL,
+    `timestamp` DATETIME NOT NULL,
 
     PRIMARY KEY(id),
     FOREIGN KEY(author_id) REFERENCES users(id),
@@ -224,6 +246,7 @@ CREATE TABLE ratings(
     appointed_id BIGINT(20) NOT NULL,
     judge_id BIGINT(20) NOT NULL,
     `value` INT(1) NOT NULL,
+    `timestamp` DATETIME NOT NULL,
 
     PRIMARY KEY(appointed_id, judge_id),
     FOREIGN KEY(appointed_id) REFERENCES users(id),
