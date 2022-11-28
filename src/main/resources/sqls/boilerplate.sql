@@ -58,6 +58,10 @@ CREATE TABLE users(
     last_name VARCHAR(40),
     `description` VARCHAR(500),
     `timestamp` DATETIME NOT NULL,
+    kind ENUM('BAND',
+        'ARTIST',
+        'VENUE',
+        'PARTICIPANT') NOT NULL,
     
     PRIMARY KEY(id)
 );
