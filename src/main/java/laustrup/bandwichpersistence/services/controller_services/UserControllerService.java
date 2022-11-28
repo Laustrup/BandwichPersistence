@@ -2,7 +2,8 @@ package laustrup.bandwichpersistence.services.controller_services;
 
 import laustrup.bandwichpersistence.models.users.Login;
 import laustrup.bandwichpersistence.models.users.User;
-import laustrup.bandwichpersistence.services.persistence_services.assembling_services.users.UserAssembly;
+import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembly;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -34,7 +35,7 @@ public class UserControllerService {
      * @return The created ResponseEntity of a User.
      */
     public ResponseEntity<User> get(Login login) {
-        User user = UserAssembly.get_instance().assemble(login);
+        User user = Assembly.get_instance().getUser(login);
 
         if ((login.usernameIsEmailKind() &&
                 (user.get_contactInfo().get_email() == null || user.get_contactInfo().get_email().isEmpty())) ||
@@ -52,7 +53,7 @@ public class UserControllerService {
      * @return The created ResponseEntity of a User.
      */
     public ResponseEntity<User> get(long id) {
-        return entityContent(UserAssembly.get_instance().assemble(id));
+        return entityContent(Assembly.get_instance().getUser(id));
     }
 
     /**

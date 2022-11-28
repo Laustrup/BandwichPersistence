@@ -56,12 +56,20 @@ public class Subscription extends Model {
     private Long _cardId;
 
     public Subscription(User user, Type type, Status status, SubscriptionOffer offer, Long cardId, LocalDateTime timestamp) {
-        super(user.get_primaryId(), cardId, user.get_title() + "-Subscription: " + user.get_primaryId(), timestamp);
-        _user = user;
+        super(user.get_primaryId(), cardId, user.get_username()+"-Subscription: " + user.get_primaryId(), timestamp);
         _type = defineType(type);
         _status = status;
         _offer = offer;
         _cardId = cardId;
+    }
+
+    public Subscription(long id, Type type, Status status, SubscriptionOffer offer, Long cardId) {
+        super(id, cardId, "Unkown_user-Subscription: " + id);
+        _type = defineType(type);
+        _status = status;
+        _offer = offer;
+        _cardId = cardId;
+        _timestamp = null;
     }
 
     public Subscription(User user, Type type, Status status, SubscriptionOffer offer, Long cardId) {
@@ -82,7 +90,21 @@ public class Subscription extends Model {
     public Long set_cardId(long id) {
         if (_cardId==null)
             _cardId = id;
+
         return _cardId;
+    }
+
+    /**
+     * This is only meant to be used in User class after assemble.
+     * Will only set the User, if the User is null.
+     * @param user The User that will be set for this Subscription.
+     * @return The User of this Subscription.
+     */
+    public User set_user(User user) {
+        if (user == null)
+            _user = user;
+
+        return _user;
     }
 
     /**
@@ -99,6 +121,7 @@ public class Subscription extends Model {
      */
     private Type defineType(Type type) {
         _type = type;
+
         if (_user.getClass() != Artist.class && _user.getClass() != Band.class) {
             switch (_type) {
                 case PREMIUM_BAND -> {
@@ -117,11 +140,13 @@ public class Subscription extends Model {
      * Checks if there is a free trial offer or the User is either a Band or Artist,
      * since they are the only paying Users.
      * Also calculates the Offer effect with the price.
+     *
      * @return The price per month of the User as a double, since it is multiplied with the Offer effect.
      */
     public double get_price() {
-        if ((_user.getClass() == Band.class || _user.getClass() == Artist.class) &&
-            (_offer.get_type() != SubscriptionOffer.Type.FREE_TRIAL && !isOfferExpired()))
+        if (_user != null &&
+                ((_user.getClass() == Band.class || _user.getClass() == Artist.class) &&
+                (_offer.get_type() != SubscriptionOffer.Type.FREE_TRIAL && !isOfferExpired())))
             return isOfferExpired() ? _price : _price * _offer.get_effect();
         else return 0;
     }

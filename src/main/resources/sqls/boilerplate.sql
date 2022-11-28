@@ -268,7 +268,7 @@ CREATE TABLE album_endpoints(
 
 CREATE TABLE subscriptions(
     user_id BIGINT(20) NOT NULL,
-    subscription_status ENUM('ACCEPTED',
+    `status` ENUM('ACCEPTED',
         'BLOCKED',
         'DISACTIVATED',
         'CLOSED') NOT NULL,
@@ -293,6 +293,7 @@ CREATE TABLE contact_informations(
     first_digits INT(3),
     phone_number INT(10),
     phone_is_mobile BOOL,
+    /* Address */
     street VARCHAR(50),
     floor VARCHAR(10),
     postal VARCHAR(10),

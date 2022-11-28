@@ -22,7 +22,6 @@ public class Album extends Model {
     @Getter
     public LocalDateTime _timestamp;
 
-    // Constructor for from database
     public Album(long id, String title, Liszt<String> urls, User author, Kind kind, LocalDateTime timestamp) {
         super(id, title, timestamp);
         _endpoints = urls;
@@ -30,7 +29,6 @@ public class Album extends Model {
         _kind = kind;
     }
 
-    // Constructor to add database
     public Album(String title, Liszt<String> endpoints, User author, Kind kind) {
         super(title);
         _endpoints = endpoints;
@@ -38,7 +36,19 @@ public class Album extends Model {
         _kind = kind;
     }
 
-    // Add methods
+    public Album(String title, Kind kind) {
+        super(title);
+        _endpoints = new Liszt<>();
+        _kind = kind;
+    }
+
+    public Model setAuthor(Model author) {
+        if (_author==null)
+            _author = author;
+
+        return _author;
+    }
+
     public Liszt<String> add(String endpoint) { return add(new String[]{endpoint}); }
 
     public Liszt<String> add(String[] endpoints) {
@@ -46,7 +56,6 @@ public class Album extends Model {
         return _endpoints;
     }
 
-    // Remove methods
     public Liszt<String> remove(String url) {
         _endpoints.remove(url);
         return _endpoints;

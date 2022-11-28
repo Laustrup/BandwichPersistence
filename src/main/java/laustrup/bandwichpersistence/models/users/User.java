@@ -145,6 +145,26 @@ public abstract class User extends Model {
     }
 
     /**
+     * Sets the User of the Subscription as this User.
+     * Is meant for after assembling.
+     * @return The Subscription of this User.
+     */
+    public Subscription setSubscriptionUser() {
+        _subscription.set_user(this);
+        return _subscription;
+    }
+
+    /**
+     * Sets the author of the image Album as this User.
+     * Is meant for after assembling.
+     * @return The images of this User.
+     */
+    public Album setImagesAuthor() {
+        _images.setAuthor(this);
+        return _images;
+    }
+
+    /**
      * Sets the full name from first- and last name with a white space between.
      * @return The calculated full name.
      */

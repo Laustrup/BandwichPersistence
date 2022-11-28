@@ -54,6 +54,12 @@ public abstract class Model {
         _title = title;
         _timestamp = timestamp;
     }
+    public Model(long id1, long id2, String title) {
+        _primaryId = id1;
+        _secondaryId = id2;
+        _title = title;
+        _timestamp = LocalDateTime.now();
+    }
 
     public Model(long id1, long id2, String title, LocalDateTime timestamp) {
         _primaryId = id1;

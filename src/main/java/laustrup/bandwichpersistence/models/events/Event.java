@@ -207,6 +207,16 @@ public class Event extends Model {
     }
 
     /**
+     * Sets the author of the image Album as this Event.
+     * Is meant for after assembling.
+     * @return The images of this Event.
+     */
+    public Album setImagesAuthor() {
+        _images.setAuthor(this);
+        return _images;
+    }
+
+    /**
      * Adds the given Gig to gigs of current Event.
      * @param gig Determines a specific Gig of one MusicalUser for a specific time.
      * @return All the Gigs of the current Event.

@@ -50,7 +50,7 @@ public class UserAssembly {
 
     /**
      * Assembles the User from a ResultSet.
-     * Will also close the Connection to the database, when it is done assembling.
+     * Will not close the Connection to the database, when it is done assembling.
      * @param set A JDBC ResultSet that is gathered from the rows of the SQL statement to the database.
      * @return The assembled User.
      */
@@ -69,7 +69,6 @@ public class UserAssembly {
             Printer.get_instance().print("Trouble assembling user...", e);
         }
 
-        UserRepository.get_instance().closeConnection();
         return user;
     }
 }
