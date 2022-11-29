@@ -1,6 +1,9 @@
 package laustrup.bandwichpersistence.repositories.sub_repositories;
 
 import laustrup.bandwichpersistence.repositories.Repository;
+import laustrup.bandwichpersistence.utilities.Liszt;
+
+import java.sql.ResultSet;
 
 /**
  * Are handling Repository actions for Artists.

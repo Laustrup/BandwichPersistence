@@ -11,6 +11,7 @@ import laustrup.bandwichpersistence.models.users.sub_users.bands.Artist;
 import laustrup.bandwichpersistence.models.users.sub_users.bands.Band;
 import laustrup.bandwichpersistence.models.users.sub_users.participants.Participant;
 import laustrup.bandwichpersistence.models.users.sub_users.subscriptions.Subscription;
+import laustrup.bandwichpersistence.repositories.sub_repositories.UserRepository;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.ModelAssembly;
 import laustrup.bandwichpersistence.utilities.Liszt;
 import laustrup.bandwichpersistence.utilities.Plato;
@@ -62,7 +63,7 @@ public class BandAssembly {
         Liszt<Bulletin> bulletins = new Liszt<>();
         LocalDateTime timestamp = set.getTimestamp("users.`timestamp`").toLocalDateTime();
         Liszt<Album> music = new Liszt<>();
-        Liszt<Artist> members = new Liszt<>();
+        Liszt<Long> memberIds = new Liszt<>();
         String runner = set.getString("gear.`description`");
         Liszt<Participant> fans = new Liszt<>();
         Liszt<User> followings = new Liszt<>();
@@ -72,11 +73,19 @@ public class BandAssembly {
                 images = handleEndpoints(set, images);
             else
                 music = handleMusic(set, music);
+
             ratings = handleRatings(set, ratings);
             events = handleEvents(set, events);
             chatRooms = handleChatRooms(set, chatRooms);
             bulletins = handleBulletins(set, bulletins);
+
+            if (!memberIds.contains(set.getLong("band_members.artist_id")))
+                memberIds.add(set.getLong("band_members.artist_id"));
+
         } while (set.next());
+
+        Liszt<Artist> members = ArtistAssembly.get_instance().assembles(UserRepository.get_instance().get(memberIds));
+
 
         return new Band(id,username,description,contactInfo,images,ratings,events,chatRooms,subscription,bulletins,
                 timestamp,music,members,runner,fans,followings);

@@ -2,6 +2,7 @@ package laustrup.bandwichpersistence.repositories.sub_repositories;
 
 import laustrup.bandwichpersistence.models.users.Login;
 import laustrup.bandwichpersistence.repositories.Repository;
+import laustrup.bandwichpersistence.utilities.Liszt;
 
 import java.sql.ResultSet;
 
@@ -52,6 +53,23 @@ public class UserRepository extends Repository {
      */
     public ResultSet get(long id) {
         return get(" WHERE users.id = " + id);
+    }
+
+    /**
+     * Will collect a JDBC ResultSet of several Users from the database, by using a SQL statement.
+     * @param ids The ids of the Users, that is wished to be found.
+     * @return The collected JDBC ResultSet.
+     */
+    public ResultSet get(Liszt<Long> ids) {
+        StringBuilder where = new StringBuilder("WHERE ");
+
+        for (int i = 1; i <= ids.size(); i++) {
+            where.append("id = ").append(ids.get(i));
+            if (i < ids.size())
+                where.append(" OR ");
+        }
+
+        return get(where.toString());
     }
 
     /**
