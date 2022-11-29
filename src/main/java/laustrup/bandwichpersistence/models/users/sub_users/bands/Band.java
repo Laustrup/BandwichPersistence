@@ -1,12 +1,10 @@
 package laustrup.bandwichpersistence.models.users.sub_users.bands;
 
-import laustrup.bandwichpersistence.models.chats.Request;
 import laustrup.bandwichpersistence.models.events.Event;
 import laustrup.bandwichpersistence.models.Rating;
 import laustrup.bandwichpersistence.models.albums.Album;
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
-import laustrup.bandwichpersistence.models.chats.messages.Message;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
 import laustrup.bandwichpersistence.models.users.sub_users.Performer;
@@ -15,9 +13,7 @@ import laustrup.bandwichpersistence.models.users.sub_users.subscriptions.Subscri
 import laustrup.bandwichpersistence.utilities.Liszt;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 import java.time.LocalDateTime;
 import java.util.InputMismatchException;
@@ -25,7 +21,6 @@ import java.util.InputMismatchException;
 /**
  * Extends performer and contains Artists as members
  */
-@NoArgsConstructor @ToString
 public class Band extends Performer {
 
     /**
@@ -114,5 +109,15 @@ public class Band extends Performer {
     public Liszt<Participant> removeFans(Participant[] fans) {
         _fans.remove(fans);
         return _fans;
+    }
+
+    @Override
+    public String toString() {
+        return "Band(id="+_primaryId+
+                ",username="+_username+
+                ",description="+_description+
+                ",timestamp="+_timestamp+
+                ",runner="+_runner+
+                ")";
     }
 }

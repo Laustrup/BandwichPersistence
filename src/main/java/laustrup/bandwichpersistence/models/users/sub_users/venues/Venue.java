@@ -25,7 +25,7 @@ import java.time.LocalDateTime;
  * itself and the opportunities for Events.
  * Extends from User, which means it also contains ChatRooms and other alike attributes.
  */
-@NoArgsConstructor @ToString
+@NoArgsConstructor
 public class Venue extends User {
 
     /**
@@ -165,5 +165,16 @@ public class Venue extends User {
     public Liszt<Event> removeEvents(Event[] events) {
         _events.remove(events);
         return _events;
+    }
+
+    @Override
+    public String toString() {
+        return "Venue(id="+_primaryId+
+                ",username="+_username+
+                ",location="+_location+
+                ",description="+_description+
+                ",gearDescription="+_gearDescription+
+                ",timestamp="+_timestamp+
+                ")";
     }
 }

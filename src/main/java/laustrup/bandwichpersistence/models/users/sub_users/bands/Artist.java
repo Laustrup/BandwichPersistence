@@ -6,7 +6,6 @@ import laustrup.bandwichpersistence.models.Rating;
 import laustrup.bandwichpersistence.models.albums.Album;
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
-import laustrup.bandwichpersistence.models.chats.messages.Message;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
 import laustrup.bandwichpersistence.models.users.sub_users.Performer;
@@ -25,7 +24,6 @@ import java.time.LocalDateTime;
  * An Artist can either be a solo Performer or member of a Band, which changes the Subscription, if it ain't freemium.
  * Extends from Performer.
  */
-@NoArgsConstructor @ToString
 public class Artist extends Performer {
 
     /**
@@ -133,5 +131,15 @@ public class Artist extends Performer {
     public Liszt<Request> remove(Request[] requests) {
         _requests.remove(requests);
         return _requests;
+    }
+
+    @Override
+    public String toString() {
+        return "Artist(id="+_primaryId+
+                ",username="+_username+
+                ",description="+_description+
+                ",timestamp="+_timestamp+
+                ",runner="+_runner+
+                ")";
     }
 }

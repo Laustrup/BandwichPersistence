@@ -5,7 +5,6 @@ import laustrup.bandwichpersistence.models.Rating;
 import laustrup.bandwichpersistence.models.albums.Album;
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
-import laustrup.bandwichpersistence.models.chats.messages.Message;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
 import laustrup.bandwichpersistence.models.users.sub_users.subscriptions.Subscription;
@@ -15,7 +14,6 @@ import laustrup.bandwichpersistence.utilities.Liszt;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 import java.time.LocalDateTime;
 
@@ -23,7 +21,7 @@ import java.time.LocalDateTime;
  * Defines a User, that will attend an Event as an audience.
  * Extends from User.
  */
-@NoArgsConstructor @ToString
+@NoArgsConstructor
 public class Participant extends User {
 
     /**
@@ -39,11 +37,12 @@ public class Participant extends User {
                        SubscriptionOffer subscriptionOffer, Liszt<Bulletin> bulletins,
                        LocalDateTime timestamp, Liszt<User> followings) {
         super(id, username, firstName, lastName, description, contactInfo, images, ratings, events, chatRooms,
-                new Subscription(new Participant(), Subscription.Type.FREEMIUM, subscriptionStatus, subscriptionOffer, null),
+                new Subscription(id, Subscription.Type.FREEMIUM, subscriptionStatus, subscriptionOffer, null),
                 bulletins, timestamp);
         _followings = followings;
         _subscription.get_user().set_username(_username);
         _subscription.get_user().set_description(_description);
+        setSubscriptionUser();
     }
 
     public Participant(long id, String username, String firstName, String lastName, String description,
@@ -60,11 +59,12 @@ public class Participant extends User {
     public Participant(String username, String firstName, String lastName, String description,
                        SubscriptionOffer subscriptionOffer, Liszt<User> followings) {
         super(username, firstName, lastName, description,
-                new Subscription(new Venue(), Subscription.Type.FREEMIUM,
+                new Subscription(new Participant(), Subscription.Type.FREEMIUM,
                         Subscription.Status.ACCEPTED, subscriptionOffer, null));
         _followings = followings;
         _subscription.get_user().set_username(_username);
         _subscription.get_user().set_description(_description);
+        setSubscriptionUser();
     }
 
     public Participant(String username, String firstName, String lastName, String description,
@@ -91,5 +91,14 @@ public class Participant extends User {
     public Liszt<User> remove(User following) {
         _followings.remove(following);
         return _followings;
+    }
+
+    @Override
+    public String toString() {
+        return "Artist(id="+_primaryId+
+                ",username="+_username+
+                ",description="+_description+
+                ",timestamp="+_timestamp+
+                ")";
     }
 }

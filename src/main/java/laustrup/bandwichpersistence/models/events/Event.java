@@ -21,7 +21,7 @@ import java.util.*;
 /**
  * An Event is placed a gig, where a venue is having bands playing at specific times.
  */
-@NoArgsConstructor @ToString
+@NoArgsConstructor
 public class Event extends Model {
 
     /**
@@ -620,4 +620,13 @@ public class Event extends Model {
         throw new InputMismatchException();
     }
 
+    @Override
+    public String toString() {
+        return "Event(id="+_primaryId+
+                ",title="+_title+
+                ",description="+_description+
+                ",price="+_price+
+                ",timestamp="+_timestamp+
+                ")";
+    }
 }
