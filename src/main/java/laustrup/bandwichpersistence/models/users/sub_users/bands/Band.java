@@ -13,6 +13,7 @@ import laustrup.bandwichpersistence.models.users.sub_users.subscriptions.Subscri
 import laustrup.bandwichpersistence.utilities.Liszt;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
@@ -21,6 +22,7 @@ import java.util.InputMismatchException;
 /**
  * Extends performer and contains Artists as members
  */
+@NoArgsConstructor
 public class Band extends Performer {
 
     /**

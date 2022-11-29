@@ -68,15 +68,47 @@ public class BandAssembly {
         Liszt<User> followings = new Liszt<>();
 
         do {
+            if (Album.Kind.valueOf(set.getString("albums.kind")).equals(Album.Kind.IMAGE))
+                images = handleEndpoints(set, images);
+            else
+                music = handleMusic(set, music);
             ratings = handleRatings(set, ratings);
             events = handleEvents(set, events);
             chatRooms = handleChatRooms(set, chatRooms);
             bulletins = handleBulletins(set, bulletins);
-
         } while (set.next());
 
         return new Band(id,username,description,contactInfo,images,ratings,events,chatRooms,subscription,bulletins,
                 timestamp,music,members,runner,fans,followings);
+    }
+
+    private Liszt<Album> handleMusic(ResultSet set, Liszt<Album> music) throws SQLException {
+        String table = "album";
+        Album album = new Album(set.getLong(table+".id"),
+                set.getString(table+".title"),
+                new Liszt<>(),null, new Liszt<>(), Album.Kind.MUSIC,
+                set.getTimestamp(table+".`timestamp`").toLocalDateTime());
+
+        if (!music.contains(album.toString()))
+            music.add(album);
+
+        try {
+            music.replace(handleEndpoints(set, music.get(music.size())),music.size());
+        } catch (ClassNotFoundException e) {
+            music.set(music.size(), handleEndpoints(set, music.get(music.size())));
+        }
+
+        return music;
+    }
+
+    private Album handleEndpoints(ResultSet set, Album album) throws SQLException {
+        String table = "album_endpoints";
+        String endpoint = set.getString(table+".`value`");
+        if (album.get_primaryId() == set.getLong(table+".album_id") &&
+                !album._endpoints.contains(endpoint))
+            album.add(endpoint);
+
+        return album;
     }
 
     private Liszt<Rating> handleRatings(ResultSet set, Liszt<Rating> ratings) throws SQLException {
@@ -140,4 +172,5 @@ public class BandAssembly {
 
         return bulletins;
     }
+
 }

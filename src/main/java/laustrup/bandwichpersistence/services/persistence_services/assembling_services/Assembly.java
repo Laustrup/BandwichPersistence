@@ -2,6 +2,9 @@ package laustrup.bandwichpersistence.services.persistence_services.assembling_se
 
 import laustrup.bandwichpersistence.models.users.Login;
 import laustrup.bandwichpersistence.models.users.User;
+import laustrup.bandwichpersistence.models.users.sub_users.Performer;
+import laustrup.bandwichpersistence.models.users.sub_users.bands.Artist;
+import laustrup.bandwichpersistence.models.users.sub_users.bands.Band;
 import laustrup.bandwichpersistence.repositories.sub_repositories.UserRepository;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.users.UserAssembly;
 
@@ -40,6 +43,8 @@ public class Assembly {
 
         user.setSubscriptionUser();
         user.setImagesAuthor();
+        if (user.getClass() == Artist.class || user.getClass() == Band.class)
+            ((Performer) user).setAuthorOfAlbums();
 
         UserRepository.get_instance().closeConnection();
         return user;

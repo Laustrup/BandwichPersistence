@@ -55,6 +55,16 @@ public abstract class Performer extends Participant {
     }
 
     /**
+     * Will set all the albums' author as this Performer.
+     * Only use for assembly.
+     */
+    public void setAuthorOfAlbums() {
+        _images.setAuthor(this);
+        for (int i = 1; i <= _music.size(); i++)
+            _music.get(i).setAuthor(this);
+    }
+
+    /**
      * Sets the card id of the Subscription.
      * Purpose is to use first time card information are provided.
      * @param id The id long value of the card, that is wished to be set.

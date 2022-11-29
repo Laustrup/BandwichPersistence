@@ -16,7 +16,6 @@ import laustrup.bandwichpersistence.utilities.Liszt;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 import java.time.LocalDateTime;
 
@@ -24,6 +23,7 @@ import java.time.LocalDateTime;
  * An Artist can either be a solo Performer or member of a Band, which changes the Subscription, if it ain't freemium.
  * Extends from Performer.
  */
+@NoArgsConstructor
 public class Artist extends Performer {
 
     /**

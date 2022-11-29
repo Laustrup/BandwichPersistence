@@ -205,7 +205,7 @@ public class TestItems extends JTest {
 
             _albums[i] = new Album(i+1, kind == Album.Kind.MUSIC ? "Debut album" : "Gig photos",
                     new Liszt<>(new String[]{kind == Album.Kind.MUSIC ? "MusicEndpoint" : "PhotoEndpoint"},false),
-                    new Participant(), kind, LocalDateTime.now());
+                    new Participant(), new Liszt<>(), kind, LocalDateTime.now());
         }
     }
 

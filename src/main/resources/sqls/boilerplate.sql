@@ -12,8 +12,10 @@ USE bandwich_db;
 DROP TABLE IF EXISTS contact_informations;
 DROP TABLE IF EXISTS subscriptions;
 DROP TABLE IF EXISTS album_endpoints;
+DROP TABLE IF EXISTS co_event_albums;
 DROP TABLE IF EXISTS event_albums;
-DROP TABLE IF EXISTS user_albums;
+DROP TABLE IF EXISTS co_album_user_authors;
+DROP TABLE IF EXISTS album_user_authors;
 DROP TABLE IF EXISTS albums;
 DROP TABLE IF EXISTS ratings;
 DROP TABLE IF EXISTS requests;
@@ -263,13 +265,22 @@ CREATE TABLE albums(
     PRIMARY KEY(id)
 );
 
-CREATE TABLE user_albums(
+CREATE TABLE album_user_authors(
     user_id BIGINT(20) NOT NULL,
     album_id BIGINT(20) NOT NULL,
 
     PRIMARY KEY(user_id, album_id),
     FOREIGN KEY(user_id) REFERENCES users(id),
     FOREIGN KEY(album_id) REFERENCES albums(id)
+);
+
+CREATE TABLE co_album_user_authors(
+    user_id  BIGINT(20) NOT NULL,
+    album_id BIGINT(20) NOT NULL,
+
+    PRIMARY KEY (user_id, album_id),
+    FOREIGN KEY (user_id) REFERENCES users (id),
+    FOREIGN KEY (album_id) REFERENCES albums (id)
 );
 
 CREATE TABLE event_albums(
@@ -279,6 +290,15 @@ CREATE TABLE event_albums(
     PRIMARY KEY(event_id, album_id),
     FOREIGN KEY(event_id) REFERENCES events(id),
     FOREIGN KEY(album_id) REFERENCES albums(id)
+);
+
+CREATE TABLE co_event_albums(
+     event_id BIGINT(20) NOT NULL,
+     album_id BIGINT(20) NOT NULL,
+
+     PRIMARY KEY(event_id, album_id),
+     FOREIGN KEY(event_id) REFERENCES events(id),
+     FOREIGN KEY(album_id) REFERENCES albums(id)
 );
 
 CREATE TABLE album_endpoints(
