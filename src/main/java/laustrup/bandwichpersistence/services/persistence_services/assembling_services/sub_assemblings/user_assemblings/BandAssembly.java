@@ -84,8 +84,10 @@ public class BandAssembly extends UserAssembler {
             _chatRooms = _handler.handleChatRooms(set, _chatRooms);
             _bulletins = _handler.handleBulletins(set, _bulletins);
 
-            idols = _handler.handleIdols(set, idols);
-            fans = _handler.handleFans(set, fans);
+            if (set.getLong("followings.idol_id") == _id)
+                fans = _handler.handleFans(set, fans);
+            else
+                idols = _handler.handleIdols(set, idols);
 
             if (!memberIds.contains(set.getLong("band_members.artist_id")))
                 memberIds.add(set.getLong("band_members.artist_id"));

@@ -87,8 +87,10 @@ public class ArtistAssembly extends UserAssembler {
             _chatRooms = _handler.handleChatRooms(set, _chatRooms);
             _bulletins = _handler.handleBulletins(set, _bulletins);
 
-            idols = _handler.handleIdols(set, idols);
-            fans = _handler.handleFans(set, fans);
+            if (set.getLong("followings.idol_id") == _id)
+                fans = _handler.handleFans(set, fans);
+            else
+                idols = _handler.handleIdols(set, idols);
 
             if (!bandIds.contains(set.getLong("band_members.band_id")))
                 bandIds.add(set.getLong("band_members.band_id"));
