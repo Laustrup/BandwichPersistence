@@ -1,4 +1,4 @@
-package laustrup.bandwichpersistence.services.persistence_services.assembling_services;
+package laustrup.bandwichpersistence.services.persistence_services.assembling_services.sub_assemblings;
 
 public class EventAssembly {
 

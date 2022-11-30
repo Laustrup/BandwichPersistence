@@ -1,8 +1,9 @@
-package laustrup.bandwichpersistence.services.persistence_services.assembling_services.users;
+package laustrup.bandwichpersistence.services.persistence_services.assembling_services.sub_assemblings.user_assemblings;
 
 import laustrup.bandwichpersistence.models.users.Login;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.repositories.sub_repositories.UserRepository;
+import laustrup.bandwichpersistence.utilities.Liszt;
 import laustrup.bandwichpersistence.utilities.Printer;
 
 import java.sql.ResultSet;
@@ -34,19 +35,39 @@ public class UserAssembly {
 
     /**
      * Builds a User object with the informations given from the UserRepository.
-     * Will be initiated as the object it is meant to be.
+     * Will be initiated as objects with primitive amounts of attributes.
      * @param login An object containing username and password.
      * @return The assembled User.
      */
-    public User assemble(Login login) { return assemble(UserRepository.get_instance().get(login)); }
+    public User assemble(Login login) { return assemble(UserRepository.get_instance().get(login),true); }
 
     /**
      * Builds a User object with the informations given from the UserRepository.
-     * Will be initiated as the object it is meant to be.
+     * Will be initiated as objects with primitive amounts of attributes.
      * @param id The id of the User that is wished to be assembled.
      * @return The assembled User.
      */
-    public User assemble(long id) { return assemble(UserRepository.get_instance().get(id)); }
+    public User assemble(long id) { return assemble(UserRepository.get_instance().get(id),true); }
+
+    /**
+     * Rebuilds Users that are only with Id.
+     * Will be initiated as objects with primitive amounts of attributes.
+     * @param users
+     * @return
+     */
+    public Liszt<User> assembles(Liszt<User> users) {
+        Liszt<Long> ids = new Liszt<>();
+        for (User user : users)
+            ids.add(user.get_primaryId());
+
+        users = new Liszt<>();
+        ResultSet set = UserRepository.get_instance().get(ids);
+
+        for (long id : ids)
+            users.add(assemble(set, false));
+
+        return users;
+    }
 
     /**
      * Assembles the User from a ResultSet.
@@ -54,11 +75,12 @@ public class UserAssembly {
      * @param set A JDBC ResultSet that is gathered from the rows of the SQL statement to the database.
      * @return The assembled User.
      */
-    private User assemble(ResultSet set) {
+    private User assemble(ResultSet set, boolean preInitiate) {
         User user = null;
 
         try {
-            set.next();
+            if (preInitiate)
+                set.next();
             switch (set.getString("users.kind")) {
                 case "BAND" -> user = BandAssembly.get_instance().assemble(set);
                 case "ARTIST" -> user = ArtistAssembly.get_instance().assemble(set);
@@ -71,4 +93,5 @@ public class UserAssembly {
 
         return user;
     }
+
 }

@@ -42,7 +42,7 @@ public abstract class Performer extends Participant {
      * All the participants that are following this Performer, is included here.
      */
     @Getter
-    protected Liszt<Participant> _fans;
+    protected Liszt<User> _fans;
 
     public Performer(long id) {
         super(id);
@@ -50,7 +50,7 @@ public abstract class Performer extends Participant {
     public Performer(long id, String username, String firstName, String lastName, String description,
                      ContactInfo contactInfo, Album images, Liszt<Rating> ratings, Liszt<Event> events, Liszt<Gig> gigs,
                      Liszt<ChatRoom> chatRooms, Subscription subscription, Liszt<Bulletin> bulletins,
-                     LocalDateTime timestamp, Liszt<Album> music, Liszt<Participant> fans, Liszt<User> followings) {
+                     LocalDateTime timestamp, Liszt<Album> music, Liszt<User> fans, Liszt<User> followings) {
         super(id, username, firstName, lastName, description, contactInfo, images, ratings, events,
                 chatRooms, subscription, bulletins, timestamp, followings);
         _music = music;
@@ -61,7 +61,7 @@ public abstract class Performer extends Participant {
     public Performer(long id, String username, String description, ContactInfo contactInfo, Album images,
                      Liszt<Rating> ratings, Liszt<Event> events, Liszt<Gig> gigs, Liszt<ChatRoom> chatRooms,
                      Subscription subscription, Liszt<Bulletin> bulletins, LocalDateTime timestamp, Liszt<Album> music,
-                     Liszt<Participant> fans, Liszt<User> followings) {
+                     Liszt<User> fans, Liszt<User> followings) {
         super(id, username, description, contactInfo, images, ratings, events,
                 chatRooms, subscription, bulletins, timestamp, followings);
         _music = music;
@@ -81,6 +81,17 @@ public abstract class Performer extends Participant {
         _music = new Liszt<>();
         _gigs = new Liszt<>();
         _fans = new Liszt<>();
+    }
+
+    /**
+     * Sets the fans. Is only allowed under assembling.
+     * @param fans The Participants that will be set to be the fans.
+     * @return All the fans.
+     */
+    public Liszt<User> set_fans(Liszt<User> fans) {
+        if (fans != null && _assembling)
+            _fans = fans;
+        return _fans;
     }
 
     /**
@@ -175,14 +186,14 @@ public abstract class Performer extends Participant {
      * @param fan An object of Fan, that is wished to be added.
      * @return The whole Liszt of fans.
      */
-    public Liszt<Participant> addFan(Participant fan) { return addFans(new Participant[]{fan}); }
+    public Liszt<User> addFan(User fan) { return addFans(new User[]{fan}); }
 
     /**
      * Adds Fans to the Liszt of fans.
      * @param fans An array of fans, that is wished to be Added.
      * @return The whole Liszt of fans.
      */
-    public Liszt<Participant> addFans(Participant[] fans) {
+    public Liszt<User> addFans(User[] fans) {
         _fans.add(fans);
         return _fans;
     }

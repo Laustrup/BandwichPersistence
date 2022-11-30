@@ -60,6 +60,7 @@ public class Artist extends Performer {
         _bands = bands;
         _runner = runner;
         _requests = requests;
+        _assembling = true;
     }
 
     public Artist(String username, String firstName, String lastName, String description, Subscription subscription,

@@ -105,6 +105,9 @@ public abstract class User extends Model {
     @Getter
     protected Subscription _subscription;
 
+    /**
+     * Messages by other Users.
+     */
     @Getter
     protected Liszt<Bulletin> _bulletins;
 

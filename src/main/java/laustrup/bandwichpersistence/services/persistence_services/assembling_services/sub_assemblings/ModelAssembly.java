@@ -1,6 +1,5 @@
-package laustrup.bandwichpersistence.services.persistence_services.assembling_services;
+package laustrup.bandwichpersistence.services.persistence_services.assembling_services.sub_assemblings;
 
-import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.contact_infos.Address;
 import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
 import laustrup.bandwichpersistence.models.users.contact_infos.Country;

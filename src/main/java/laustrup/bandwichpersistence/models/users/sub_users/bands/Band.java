@@ -56,6 +56,7 @@ public class Band extends Performer {
             throw new InputMismatchException();
 
         _runner = runner;
+        _assembling = true;
     }
 
     public Band(String username, String description, Subscription subscription, Liszt<Artist> members) throws InputMismatchException {

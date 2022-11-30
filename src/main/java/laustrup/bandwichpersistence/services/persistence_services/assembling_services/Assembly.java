@@ -5,8 +5,9 @@ import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.sub_users.Performer;
 import laustrup.bandwichpersistence.models.users.sub_users.bands.Artist;
 import laustrup.bandwichpersistence.models.users.sub_users.bands.Band;
+import laustrup.bandwichpersistence.models.users.sub_users.participants.Participant;
 import laustrup.bandwichpersistence.repositories.sub_repositories.UserRepository;
-import laustrup.bandwichpersistence.services.persistence_services.assembling_services.users.UserAssembly;
+import laustrup.bandwichpersistence.services.persistence_services.assembling_services.sub_assemblings.user_assemblings.UserAssembly;
 
 /**
  * This class uses other assemblies to build objects from database,
@@ -39,15 +40,7 @@ public class Assembly {
      * @return The assembled User.
      */
     public User getUser(Login login) {
-        User user = UserAssembly.get_instance().assemble(login);
-
-        user.setSubscriptionUser();
-        user.setImagesAuthor();
-        if (user.getClass() == Artist.class || user.getClass() == Band.class)
-            ((Performer) user).setAuthorOfAlbums();
-
-        UserRepository.get_instance().closeConnection();
-        return user;
+        return assemble(UserAssembly.get_instance().assemble(login));
     }
 
     /**
@@ -57,11 +50,29 @@ public class Assembly {
      * @return The assembled User.
      */
     public User getUser(long id) {
-        User user = UserAssembly.get_instance().assemble(id);
+        return assemble(UserAssembly.get_instance().assemble(id));
+    }
+
+    /**
+     * Finishes the last assembling of a User, in order to get all values.
+     * @param user The User that will be further assembled.
+     * @return The assembled User.
+     */
+    private User assemble(User user) {
+        if (user.getClass() == Artist.class ||
+                user.getClass() == Band.class) {
+            ((Performer) user).set_followings(UserAssembly.get_instance().assembles(((Performer) user).get_followings()));
+            ((Performer) user).set_fans(UserAssembly.get_instance().assembles(((Performer) user).get_fans()));
+        }
+        else if (user.getClass() == Participant.class)
+            ((Participant) user).set_followings(UserAssembly.get_instance().assembles(((Participant) user).get_followings()));
 
         user.setSubscriptionUser();
         user.setImagesAuthor();
+        if (user.getClass() == Artist.class || user.getClass() == Band.class)
+            ((Performer) user).setAuthorOfAlbums();
 
+        user.doneAssembling();
         UserRepository.get_instance().closeConnection();
         return user;
     }

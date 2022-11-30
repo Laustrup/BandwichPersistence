@@ -108,6 +108,17 @@ public class Participant extends User {
     }
 
     /**
+     * Sets the followings. Is only allowed under assembling.
+     * @param followings The Users that will be set to be the followings.
+     * @return All the followings.
+     */
+    public Liszt<User> set_followings(Liszt<User> followings) {
+        if (followings != null && _assembling)
+            _followings = followings;
+        return _followings;
+    }
+
+    /**
      * Adds a User to the followings of the Participant.
      * @param following A User, that is wished to be added.
      * @return All the followings of the Participant.

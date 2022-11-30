@@ -42,7 +42,16 @@ public abstract class Model {
     @Getter
     protected LocalDateTime _timestamp;
 
-    public Model() { _timestamp = LocalDateTime.now(); }
+    /**
+     * A status that determines if the Model is being assembled or not.
+     * Some methods require this boolean to be true.
+     */
+    @Getter
+    protected boolean _assembling;
+
+    public Model() {
+        _timestamp = LocalDateTime.now();
+    }
     public Model(long id) {
         _primaryId = id;
         _timestamp = LocalDateTime.now();
@@ -77,4 +86,13 @@ public abstract class Model {
      * @return True if secondary id isn't null.
      */
     public boolean hasSecondaryId() { return _secondaryId != null; }
+
+    /**
+     * Will determine that the status of is being assembling is over by making assembling false.
+     * @return The assembling status.
+     */
+    public boolean doneAssembling() {
+        _assembling = false;
+        return _assembling;
+    }
 }
