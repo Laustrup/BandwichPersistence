@@ -118,9 +118,9 @@ class LisztTeszt extends JTest {
             Band original = bands[index];
             Band replacement = new Band(original.get_primaryId(), original.get_username(),
                     original.get_description(), original.get_contactInfo(),
-                    original.get_images(), original.get_ratings(), original.get_events(), original.get_chatRooms(),
-                    original.get_subscription(), original.get_bulletins(), original.get_timestamp(),
-                    original.get_music(), original.get_members(), original.get_runner(),
+                    original.get_images(), original.get_ratings(), original.get_events(), original.get_gigs(),
+                    original.get_chatRooms(), original.get_subscription(), original.get_bulletins(),
+                    original.get_timestamp(), original.get_music(), original.get_members(), original.get_runner(),
                     original.get_fans(), original.get_followings());
             replacement.set_runner("This is a replacement!");
 
@@ -152,9 +152,9 @@ class LisztTeszt extends JTest {
             Band original = bands[_random.nextInt(bands.length)];
             Band replacement = new Band(original.get_primaryId(), original.get_username(),
                     original.get_description(), original.get_contactInfo(),
-                    original.get_images(), original.get_ratings(), original.get_events(), original.get_chatRooms(),
-                    original.get_subscription(), original.get_bulletins(), original.get_timestamp(),
-                    original.get_music(), original.get_members(), original.get_runner(),
+                    original.get_images(), original.get_ratings(), original.get_events(), original.get_gigs(),
+                    original.get_chatRooms(), original.get_subscription(), original.get_bulletins(),
+                    original.get_timestamp(), original.get_music(), original.get_members(), original.get_runner(),
                     original.get_fans(), original.get_followings());
             replacement.set_runner("This is a replacement!");
 

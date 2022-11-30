@@ -108,6 +108,9 @@ public abstract class User extends Model {
     @Getter
     protected Liszt<Bulletin> _bulletins;
 
+    public User(long id) {
+        super(id);
+    }
     public User(long id, String username, String firstName, String lastName, String description,
                 ContactInfo contactInfo, Album images, Liszt<Rating> ratings, Liszt<Event> events,
                 Liszt<ChatRoom> chatRooms, Subscription subscription,
@@ -127,12 +130,41 @@ public abstract class User extends Model {
         _bulletins = bulletins;
     }
 
+    public User(long id, String username, String description, ContactInfo contactInfo, Album images,
+                Liszt<Rating> ratings, Liszt<Event> events, Liszt<ChatRoom> chatRooms, Subscription subscription,
+                Liszt<Bulletin> bulletins, LocalDateTime timestamp) {
+        super(id,username + "-" + id,timestamp);
+        _username = username;
+        _contactInfo = contactInfo;
+        _description = description;
+        _images = images;
+        _ratings = ratings;
+        _events = events;
+        _chatRooms = chatRooms;
+        _subscription = subscription;
+        _bulletins = bulletins;
+    }
+
     public User(String username, String firstName, String lastName, String description, Subscription subscription) {
         super(username);
         _username = username;
         _firstName = firstName;
         _lastName = lastName;
         get_fullName();
+        _description = description;
+
+        _images = new Album();
+        _ratings = new Liszt<>();
+        _events = new Liszt<>();
+        _chatRooms = new Liszt<>();
+        _bulletins = new Liszt<>();
+
+        _subscription = subscription;
+    }
+
+    public User(String username, String description, Subscription subscription) {
+        super(username);
+        _username = username;
         _description = description;
 
         _images = new Album();

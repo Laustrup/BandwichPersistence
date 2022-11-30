@@ -31,6 +31,9 @@ public class Participant extends User {
     @Getter
     private Liszt<User> _followings;
 
+    public Participant(long id) {
+        super(id);
+    }
     public Participant(long id, String username, String firstName, String lastName, String description,
                        ContactInfo contactInfo, Album images, Liszt<Rating> ratings, Liszt<Event> events,
                        Liszt<ChatRoom> chatRooms, Subscription.Status subscriptionStatus,
@@ -45,11 +48,36 @@ public class Participant extends User {
         setSubscriptionUser();
     }
 
+    public Participant(long id, String username, String description,
+                       ContactInfo contactInfo, Album images, Liszt<Rating> ratings, Liszt<Event> events,
+                       Liszt<ChatRoom> chatRooms, Subscription.Status subscriptionStatus,
+                       SubscriptionOffer subscriptionOffer, Liszt<Bulletin> bulletins,
+                       LocalDateTime timestamp, Liszt<User> followings) {
+        super(id, username, description, contactInfo, images, ratings, events, chatRooms,
+                new Subscription(id, Subscription.Type.FREEMIUM, subscriptionStatus, subscriptionOffer, null),
+                bulletins, timestamp);
+        _followings = followings;
+        _subscription.get_user().set_username(_username);
+        _subscription.get_user().set_description(_description);
+        setSubscriptionUser();
+    }
+
     public Participant(long id, String username, String firstName, String lastName, String description,
                        ContactInfo contactInfo, Album images, Liszt<Rating> ratings, Liszt<Event> events,
                        Liszt<ChatRoom> chatRooms, Subscription subscription,
                        Liszt<Bulletin> bulletins, LocalDateTime timestamp, Liszt<User> followings) {
         super(id, username, firstName, lastName, description, contactInfo, images, ratings, events, chatRooms,
+                subscription, bulletins, timestamp);
+        _followings = followings;
+        _subscription.get_user().set_username(_username);
+        _subscription.get_user().set_description(_description);
+    }
+
+    public Participant(long id, String username, String description,
+                       ContactInfo contactInfo, Album images, Liszt<Rating> ratings, Liszt<Event> events,
+                       Liszt<ChatRoom> chatRooms, Subscription subscription,
+                       Liszt<Bulletin> bulletins, LocalDateTime timestamp, Liszt<User> followings) {
+        super(id, username, description, contactInfo, images, ratings, events, chatRooms,
                 subscription, bulletins, timestamp);
         _followings = followings;
         _subscription.get_user().set_username(_username);
@@ -70,6 +98,12 @@ public class Participant extends User {
     public Participant(String username, String firstName, String lastName, String description,
                        Subscription subscription) {
         super(username, firstName, lastName, description, subscription);
+        _followings = new Liszt<>();
+    }
+
+    public Participant(String username, String description,
+                       Subscription subscription) {
+        super(username, description, subscription);
         _followings = new Liszt<>();
     }
 

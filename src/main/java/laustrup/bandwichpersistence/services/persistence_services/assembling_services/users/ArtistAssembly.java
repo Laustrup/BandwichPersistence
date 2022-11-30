@@ -6,6 +6,7 @@ import laustrup.bandwichpersistence.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.models.chats.Request;
 import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
 import laustrup.bandwichpersistence.models.events.Event;
+import laustrup.bandwichpersistence.models.events.Gig;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
 import laustrup.bandwichpersistence.models.users.sub_users.bands.Artist;
@@ -60,6 +61,7 @@ public class ArtistAssembly {
         ContactInfo contactInfo = ModelAssembly.get_instance().assembleContactInfo(set);
         Album images = new Album(username+":images", Album.Kind.IMAGE);
         Liszt<Rating> ratings = new Liszt<>();
+        Liszt<Gig> gigs = new Liszt<>();
         Liszt<Event> events = new Liszt<>();
         Liszt<ChatRoom> chatRooms = new Liszt<>();
         Subscription subscription = ModelAssembly.get_instance().assembleSubscription(set);
@@ -78,7 +80,7 @@ public class ArtistAssembly {
 
         } while (set.next());
 
-        return new Artist(id, username, firstName, last_name, description, contactInfo, images, ratings, events,
+        return new Artist(id, username, firstName, last_name, description, contactInfo, images, ratings, events, gigs,
                 chatRooms, subscription, bulletins, timestamp, music, bands, runner, fans, followings, requests);
     }
 

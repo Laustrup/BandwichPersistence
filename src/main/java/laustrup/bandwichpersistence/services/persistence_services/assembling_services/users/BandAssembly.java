@@ -5,13 +5,16 @@ import laustrup.bandwichpersistence.models.albums.Album;
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
 import laustrup.bandwichpersistence.models.events.Event;
+import laustrup.bandwichpersistence.models.events.Gig;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
+import laustrup.bandwichpersistence.models.users.sub_users.Performer;
 import laustrup.bandwichpersistence.models.users.sub_users.bands.Artist;
 import laustrup.bandwichpersistence.models.users.sub_users.bands.Band;
 import laustrup.bandwichpersistence.models.users.sub_users.participants.Participant;
 import laustrup.bandwichpersistence.models.users.sub_users.subscriptions.Subscription;
 import laustrup.bandwichpersistence.repositories.sub_repositories.UserRepository;
+import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembler;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.ModelAssembly;
 import laustrup.bandwichpersistence.utilities.Liszt;
 import laustrup.bandwichpersistence.utilities.Plato;
@@ -25,7 +28,7 @@ import java.time.LocalDateTime;
  * Will build Bands from database row values.
  * Is a singleton.
  */
-public class BandAssembly {
+public class BandAssembly extends Assembler {
 
     /**
      * Singleton instance of the Service.
@@ -58,6 +61,7 @@ public class BandAssembly {
         Album images = new Album(username+":images", Album.Kind.IMAGE);
         Liszt<Rating> ratings = new Liszt<>();
         Liszt<Event> events = new Liszt<>();
+        Liszt<Gig> gigs = new Liszt<>();
         Liszt<ChatRoom> chatRooms = new Liszt<>();
         Subscription subscription = ModelAssembly.get_instance().assembleSubscription(set);
         Liszt<Bulletin> bulletins = new Liszt<>();
@@ -75,6 +79,7 @@ public class BandAssembly {
                 music = handleMusic(set, music);
 
             ratings = handleRatings(set, ratings);
+            gigs = handleGigs(set, gigs);
             events = handleEvents(set, events);
             chatRooms = handleChatRooms(set, chatRooms);
             bulletins = handleBulletins(set, bulletins);
@@ -87,7 +92,7 @@ public class BandAssembly {
         Liszt<Artist> members = ArtistAssembly.get_instance().assembles(UserRepository.get_instance().get(memberIds));
 
 
-        return new Band(id,username,description,contactInfo,images,ratings,events,chatRooms,subscription,bulletins,
+        return new Band(id,username,description,contactInfo,images,ratings,events,gigs,chatRooms,subscription,bulletins,
                 timestamp,music,members,runner,fans,followings);
     }
 
@@ -131,6 +136,25 @@ public class BandAssembly {
             ratings.add(rating);
 
         return ratings;
+    }
+
+    private Liszt<Gig> handleGigs(ResultSet set, Liszt<Gig> gigs) throws SQLException {
+        String table = "acts";
+        // This Artist could also be a Band, but only the id is needed and will be specified in Assembly.
+        Performer performer = new Artist(set.getLong(table+".user_id"));
+
+        table = "gigs";
+        Gig gig = new Gig(set.getLong(table+".id"), new Performer[]{},
+                set.getTimestamp(table+".`start`").toLocalDateTime(),
+                set.getTimestamp(table+".`end`").toLocalDateTime(),
+                set.getTimestamp(table+".`timestamp`").toLocalDateTime());
+
+        if (gigs.get(gigs.size()).get_primaryId()!=set.getLong(table+".id"))
+            gigs.add(gig);
+        if (!gigs.get(gigs.size()).contains(performer))
+            gigs.get(gigs.size()).add(performer);
+
+        return gigs;
     }
 
     //TODO Finish values

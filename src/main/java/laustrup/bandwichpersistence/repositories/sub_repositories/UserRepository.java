@@ -40,9 +40,9 @@ public class UserRepository extends Repository {
      */
     public ResultSet get(Login login) {
         return login.usernameIsEmailKind() ?
-                get(" WHERE contact_informations.email = " + login.get_username() +
+                get("WHERE contact_informations.email = " + login.get_username() +
                         " AND users.`password` = " + login.get_password())
-                : get(" WHERE users.username = " + login.get_username() +
+                : get("WHERE users.username = " + login.get_username() +
                         " AND users.`password` = " + login.get_password());
     }
 
@@ -52,7 +52,7 @@ public class UserRepository extends Repository {
      * @return The collected JDBC ResultSet.
      */
     public ResultSet get(long id) {
-        return get(" WHERE users.id = " + id);
+        return get("WHERE users.id = " + id);
     }
 
     /**
@@ -73,6 +73,29 @@ public class UserRepository extends Repository {
     }
 
     /**
+     * Will collect a JDBC ResultSet of all Users from the database, by using a SQL statement.
+     * @return The collected JDBC ResultSet.
+     */
+    public ResultSet get() {
+        return get("");
+    }
+
+    /**
+     * Will collect a JDBC ResultSet of all Users that has something in common with a search query from the database,
+     * by using a SQL statement.
+     * It will compare columns of usernames, firstnames, lastnames and descriptions.
+     * Doesn't order them by relevance at the moment.
+     * @param query The search query, that is a line that should have something in common with columns.
+     * @return The collected JDBC ResultSet.
+     */
+    public ResultSet search(String query) {
+        return get("WHERE users.username LIKE '" + query + "' OR " +
+                "users.firstname LIKE '" + query + "' OR " +
+                "users.lastname LIKE '" + query + "' OR " +
+                "users.`description LIKE '" + query + "'");
+    }
+
+    /**
      * This is the method that can through a SQL statement find and collect the User.
      * Both from an id or a login, that is given from other public methods.
      * @param where The where statement, that decides what information that is being looked for.
@@ -85,7 +108,7 @@ public class UserRepository extends Repository {
                 "INNER JOIN venues ON venues.user_id = users.id " +
                 "INNER JOIN `events` ON `events`.venue_id = users.id " +
                 "INNER JOIN gigs ON gigs.event_id = `events`.id " +
-                "INNER JOIN acts ON acts.gig_id = gigs.id " +
+                "INNER JOIN acts ON acts.gig_id = gigs.id OR acts.user_id = users.id " +
                 "INNER JOIN participations ON participations.event_id = `events`.id" +
                 "INNER JOIN followings ON followings.follower_id = users.id OR followings.lead_id = users.id " +
                 "INNER JOIN chatters ON chatters.user_id = users.id " +
@@ -93,11 +116,21 @@ public class UserRepository extends Repository {
                 "INNER JOIN bulletins ON users.id = bulletins.receiver_id " +
                 "INNER JOIN requests ON users.id = requests.user_id " +
                 "INNER JOIN ratings ON users.id = ratings.appointed_id " +
-                "INNER JOIN user_albums ON users.id = user_albums.user_id " +
+                "INNER JOIN album_user_authors ON users.id = album_user_authors.user_id " +
                 "INNER JOIN albums ON user_albums.album_id = albums.id " +
                 "INNER JOIN album_endpoints ON albums.id = album_endpoints.album_id " +
                 "INNER JOIN subscriptions ON users.id = subscriptions.user_id " +
                 "INNER JOIN contact_informations ON users.id = contact_informations.user_id " +
                 where + ";");
+    }
+
+
+    /**
+     * Will collect a JDBC ResultSet of a Card from the database, by using a SQL statement.
+     * @param id The id of the Card, that is wished to be found.
+     * @return The collected JDBC ResultSet.
+     */
+    public ResultSet card(long id) {
+        return read("SELECT * FROM cards WHERE id = " + id + ";");
     }
 }

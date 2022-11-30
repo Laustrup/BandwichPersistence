@@ -6,6 +6,7 @@ import laustrup.bandwichpersistence.models.Rating;
 import laustrup.bandwichpersistence.models.albums.Album;
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
+import laustrup.bandwichpersistence.models.events.Gig;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
 import laustrup.bandwichpersistence.models.users.sub_users.Performer;
@@ -44,14 +45,18 @@ public class Artist extends Performer {
     @Getter
     private Liszt<Request> _requests;
 
+    public Artist(long id) {
+        super(id);
+    }
+
     public Artist(long id, String username, String firstName, String lastName, String description,
-                  ContactInfo contactInfo, Album images, Liszt<Rating> ratings, Liszt<Event> events,
+                  ContactInfo contactInfo, Album images, Liszt<Rating> ratings, Liszt<Event> events, Liszt<Gig> gigs,
                   Liszt<ChatRoom> chatRooms, Subscription subscription,
                   Liszt<Bulletin> bulletins, LocalDateTime timestamp, Liszt<Album> music,
                   Liszt<Band> bands, String runner, Liszt<Participant> fans, Liszt<User> followings,
                   Liszt<Request> requests) {
         super(id, username, firstName, lastName, description, contactInfo, images, ratings,
-                events, chatRooms, subscription, bulletins, timestamp, music, fans, followings);
+                events, gigs, chatRooms, subscription, bulletins, timestamp, music, fans, followings);
         _bands = bands;
         _runner = runner;
         _requests = requests;

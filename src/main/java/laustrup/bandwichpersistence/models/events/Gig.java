@@ -1,6 +1,8 @@
 package laustrup.bandwichpersistence.models.events;
 
+import laustrup.bandwichpersistence.models.Model;
 import laustrup.bandwichpersistence.models.users.sub_users.Performer;
+
 import lombok.Data;
 import lombok.ToString;
 
@@ -10,8 +12,7 @@ import java.time.LocalDateTime;
  * Determines a specific gig of one band for a specific time.
  */
 @Data
-@ToString
-public class Gig {
+public class Gig extends Model {
     /**
      * This act is of a Gig and can both be assigned as artists or bands.
      */
@@ -27,9 +28,61 @@ public class Gig {
      */
     private LocalDateTime _end;
 
-    public Gig(Performer[] act, LocalDateTime start, LocalDateTime end) {
+    public Gig(Performer[] act) {
+        super("New gig");
+        _act = _act;
+    }
+
+    public Gig(long id, Performer[] act, LocalDateTime start, LocalDateTime end, LocalDateTime timestamp) {
+        super(id, "Gig:"+id, timestamp);
         _act = act;
         _start = start;
         _end = end;
+    }
+
+    public Gig(Performer[] act, LocalDateTime start, LocalDateTime end) {
+        super("New gig");
+        _act = act;
+        _start = start;
+        _end = end;
+    }
+
+    /**
+     * Checks if a Performer is a part of the act.
+     * @param performer The Performer object that is wished to be checked.
+     * @return True if the primary ids matches of the Performer and a Performer of the act,
+     *         otherwise false.
+     */
+    public boolean contains(Performer performer) {
+        for (Performer actor : _act)
+            if (actor.get_primaryId() == performer.get_primaryId())
+                return true;
+
+        return false;
+    }
+
+    /**
+     * Will add a Performer to the act.
+     * @param performer The Performer object that is wished to be added.
+     * @return All the Performers of the act.
+     */
+    public Performer[] add(Performer performer) {
+        Performer[] storage = new Performer[_act.length+1];
+
+        for (int i = 0; i < _act.length; i++)
+            storage[i] = _act[i];
+
+        storage[_act.length] = performer;
+        _act = storage;
+
+        return _act;
+    }
+
+    @Override
+    public String toString() {
+        return "Gig(id:" + _primaryId +
+                "start:" + _start.toString() +
+                "end:" + _end.toString() +
+                ")";
     }
 }

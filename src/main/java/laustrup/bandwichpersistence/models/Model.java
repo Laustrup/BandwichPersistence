@@ -43,6 +43,10 @@ public abstract class Model {
     protected LocalDateTime _timestamp;
 
     public Model() { _timestamp = LocalDateTime.now(); }
+    public Model(long id) {
+        _primaryId = id;
+        _timestamp = LocalDateTime.now();
+    }
 
     public Model(String title) {
         _title = title;
@@ -54,16 +58,16 @@ public abstract class Model {
         _title = title;
         _timestamp = timestamp;
     }
-    public Model(long id1, long id2, String title) {
-        _primaryId = id1;
-        _secondaryId = id2;
+    public Model(long primaryId, long secondaryId, String title) {
+        _primaryId = primaryId;
+        _secondaryId = secondaryId;
         _title = title;
         _timestamp = LocalDateTime.now();
     }
 
-    public Model(long id1, long id2, String title, LocalDateTime timestamp) {
-        _primaryId = id1;
-        _secondaryId = id2;
+    public Model(long primaryId, long secondaryId, String title, LocalDateTime timestamp) {
+        _primaryId = primaryId;
+        _secondaryId = secondaryId;
         _title = title;
         _timestamp = timestamp;
     }

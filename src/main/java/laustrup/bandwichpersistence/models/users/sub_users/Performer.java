@@ -7,6 +7,7 @@ import laustrup.bandwichpersistence.models.albums.Album;
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
 import laustrup.bandwichpersistence.models.chats.messages.Message;
+import laustrup.bandwichpersistence.models.events.Gig;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
 import laustrup.bandwichpersistence.models.users.sub_users.participants.Participant;
@@ -32,25 +33,53 @@ public abstract class Performer extends Participant {
     protected Liszt<Album> _music;
 
     /**
+     * Describes all the gigs, that the Performer is a part of an act.
+     */
+    @Getter
+    protected Liszt<Gig> _gigs;
+
+    /**
      * All the participants that are following this Performer, is included here.
      */
     @Getter
     protected Liszt<Participant> _fans;
 
+    public Performer(long id) {
+        super(id);
+    }
     public Performer(long id, String username, String firstName, String lastName, String description,
-                     ContactInfo contactInfo, Album images, Liszt<Rating> ratings, Liszt<Event> events,
-                     Liszt<ChatRoom> chatRooms, Subscription subscription,
-                     Liszt<Bulletin> bulletins, LocalDateTime timestamp, Liszt<Album> music,
-                     Liszt<Participant> fans, Liszt<User> followings) {
+                     ContactInfo contactInfo, Album images, Liszt<Rating> ratings, Liszt<Event> events, Liszt<Gig> gigs,
+                     Liszt<ChatRoom> chatRooms, Subscription subscription, Liszt<Bulletin> bulletins,
+                     LocalDateTime timestamp, Liszt<Album> music, Liszt<Participant> fans, Liszt<User> followings) {
         super(id, username, firstName, lastName, description, contactInfo, images, ratings, events,
                 chatRooms, subscription, bulletins, timestamp, followings);
         _music = music;
+        _gigs = gigs;
+        _fans = fans;
+    }
+
+    public Performer(long id, String username, String description, ContactInfo contactInfo, Album images,
+                     Liszt<Rating> ratings, Liszt<Event> events, Liszt<Gig> gigs, Liszt<ChatRoom> chatRooms,
+                     Subscription subscription, Liszt<Bulletin> bulletins, LocalDateTime timestamp, Liszt<Album> music,
+                     Liszt<Participant> fans, Liszt<User> followings) {
+        super(id, username, description, contactInfo, images, ratings, events,
+                chatRooms, subscription, bulletins, timestamp, followings);
+        _music = music;
+        _gigs = gigs;
         _fans = fans;
     }
 
     public Performer(String username, String firstName, String lastName, String description, Subscription subscription) {
         super(username, firstName, lastName, description, subscription);
         _music = new Liszt<>();
+        _gigs = new Liszt<>();
+        _fans = new Liszt<>();
+    }
+
+    public Performer(String username, String description, Subscription subscription) {
+        super(username, description, subscription);
+        _music = new Liszt<>();
+        _gigs = new Liszt<>();
         _fans = new Liszt<>();
     }
 
@@ -109,7 +138,7 @@ public abstract class Performer extends Participant {
      * Removes an endpoint from an Album of the Performer.
      * @param endpoint An endpoint from a link containing a music file.
      * @param albumId The id of the Album, that is wished to remove the endpoint.
-     * @return The Album the removed the new endpoint. Null if it hasn't been removed.
+     * @return The Album of the removed endpoint. Null if it hasn't been removed.
      */
     public Album remove(String endpoint, long albumId) {
         for (Album album : _music) {
@@ -119,6 +148,26 @@ public abstract class Performer extends Participant {
             }
         }
         return null;
+    }
+
+    /**
+     * Will add a Gig to the Performer.
+     * @param gig A Gig object, that is wished to be added.
+     * @return All the Gigs of the Performer.
+     */
+    public Liszt<Gig> add(Gig gig) {
+        _gigs.add(gig);
+        return _gigs;
+    }
+
+    /**
+     * Removes a Gig from the Liszt of Gigs of the Performer.
+     * @param gig A Gig object, that is wished to be removed.
+     * @return All the Gigs of the Performer.
+     */
+    public Liszt<Gig> remove(Gig gig) {
+        _gigs.remove(gig);
+        return _gigs;
     }
 
     /**

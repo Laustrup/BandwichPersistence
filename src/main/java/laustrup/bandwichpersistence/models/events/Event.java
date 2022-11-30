@@ -156,7 +156,7 @@ public class Event extends Model {
 
         _gigs = new Liszt<>();
         if (user.getClass() == Performer.class)
-            _gigs.add(new Gig(new Performer[]{(Performer) user}, null, null));
+            _gigs.add(new Gig(new Performer[]{(Performer) user}));
         else _venue = (Venue) user;
 
         _participations = new Liszt<>();

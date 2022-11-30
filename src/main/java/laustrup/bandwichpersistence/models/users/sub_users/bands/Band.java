@@ -5,6 +5,7 @@ import laustrup.bandwichpersistence.models.Rating;
 import laustrup.bandwichpersistence.models.albums.Album;
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
+import laustrup.bandwichpersistence.models.events.Gig;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
 import laustrup.bandwichpersistence.models.users.sub_users.Performer;
@@ -38,12 +39,16 @@ public class Band extends Performer {
     @Getter @Setter
     private String _runner;
 
+    public Band(long id) {
+        super(id);
+    }
+
     public Band(long id, String username, String description, ContactInfo contactInfo, Album images,
-                Liszt<Rating> ratings, Liszt<Event> events, Liszt<ChatRoom> chatRooms, Subscription subscription,
+                Liszt<Rating> ratings, Liszt<Event> events, Liszt<Gig> gigs, Liszt<ChatRoom> chatRooms, Subscription subscription,
                 Liszt<Bulletin> bulletins, LocalDateTime timestamp, Liszt<Album> music, Liszt<Artist> members,
                 String runner, Liszt<Participant> fans, Liszt<User> followings)
             throws InputMismatchException {
-        super(id, username, null, null, description, contactInfo, images, ratings, events, chatRooms, subscription,
+        super(id, username, null, null, description, contactInfo, images, ratings, events, gigs, chatRooms, subscription,
                 bulletins, timestamp, music, fans, followings);
 
         _members = members;

@@ -140,6 +140,7 @@ CREATE TABLE gigs(
     event_id BIGINT(20) NOT NULL,
     `start` DATETIME,
     `end` DATETIME,
+    `timestamp` DATETIME,
 
     PRIMARY KEY(id),
     FOREIGN KEY(event_id) REFERENCES events(id)
@@ -326,7 +327,8 @@ CREATE TABLE subscriptions(
 
     card_id BIGINT(8),
     PRIMARY KEY (user_id),
-    FOREIGN KEY(user_id) REFERENCES users(id)
+    FOREIGN KEY(user_id) REFERENCES users(id),
+    FOREIGN KEY(card_id) REFERENCES cards(id)
 );
 
 CREATE TABLE contact_informations(

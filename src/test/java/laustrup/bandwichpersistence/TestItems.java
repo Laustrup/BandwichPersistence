@@ -243,7 +243,7 @@ public class TestItems extends JTest {
             _artists[i] = new Artist(id, gender ? "Hansinator "+id : "Ursulanator "+id,
                     gender ? "Hans "+id : "Ursula "+id, "Hansen "+id, "Description "+id,
                     _contactInfo[_random.nextInt(_contactInfo.length)], images.get(_random.nextInt(images.size())+1),
-                    randomizeRatings(), new Liszt<>(), new Liszt<>(), setupSubscription(new Artist()), new Liszt<>(),
+                    randomizeRatings(), new Liszt<>(), new Liszt<>(), new Liszt<>(), setupSubscription(new Artist()), new Liszt<>(),
                     LocalDateTime.now(), sortMusicAlbums(),new Liszt<>(), "Gear "+id, new Liszt<>(), new Liszt<>(),
                     new Liszt<>());
         }
@@ -283,7 +283,7 @@ public class TestItems extends JTest {
 
             _bands[i] = new Band(id, "Band "+id, "Description "+id,
                     _contactInfo[_random.nextInt(_contactInfo.length)], images.get(_random.nextInt(images.size())+1),
-                    randomizeRatings(), new Liszt<>(), new Liszt<>(), setupSubscription(new Band()), new Liszt<>(),
+                    randomizeRatings(), new Liszt<>(), new Liszt<>(), new Liszt<>(), setupSubscription(new Band()), new Liszt<>(),
                     LocalDateTime.now(), sortMusicAlbums(), members, "Gear "+id,fans, new Liszt<>());
 
             for (Artist artist : _bands[i].get_members()) _artists[(int) (artist.get_primaryId()-1)].addBand(_bands[i]);
@@ -351,7 +351,7 @@ public class TestItems extends JTest {
             Performer[] act = generateAct();
             LocalDateTime end = start.plusMinutes(gigLengths);
 
-            gigs.add(new Gig(act, start, end));
+            gigs.add(new Gig(gigs.size()+i+1, act, start, end, LocalDateTime.now()));
 
             start = start.minusMinutes(gigLengths);
         }
@@ -364,12 +364,15 @@ public class TestItems extends JTest {
             for (Performer performer : gig.get_act()) {
                 if (performer.getClass() == Band.class) {
                     _bands[(int) performer.get_primaryId()-1].add(event);
+                    _bands[(int) performer.get_primaryId()-1].add(gig);
                     for (Artist artist : _bands[(int) performer.get_primaryId()-1].get_members()) {
                         _artists[(int) artist.get_primaryId()-1].add(event);
+                        _artists[(int) artist.get_primaryId()-1].add(gig);
                     }
                 }
                 else if (performer.getClass() == Artist.class)
                     _artists[(int) performer.get_primaryId()-1].add(event);
+                _artists[(int) performer.get_primaryId()-1].add(gig);
             }
         }
         for (Request request : event.get_requests()) {
