@@ -169,12 +169,23 @@ CREATE TABLE participations(
 );
 
 CREATE TABLE followings(
-    follower_id BIGINT(20) NOT NULL,
-    lead_id BIGINT(20) NOT NULL,
+    /* FAN */
+    fan_id BIGINT(20) NOT NULL,
+    fan_kind ENUM('BAND',
+        'ARTIST',
+        'VENUE',
+        'PARTICIPANT') NOT NULL,
 
-    PRIMARY KEY(follower_id,lead_id),
-    FOREIGN KEY(follower_id) REFERENCES users(id),
-    FOREIGN KEY(lead_id) REFERENCES users(id)
+    /* IDOL */
+    idol_id BIGINT(20) NOT NULL,
+    idol_kind ENUM('BAND',
+        'ARTIST',
+        'VENUE',
+        'PARTICIPANT') NOT NULL,
+
+    PRIMARY KEY(fan_id,idol_id),
+    FOREIGN KEY(fan_id) REFERENCES users(id),
+    FOREIGN KEY(idol_id) REFERENCES users(id)
 );
 
 CREATE TABLE chat_rooms(

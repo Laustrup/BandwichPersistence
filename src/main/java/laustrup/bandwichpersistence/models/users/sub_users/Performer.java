@@ -50,9 +50,9 @@ public abstract class Performer extends Participant {
     public Performer(long id, String username, String firstName, String lastName, String description,
                      ContactInfo contactInfo, Album images, Liszt<Rating> ratings, Liszt<Event> events, Liszt<Gig> gigs,
                      Liszt<ChatRoom> chatRooms, Subscription subscription, Liszt<Bulletin> bulletins,
-                     LocalDateTime timestamp, Liszt<Album> music, Liszt<User> fans, Liszt<User> followings) {
+                     LocalDateTime timestamp, Liszt<Album> music, Liszt<User> fans, Liszt<User> idols) {
         super(id, username, firstName, lastName, description, contactInfo, images, ratings, events,
-                chatRooms, subscription, bulletins, timestamp, followings);
+                chatRooms, subscription, bulletins, timestamp, idols);
         _music = music;
         _gigs = gigs;
         _fans = fans;
@@ -61,9 +61,9 @@ public abstract class Performer extends Participant {
     public Performer(long id, String username, String description, ContactInfo contactInfo, Album images,
                      Liszt<Rating> ratings, Liszt<Event> events, Liszt<Gig> gigs, Liszt<ChatRoom> chatRooms,
                      Subscription subscription, Liszt<Bulletin> bulletins, LocalDateTime timestamp, Liszt<Album> music,
-                     Liszt<User> fans, Liszt<User> followings) {
+                     Liszt<User> fans, Liszt<User> idols) {
         super(id, username, description, contactInfo, images, ratings, events,
-                chatRooms, subscription, bulletins, timestamp, followings);
+                chatRooms, subscription, bulletins, timestamp, idols);
         _music = music;
         _gigs = gigs;
         _fans = fans;

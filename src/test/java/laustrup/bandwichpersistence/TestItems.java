@@ -268,7 +268,7 @@ public class TestItems extends JTest {
                 members.add(_artists[index]);
             }
 
-            Liszt<Participant> fans = new Liszt<>();
+            Liszt<User> fans = new Liszt<>();
             int fanAmount = _random.nextInt(_participants.length);
             alreadyTakenIndexes = new HashSet<>();
 
@@ -286,8 +286,8 @@ public class TestItems extends JTest {
                     randomizeRatings(), new Liszt<>(), new Liszt<>(), new Liszt<>(), setupSubscription(new Band()), new Liszt<>(),
                     LocalDateTime.now(), sortMusicAlbums(), members, "Gear "+id,fans, new Liszt<>());
 
-            for (Artist artist : _bands[i].get_members()) _artists[(int) (artist.get_primaryId()-1)].addBand(_bands[i]);
-            for (Participant participant : _bands[i].get_fans()) _participants[(int) (participant.get_primaryId() - 1)].add(_bands[i]);
+            for (Artist member : _bands[i].get_members()) _artists[(int) (member.get_primaryId()-1)].addBand(_bands[i]);
+            for (User fan : _bands[i].get_fans()) _participants[(int) (fan.get_primaryId() - 1)].add(_bands[i]);
         }
     }
 

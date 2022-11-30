@@ -67,8 +67,8 @@ public class ArtistAssembly extends UserAssembler {
         Liszt<Gig> gigs = new Liszt<>();
         Liszt<Album> music = new Liszt<>();
         String runner = set.getString("gear.`description`");
-        Liszt<Participant> fans = new Liszt<>();
-        Liszt<User> followings = new Liszt<>();
+        Liszt<User> fans = new Liszt<>();
+        Liszt<User> idols = new Liszt<>();
         Liszt<Request> requests = new Liszt<>();
         Liszt<Long> bandIds = new Liszt<>();
 
@@ -87,6 +87,9 @@ public class ArtistAssembly extends UserAssembler {
             _chatRooms = _handler.handleChatRooms(set, _chatRooms);
             _bulletins = _handler.handleBulletins(set, _bulletins);
 
+            idols = _handler.handleIdols(set, idols);
+            fans = _handler.handleFans(set, fans);
+
             if (!bandIds.contains(set.getLong("band_members.band_id")))
                 bandIds.add(set.getLong("band_members.band_id"));
         } while (set.next());
@@ -95,6 +98,6 @@ public class ArtistAssembly extends UserAssembler {
 
         resetUserAttributes();
         return new Artist(_id, _username, _firstName, _lastName, _description, _contactInfo, _images, _ratings, _events, gigs,
-                _chatRooms, _subscription, _bulletins, _timestamp, music, bands, runner, fans, followings, requests);
+                _chatRooms, _subscription, _bulletins, _timestamp, music, bands, runner, fans, idols, requests);
     }
 }

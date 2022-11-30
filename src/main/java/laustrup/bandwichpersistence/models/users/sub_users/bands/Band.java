@@ -46,10 +46,10 @@ public class Band extends Performer {
     public Band(long id, String username, String description, ContactInfo contactInfo, Album images,
                 Liszt<Rating> ratings, Liszt<Event> events, Liszt<Gig> gigs, Liszt<ChatRoom> chatRooms, Subscription subscription,
                 Liszt<Bulletin> bulletins, LocalDateTime timestamp, Liszt<Album> music, Liszt<Artist> members,
-                String runner, Liszt<Participant> fans, Liszt<User> followings)
+                String runner, Liszt<User> fans, Liszt<User> idols)
             throws InputMismatchException {
-        super(id, username, null, null, description, contactInfo, images, ratings, events, gigs, chatRooms, subscription,
-                bulletins, timestamp, music, fans, followings);
+        super(id, username, description, contactInfo, images, ratings, events, gigs, chatRooms, subscription,
+                bulletins, timestamp, music, fans, idols);
 
         _members = members;
         if (_members.size() <= 0)
@@ -60,7 +60,7 @@ public class Band extends Performer {
     }
 
     public Band(String username, String description, Subscription subscription, Liszt<Artist> members) throws InputMismatchException {
-        super(username, null, null, description, subscription);
+        super(username, description, subscription);
 
         if (_members.size() > 0)
             _members = members;
@@ -107,14 +107,14 @@ public class Band extends Performer {
      * @param fan An object of Fan, that is wished to be removed.
      * @return The whole Liszt of fans.
      */
-    public Liszt<Participant> removeFan(Participant fan) { return removeFans(new Participant[]{fan}); }
+    public Liszt<User> removeFan(Participant fan) { return removeFans(new User[]{fan}); }
 
     /**
      * Removes Fans of the Liszt of fans.
      * @param fans An array of fans, that is wished to be removed.
      * @return The whole Liszt of fans.
      */
-    public Liszt<Participant> removeFans(Participant[] fans) {
+    public Liszt<User> removeFans(User[] fans) {
         _fans.remove(fans);
         return _fans;
     }

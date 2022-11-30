@@ -5,7 +5,6 @@ import laustrup.bandwichpersistence.models.events.Gig;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.sub_users.bands.Artist;
 import laustrup.bandwichpersistence.models.users.sub_users.bands.Band;
-import laustrup.bandwichpersistence.models.users.sub_users.participants.Participant;
 import laustrup.bandwichpersistence.repositories.sub_repositories.UserRepository;
 import laustrup.bandwichpersistence.utilities.Liszt;
 
@@ -67,8 +66,8 @@ public class BandAssembly extends UserAssembler {
         Liszt<Album> music = new Liszt<>();
         Liszt<Long> memberIds = new Liszt<>();
         String runner = set.getString("gear.`description`");
-        Liszt<Participant> fans = new Liszt<>();
-        Liszt<User> followings = new Liszt<>();
+        Liszt<User> fans = new Liszt<>();
+        Liszt<User> idols = new Liszt<>();
 
         do {
             if (_id != set.getLong("users.id"))
@@ -85,6 +84,9 @@ public class BandAssembly extends UserAssembler {
             _chatRooms = _handler.handleChatRooms(set, _chatRooms);
             _bulletins = _handler.handleBulletins(set, _bulletins);
 
+            idols = _handler.handleIdols(set, idols);
+            fans = _handler.handleFans(set, fans);
+
             if (!memberIds.contains(set.getLong("band_members.artist_id")))
                 memberIds.add(set.getLong("band_members.artist_id"));
 
@@ -94,7 +96,7 @@ public class BandAssembly extends UserAssembler {
 
         resetUserAttributes();
         return new Band(_id, _username, _description, _contactInfo, _images, _ratings, _events, gigs, _chatRooms,
-                _subscription, _bulletins, _timestamp, music, members, runner, fans, followings);
+                _subscription, _bulletins, _timestamp, music, members, runner, fans, idols);
     }
 
 }

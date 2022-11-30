@@ -89,10 +89,11 @@ public class UserRepository extends Repository {
      * @return The collected JDBC ResultSet.
      */
     public ResultSet search(String query) {
-        return get("WHERE users.username LIKE '" + query + "' OR " +
-                "users.firstname LIKE '" + query + "' OR " +
-                "users.lastname LIKE '" + query + "' OR " +
-                "users.`description LIKE '" + query + "'");
+        query = query.replaceAll("%","");
+        return get("WHERE users.username LIKE '%" + query + "%' OR " +
+                "users.firstname LIKE '%" + query + "%' OR " +
+                "users.lastname LIKE '%" + query + "%' OR " +
+                "users.`description LIKE '%" + query + "%'");
     }
 
     /**
@@ -111,6 +112,7 @@ public class UserRepository extends Repository {
                 "INNER JOIN acts ON acts.gig_id = gigs.id OR acts.user_id = users.id " +
                 "INNER JOIN participations ON participations.event_id = `events`.id" +
                 "INNER JOIN followings ON followings.follower_id = users.id OR followings.lead_id = users.id " +
+                "INNER JOIN fans ON fans.fan_id = users.id OR fans.idol_id = users.id " +
                 "INNER JOIN chatters ON chatters.user_id = users.id " +
                 "INNER JOIN chat_rooms ON chatters.chat_room_id = chat_rooms.id " +
                 "INNER JOIN bulletins ON users.id = bulletins.receiver_id " +

@@ -58,6 +58,9 @@ public class Venue extends User {
     @Getter
     private Liszt<Request> _requests;
 
+    public Venue(long id) {
+        super(id);
+    }
     public Venue(long id, String username, String description,
                  ContactInfo contactInfo, Album images, Liszt<Rating> ratings, Liszt<Event> events,
                  Liszt<ChatRoom> chatRooms, LocalDateTime timestamp,
@@ -78,6 +81,7 @@ public class Venue extends User {
         _subscription.get_user().set_username(_username);
         _subscription.get_user().set_description(_description);
         _requests = requests;
+        _assembling = true;
     }
 
     public Venue(String username, String description,

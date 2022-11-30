@@ -53,10 +53,10 @@ public class Artist extends Performer {
                   ContactInfo contactInfo, Album images, Liszt<Rating> ratings, Liszt<Event> events, Liszt<Gig> gigs,
                   Liszt<ChatRoom> chatRooms, Subscription subscription,
                   Liszt<Bulletin> bulletins, LocalDateTime timestamp, Liszt<Album> music,
-                  Liszt<Band> bands, String runner, Liszt<Participant> fans, Liszt<User> followings,
+                  Liszt<Band> bands, String runner, Liszt<User> fans, Liszt<User> idols,
                   Liszt<Request> requests) {
         super(id, username, firstName, lastName, description, contactInfo, images, ratings,
-                events, gigs, chatRooms, subscription, bulletins, timestamp, music, fans, followings);
+                events, gigs, chatRooms, subscription, bulletins, timestamp, music, fans, idols);
         _bands = bands;
         _runner = runner;
         _requests = requests;

@@ -8,8 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-import java.time.LocalDateTime;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 class LisztTeszt extends JTest {
@@ -121,7 +119,7 @@ class LisztTeszt extends JTest {
                     original.get_images(), original.get_ratings(), original.get_events(), original.get_gigs(),
                     original.get_chatRooms(), original.get_subscription(), original.get_bulletins(),
                     original.get_timestamp(), original.get_music(), original.get_members(), original.get_runner(),
-                    original.get_fans(), original.get_followings());
+                    original.get_fans(), original.get_idols());
             replacement.set_runner("This is a replacement!");
 
             try {
@@ -155,7 +153,7 @@ class LisztTeszt extends JTest {
                     original.get_images(), original.get_ratings(), original.get_events(), original.get_gigs(),
                     original.get_chatRooms(), original.get_subscription(), original.get_bulletins(),
                     original.get_timestamp(), original.get_music(), original.get_members(), original.get_runner(),
-                    original.get_fans(), original.get_followings());
+                    original.get_fans(), original.get_idols());
             replacement.set_runner("This is a replacement!");
 
             try {

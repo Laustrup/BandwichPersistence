@@ -6,8 +6,12 @@ import laustrup.bandwichpersistence.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
 import laustrup.bandwichpersistence.models.events.Event;
 import laustrup.bandwichpersistence.models.events.Gig;
+import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.sub_users.Performer;
 import laustrup.bandwichpersistence.models.users.sub_users.bands.Artist;
+import laustrup.bandwichpersistence.models.users.sub_users.bands.Band;
+import laustrup.bandwichpersistence.models.users.sub_users.participants.Participant;
+import laustrup.bandwichpersistence.models.users.sub_users.venues.Venue;
 import laustrup.bandwichpersistence.utilities.Liszt;
 import laustrup.bandwichpersistence.utilities.Plato;
 
@@ -115,7 +119,6 @@ public class AssemblyHandler {
     //TODO Finish values
     public Liszt<Bulletin> handleBulletins(ResultSet set, Liszt<Bulletin> bulletins) throws SQLException {
         String table = "bulletins";
-
         Bulletin bulletin = new Bulletin(set.getLong(table+".id"),
                 set.getString(table+".content"),set.getBoolean(table+".is_sent"),
                 set.getBoolean(table+".is_edited"), set.getBoolean(table+".is_public"),
@@ -125,5 +128,40 @@ public class AssemblyHandler {
             bulletins.add(bulletin);
 
         return bulletins;
+    }
+
+    public Liszt<User> handleIdols(ResultSet set, Liszt<User> idols) throws SQLException {
+        String table = "followings";
+        User idol;
+        switch (set.getString(table+".idol_kind")) {
+            case "BAND" -> idol = new Band(set.getLong(table + ".idol_id"));
+            case "ARTIST" -> idol = new Artist(set.getLong(table + ".idol_id"));
+            case "VENUE" -> idol = new Venue(set.getLong(table + ".idol_id"));
+            case "PARTICIPANT" -> idol = new Participant(set.getLong(table + ".idol_id"));
+            default -> idol = null;
+        }
+
+        if (idol != null && !idols.contains(idol))
+            idols.add(idol);
+
+        return idols;
+    }
+
+    public Liszt<User> handleFans(ResultSet set, Liszt<User> fans) throws SQLException {
+        String table = "followings";
+        User fan;
+        switch (set.getString(table+".fan_kind")) {
+            case "BAND" -> fan = new Band(set.getLong(table+".fan_id"));
+            case "ARTIST" -> fan = new Artist(set.getLong(table+".fan_id"));
+            case "VENUE" -> fan = new Venue(set.getLong(table+".fan_id"));
+            case "PARTICIPANT" -> fan = new Participant(set.getLong(table+".fan_id"));
+            default -> fan = null;
+        }
+
+        if (fan != null && !fans.contains(fan))
+            fans.add(fan);
+
+        return fans;
+
     }
 }

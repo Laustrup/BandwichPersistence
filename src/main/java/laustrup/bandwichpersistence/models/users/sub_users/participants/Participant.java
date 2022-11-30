@@ -9,7 +9,6 @@ import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
 import laustrup.bandwichpersistence.models.users.sub_users.subscriptions.Subscription;
 import laustrup.bandwichpersistence.models.users.sub_users.subscriptions.SubscriptionOffer;
-import laustrup.bandwichpersistence.models.users.sub_users.venues.Venue;
 import laustrup.bandwichpersistence.utilities.Liszt;
 
 import lombok.Getter;
@@ -29,7 +28,7 @@ public class Participant extends User {
      * indicating that new content will be shared with the Participant.
      */
     @Getter
-    private Liszt<User> _followings;
+    private Liszt<User> _idols;
 
     public Participant(long id) {
         super(id);
@@ -38,11 +37,11 @@ public class Participant extends User {
                        ContactInfo contactInfo, Album images, Liszt<Rating> ratings, Liszt<Event> events,
                        Liszt<ChatRoom> chatRooms, Subscription.Status subscriptionStatus,
                        SubscriptionOffer subscriptionOffer, Liszt<Bulletin> bulletins,
-                       LocalDateTime timestamp, Liszt<User> followings) {
+                       LocalDateTime timestamp, Liszt<User> idols) {
         super(id, username, firstName, lastName, description, contactInfo, images, ratings, events, chatRooms,
                 new Subscription(id, Subscription.Type.FREEMIUM, subscriptionStatus, subscriptionOffer, null),
                 bulletins, timestamp);
-        _followings = followings;
+        _idols = idols;
         _subscription.get_user().set_username(_username);
         _subscription.get_user().set_description(_description);
         setSubscriptionUser();
@@ -52,11 +51,11 @@ public class Participant extends User {
                        ContactInfo contactInfo, Album images, Liszt<Rating> ratings, Liszt<Event> events,
                        Liszt<ChatRoom> chatRooms, Subscription.Status subscriptionStatus,
                        SubscriptionOffer subscriptionOffer, Liszt<Bulletin> bulletins,
-                       LocalDateTime timestamp, Liszt<User> followings) {
+                       LocalDateTime timestamp, Liszt<User> idols) {
         super(id, username, description, contactInfo, images, ratings, events, chatRooms,
                 new Subscription(id, Subscription.Type.FREEMIUM, subscriptionStatus, subscriptionOffer, null),
                 bulletins, timestamp);
-        _followings = followings;
+        _idols = idols;
         _subscription.get_user().set_username(_username);
         _subscription.get_user().set_description(_description);
         setSubscriptionUser();
@@ -65,10 +64,10 @@ public class Participant extends User {
     public Participant(long id, String username, String firstName, String lastName, String description,
                        ContactInfo contactInfo, Album images, Liszt<Rating> ratings, Liszt<Event> events,
                        Liszt<ChatRoom> chatRooms, Subscription subscription,
-                       Liszt<Bulletin> bulletins, LocalDateTime timestamp, Liszt<User> followings) {
+                       Liszt<Bulletin> bulletins, LocalDateTime timestamp, Liszt<User> idols) {
         super(id, username, firstName, lastName, description, contactInfo, images, ratings, events, chatRooms,
                 subscription, bulletins, timestamp);
-        _followings = followings;
+        _idols = idols;
         _subscription.get_user().set_username(_username);
         _subscription.get_user().set_description(_description);
     }
@@ -76,20 +75,20 @@ public class Participant extends User {
     public Participant(long id, String username, String description,
                        ContactInfo contactInfo, Album images, Liszt<Rating> ratings, Liszt<Event> events,
                        Liszt<ChatRoom> chatRooms, Subscription subscription,
-                       Liszt<Bulletin> bulletins, LocalDateTime timestamp, Liszt<User> followings) {
+                       Liszt<Bulletin> bulletins, LocalDateTime timestamp, Liszt<User> idols) {
         super(id, username, description, contactInfo, images, ratings, events, chatRooms,
                 subscription, bulletins, timestamp);
-        _followings = followings;
+        _idols = idols;
         _subscription.get_user().set_username(_username);
         _subscription.get_user().set_description(_description);
     }
 
     public Participant(String username, String firstName, String lastName, String description,
-                       SubscriptionOffer subscriptionOffer, Liszt<User> followings) {
+                       SubscriptionOffer subscriptionOffer, Liszt<User> idols) {
         super(username, firstName, lastName, description,
                 new Subscription(new Participant(), Subscription.Type.FREEMIUM,
                         Subscription.Status.ACCEPTED, subscriptionOffer, null));
-        _followings = followings;
+        _idols = idols;
         _subscription.get_user().set_username(_username);
         _subscription.get_user().set_description(_description);
         setSubscriptionUser();
@@ -98,13 +97,13 @@ public class Participant extends User {
     public Participant(String username, String firstName, String lastName, String description,
                        Subscription subscription) {
         super(username, firstName, lastName, description, subscription);
-        _followings = new Liszt<>();
+        _idols = new Liszt<>();
     }
 
     public Participant(String username, String description,
                        Subscription subscription) {
         super(username, description, subscription);
-        _followings = new Liszt<>();
+        _idols = new Liszt<>();
     }
 
     /**
@@ -112,10 +111,10 @@ public class Participant extends User {
      * @param followings The Users that will be set to be the followings.
      * @return All the followings.
      */
-    public Liszt<User> set_followings(Liszt<User> followings) {
+    public Liszt<User> set_idols(Liszt<User> followings) {
         if (followings != null && _assembling)
-            _followings = followings;
-        return _followings;
+            _idols = followings;
+        return _idols;
     }
 
     /**
@@ -124,8 +123,8 @@ public class Participant extends User {
      * @return All the followings of the Participant.
      */
     public Liszt<User> add(User following) {
-        _followings.add(following);
-        return _followings;
+        _idols.add(following);
+        return _idols;
     }
 
     /**
@@ -134,8 +133,8 @@ public class Participant extends User {
      * @return All the followings of the Participant.
      */
     public Liszt<User> remove(User following) {
-        _followings.remove(following);
-        return _followings;
+        _idols.remove(following);
+        return _idols;
     }
 
     @Override
