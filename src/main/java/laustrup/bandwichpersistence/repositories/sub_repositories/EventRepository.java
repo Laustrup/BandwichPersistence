@@ -35,14 +35,28 @@ public class EventRepository extends Repository {
 
     private EventRepository() {}
 
+    /**
+     * Will collect a JDBC ResultSet of all Events from the database, by using a SQL statement.
+     * @return The collected JDBC ResultSet.
+     */
     public ResultSet get() {
         return get("");
     }
 
+    /**
+     * Will collect a JDBC ResultSet of an Event from the database, by using a SQL statement.
+     * @param id The id of the Event, that is wished to be found.
+     * @return The collected JDBC ResultSet.
+     */
     public ResultSet get(long id) {
         return get("WHERE `events`.id = " + id);
     }
 
+    /**
+     * Will collect a JDBC ResultSet of several Events from the database, by using a SQL statement.
+     * @param ids The ids of the Events, that is wished to be found.
+     * @return The collected JDBC ResultSet.
+     */
     public ResultSet get(Liszt<Long> ids) {
         StringBuilder where = new StringBuilder("WHERE ");
 
@@ -55,6 +69,14 @@ public class EventRepository extends Repository {
         return get(where.toString());
     }
 
+    /**
+     * Will collect a JDBC ResultSet of all Events that has something in common with a search query from the database,
+     * by using a SQL statement.
+     * It will compare columns of titles, descriptions and locations.
+     * Doesn't order them by relevance at the moment.
+     * @param query The search query, that is a line that should have something in common with columns.
+     * @return The collected JDBC ResultSet.
+     */
     public ResultSet search(String query) {
         query = query.replaceAll("%","");
         return get("WHERE `events`.title LIKE '%" + query + "%' OR " +
@@ -62,6 +84,12 @@ public class EventRepository extends Repository {
                 "`events`.location LIKE '%" + query + "%'");
     }
 
+    /**
+     * This is the method that can through a SQL statement find and collect the Event.
+     * Both from an id/ids or a search query, that is given from other public methods.
+     * @param where The where statement, that decides what information that is being looked for.
+     * @return The collected JDBC ResultSet.
+     */
     private ResultSet get(String where) {
         return read("SELECT * FROM `events` " +
                 "INNER JOIN contact_informations ON `events`.venue_id = contact_informations.id " +
@@ -70,11 +98,12 @@ public class EventRepository extends Repository {
                 "INNER JOIN requests ON `events`.id = requests.event_id " +
                 "INNER JOIN participations ON `events`.id = participations.event_id " +
                 "INNER JOIN event_bulletins ON `events`.id = event_bulletins.receiver_id " +
+                "INNER JOIN album_relations ON `events`.id = album_relations.event_id " +
+                "INNER JOIN albums ON album_relations.album_id = albums.id " +
+                "INNER JOIN album_endpoints ON album.id = album_endpoints " +
                 "INNER JOIN users ON `events`.venue_id = users.id OR acts.user_id = users.id " +
                     "OR requests.user_id = users.id OR participations.participant_id = users.id " +
-                        "OR event_bulletins.author_id = users.id " +
-                "INNER JOIN event_albums ON `events`.id = event_albums.event_id " +
-                "INNER JOIN co_" +
+                        "OR event_bulletins.author_id = users.id OR album_relations.user_id = users.id " +
                 where + ";");
     }
 }

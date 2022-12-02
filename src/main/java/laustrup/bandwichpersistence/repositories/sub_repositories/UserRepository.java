@@ -32,6 +32,14 @@ public class UserRepository extends Repository {
     private UserRepository() {}
 
     /**
+     * Will collect a JDBC ResultSet of all Users from the database, by using a SQL statement.
+     * @return The collected JDBC ResultSet.
+     */
+    public ResultSet get() {
+        return get("");
+    }
+
+    /**
      * Will collect a JDBC ResultSet of a User from the database, by using a SQL statement.
      * Checks if the username is an email, but if username is email, it needs to be checked if it is null,
      * since it is declared to be needing an email to log in with an email.
@@ -73,14 +81,6 @@ public class UserRepository extends Repository {
     }
 
     /**
-     * Will collect a JDBC ResultSet of all Users from the database, by using a SQL statement.
-     * @return The collected JDBC ResultSet.
-     */
-    public ResultSet get() {
-        return get("");
-    }
-
-    /**
      * Will collect a JDBC ResultSet of all Users that has something in common with a search query from the database,
      * by using a SQL statement.
      * It will compare columns of usernames, firstnames, lastnames and descriptions.
@@ -98,7 +98,7 @@ public class UserRepository extends Repository {
 
     /**
      * This is the method that can through a SQL statement find and collect the User.
-     * Both from an id or a login, that is given from other public methods.
+     * Both from an id/ids, login or a search query, that is given from other public methods.
      * @param where The where statement, that decides what information that is being looked for.
      * @return The collected JDBC ResultSet.
      */
@@ -118,7 +118,7 @@ public class UserRepository extends Repository {
                 "INNER JOIN user_bulletins ON users.id = bulletins.receiver_id " +
                 "INNER JOIN requests ON users.id = requests.user_id " +
                 "INNER JOIN ratings ON users.id = ratings.appointed_id " +
-                "INNER JOIN album_user_authors ON users.id = album_user_authors.user_id " +
+                "INNER JOIN album_relations ON users.id = album_relations.user_id " +
                 "INNER JOIN albums ON user_albums.album_id = albums.id " +
                 "INNER JOIN album_endpoints ON albums.id = album_endpoints.album_id " +
                 "INNER JOIN subscriptions ON users.id = subscriptions.user_id " +
