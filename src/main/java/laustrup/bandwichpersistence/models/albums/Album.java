@@ -1,11 +1,13 @@
 package laustrup.bandwichpersistence.models.albums;
 
 import laustrup.bandwichpersistence.models.Model;
+import laustrup.bandwichpersistence.models.events.Event;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.utilities.Liszt;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
@@ -16,7 +18,7 @@ public class Album extends Model {
      * These endpoints are being used for getting the image/music file.
      */
     @Getter
-    public Liszt<String> _endpoints;
+    private Liszt<String> _endpoints;
 
     /**
      * The main author of the current Album.
@@ -25,45 +27,47 @@ public class Album extends Model {
      * but there will then be only one who made the upload.
      */
     @Getter
-    public Model _author;
+    private User _author;
 
     /**
-     * Categories other mentionable people, who have participated in the album.
+     * Categories the tagged people, who have participated on the album.
      */
     @Getter
-    public Liszt<Model> _coAuthors;
+    private Liszt<User> _tags;
+
+    /**
+     * An Album can have a relation to an Event, but doesn't necessarily have to.
+     */
+    @Getter @Setter
+    private Event _event;
 
     /**
      * This is an Enum.
      * The Album might either be a MUSIC or IMAGE Album.
      */
     @Getter
-    public Kind _kind;
+    private Kind _kind;
 
-    public Album(long id, String title, Liszt<String> urls, User author, Liszt<Model> coAuthors,
+    public Album(long id, String title, Liszt<String> urls, User author, Liszt<User> tags, Event event,
                  Kind kind, LocalDateTime timestamp) {
         super(id, title, timestamp);
         _endpoints = urls;
         _author = author;
-        _coAuthors = coAuthors;
+        _tags = tags;
+        _event = event;
         _kind = kind;
     }
 
-    public Album(String title, Liszt<String> endpoints, User author, Liszt<Model> coAuthors, Kind kind) {
+    public Album(String title, Liszt<String> endpoints, User author, Liszt<User> tags, Event event, Kind kind) {
         super(title);
         _endpoints = endpoints;
         _author = author;
-        _coAuthors = coAuthors;
+        _tags = tags;
+        _event = event;
         _kind = kind;
     }
 
-    public Album(String title, Kind kind) {
-        super(title);
-        _endpoints = new Liszt<>();
-        _kind = kind;
-    }
-
-    public Model setAuthor(Model author) {
+    public Model setAuthor(User author) {
         if (_author==null)
             _author = author;
 
@@ -88,8 +92,35 @@ public class Album extends Model {
     }
 
     /**
+     * Will add a User as a tag to the Album.
+     * @param tag The User that will be added as a tag.
+     * @return All the tags of the Album.
+     */
+    public Liszt<User> add(User tag) { return add(new User[]{tag}); }
+
+    /**
+     * Will add some Users as tags to the Album.
+     * @param tags The Users that will be added as tags.
+     * @return All the tags of the Album.
+     */
+    public Liszt<User> add(User[] tags) {
+        _tags.add(tags);
+        return _tags;
+    }
+
+    /**
+     * Removes a tagged User of the Album.
+     * @param tag The User that will be removed as a tag.
+     * @return All the tags of the Album.
+     */
+    public Liszt<User> remove(User tag) {
+        _tags.remove(tag);
+        return _tags;
+    }
+
+    /**
      * Removes an endpoint of the Album.
-     * @param endpoint will be used for getting the file of the content.
+     * @param endpoint Will be used for getting the file of the content.
      * @return All the endpoints of the Album.
      */
     public Liszt<String> remove(String endpoint) {

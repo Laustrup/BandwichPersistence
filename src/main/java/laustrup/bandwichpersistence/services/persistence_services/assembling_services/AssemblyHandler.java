@@ -21,15 +21,29 @@ import java.sql.SQLException;
 
 public class AssemblyHandler {
 
-    public Liszt<Album> handleMusic(ResultSet set, Liszt<Album> music) throws SQLException {
+    public Liszt<Album> handleMusic(ResultSet set, Liszt<Album> music, User user) throws SQLException {
         String table = "album";
-        Album album = new Album(set.getLong(table+".id"),
-                set.getString(table+".title"),
-                new Liszt<>(),null, new Liszt<>(), Album.Kind.MUSIC,
-                set.getTimestamp(table+".`timestamp`").toLocalDateTime());
 
-        if (!music.contains(album.toString()))
-            music.add(album);
+        Album album = null;
+        if (set.getBoolean("album_relations.is_author"))
+            album = new Album(set.getLong(table+".id"),
+                set.getString(table+".title"), new Liszt<>(), user, new Liszt<>(),
+                    (((Long) set.getLong("album_relations.event_id")) != null ?
+                        new Event(set.getLong("album_relations.event_id")) : null),
+                    Album.Kind.MUSIC, set.getTimestamp(table+".`timestamp`").toLocalDateTime());
+        else
+            for (int i = 1; i <= music.size(); i++) {
+                if (music.get(i).get_primaryId() == set.getLong("album_relations.album_id")) {
+                    music.get(i).add(user);
+                    break;
+                }
+            }
+
+        if (music != null) {
+            assert album != null;
+            if (!music.contains(album.toString()))
+                music.add(album);
+        }
 
         try {
             music.replace(handleEndpoints(set, music.get(music.size())),music.size());
@@ -44,7 +58,7 @@ public class AssemblyHandler {
         String table = "album_endpoints";
         String endpoint = set.getString(table+".`value`");
         if (album.get_primaryId() == set.getLong(table+".album_id") &&
-                !album._endpoints.contains(endpoint))
+                !album.get_endpoints().contains(endpoint))
             album.add(endpoint);
 
         return album;
@@ -118,8 +132,8 @@ public class AssemblyHandler {
     }
 
     //TODO Finish values
-    public Liszt<Bulletin> handleBulletins(ResultSet set, Liszt<Bulletin> bulletins) throws SQLException {
-        String table = "bulletins";
+    public Liszt<Bulletin> handleBulletins(ResultSet set, Liszt<Bulletin> bulletins, boolean forEvents) throws SQLException {
+        String table = forEvents ? "event_bulletins" : "user_bulletins";
         Bulletin bulletin = new Bulletin(set.getLong(table+".id"),
                 set.getString(table+".content"),set.getBoolean(table+".is_sent"),
                 set.getBoolean(table+".is_edited"), set.getBoolean(table+".is_public"),
@@ -165,6 +179,7 @@ public class AssemblyHandler {
         return fans;
     }
 
+    //TODO Finish values
     public Liszt<Request> handleRequests(ResultSet set, Liszt<Request> requests, User user) throws SQLException {
         String table = "requests";
         Request request = new Request(user, new Event(set.getLong(table+".event_id")),

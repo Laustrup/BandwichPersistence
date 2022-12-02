@@ -12,15 +12,12 @@ USE bandwich_db;
 DROP TABLE IF EXISTS contact_informations;
 DROP TABLE IF EXISTS subscriptions;
 DROP TABLE IF EXISTS album_endpoints;
-DROP TABLE IF EXISTS co_event_albums;
-DROP TABLE IF EXISTS event_albums;
-DROP TABLE IF EXISTS co_album_user_authors;
-DROP TABLE IF EXISTS album_user_authors;
+DROP TABLE IF EXISTS album_relations;
 DROP TABLE IF EXISTS albums;
 DROP TABLE IF EXISTS ratings;
 DROP TABLE IF EXISTS requests;
 DROP TABLE IF EXISTS event_bulletins;
-DROP TABLE IF EXISTS bulletins;
+DROP TABLE IF EXISTS user_bulletins;
 DROP TABLE IF EXISTS mails;
 DROP TABLE IF EXISTS chatters;
 DROP TABLE IF EXISTS chat_rooms;
@@ -120,7 +117,6 @@ CREATE TABLE `events`(
         'FALSE',
         'TRUE',
         'UNDEFINED',
-        'BELOW_HALF',
         'ABOVE_HALF'
         ),
 
@@ -131,6 +127,7 @@ CREATE TABLE `events`(
     venue_id BIGINT(20) NOT NULL,
 
     `timestamp` DATETIME NOT NULL,
+
     PRIMARY KEY(id),
     FOREIGN KEY(venue_id) REFERENCES venues(user_id)
 );
@@ -221,7 +218,7 @@ CREATE TABLE mails(
     FOREIGN KEY(chat_room_id) REFERENCES chat_rooms(id)
 );
 
-CREATE TABLE bulletins(
+CREATE TABLE user_bulletins(
     id BIGINT(20) NOT NULL,
     author_id BIGINT(20) NOT NULL,
     content VARCHAR(1000),
@@ -237,12 +234,18 @@ CREATE TABLE bulletins(
 );
 
 CREATE TABLE event_bulletins(
-    event_id BIGINT(20) NOT NULL,
-    bulletin_id BIGINT(20) NOT NULL,
+    id BIGINT(20) NOT NULL,
+    author_id BIGINT(20) NOT NULL,
+    content VARCHAR(1000),
+    is_sent BOOL NOT NULL,
+    is_edited BOOL,
+    is_public BOOL NOT NULL,
+    receiver_id BIGINT(20) NOT NULL,
+    `timestamp` DATETIME NOT NULL,
 
-    PRIMARY KEY(event_id, bulletin_id),
-    FOREIGN KEY(event_id) REFERENCES `events`(id),
-    FOREIGN KEY(bulletin_id) REFERENCES bulletins(id)
+    PRIMARY KEY(id),
+    FOREIGN KEY(author_id) REFERENCES users(id),
+    FOREIGN KEY(receiver_id) REFERENCES `events`(id)
 );
 
 CREATE TABLE requests(
@@ -282,40 +285,16 @@ CREATE TABLE albums(
     PRIMARY KEY(id)
 );
 
-CREATE TABLE album_user_authors(
+CREATE TABLE album_relations(
     user_id BIGINT(20) NOT NULL,
     album_id BIGINT(20) NOT NULL,
+    event_id BIGINT(20),
+    is_author BOOLEAN NOT NULL,
 
     PRIMARY KEY(user_id, album_id),
     FOREIGN KEY(user_id) REFERENCES users(id),
-    FOREIGN KEY(album_id) REFERENCES albums(id)
-);
-
-CREATE TABLE co_album_user_authors(
-    user_id  BIGINT(20) NOT NULL,
-    album_id BIGINT(20) NOT NULL,
-
-    PRIMARY KEY (user_id, album_id),
-    FOREIGN KEY (user_id) REFERENCES users (id),
-    FOREIGN KEY (album_id) REFERENCES albums (id)
-);
-
-CREATE TABLE event_albums(
-    event_id BIGINT(20) NOT NULL,
-    album_id BIGINT(20) NOT NULL,
-
-    PRIMARY KEY(event_id, album_id),
-    FOREIGN KEY(event_id) REFERENCES events(id),
-    FOREIGN KEY(album_id) REFERENCES albums(id)
-);
-
-CREATE TABLE co_event_albums(
-     event_id BIGINT(20) NOT NULL,
-     album_id BIGINT(20) NOT NULL,
-
-     PRIMARY KEY(event_id, album_id),
-     FOREIGN KEY(event_id) REFERENCES events(id),
-     FOREIGN KEY(album_id) REFERENCES albums(id)
+    FOREIGN KEY(album_id) REFERENCES albums(id),
+    FOREIGN KEY(event_id) REFERENCES `events`(id)
 );
 
 CREATE TABLE album_endpoints(

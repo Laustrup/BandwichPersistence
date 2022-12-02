@@ -64,7 +64,7 @@ public class UserRepository extends Repository {
         StringBuilder where = new StringBuilder("WHERE ");
 
         for (int i = 1; i <= ids.size(); i++) {
-            where.append("id = ").append(ids.get(i));
+            where.append("users.id = ").append(ids.get(i));
             if (i < ids.size())
                 where.append(" OR ");
         }
@@ -115,7 +115,7 @@ public class UserRepository extends Repository {
                 "INNER JOIN fans ON fans.fan_id = users.id OR fans.idol_id = users.id " +
                 "INNER JOIN chatters ON chatters.user_id = users.id " +
                 "INNER JOIN chat_rooms ON chatters.chat_room_id = chat_rooms.id " +
-                "INNER JOIN bulletins ON users.id = bulletins.receiver_id " +
+                "INNER JOIN user_bulletins ON users.id = bulletins.receiver_id " +
                 "INNER JOIN requests ON users.id = requests.user_id " +
                 "INNER JOIN ratings ON users.id = ratings.appointed_id " +
                 "INNER JOIN album_user_authors ON users.id = album_user_authors.user_id " +

@@ -76,13 +76,14 @@ public class BandAssembly extends UserAssembler {
             if (Album.Kind.valueOf(set.getString("albums.kind")).equals(Album.Kind.IMAGE))
                 _images = _handler.handleEndpoints(set, _images);
             else
-                music = _handler.handleMusic(set, music);
+                // User is by default set to Band, but that might change, when Album is described.
+                music = _handler.handleMusic(set, music, new Band(set.getLong("album_relations.user_id")));
 
             _ratings = _handler.handleRatings(set, _ratings);
             gigs = _handler.handleGigs(set, gigs);
             _events = _handler.handleEvents(set, _events);
             _chatRooms = _handler.handleChatRooms(set, _chatRooms);
-            _bulletins = _handler.handleBulletins(set, _bulletins);
+            _bulletins = _handler.handleBulletins(set, _bulletins, false);
 
             if (set.getLong("followings.idol_id") == _id)
                 fans = _handler.handleFans(set, fans);
