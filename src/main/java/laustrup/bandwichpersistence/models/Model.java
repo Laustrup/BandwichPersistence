@@ -49,6 +49,12 @@ public abstract class Model {
     @Getter
     protected boolean _assembling;
 
+    /**
+     * A kind of String message, that can be used to define an incident a message.
+     */
+    @Getter @Setter
+    protected String _status = "UNDEFINED";
+
     public Model() {
         _timestamp = LocalDateTime.now();
     }

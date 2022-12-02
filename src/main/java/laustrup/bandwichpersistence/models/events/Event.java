@@ -151,20 +151,8 @@ public class Event extends Model {
     @Getter @Setter
     private Album _images;
 
-    public Event(String title, User user) {
-        super(title);
-
-        _gigs = new Liszt<>();
-        if (user.getClass() == Performer.class)
-            _gigs.add(new Gig(new Performer[]{(Performer) user}));
-        else _venue = (Venue) user;
-
-        _participations = new Liszt<>();
-        _bulletins = new Liszt<>();
-        _images = new Album();
-
-        _length = 0;
-        _cancelled = new Plato();
+    public Event(long id) {
+        super(id);
     }
 
     public Event(long id, String title, String description, LocalDateTime openDoors,
@@ -203,7 +191,24 @@ public class Event extends Model {
         _participations = participations;
         _bulletins = bulletins;
         _images = images;
+        _assembling = true;
 
+    }
+
+    public Event(String title, User user) {
+        super(title);
+
+        _gigs = new Liszt<>();
+        if (user.getClass() == Performer.class)
+            _gigs.add(new Gig(new Performer[]{(Performer) user}));
+        else _venue = (Venue) user;
+
+        _participations = new Liszt<>();
+        _bulletins = new Liszt<>();
+        _images = new Album();
+
+        _length = 0;
+        _cancelled = new Plato();
     }
 
     /**

@@ -7,6 +7,7 @@ import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.sub_users.bands.Artist;
 import laustrup.bandwichpersistence.models.users.sub_users.bands.Band;
 import laustrup.bandwichpersistence.models.users.sub_users.participants.Participant;
+import laustrup.bandwichpersistence.models.users.sub_users.venues.Venue;
 import laustrup.bandwichpersistence.repositories.sub_repositories.UserRepository;
 import laustrup.bandwichpersistence.utilities.Liszt;
 
@@ -91,6 +92,8 @@ public class ArtistAssembly extends UserAssembler {
                 fans = _handler.handleFans(set, fans);
             else
                 idols = _handler.handleIdols(set, idols);
+
+            requests = _handler.handleRequests(set, requests, new Artist(_id));
 
             if (!bandIds.contains(set.getLong("band_members.band_id")))
                 bandIds.add(set.getLong("band_members.band_id"));

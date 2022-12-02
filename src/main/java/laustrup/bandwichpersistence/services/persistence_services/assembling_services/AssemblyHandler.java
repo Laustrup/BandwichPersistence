@@ -3,6 +3,7 @@ package laustrup.bandwichpersistence.services.persistence_services.assembling_se
 import laustrup.bandwichpersistence.models.Rating;
 import laustrup.bandwichpersistence.models.albums.Album;
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
+import laustrup.bandwichpersistence.models.chats.Request;
 import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
 import laustrup.bandwichpersistence.models.events.Event;
 import laustrup.bandwichpersistence.models.events.Gig;
@@ -162,6 +163,18 @@ public class AssemblyHandler {
             fans.add(fan);
 
         return fans;
+    }
 
+    public Liszt<Request> handleRequests(ResultSet set, Liszt<Request> requests, User user) throws SQLException {
+        String table = "requests";
+        Request request = new Request(user, new Event(set.getLong(table+".event_id")),
+                new Plato(Plato.Argument.valueOf(set.getString(table+".is_approved"))),
+                set.getString(table+".message"),
+                set.getTimestamp(table+".`timestamp`").toLocalDateTime());
+
+        if (!requests.contains(request.toString()))
+            requests.add(request);
+
+        return requests;
     }
 }

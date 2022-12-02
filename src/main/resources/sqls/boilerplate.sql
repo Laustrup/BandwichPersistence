@@ -248,8 +248,13 @@ CREATE TABLE event_bulletins(
 CREATE TABLE requests(
     user_id BIGINT(20) NOT NULL,
     event_id BIGINT(20) NOT NULL,
-    is_approved BOOL,
+    is_approved ENUM(
+        'FALSE',
+        'TRUE',
+        'UNDEFINED'
+        ),
     message VARCHAR(250),
+    `timestamp` DATETIME NOT NULL,
 
     PRIMARY KEY(user_id,event_id),
     FOREIGN KEY(user_id) REFERENCES users(id),

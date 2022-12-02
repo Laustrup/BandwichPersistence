@@ -1,6 +1,9 @@
 package laustrup.bandwichpersistence.services.persistence_services.assembling_services.sub_assemblings.user_assemblings;
 
+import laustrup.bandwichpersistence.models.chats.Request;
+import laustrup.bandwichpersistence.models.users.sub_users.subscriptions.Subscription;
 import laustrup.bandwichpersistence.models.users.sub_users.venues.Venue;
+import laustrup.bandwichpersistence.utilities.Liszt;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -10,7 +13,7 @@ import java.sql.SQLException;
  * Will build Venues from database row values.
  * Is a singleton.
  */
-public class VenueAssembly {
+public class VenueAssembly extends UserAssembler {
 
     /**
      * Singleton instance of the Service.
@@ -30,6 +33,24 @@ public class VenueAssembly {
     private VenueAssembly() {}
 
     /**
+     * Assembles Venues with values from the ResultSet.
+     * @param set A ResultSet from the database, must include the values intended for the assembled object.
+     * @return Venues made from the values of the ResultSet.
+     * @throws SQLException Will be triggered from the ResultSet, if there is an error.
+     */
+    public Liszt<Venue> assembles(ResultSet set) throws SQLException {
+        Liszt<Venue> venues = new Liszt<>();
+
+        while (!set.isAfterLast()) {
+            if (set.isBeforeFirst())
+                set.next();
+            venues.add(assemble(set));
+        }
+
+        return venues;
+    }
+
+    /**
      * Assembles a Venue with values from the ResultSet.
      * There needs to be made a set.next() before executing this method.
      * @param set A ResultSet that has been executed early, must include the values intended for the assembled object.
@@ -37,11 +58,18 @@ public class VenueAssembly {
      * @throws SQLException Will be triggered from the ResultSet, if there is an error.
      */
     public Venue assemble(ResultSet set) throws SQLException {
+        setupUserAttributes(set);
+        String location = set.getString("venues.location");
+        String gear = set.getString("gear.`description`");
+        int size = set.getInt("venues.`size`");
+        Liszt<Request> requests = new Liszt<>();
 
         do {
-
+            requests = _handler.handleRequests(set, requests, new Venue(_id));
         } while (set.next());
 
-        return new Venue();
+        resetUserAttributes();
+        return new Venue(_id, _username, _description, _contactInfo, _images, _ratings, _events, _chatRooms, _timestamp,
+                location, gear, _subscription.get_status(), _subscription.get_offer(), _bulletins, size, requests);
     }
 }
