@@ -1,14 +1,12 @@
 package laustrup.bandwichpersistence.controllers;
 
+import laustrup.bandwichpersistence.models.Search;
 import laustrup.bandwichpersistence.models.users.Login;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.services.controller_services.UserControllerService;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController("api/user/")
 public class UserController {
@@ -18,8 +16,13 @@ public class UserController {
         return UserControllerService.get_instance().get(login);
     }
 
-    @PostMapping("{id}")
+    @PostMapping("get/{id}")
     public ResponseEntity<User> get(@PathVariable(name = "id") long id) {
         return UserControllerService.get_instance().get(id);
+    }
+
+    @PostMapping("search/{search_query}")
+    public ResponseEntity<Search> search(@PathVariable(name = "search_query") String searchQuery) {
+        return UserControllerService.get_instance().search(searchQuery);
     }
 }
