@@ -8,6 +8,7 @@ import laustrup.bandwichpersistence.models.users.sub_users.Performer;
 import laustrup.bandwichpersistence.models.users.sub_users.bands.Artist;
 import laustrup.bandwichpersistence.models.users.sub_users.bands.Band;
 import laustrup.bandwichpersistence.models.users.sub_users.participants.Participant;
+import laustrup.bandwichpersistence.models.users.sub_users.venues.Venue;
 import laustrup.bandwichpersistence.repositories.sub_repositories.*;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.sub_assemblings.EventAssembly;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.sub_assemblings.user_assemblings.UserAssembly;
@@ -40,28 +41,6 @@ public class Assembly {
     private Assembly() {}
 
     /**
-     * Gets a User object with the informations given from the UserRepository.
-     * Will be initiated as the object it is meant to be.
-     * @param login An object containing username and password.
-     * @return The assembled User.
-     */
-    public User getUser(Login login) {
-        return assemble(UserAssembly.get_instance().assemble(login), true);
-    }
-
-    /**
-     * Gets a User object with the informations given from the UserRepository.
-     * Will be initiated as the object it is meant to be.
-     * @param id The id of the User that is wished to be assembled.
-     * @return The assembled User.
-     */
-    public User getUser(long id) {
-        return assemble(UserAssembly.get_instance().assemble(id), true);
-    }
-
-    public Liszt<User> getUsers() { return assemble(UserAssembly.get_instance().assembles()); }
-
-    /**
      * Gets a Search object with the informations given from the UserRepository.
      * @param query The search query of the Users that is wished to be assembled.
      * @return The assembled Search.
@@ -74,23 +53,50 @@ public class Assembly {
     }
 
     /**
+     * Gets a User object with the informations given from the UserRepository.
+     * Will be initiated as the object it is meant to be.
+     * @param login An object containing username and password.
+     * @return The assembled User.
+     */
+    public User getUser(Login login) {
+        return assembling(UserAssembly.get_instance().assemble(login), true);
+    }
+
+    /**
+     * Gets a User object with the informations given from the UserRepository.
+     * Will be initiated as the object it is meant to be.
+     * @param id The id of the User that is wished to be assembled.
+     * @return The assembled User.
+     */
+    public User getUser(long id) {
+        return assembling(UserAssembly.get_instance().assemble(id), true);
+    }
+
+    /**
+     * Will get all the Users.
+     * @return All Users.
+     */
+    public Liszt<User> getUsers() { return userAssembling(UserAssembly.get_instance().assembles()); }
+
+    /**
      * Finishes the last assembling of Users, in order to get all values.
      * @param users The Users that will be further assembled.
      * @return The assembled Users.
      */
-    private Liszt<User> assemble(Liszt<User> users) {
+    private Liszt<User> userAssembling(Liszt<User> users) {
         for (int i = 1; i <= users.size(); i++)
-            users.set(i, assemble(users.get(i), false));
+            users.set(i, assembling(users.get(i), false));
 
-        return finish(users);
+        return userFinishing(users);
     }
 
     /**
      * Finishes the last assembling of a User, in order to get all values.
      * @param user The User that will be further assembled.
+     * @param willFinish Will set assembling as done and close connections, if true.
      * @return The assembled User.
      */
-    private User assemble(User user, boolean willFinish) {
+    private User assembling(User user, boolean willFinish) {
         if (user.getClass() == Artist.class ||
                 user.getClass() == Band.class) {
             ((Performer) user).set_idols(UserAssembly.get_instance().describe(((Performer) user).get_idols()));
@@ -98,6 +104,15 @@ public class Assembly {
         }
         else if (user.getClass() == Participant.class)
             ((Participant) user).set_idols(UserAssembly.get_instance().describe(((Participant) user).get_idols()));
+
+        /*
+        if (user.getClass() == Artist.class)
+            //((Artist) user).set_requests();
+        else if (user.getClass() == Venue.class)
+            //((Venue) user).set_requests();
+         */
+
+        user.set_events(EventAssembly.get_instance().describe(user.get_events()));
 
         user.setSubscriptionUser();
         user.setImagesAuthor();
@@ -110,14 +125,46 @@ public class Assembly {
             return user;
     }
 
+    /**
+     * Gets an Event object with the informations given from the UserRepository.
+     * Will be initiated as the object it is meant to be.
+     * @param id The id of the Event that is wished to be assembled.
+     * @return The assembled Event.
+     */
+    public Event getEvent(long id) { return assembling(EventAssembly.get_instance().assemble(id), true); }
+
+    /**
+     * Will get all the Events.
+     * @return All Events.
+     */
+    public Liszt<Event> getEvents() { return eventAssembling(EventAssembly.get_instance().assembles()); }
+
+    /**
+     * Finishes the last assembling of Events, in order to get all values.
+     * @param events The Events that will be further assembled.
+     * @return The assembled Events.
+     */
+    private Liszt<Event> eventAssembling(Liszt<Event> events) {
+        for (int i = 1; i <= events.size(); i++)
+            events.set(i, assembling(events.get(i), false));
+
+        return eventFinishing(events);
+    }
+
+    /**
+     * Finishes the last assembling of an Event, in order to get all values.
+     * @param event The Event that will be further assembled.
+     * @param willFinish Will set assembling as done and close connections, if true.
+     * @return The assembled Event.
+     */
+    private Event assembling(Event event, boolean willFinish) {
+        event.set_venue((Venue) getUser(event.get_venue().get_primaryId()));
 
 
-    public Event getEvent(long id) { return EventAssembly.get_instance().assemble(id); }
-
-    private Event assemble(Event event) {
-
-
-        return finish(event);
+        if (willFinish)
+            return finish(event);
+        else
+            return event;
     }
 
     /**
@@ -153,7 +200,7 @@ public class Assembly {
      * @param users The Users that will be done assembling.
      * @return The assembled Users.
      */
-    private Liszt<User> finish(Liszt<User> users) {
+    private Liszt<User> userFinishing(Liszt<User> users) {
         for (User user : users)
             user.doneAssembling();
 
@@ -177,6 +224,22 @@ public class Assembly {
             Printer.get_instance().print(connectionStatus.get_message(), new Exception());
 
         return event;
+    }
+
+    /**
+     * Will set the Events as done assembling and close all open connections.
+     * @param events The Events that will be done assembling.
+     * @return The assembled Events.
+     */
+    private Liszt<Event> eventFinishing(Liszt<Event> events) {
+        for (Event event : events)
+            event.doneAssembling();
+
+        Plato connectionStatus = closeConnections();
+        if (!connectionStatus.get_truth())
+            Printer.get_instance().print(connectionStatus.get_message(), new Exception());
+
+        return events;
     }
 
     /**

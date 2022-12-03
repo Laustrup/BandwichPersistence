@@ -5,6 +5,7 @@ import laustrup.bandwichpersistence.models.albums.Album;
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.models.chats.Request;
 import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
+import laustrup.bandwichpersistence.models.chats.messages.Mail;
 import laustrup.bandwichpersistence.models.events.Event;
 import laustrup.bandwichpersistence.models.events.Gig;
 import laustrup.bandwichpersistence.models.users.User;
@@ -13,6 +14,7 @@ import laustrup.bandwichpersistence.models.users.sub_users.bands.Artist;
 import laustrup.bandwichpersistence.models.users.sub_users.bands.Band;
 import laustrup.bandwichpersistence.models.users.sub_users.participants.Participant;
 import laustrup.bandwichpersistence.models.users.sub_users.venues.Venue;
+import laustrup.bandwichpersistence.services.persistence_services.assembling_services.sub_assemblings.user_assemblings.UserAssembly;
 import laustrup.bandwichpersistence.utilities.Liszt;
 import laustrup.bandwichpersistence.utilities.Plato;
 
@@ -136,7 +138,7 @@ public class AssemblyHandler {
         String table = forEvents ? "event_bulletins" : "user_bulletins";
         Bulletin bulletin = new Bulletin(set.getLong(table+".id"),
                 set.getString(table+".content"),set.getBoolean(table+".is_sent"),
-                set.getBoolean(table+".is_edited"), set.getBoolean(table+".is_public"),
+                new Plato(Plato.Argument.valueOf(set.getString(table+".is_edited"))), set.getBoolean(table+".is_public"),
                 set.getTimestamp(table+".`timestamp`").toLocalDateTime());
 
         if (!bulletins.contains(bulletin))
@@ -191,5 +193,39 @@ public class AssemblyHandler {
             requests.add(request);
 
         return requests;
+    }
+
+    public Liszt<Mail> handleMails(ResultSet set, Liszt<Mail> mails) throws SQLException {
+        String table = "mails";
+        Mail mail = new Mail(set.getLong(table+".id"),new Artist(set.getLong(table+".author_id")),
+                set.getString(table+".content"),set.getBoolean(table+".is_sent"),
+                new Plato(Plato.Argument.valueOf(set.getString(table+".is_edited"))),set.getBoolean(table+".is_public"),
+                set.getTimestamp(table+".`timestamp`").toLocalDateTime());
+
+        if (!mails.contains(mail)) {
+            User author = UserAssembly.get_instance().assemble(mail.get_author().get_primaryId());
+            mails.add(new Mail(set.getLong(table+".id"),author,
+                    set.getString(table+".content"),set.getBoolean(table+".is_sent"),
+                    new Plato(Plato.Argument.valueOf(set.getString(table+".is_edited"))),set.getBoolean(table+".is_public"),
+                    set.getTimestamp(table+".`timestamp`").toLocalDateTime()));
+        }
+
+        return mails;
+    }
+    public Liszt<User> handleChatters(ResultSet set, Liszt<User> chatters) throws SQLException {
+        String table = "chatters";
+        boolean chatterExists = false;
+
+        for (User user : chatters) {
+            if (user.get_primaryId() == set.getLong(table+".user_id")) {
+                chatterExists = true;
+                break;
+            }
+        }
+
+        if (!chatterExists)
+            chatters.add(UserAssembly.get_instance().assemble(set.getLong(table+".user_id")));
+
+        return chatters;
     }
 }

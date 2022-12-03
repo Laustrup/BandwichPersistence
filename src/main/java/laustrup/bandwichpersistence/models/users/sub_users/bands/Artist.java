@@ -60,6 +60,7 @@ public class Artist extends Performer {
         _bands = bands;
         _runner = runner;
         _requests = requests;
+
         _assembling = true;
     }
 
@@ -69,6 +70,17 @@ public class Artist extends Performer {
         _bands = bands;
         _runner = runner;
         _requests = new Liszt<>();
+    }
+
+    /**
+     * Sets the Requests.
+     * Will only be done, if it is under assembling.
+     * @return The Requests of this Artist.
+     */
+    public Liszt<Request> set_requests(Liszt<Request> requests) {
+        if (_assembling)
+            _requests = requests;
+        return _requests;
     }
 
     /**

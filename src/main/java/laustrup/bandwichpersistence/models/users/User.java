@@ -180,12 +180,24 @@ public abstract class User extends Model {
     }
 
     /**
+     * Sets the Events.
+     * Will only be done, if it is under assembling.
+     * @return The Events of this User.
+     */
+    public Liszt<Event> set_events(Liszt<Event> events) {
+        if (_assembling)
+            _events = events;
+        return _events;
+    }
+
+    /**
      * Sets the User of the Subscription as this User.
-     * Is meant for after assembling.
+     * Will only be done, if it is under assembling.
      * @return The Subscription of this User.
      */
     public Subscription setSubscriptionUser() {
-        _subscription.set_user(this);
+        if (_assembling)
+            _subscription.set_user(this);
         return _subscription;
     }
 

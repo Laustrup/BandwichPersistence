@@ -1,20 +1,24 @@
 package laustrup.bandwichpersistence.services.persistence_services.assembling_services.sub_assemblings.user_assemblings;
 
+import laustrup.bandwichpersistence.models.chats.ChatRoom;
+import laustrup.bandwichpersistence.models.chats.messages.Mail;
 import laustrup.bandwichpersistence.models.users.Login;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.repositories.sub_repositories.UserRepository;
+import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembler;
 import laustrup.bandwichpersistence.utilities.Liszt;
 import laustrup.bandwichpersistence.utilities.Printer;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 
 /**
  * Is only used for database read functions.
  * Will build Users from database row values.
  * Is a singleton.
  */
-public class UserAssembly {
+public class UserAssembly extends Assembler {
 
     /**
      * Singleton instance of the Service.
@@ -142,5 +146,47 @@ public class UserAssembly {
         }
 
         return user;
+    }
+
+    public Liszt<ChatRoom> describeChatRooms(Liszt<ChatRoom> chatRooms) {
+        Liszt<Long> ids = new Liszt<>();
+
+        for (ChatRoom chatRoom : chatRooms)
+            ids.add(chatRoom.get_primaryId());
+
+        chatRooms = new Liszt<>();
+        ResultSet set = UserRepository.get_instance().getChatRooms(ids);
+
+        for (long id : ids) {
+            try {
+                if (set.isBeforeFirst())
+                    set.next();
+                chatRooms.add(assembleChatRoom(set));
+            } catch (SQLException e) {
+                Printer.get_instance().print("Couldn't describe Users...", e);
+            }
+        }
+
+        return chatRooms;
+    }
+
+    public ChatRoom assembleChatRoom(ResultSet set) throws SQLException {
+        long id = set.getLong("chat_rooms.id");
+        String title = set.getString("chat_rooms.title");
+        Liszt<Mail> mails = new Liszt<>();
+        Liszt<User> chatters = new Liszt<>();
+        User responsible = assemble(set.getLong("chat_rooms.responsible_id"));
+        LocalDateTime timestamp = set.getTimestamp("chat_rooms.`timestamp`").toLocalDateTime();
+
+        do {
+            if (id != set.getLong("chat_rooms.id"))
+                break;
+
+            mails = _handler.handleMails(set, mails);
+            chatters = _handler.handleChatters(set, chatters);
+
+        } while (set.next());
+
+        return new ChatRoom(id, title, mails, chatters, responsible, timestamp);
     }
 }

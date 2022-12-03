@@ -47,14 +47,31 @@ public class EventAssembly extends Assembler {
     public Event assemble(long id) { return assemble(EventRepository.get_instance().get(id),true); }
 
     /**
+     * Builds all Event objects with the informations given from the EventRepository.
+     * Will be initiated as objects with primitive amounts of attributes.
+     * @return All the assembled Events.
+     */
+    public Liszt<Event> assembles() {
+        return assembles(EventRepository.get_instance().get());
+    }
+
+    /**
      * Builds Event objects that are alike the search query, where the informations are given from the EventRepository.
      * Will be initiated as objects with primitive amounts of attributes.
      * @param searchQuery The search that should have something in common with some Events.
      * @return The assembled Events similar to the search query.
      */
     public Liszt<Event> assembles(String searchQuery) {
+        return assembles(EventRepository.get_instance().search(searchQuery));
+    }
+
+    /**
+     * The private method that assembles multiple Events, that are defined in other public methods.
+     * @param set The ResultSet that will define the values for the Events.
+     * @return The assembled Events.
+     */
+    public Liszt<Event> assembles(ResultSet set) {
         Liszt<Event> events = new Liszt<>();
-        ResultSet set = EventRepository.get_instance().search(searchQuery);
 
         try {
             while (!set.isAfterLast()) {
@@ -63,7 +80,7 @@ public class EventAssembly extends Assembler {
                 events.add(assemble(set, false));
             }
         } catch (SQLException e) {
-            Printer.get_instance().print("Couldn't assemble Events of search query...", e);
+            Printer.get_instance().print("Couldn't assemble Events...", e);
         }
 
         return events;
@@ -132,7 +149,6 @@ public class EventAssembly extends Assembler {
         String ticketsURL = set.getString("`events`.tickets_url");
         ContactInfo contactInfo = ModelAssembly.get_instance().assembleContactInfo(set);
         Liszt<Gig> gigs = new Liszt<>();
-        //TODO Describe
         Venue venue = new Venue(set.getLong("`events`.venue_id"));
         Liszt<Request> requests = new Liszt<>();
         Liszt<Participation> participations = new Liszt<>();

@@ -58,7 +58,9 @@ public class ChatRoom extends Model {
         _mails = mails;
         _chatters = chatters;
         _responsible = responsible;
+        _assembling = true;
 
+        setChatRoomOfMails();
         isTheChatRoomAnswered();
     }
 
@@ -66,6 +68,7 @@ public class ChatRoom extends Model {
         super(id, title.isEmpty() || title == null ? "ChatRoom-"+id : title, timestamp);
         _mails = new Liszt<>();
         _chatters = new Liszt<>();
+        _assembling = true;
     }
 
     public ChatRoom(String title, Liszt<User> chatters, User responsible) {
@@ -75,6 +78,21 @@ public class ChatRoom extends Model {
         _responsible = responsible;
 
         isTheChatRoomAnswered();
+    }
+
+    /**
+     * Can only be used, if it is being assembled.
+     * Will set each Mail's ChatRoom to this object.
+     * @return All Mails.
+     */
+    private Liszt<Mail> setChatRoomOfMails(){
+        if (_assembling) {
+            for (int i = 1; i <= _mails.size(); i++)
+                _mails.get(i).set_chatRoom(this);
+
+            _assembling = false;
+        }
+        return _mails;
     }
 
     /**

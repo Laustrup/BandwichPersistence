@@ -104,6 +104,17 @@ public class Venue extends User {
     }
 
     /**
+     * Sets the Requests.
+     * Will only be done, if it is under assembling.
+     * @return The Requests of this Venue.
+     */
+    public Liszt<Request> set_requests(Liszt<Request> requests) {
+        if (_assembling)
+            _requests = requests;
+        return _requests;
+    }
+
+    /**
      * Adds an Event to the Liszt of Events.
      * @param event An object of Event, that is wished to be added.
      * @return The whole Liszt of Events.

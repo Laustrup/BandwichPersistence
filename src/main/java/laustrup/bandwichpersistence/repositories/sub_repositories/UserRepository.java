@@ -126,6 +126,20 @@ public class UserRepository extends Repository {
                 where + ";");
     }
 
+    public ResultSet getChatRooms(Liszt<Long> ids) {
+        StringBuilder where = new StringBuilder("WHERE ");
+
+        for (int i = 1; i <= ids.size(); i++) {
+            where.append("chat_rooms.id = ").append(ids.get(i));
+            if (i < ids.size())
+                where.append(" OR ");
+        }
+
+        return read("SELECT * FROM chat_rooms " +
+                "INNER JOIN chatters ON chat_rooms.id = chatters.chat_room_id " +
+                "INNER JOIN mails ON chat_rooms.id = mails.chat_room id " +
+                where + ";");
+    }
 
     /**
      * Will collect a JDBC ResultSet of a Card from the database, by using a SQL statement.

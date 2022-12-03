@@ -445,7 +445,7 @@ public class TestItems extends JTest {
         for (int i = 0; i < bulletins.length; i++) {
             long id = i+1;
             bulletins[i] = new Bulletin(id, generateUser(), model, "Content "+id, _random.nextBoolean(),
-                    _random.nextBoolean(), _random.nextBoolean(), LocalDateTime.now());
+                    generatePlato(), _random.nextBoolean(), LocalDateTime.now());
         }
 
         return bulletins;
@@ -497,7 +497,7 @@ public class TestItems extends JTest {
             for (int j = 0; j < contentAmount; j++) content += "Test ";
 
             mails.add(new Mail(i+1, new ChatRoom(), members.get(_random.nextInt(members.size())+1),
-                    content, _random.nextBoolean(), _random.nextBoolean(), _random.nextBoolean(), LocalDateTime.now()));
+                    content, _random.nextBoolean(), generatePlato(), _random.nextBoolean(), LocalDateTime.now()));
         }
 
         return mails;

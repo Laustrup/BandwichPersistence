@@ -209,9 +209,14 @@ CREATE TABLE mails(
     author_id BIGINT(20) NOT NULL,
     content VARCHAR(1000),
     is_sent BOOL NOT NULL,
-    is_edited BOOL,
+    is_edited ENUM(
+        'FALSE',
+        'TRUE',
+        'UNDEFINED'
+        ),
     is_public BOOL NOT NULL,
     chat_room_id BIGINT(20) NOT NULL,
+    `timestamp` DATETIME NOT NULL,
 
     PRIMARY KEY(id),
     FOREIGN KEY(author_id) REFERENCES users(id),
@@ -223,7 +228,11 @@ CREATE TABLE user_bulletins(
     author_id BIGINT(20) NOT NULL,
     content VARCHAR(1000),
     is_sent BOOL NOT NULL,
-    is_edited BOOL,
+    is_edited ENUM(
+        'FALSE',
+        'TRUE',
+        'UNDEFINED'
+        ),
     is_public BOOL NOT NULL,
     receiver_id BIGINT(20) NOT NULL,
     `timestamp` DATETIME NOT NULL,
@@ -238,7 +247,11 @@ CREATE TABLE event_bulletins(
     author_id BIGINT(20) NOT NULL,
     content VARCHAR(1000),
     is_sent BOOL NOT NULL,
-    is_edited BOOL,
+    is_edited ENUM(
+        'FALSE',
+        'TRUE',
+        'UNDEFINED'
+        ),
     is_public BOOL NOT NULL,
     receiver_id BIGINT(20) NOT NULL,
     `timestamp` DATETIME NOT NULL,
