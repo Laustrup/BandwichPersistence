@@ -5,8 +5,13 @@ import laustrup.bandwichpersistence.models.albums.Album;
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
 import laustrup.bandwichpersistence.models.events.Event;
+import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
+import laustrup.bandwichpersistence.models.users.sub_users.bands.Artist;
+import laustrup.bandwichpersistence.models.users.sub_users.bands.Band;
+import laustrup.bandwichpersistence.models.users.sub_users.participants.Participant;
 import laustrup.bandwichpersistence.models.users.sub_users.subscriptions.Subscription;
+import laustrup.bandwichpersistence.models.users.sub_users.venues.Venue;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembler;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.sub_assemblings.ModelAssembly;
 import laustrup.bandwichpersistence.utilities.Liszt;
@@ -100,7 +105,9 @@ public abstract class UserAssembler extends Assembler {
         _lastName = set.getString("users.last_name");
         _description = set.getString("users.`description`");
         _contactInfo = ModelAssembly.get_instance().assembleContactInfo(set);
-        _images = new Album(_username+":images", Album.Kind.IMAGE);
+        _images = new Album(set.getLong("albums.id"),
+                _username+":images", new Liszt<>(), defineUserType(set), new Liszt<>(), null,
+                Album.Kind.IMAGE, set.getTimestamp("albums.`timestamp`").toLocalDateTime());
         _ratings = new Liszt<>();
         _events = new Liszt<>();
         _chatRooms = new Liszt<>();

@@ -50,12 +50,35 @@ public class UserAssembly {
     public User assemble(long id) { return assemble(UserRepository.get_instance().get(id),true); }
 
     /**
-     * Rebuilds Users that are only with Id.
+     * Builds User objects that are alike the search query, where the informations are given from the UserRepository.
      * Will be initiated as objects with primitive amounts of attributes.
-     * @param users
-     * @return
+     * @param searchQuery The search that should have something in common with some Users.
+     * @return The assembled Users similar to the search query.
      */
-    public Liszt<User> assembles(Liszt<User> users) {
+    public Liszt<User> assembles(String searchQuery) {
+        Liszt<User> users = new Liszt<>();
+        ResultSet set = UserRepository.get_instance().search(searchQuery);
+
+        try {
+            while (!set.isAfterLast()) {
+                if (set.isBeforeFirst())
+                    set.next();
+                users.add(assemble(set, false));
+            }
+        } catch (SQLException e) {
+            Printer.get_instance().print("Couldn't assemble Users of search query...", e);
+        }
+
+        return users;
+    }
+
+    /**
+     * Rebuilds Users that are only with ids.
+     * Will be initiated as objects with primitive amounts of attributes.
+     * @param users The User objects that should be described.
+     * @return The described Users.
+     */
+    public Liszt<User> describe(Liszt<User> users) {
         Liszt<Long> ids = new Liszt<>();
         for (User user : users)
             ids.add(user.get_primaryId());
@@ -63,8 +86,15 @@ public class UserAssembly {
         users = new Liszt<>();
         ResultSet set = UserRepository.get_instance().get(ids);
 
-        for (long id : ids)
-            users.add(assemble(set, false));
+        for (long id : ids) {
+            try {
+                if (set.isBeforeFirst())
+                    set.next();
+                users.add(assemble(set, false));
+            } catch (SQLException e) {
+                Printer.get_instance().print("Couldn't describe Users...", e);
+            }
+        }
 
         return users;
     }
@@ -73,6 +103,8 @@ public class UserAssembly {
      * Assembles the User from a ResultSet.
      * Will not close the Connection to the database, when it is done assembling.
      * @param set A JDBC ResultSet that is gathered from the rows of the SQL statement to the database.
+     * @param preInitiate If true, it will set the ResultsSet at first row, should only be done,
+     *                   if there is only expected a single entity.
      * @return The assembled User.
      */
     private User assemble(ResultSet set, boolean preInitiate) {
@@ -93,5 +125,4 @@ public class UserAssembly {
 
         return user;
     }
-
 }

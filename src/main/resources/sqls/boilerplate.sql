@@ -98,17 +98,17 @@ CREATE TABLE `events`(
     open_doors DATETIME,
     `description` VARCHAR(1000),
 
-    is_cancelled ENUM(
-        'FALSE',
-        'TRUE',
-        'UNDEFINED'
-        ),
     is_voluntary ENUM(
         'FALSE',
         'TRUE',
         'UNDEFINED'
         ),
     is_public ENUM(
+        'FALSE',
+        'TRUE',
+        'UNDEFINED'
+        ),
+    is_cancelled ENUM(
         'FALSE',
         'TRUE',
         'UNDEFINED'

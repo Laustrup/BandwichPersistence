@@ -1,5 +1,7 @@
 package laustrup.bandwichpersistence.services.persistence_services.assembling_services;
 
+import laustrup.bandwichpersistence.models.Search;
+import laustrup.bandwichpersistence.models.events.Event;
 import laustrup.bandwichpersistence.models.users.Login;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.sub_users.Performer;
@@ -7,9 +9,13 @@ import laustrup.bandwichpersistence.models.users.sub_users.bands.Artist;
 import laustrup.bandwichpersistence.models.users.sub_users.bands.Band;
 import laustrup.bandwichpersistence.models.users.sub_users.participants.Participant;
 import laustrup.bandwichpersistence.repositories.sub_repositories.*;
+import laustrup.bandwichpersistence.services.persistence_services.assembling_services.sub_assemblings.EventAssembly;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.sub_assemblings.user_assemblings.UserAssembly;
+import laustrup.bandwichpersistence.utilities.Liszt;
 import laustrup.bandwichpersistence.utilities.Plato;
 import laustrup.bandwichpersistence.utilities.Printer;
+
+import java.sql.ResultSet;
 
 /**
  * This class uses other assemblies to build objects from database,
@@ -56,6 +62,18 @@ public class Assembly {
     }
 
     /**
+     * Gets a Search object with the informations given from the UserRepository.
+     * @param query The search query of the Users that is wished to be assembled.
+     * @return The assembled Search.
+     */
+    public Search search(String query) {
+        Liszt<User> users = UserAssembly.get_instance().assembles(query);
+        Liszt<Event> events = EventAssembly.get_instance().assembles(query);
+
+        return finish(new Search(users, events));
+    }
+
+    /**
      * Finishes the last assembling of a User, in order to get all values.
      * @param user The User that will be further assembled.
      * @return The assembled User.
@@ -63,11 +81,11 @@ public class Assembly {
     private User assemble(User user) {
         if (user.getClass() == Artist.class ||
                 user.getClass() == Band.class) {
-            ((Performer) user).set_idols(UserAssembly.get_instance().assembles(((Performer) user).get_idols()));
-            ((Performer) user).set_fans(UserAssembly.get_instance().assembles(((Performer) user).get_fans()));
+            ((Performer) user).set_idols(UserAssembly.get_instance().describe(((Performer) user).get_idols()));
+            ((Performer) user).set_fans(UserAssembly.get_instance().describe(((Performer) user).get_fans()));
         }
         else if (user.getClass() == Participant.class)
-            ((Participant) user).set_idols(UserAssembly.get_instance().assembles(((Participant) user).get_idols()));
+            ((Participant) user).set_idols(UserAssembly.get_instance().describe(((Participant) user).get_idols()));
 
         user.setSubscriptionUser();
         user.setImagesAuthor();
@@ -77,9 +95,30 @@ public class Assembly {
         return finish(user);
     }
 
+    public Event getEvent(long id) { return EventAssembly.get_instance().assemble(id); }
+
+    private Event assemble(Event event) {
+
+
+        return finish(event);
+    }
+
+    /**
+     * Will set the Search as done assembling and close all open connections.
+     * @param search The Search that will be done assembling.
+     * @return The assembled Search.
+     */
+    private Search finish(Search search) {
+        Plato connectionStatus = closeConnections();
+        if (!connectionStatus.get_truth())
+            Printer.get_instance().print(connectionStatus.get_message(), new Exception());
+
+        return search;
+    }
+
     /**
      * Will set the User as done assembling and close all open connections.
-     * @param user The user that will be done assembling.
+     * @param user The User that will be done assembling.
      * @return The assembled User.
      */
     private User finish(User user) {
@@ -90,6 +129,21 @@ public class Assembly {
             Printer.get_instance().print(connectionStatus.get_message(), new Exception());
 
         return user;
+    }
+
+    /**
+     * Will set the Event as done assembling and close all open connections.
+     * @param event The Event that will be done assembling.
+     * @return The assembled Event.
+     */
+    private Event finish(Event event) {
+        event.doneAssembling();
+
+        Plato connectionStatus = closeConnections();
+        if (!connectionStatus.get_truth())
+            Printer.get_instance().print(connectionStatus.get_message(), new Exception());
+
+        return event;
     }
 
     /**
