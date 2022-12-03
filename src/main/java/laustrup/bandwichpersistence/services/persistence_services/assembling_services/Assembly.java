@@ -15,8 +15,6 @@ import laustrup.bandwichpersistence.utilities.Liszt;
 import laustrup.bandwichpersistence.utilities.Plato;
 import laustrup.bandwichpersistence.utilities.Printer;
 
-import java.sql.ResultSet;
-
 /**
  * This class uses other assemblies to build objects from database,
  * finishes details and closes database connections.
@@ -48,7 +46,7 @@ public class Assembly {
      * @return The assembled User.
      */
     public User getUser(Login login) {
-        return assemble(UserAssembly.get_instance().assemble(login));
+        return assemble(UserAssembly.get_instance().assemble(login), true);
     }
 
     /**
@@ -58,8 +56,10 @@ public class Assembly {
      * @return The assembled User.
      */
     public User getUser(long id) {
-        return assemble(UserAssembly.get_instance().assemble(id));
+        return assemble(UserAssembly.get_instance().assemble(id), true);
     }
+
+    public Liszt<User> getUsers() { return assemble(UserAssembly.get_instance().assembles()); }
 
     /**
      * Gets a Search object with the informations given from the UserRepository.
@@ -74,11 +74,23 @@ public class Assembly {
     }
 
     /**
+     * Finishes the last assembling of Users, in order to get all values.
+     * @param users The Users that will be further assembled.
+     * @return The assembled Users.
+     */
+    private Liszt<User> assemble(Liszt<User> users) {
+        for (int i = 1; i <= users.size(); i++)
+            users.set(i, assemble(users.get(i), false));
+
+        return finish(users);
+    }
+
+    /**
      * Finishes the last assembling of a User, in order to get all values.
      * @param user The User that will be further assembled.
      * @return The assembled User.
      */
-    private User assemble(User user) {
+    private User assemble(User user, boolean willFinish) {
         if (user.getClass() == Artist.class ||
                 user.getClass() == Band.class) {
             ((Performer) user).set_idols(UserAssembly.get_instance().describe(((Performer) user).get_idols()));
@@ -92,8 +104,13 @@ public class Assembly {
         if (user.getClass() == Artist.class || user.getClass() == Band.class)
             ((Performer) user).setAuthorOfAlbums();
 
-        return finish(user);
+        if (willFinish)
+            return finish(user);
+        else
+            return user;
     }
+
+
 
     public Event getEvent(long id) { return EventAssembly.get_instance().assemble(id); }
 
@@ -129,6 +146,22 @@ public class Assembly {
             Printer.get_instance().print(connectionStatus.get_message(), new Exception());
 
         return user;
+    }
+
+    /**
+     * Will set the Users as done assembling and close all open connections.
+     * @param users The Users that will be done assembling.
+     * @return The assembled Users.
+     */
+    private Liszt<User> finish(Liszt<User> users) {
+        for (User user : users)
+            user.doneAssembling();
+
+        Plato connectionStatus = closeConnections();
+        if (!connectionStatus.get_truth())
+            Printer.get_instance().print(connectionStatus.get_message(), new Exception());
+
+        return users;
     }
 
     /**

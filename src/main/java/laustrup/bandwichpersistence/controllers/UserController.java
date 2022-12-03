@@ -5,6 +5,7 @@ import laustrup.bandwichpersistence.models.users.Login;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.services.controller_services.UserControllerService;
 
+import laustrup.bandwichpersistence.utilities.Liszt;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +20,11 @@ public class UserController {
     @PostMapping("get/{id}")
     public ResponseEntity<User> get(@PathVariable(name = "id") long id) {
         return UserControllerService.get_instance().get(id);
+    }
+
+    @PostMapping("get")
+    public ResponseEntity<Liszt<User>> get() {
+        return UserControllerService.get_instance().get();
     }
 
     @PostMapping("search/{search_query}")

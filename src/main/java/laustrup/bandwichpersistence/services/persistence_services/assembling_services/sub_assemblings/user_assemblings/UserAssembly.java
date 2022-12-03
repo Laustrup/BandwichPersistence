@@ -50,14 +50,31 @@ public class UserAssembly {
     public User assemble(long id) { return assemble(UserRepository.get_instance().get(id),true); }
 
     /**
+     * Builds all the User objects, where the informations are given from the UserRepository.
+     * Will be initiated as objects with primitive amounts of attributes.
+     * @return All the assembled Users.
+     */
+    public Liszt<User> assembles() {
+        return assembles(UserRepository.get_instance().get());
+    }
+
+    /**
      * Builds User objects that are alike the search query, where the informations are given from the UserRepository.
      * Will be initiated as objects with primitive amounts of attributes.
      * @param searchQuery The search that should have something in common with some Users.
      * @return The assembled Users similar to the search query.
      */
     public Liszt<User> assembles(String searchQuery) {
+        return assembles(UserRepository.get_instance().search(searchQuery));
+    }
+
+    /**
+     * The private method that assembles multiple Users, that are defined in other public methods.
+     * @param set The ResultSet that will define the values for the Users.
+     * @return The assembled Users.
+     */
+    private Liszt<User> assembles(ResultSet set) {
         Liszt<User> users = new Liszt<>();
-        ResultSet set = UserRepository.get_instance().search(searchQuery);
 
         try {
             while (!set.isAfterLast()) {
@@ -66,7 +83,8 @@ public class UserAssembly {
                 users.add(assemble(set, false));
             }
         } catch (SQLException e) {
-            Printer.get_instance().print("Couldn't assemble Users of search query...", e);
+            Printer.get_instance().print("Couldn't assemble Users...", e);
+            return null;
         }
 
         return users;
