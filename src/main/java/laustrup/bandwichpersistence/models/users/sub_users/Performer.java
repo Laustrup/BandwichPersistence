@@ -95,6 +95,17 @@ public abstract class Performer extends Participant {
     }
 
     /**
+     * Sets the Gigs. Is only allowed under assembling.
+     * @param gigs The Gigs that will be set to be the Gigs.
+     * @return All the Gigs.
+     */
+    public Liszt<Gig> set_gigs(Liszt<Gig> gigs) {
+        if (_assembling)
+            _gigs = gigs;
+        return _gigs;
+    }
+
+    /**
      * Will set all the albums' author as this Performer.
      * Only use for assembly.
      */

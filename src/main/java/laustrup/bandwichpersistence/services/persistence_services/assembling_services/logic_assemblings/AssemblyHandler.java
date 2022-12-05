@@ -86,7 +86,9 @@ public class AssemblyHandler {
         Performer performer = new Artist(set.getLong(table+".user_id"));
 
         table = "gigs";
-        Gig gig = new Gig(set.getLong(table+".id"), new Performer[]{},
+        Gig gig = new Gig(set.getLong(table+".id"),
+                new Event(set.getLong(table+".event_id")),
+                new Performer[]{},
                 set.getTimestamp(table+".`start`").toLocalDateTime(),
                 set.getTimestamp(table+".`end`").toLocalDateTime(),
                 set.getTimestamp(table+".`timestamp`").toLocalDateTime());

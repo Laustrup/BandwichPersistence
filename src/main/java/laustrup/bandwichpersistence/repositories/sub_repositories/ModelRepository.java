@@ -11,24 +11,24 @@ import java.sql.ResultSet;
  * that handles database connections and
  * uses JDBC to perform SQLs created by this class.
  */
-public class MiscRepository extends Repository {
+public class ModelRepository extends Repository {
 
     /**
      * Singleton instance of the Repository.
      */
-    private static MiscRepository _instance = null;
+    private static ModelRepository _instance = null;
 
     /**
      * Checks first if instance is null, otherwise will create a new instance of the object.
      * Created as a lazyfetch.
      * @return The instance of the object, as meant as a singleton.
      */
-    public static MiscRepository get_instance() {
-        if (_instance == null) _instance = new MiscRepository();
+    public static ModelRepository get_instance() {
+        if (_instance == null) _instance = new ModelRepository();
         return _instance;
     }
 
-    private MiscRepository() {}
+    private ModelRepository() {}
 
     public ResultSet chatRooms(Liszt<Long> ids) {
         StringBuilder where = new StringBuilder("WHERE ");

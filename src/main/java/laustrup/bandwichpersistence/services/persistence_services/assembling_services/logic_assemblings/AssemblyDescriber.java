@@ -4,9 +4,11 @@ import laustrup.bandwichpersistence.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.models.chats.Request;
 import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
 import laustrup.bandwichpersistence.models.events.Event;
+import laustrup.bandwichpersistence.models.events.Gig;
 import laustrup.bandwichpersistence.models.users.User;
+import laustrup.bandwichpersistence.models.users.sub_users.Performer;
 import laustrup.bandwichpersistence.repositories.sub_repositories.EventRepository;
-import laustrup.bandwichpersistence.repositories.sub_repositories.MiscRepository;
+import laustrup.bandwichpersistence.repositories.sub_repositories.ModelRepository;
 import laustrup.bandwichpersistence.repositories.sub_repositories.UserRepository;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.sub_assemblings.EventAssembly;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.sub_assemblings.user_assemblings.UserAssembly;
@@ -15,6 +17,10 @@ import laustrup.bandwichpersistence.utilities.Printer;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * A class that fills objects with only id values' other values.
@@ -63,7 +69,7 @@ public class AssemblyDescriber {
             _ids.add(chatRoom.get_primaryId());
 
         chatRooms = new Liszt<>();
-        ResultSet set = MiscRepository.get_instance().chatRooms(_ids);
+        ResultSet set = ModelRepository.get_instance().chatRooms(_ids);
 
         for (long id : _ids) {
             try {
@@ -159,5 +165,52 @@ public class AssemblyDescriber {
         }
 
         return requests;
+    }
+
+    //TODO Another gig describe for Event
+    public Liszt<Gig> describeGigs(Liszt<Gig> gigs) {
+        Liszt<Event> events = new Liszt<>();
+        for (Gig gig : gigs)
+            events.add(gig.get_event());
+
+        events = describeEvents(events);
+        Liszt<Performer[]> acts = generateActs(gigs);
+
+        Liszt<Gig> described = new Liszt<>();
+
+        for (int i = 1; i <= gigs.size(); i++)
+            described.add(new Gig(gigs.get(i).get_primaryId(), events.get(i), acts.get(i), gigs.get(i).get_start(),
+                    gigs.get(i).get_end(), gigs.get(i).get_timestamp()));
+
+        return described;
+    }
+
+    private Liszt<Performer[]> generateActs(Liszt<Gig> gigs) {
+        Set<Long> ids = new HashSet<>();
+        for (Gig gig : gigs)
+            for (Performer performer : gig.get_act())
+                ids.add(performer.get_primaryId());
+
+        Liszt<User> users = new Liszt<>();
+        for (long id : ids)
+            users.add(UserAssembly.get_instance().assemble(id));
+
+        Liszt<Performer[]> acts = new Liszt<>();
+
+        for (int i = 1; i <= gigs.size(); i++) {
+            Performer[] performers = null;
+            for (int j = 0; j < gigs.get(i).get_act().length; j++) {
+                performers = new Performer[gigs.get(i).get_act().length];
+                for (User user : users) {
+                    if (user.get_primaryId() == gigs.get(i).get_act()[i].get_primaryId()) {
+                        performers[i] = (Performer) user;
+                        break;
+                    }
+                }
+            }
+            acts.add(performers);
+        }
+
+        return acts;
     }
 }

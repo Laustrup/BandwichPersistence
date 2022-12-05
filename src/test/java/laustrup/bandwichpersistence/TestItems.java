@@ -330,7 +330,7 @@ public class TestItems extends JTest {
                     generatePlato(), generatePlato(), generatePlato(), generatePlato(), "Location " + id,
                     _random.nextDouble(498)+1, "https://www.Billetlugen.dk/"+id,
                     _contactInfo[_random.nextInt(_contactInfo.length)],
-                    generateGigs(startOfLatestGig, gigAmount, gigLengths),
+                    generateGigs(new Event(id), startOfLatestGig, gigAmount, gigLengths),
                     _venues[_random.nextInt(_venues.length)], new Liszt<>(), generateParticipations(), new Liszt<>(),
                     images.get(_random.nextInt(images.size())+1), LocalDateTime.now());
 
@@ -343,7 +343,7 @@ public class TestItems extends JTest {
         }
     }
 
-    public Liszt<Gig> generateGigs(LocalDateTime latestGig, int amount, int gigLengths) {
+    public Liszt<Gig> generateGigs(Event event, LocalDateTime latestGig, int amount, int gigLengths) {
         Liszt<Gig> gigs = new Liszt<>();
         LocalDateTime start = latestGig;
 
@@ -351,7 +351,7 @@ public class TestItems extends JTest {
             Performer[] act = generateAct();
             LocalDateTime end = start.plusMinutes(gigLengths);
 
-            gigs.add(new Gig(gigs.size()+i+1, act, start, end, LocalDateTime.now()));
+            gigs.add(new Gig(gigs.size()+i+1, event, act, start, end, LocalDateTime.now()));
 
             start = start.minusMinutes(gigLengths);
         }

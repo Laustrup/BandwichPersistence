@@ -32,10 +32,10 @@ public class EventTest extends JTest {
             _event = _items.get_events()[_random.nextInt(_items.get_eventAmount())];
 
             Liszt<Gig> originals = _event.get_gigs();
-            Liszt<Gig> generatedGigs = _items.generateGigs(TimeService.get_instance().generateRandom(),
+            Liszt<Gig> generatedGigs = _items.generateGigs(_event, TimeService.get_instance().generateRandom(),
                     _random.nextInt(11), _random.nextInt(45));
 
-            while (generatedGigs==null) generatedGigs = _items.generateGigs(TimeService.get_instance().generateRandom(),
+            while (generatedGigs==null) generatedGigs = _items.generateGigs(_event, TimeService.get_instance().generateRandom(),
                     _random.nextInt(11), _random.nextInt(45));
 
             boolean bothGigCollectionSharesGigs = false;

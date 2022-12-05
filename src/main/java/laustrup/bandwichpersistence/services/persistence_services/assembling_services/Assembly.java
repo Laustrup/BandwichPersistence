@@ -103,6 +103,7 @@ public class Assembly extends Assembler {
                 user.getClass() == Band.class) {
             ((Performer) user).set_idols(_describer.describeUsers(((Performer) user).get_idols()));
             ((Performer) user).set_fans(_describer.describeUsers(((Performer) user).get_fans()));
+            ((Performer) user).set_gigs(_describer.describeGigs(((Performer) user).get_gigs()));
         }
         else if (user.getClass() == Participant.class)
             ((Participant) user).set_idols(_describer.describeUsers(((Participant) user).get_idols()));
@@ -137,6 +138,8 @@ public class Assembly extends Assembler {
                     ((Venue) user).get_requests().get(i).doneAssembling();
             }
         }
+
+
 
         user.setSubscriptionUser();
         user.setImagesAuthor();
@@ -311,9 +314,9 @@ public class Assembly extends Assembler {
             }
         }
 
-        status = MiscRepository.get_instance().connectionIsClosed();
+        status = ModelRepository.get_instance().connectionIsClosed();
         if (!status.get_truth() && status.get_argument() != Plato.Argument.UNDEFINED) {
-            status = MiscRepository.get_instance().closeConnection();
+            status = ModelRepository.get_instance().closeConnection();
             if (!status.get_truth()) {
                 situation.set_message("Couldn't close ArtistRepository at Assembly...");
                 situation.set_argument(false);

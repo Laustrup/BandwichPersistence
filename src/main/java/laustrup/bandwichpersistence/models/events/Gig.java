@@ -14,6 +14,11 @@ import java.time.LocalDateTime;
 @Data
 public class Gig extends Model {
     /**
+     * The Event of this Gig.
+     */
+    private Event _event;
+
+    /**
      * This act is of a Gig and can both be assigned as artists or bands.
      */
     private Performer[] _act;
@@ -30,18 +35,22 @@ public class Gig extends Model {
 
     public Gig(Performer[] act) {
         super("New gig");
-        _act = _act;
+        _act = act;
     }
 
-    public Gig(long id, Performer[] act, LocalDateTime start, LocalDateTime end, LocalDateTime timestamp) {
+    public Gig(long id, Event event, Performer[] act, LocalDateTime start, LocalDateTime end, LocalDateTime timestamp) {
         super(id, "Gig:"+id, timestamp);
+        _event = event;
         _act = act;
         _start = start;
         _end = end;
+
+        _assembling = true;
     }
 
-    public Gig(Performer[] act, LocalDateTime start, LocalDateTime end) {
+    public Gig(Event event, Performer[] act, LocalDateTime start, LocalDateTime end) {
         super("New gig");
+        _event = event;
         _act = act;
         _start = start;
         _end = end;
