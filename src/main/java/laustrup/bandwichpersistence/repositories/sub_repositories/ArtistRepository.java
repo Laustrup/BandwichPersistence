@@ -1,9 +1,14 @@
 package laustrup.bandwichpersistence.repositories.sub_repositories;
 
+import laustrup.bandwichpersistence.models.users.sub_users.bands.Artist;
 import laustrup.bandwichpersistence.repositories.Repository;
+import laustrup.bandwichpersistence.services.persistence_services.assembling_services.sub_assemblings.user_assemblings.UserAssembly;
 import laustrup.bandwichpersistence.utilities.Liszt;
+import laustrup.bandwichpersistence.utilities.Printer;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  * Are handling Repository actions for Artists.
@@ -29,4 +34,18 @@ public class ArtistRepository extends Repository {
     }
 
     private ArtistRepository() {}
+
+    /**
+     * Will create an Artist and get the generated key value if success.
+     * @param artist The Artist that will be created.
+     * @return A ResultSet of the created values with the generated keys. If there's an SQLException, it returns null.
+     */
+    public ResultSet create(Artist artist) {
+        try {
+            return create("INSERT INTO() VALUES ();").getGeneratedKeys();
+        } catch (SQLException e) {
+            Printer.get_instance().print("Couldn't get generated keys of Artist...", e);
+        }
+        return null;
+    }
 }

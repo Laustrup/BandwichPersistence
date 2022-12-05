@@ -28,7 +28,7 @@ public abstract class Repository {
      * @param sql The specified SQL statement, that specifies the action intended for the database.
      * @return The ResultSet gathered from the PreparedStatement, if something unexpected happened, it returns null.
      */
-    public ResultSet read(String sql) {
+    protected ResultSet read(String sql) {
         if (handleConnection()) {
             try {
                 PreparedStatement statement = _connector.get_connection().prepareStatement(sql);
@@ -50,7 +50,7 @@ public abstract class Repository {
      * @param sql The specified SQL statement, that specifies the action intended for the database.
      * @return The boolean answer of the database success.
      */
-    public boolean edit(String sql) {
+    protected boolean edit(String sql) {
         if (handleConnection()) {
             try {
                 PreparedStatement statement = _connector.get_connection().prepareStatement(sql);
@@ -71,7 +71,7 @@ public abstract class Repository {
      * @param sql The specified SQL statement, that specifies the action intended for the database.
      * @return The PreparedStatement that is executed with the GENERATED KEY.
      */
-    public PreparedStatement create(String sql) {
+    protected PreparedStatement create(String sql) {
         if (handleConnection()) {
             try {
                 return _connector.get_connection().prepareStatement(sql,

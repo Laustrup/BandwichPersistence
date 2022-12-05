@@ -1,15 +1,16 @@
-package laustrup.bandwichpersistence.services.controller_services;
+package laustrup.bandwichpersistence.services.controller_services.sub_controller_services;
 
 import laustrup.bandwichpersistence.models.Search;
 import laustrup.bandwichpersistence.models.users.Login;
 import laustrup.bandwichpersistence.models.users.User;
+import laustrup.bandwichpersistence.services.controller_services.ControllerService;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembly;
-
 import laustrup.bandwichpersistence.utilities.Liszt;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-public class UserControllerService {
+public class UserControllerService extends ControllerService<User> {
 
     /**
      * Singleton instance of the Service.
@@ -74,34 +75,4 @@ public class UserControllerService {
      * @return The created ResponseEntity of a Search.
      */
     public ResponseEntity<Search> search(String query) { return searchContent(Assembly.get_instance().search(query)); }
-
-    /**
-     * Will create a ResponseEntity with status of whether the content is null or not.
-     * @param user The User that is either null or not and should be returned.
-     * @return The created ResponseEntity of a User.
-     */
-    private ResponseEntity<User> entityContent(User user) {
-        if (user != null) return new ResponseEntity<>(user, HttpStatus.OK);
-        else return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
-    }
-
-    /**
-     * Will create a ResponseEntity with status of whether the content is null or not.
-     * @param users The Users that is either null or not and should be returned.
-     * @return The created ResponseEntity of Users.
-     */
-    private ResponseEntity<Liszt<User>> entityContent(Liszt<User> users) {
-        if (users != null) return new ResponseEntity<>(users, HttpStatus.OK);
-        else return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
-    }
-
-    /**
-     * Will create a ResponseEntity with status of whether the content is null or not.
-     * @param search The Search that is either null or not and should be returned.
-     * @return The created ResponseEntity of a Search.
-     */
-    private ResponseEntity<Search> searchContent(Search search) {
-        if (search != null) return new ResponseEntity<>(search, HttpStatus.OK);
-        else return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
-    }
 }

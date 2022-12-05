@@ -1,13 +1,13 @@
-package laustrup.bandwichpersistence.services.controller_services;
+package laustrup.bandwichpersistence.services.controller_services.sub_controller_services;
 
 import laustrup.bandwichpersistence.models.events.Event;
-import laustrup.bandwichpersistence.models.users.User;
+import laustrup.bandwichpersistence.services.controller_services.ControllerService;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembly;
 import laustrup.bandwichpersistence.utilities.Liszt;
-import org.springframework.http.HttpStatus;
+
 import org.springframework.http.ResponseEntity;
 
-public class EventControllerService {
+public class EventControllerService extends ControllerService<Event> {
 
     /**
      * Singleton instance of the Service.
@@ -43,23 +43,4 @@ public class EventControllerService {
      */
     public ResponseEntity<Liszt<Event>> get() { return entityContent(Assembly.get_instance().getEvents()); }
 
-    /**
-     * Will create a ResponseEntity with status of whether the content is null or not.
-     * @param event The Event that is either null or not and should be returned.
-     * @return The created ResponseEntity of an Event.
-     */
-    private ResponseEntity<Event> entityContent(Event event) {
-        if (event != null) return new ResponseEntity<>(event, HttpStatus.OK);
-        else return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
-    }
-
-    /**
-     * Will create a ResponseEntity with status of whether the content is null or not.
-     * @param events The Events that is either null or not and should be returned.
-     * @return The created ResponseEntity of Events.
-     */
-    private ResponseEntity<Liszt<Event>> entityContent(Liszt<Event> events) {
-        if (events != null) return new ResponseEntity<>(events, HttpStatus.OK);
-        else return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
-    }
 }

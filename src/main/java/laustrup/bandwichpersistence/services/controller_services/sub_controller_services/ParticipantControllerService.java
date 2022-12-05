@@ -1,6 +1,9 @@
-package laustrup.bandwichpersistence.services.controller_services;
+package laustrup.bandwichpersistence.services.controller_services.sub_controller_services;
 
-public class ParticipantControllerService {
+import laustrup.bandwichpersistence.models.users.sub_users.participants.Participant;
+import laustrup.bandwichpersistence.services.controller_services.ControllerService;
+
+public class ParticipantControllerService extends ControllerService<Participant> {
 
     /**
      * Singleton instance of the Service.

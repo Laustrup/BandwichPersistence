@@ -1,7 +1,7 @@
 package laustrup.bandwichpersistence.controllers;
 
 import laustrup.bandwichpersistence.models.events.Event;
-import laustrup.bandwichpersistence.services.controller_services.EventControllerService;
+import laustrup.bandwichpersistence.services.controller_services.sub_controller_services.EventControllerService;
 import laustrup.bandwichpersistence.utilities.Liszt;
 
 import org.springframework.http.ResponseEntity;

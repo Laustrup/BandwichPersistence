@@ -1,10 +1,10 @@
-package laustrup.bandwichpersistence.services.controller_services;
+package laustrup.bandwichpersistence.services.controller_services.sub_controller_services;
 
 
 import laustrup.bandwichpersistence.models.users.sub_users.venues.Venue;
-import org.springframework.http.HttpEntity;
+import laustrup.bandwichpersistence.services.controller_services.ControllerService;
 
-public class VenueControllerService {
+public class VenueControllerService extends ControllerService<Venue> {
 
     /**
      * Singleton instance of the Service.
