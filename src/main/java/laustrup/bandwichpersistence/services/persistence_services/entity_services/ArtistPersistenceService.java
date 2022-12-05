@@ -35,11 +35,12 @@ public class ArtistPersistenceService {
      * Uses Assembly to get the values from the database,
      * to insure it exists and also to close connections.
      * @param artist The Artist that will be created.
+     * @param password The password for the Artist.
      * @return If success, the created Artist with its generated key, otherwise null.
      */
-    public Artist create(Artist artist) {
+    public Artist create(Artist artist, String password) {
         if (artist.get_primaryId() == 0) {
-            ResultSet set = ArtistRepository.get_instance().create(artist);
+            ResultSet set = ArtistRepository.get_instance().create(artist, password);
 
             try {
                 if (set.isBeforeFirst())

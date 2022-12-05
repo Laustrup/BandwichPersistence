@@ -26,8 +26,8 @@ public class ArtistControllerService extends ControllerService<Artist> {
     private ArtistControllerService() {}
 
 
-    public ResponseEntity<Artist> create(Artist artist) {
-        return entityContent(ArtistPersistenceService.get_instance().create(artist));
+    public ResponseEntity<Artist> create(Artist artist, String password) {
+        return entityContent(ArtistPersistenceService.get_instance().create(artist, password));
     }
 
 }
