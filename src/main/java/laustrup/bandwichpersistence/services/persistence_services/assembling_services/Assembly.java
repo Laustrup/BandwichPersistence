@@ -1,6 +1,7 @@
 package laustrup.bandwichpersistence.services.persistence_services.assembling_services;
 
 import laustrup.bandwichpersistence.models.Search;
+import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
 import laustrup.bandwichpersistence.models.events.Event;
 import laustrup.bandwichpersistence.models.users.Login;
 import laustrup.bandwichpersistence.models.users.User;
@@ -113,7 +114,12 @@ public class Assembly extends Assembler {
             //((Venue) user).set_requests();
          */
 
-        user.set_events(EventAssembly.get_instance().describe(user.get_events()));
+        user.set_events(_describer.describeEvents(user.get_events()));
+
+        Liszt<Bulletin> bulletins = _describer.describeBulletins(user.get_bulletins());
+        for (int i = 1; i <= user.get_bulletins().size(); i++)
+            user.get_bulletins().set(i, bulletins.get(i));
+        user.set_bulletinReceivers();
 
         user.setSubscriptionUser();
         user.setImagesAuthor();
@@ -282,6 +288,15 @@ public class Assembly extends Assembler {
         status = ParticipantRepository.get_instance().connectionIsClosed();
         if (!status.get_truth() && status.get_argument() != Plato.Argument.UNDEFINED) {
             status = ParticipantRepository.get_instance().closeConnection();
+            if (!status.get_truth()) {
+                situation.set_message("Couldn't close ArtistRepository at Assembly...");
+                situation.set_argument(false);
+            }
+        }
+
+        status = MiscRepository.get_instance().connectionIsClosed();
+        if (!status.get_truth() && status.get_argument() != Plato.Argument.UNDEFINED) {
+            status = MiscRepository.get_instance().closeConnection();
             if (!status.get_truth()) {
                 situation.set_message("Couldn't close ArtistRepository at Assembly...");
                 situation.set_argument(false);

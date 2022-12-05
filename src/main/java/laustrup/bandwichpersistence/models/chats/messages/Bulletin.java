@@ -3,6 +3,7 @@ package laustrup.bandwichpersistence.models.chats.messages;
 import laustrup.bandwichpersistence.models.Model;
 import laustrup.bandwichpersistence.models.users.User;
 
+import laustrup.bandwichpersistence.utilities.Liszt;
 import laustrup.bandwichpersistence.utilities.Plato;
 import lombok.Getter;
 import lombok.ToString;
@@ -22,9 +23,22 @@ public class Bulletin extends Message {
 
     public Bulletin(long id, String content, boolean isSent, Plato isEdited, boolean isPublic, LocalDateTime timestamp) {
         super(id, null, content, isSent, isEdited, isPublic, timestamp);
+        _assembling = true;
     }
 
     public Bulletin(User author, String content) {
         super(author);
+    }
+
+    public Model set_reciever(Model reciever) {
+        if (_assembling)
+            _receiver = reciever;
+        return _receiver;
+    }
+
+    public User set_author(User author) {
+        if (_assembling)
+            _author = author;
+        return _author;
     }
 }

@@ -87,33 +87,6 @@ public class EventAssembly extends Assembler {
     }
 
     /**
-     * Rebuilds Events that are only with ids.
-     * Will be initiated as objects with primitive amounts of attributes.
-     * @param events The Event objects that should be described.
-     * @return The described Events.
-     */
-    public Liszt<Event> describe(Liszt<Event> events) {
-        Liszt<Long> ids = new Liszt<>();
-        for (Event event : events)
-            ids.add(event.get_primaryId());
-
-        events = new Liszt<>();
-        ResultSet set = EventRepository.get_instance().get(ids);
-
-        for (long id : ids) {
-            try {
-                if (set.isBeforeFirst())
-                    set.next();
-                events.add(assemble(set, false));
-            } catch (SQLException e) {
-                Printer.get_instance().print("Couldn't describe Events...", e);
-            }
-        }
-
-        return events;
-    }
-
-    /**
      * Assembles the Event from a ResultSet.
      * Will not close the Connection to the database, when it is done assembling.
      * @param set A JDBC ResultSet that is gathered from the rows of the SQL statement to the database.
@@ -121,7 +94,7 @@ public class EventAssembly extends Assembler {
      *                   if there is only expected a single entity.
      * @return The assembled Event.
      */
-    private Event assemble(ResultSet set, boolean preInitiate) {
+    public Event assemble(ResultSet set, boolean preInitiate) {
         Event event = null;
 
         try {

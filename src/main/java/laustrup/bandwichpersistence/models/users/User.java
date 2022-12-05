@@ -190,6 +190,13 @@ public abstract class User extends Model {
         return _events;
     }
 
+    public Liszt<Bulletin> set_bulletinReceivers() {
+        if (_assembling)
+            for (int i = 1; i <= _bulletins.size(); i++)
+                _bulletins.get(i).set_reciever(this);
+        return _bulletins;
+    }
+
     /**
      * Sets the User of the Subscription as this User.
      * Will only be done, if it is under assembling.

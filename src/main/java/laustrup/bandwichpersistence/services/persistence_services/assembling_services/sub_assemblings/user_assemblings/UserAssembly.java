@@ -1,6 +1,7 @@
 package laustrup.bandwichpersistence.services.persistence_services.assembling_services.sub_assemblings.user_assemblings;
 
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
+import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
 import laustrup.bandwichpersistence.models.chats.messages.Mail;
 import laustrup.bandwichpersistence.models.users.Login;
 import laustrup.bandwichpersistence.models.users.User;
