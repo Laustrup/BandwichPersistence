@@ -79,7 +79,6 @@ public class AssemblyHandler {
         return ratings;
     }
 
-    //TODO Finish values
     public Liszt<Gig> handleGigs(ResultSet set, Liszt<Gig> gigs) throws SQLException {
         String table = "acts";
         // This Artist could also be a Band, but only the id is needed and will be specified in Assembly.
@@ -101,7 +100,6 @@ public class AssemblyHandler {
         return gigs;
     }
 
-    //TODO Finish values
     public Liszt<Event> handleEvents(ResultSet set, Liszt<Event> events) throws SQLException {
         String table = "`events`";
         Event event = new Event(set.getLong(table+".id"),
@@ -122,7 +120,6 @@ public class AssemblyHandler {
         return events;
     }
 
-    //TODO Finish values
     public Liszt<ChatRoom> handleChatRooms(ResultSet set, Liszt<ChatRoom> chatRooms) throws SQLException {
         String table = "chat_rooms";
         ChatRoom chatRoom = new ChatRoom(set.getLong(table+".id"),
@@ -135,7 +132,6 @@ public class AssemblyHandler {
         return chatRooms;
     }
 
-    //TODO Finish values
     public Liszt<Bulletin> handleBulletins(ResultSet set, Liszt<Bulletin> bulletins, boolean forEvents) throws SQLException {
         String table = forEvents ? "event_bulletins" : "user_bulletins";
         Bulletin bulletin = new Bulletin(set.getLong(table+".id"),
@@ -183,7 +179,6 @@ public class AssemblyHandler {
         return fans;
     }
 
-    //TODO Finish values
     public Liszt<Request> handleRequests(ResultSet set, Liszt<Request> requests, User user) throws SQLException {
         String table = "requests";
         Request request = new Request(user, new Event(set.getLong(table+".event_id")),

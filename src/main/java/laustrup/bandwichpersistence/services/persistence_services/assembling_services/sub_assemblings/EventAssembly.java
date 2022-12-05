@@ -141,6 +141,7 @@ public class EventAssembly extends Assembler {
                         set.getLong("requests.user_id") != venue.get_primaryId()
                                 ? new Artist(set.getLong("requests.user_id"))
                                 : new Venue(set.getLong("requests.user_id")));
+                bulletins = _handler.handleBulletins(set, bulletins, true);
                 images = _handler.handleEndpoints(set, images);
             } while (set.next());
         } catch (SQLException e) {

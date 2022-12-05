@@ -61,7 +61,7 @@ public class Assembly extends Assembler {
      * @return The assembled User.
      */
     public User getUser(Login login) {
-        return assembling(UserAssembly.get_instance().assemble(login), true);
+        return userAssembling(UserAssembly.get_instance().assemble(login), true);
     }
 
     /**
@@ -71,7 +71,7 @@ public class Assembly extends Assembler {
      * @return The assembled User.
      */
     public User getUser(long id) {
-        return assembling(UserAssembly.get_instance().assemble(id), true);
+        return userAssembling(UserAssembly.get_instance().assemble(id), true);
     }
 
     /**
@@ -87,7 +87,7 @@ public class Assembly extends Assembler {
      */
     private Liszt<User> userAssembling(Liszt<User> users) {
         for (int i = 1; i <= users.size(); i++)
-            users.set(i, assembling(users.get(i), false));
+            users.set(i, userAssembling(users.get(i), false));
 
         return userFinishing(users);
     }
@@ -98,7 +98,7 @@ public class Assembly extends Assembler {
      * @param willFinish Will set assembling as done and close connections, if true.
      * @return The assembled User.
      */
-    private User assembling(User user, boolean willFinish) {
+    private User userAssembling(User user, boolean willFinish) {
         if (user.getClass() == Artist.class ||
                 user.getClass() == Band.class) {
             ((Performer) user).set_idols(_describer.describeUsers(((Performer) user).get_idols()));
@@ -131,15 +131,12 @@ public class Assembly extends Assembler {
                 ((Artist) user).set_requestUsers();
                 for (int i = 1; i <= requests.size(); i++)
                     ((Artist) user).get_requests().get(i).doneAssembling();
-            }
-            else {
+            } else {
                 ((Venue) user).set_requestUsers();
                 for (int i = 1; i <= requests.size(); i++)
                     ((Venue) user).get_requests().get(i).doneAssembling();
             }
         }
-
-
 
         user.setSubscriptionUser();
         user.setImagesAuthor();
@@ -187,6 +184,16 @@ public class Assembly extends Assembler {
     private Event assembling(Event event, boolean willFinish) {
         event.set_venue((Venue) getUser(event.get_venue().get_primaryId()));
 
+        event.set_gigs(_describer.describeGigs(event.get_gigs()));
+
+        Liszt<Bulletin> bulletins = _describer.describeBulletinAuthors(event.get_bulletins());
+        for (int i = 1; i <= event.get_bulletins().size(); i++)
+            event.get_bulletins().set(i, bulletins.get(i));
+
+        Liszt<Request> requests = _describer.describeRequests(event.get_requests(), false);
+        for (int i = 1; i <= event.get_requests().size(); i++)
+            event.get_requests().set(i, requests.get(i));
+        event.set_requestEvents();
 
         if (willFinish)
             return finish(event);
