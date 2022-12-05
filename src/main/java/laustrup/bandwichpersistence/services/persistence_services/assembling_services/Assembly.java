@@ -1,6 +1,7 @@
 package laustrup.bandwichpersistence.services.persistence_services.assembling_services;
 
 import laustrup.bandwichpersistence.models.Search;
+import laustrup.bandwichpersistence.models.chats.Request;
 import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
 import laustrup.bandwichpersistence.models.events.Event;
 import laustrup.bandwichpersistence.models.users.Login;
@@ -107,19 +108,35 @@ public class Assembly extends Assembler {
             ((Participant) user).set_idols(_describer.describeUsers(((Participant) user).get_idols()));
 
         user.set_chatRooms(_describer.describeChatRooms(user.get_chatRooms()));
-        /*
-        if (user.getClass() == Artist.class)
-            //((Artist) user).set_requests();
-        else if (user.getClass() == Venue.class)
-            //((Venue) user).set_requests();
-         */
-
         user.set_events(_describer.describeEvents(user.get_events()));
 
-        Liszt<Bulletin> bulletins = _describer.describeBulletins(user.get_bulletins());
+        Liszt<Bulletin> bulletins = _describer.describeBulletinAuthors(user.get_bulletins());
         for (int i = 1; i <= user.get_bulletins().size(); i++)
             user.get_bulletins().set(i, bulletins.get(i));
         user.set_bulletinReceivers();
+
+        if (user.getClass() == Artist.class ||
+            user.getClass() == Venue.class) {
+            Liszt<Request> requests = user.getClass() == Artist.class ?
+                    _describer.describeRequests(((Artist) user).get_requests(), true) :
+                    _describer.describeRequests(((Venue) user).get_requests(), true);
+            for (int i = 1; i <= requests.size(); i++) {
+                if (user.getClass() == Artist.class)
+                    ((Artist) user).get_requests().set(i, requests.get(i));
+                else
+                    ((Venue) user).get_requests().set(i, requests.get(i));
+            }
+            if (user.getClass() == Artist.class) {
+                ((Artist) user).set_requestUsers();
+                for (int i = 1; i <= requests.size(); i++)
+                    ((Artist) user).get_requests().get(i).doneAssembling();
+            }
+            else {
+                ((Venue) user).set_requestUsers();
+                for (int i = 1; i <= requests.size(); i++)
+                    ((Venue) user).get_requests().get(i).doneAssembling();
+            }
+        }
 
         user.setSubscriptionUser();
         user.setImagesAuthor();

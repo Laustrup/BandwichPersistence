@@ -3,7 +3,6 @@ package laustrup.bandwichpersistence.models.chats;
 import laustrup.bandwichpersistence.models.events.Event;
 import laustrup.bandwichpersistence.models.Model;
 import laustrup.bandwichpersistence.models.users.User;
-
 import laustrup.bandwichpersistence.utilities.Plato;
 
 import lombok.Getter;
@@ -48,6 +47,7 @@ public class Request extends Model {
         _event = event;
         _approved = approved;
         _message = message;
+        _assembling = true;
     }
     public Request(User user, Event event, Plato approved) {
         super(user.get_primaryId(), event.get_primaryId(), "Request of " + user.get_username() + " to " + event.get_title(),
@@ -61,4 +61,26 @@ public class Request extends Model {
      * Will set the approved to true.
      */
     public void approve() { _approved.set_argument(true); }
+
+    /**
+     * Will set the User, but only if it is under assembling.
+     * @param user The User of this Request.
+     * @return The User of this Request.
+     */
+    public User set_user(User user) {
+        if (_assembling)
+            _user = user;
+        return _user;
+    }
+
+    /**
+     * Will set the Event, but only if it is under assembling.
+     * @param event The Event of this Request.
+     * @return The Event of this Request.
+     */
+    public Event set_event(Event event) {
+        if (_assembling)
+            _event = event;
+        return _event;
+    }
 }

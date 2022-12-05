@@ -108,7 +108,7 @@ public class EventAssembly extends Assembler {
         return event;
     }
 
-    private Event assemble(ResultSet set) throws SQLException {
+    public Event assemble(ResultSet set) throws SQLException {
         long id = set.getLong("`events`.id");
         String title = set.getString("`events`.title"),
             description = set.getString("`events`.`description`");

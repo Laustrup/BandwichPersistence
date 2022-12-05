@@ -73,13 +73,14 @@ public class Artist extends Performer {
     }
 
     /**
-     * Sets the Requests.
+     * Sets the Users of Requests.
      * Will only be done, if it is under assembling.
      * @return The Requests of this Artist.
      */
-    public Liszt<Request> set_requests(Liszt<Request> requests) {
+    public Liszt<Request> set_requestUsers() {
         if (_assembling)
-            _requests = requests;
+            for (int i = 1; i <= _requests.size(); i++)
+                _requests.get(i).set_user(this);
         return _requests;
     }
 

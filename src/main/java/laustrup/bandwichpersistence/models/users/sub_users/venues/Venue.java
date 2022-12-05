@@ -81,6 +81,7 @@ public class Venue extends User {
         _subscription.get_user().set_username(_username);
         _subscription.get_user().set_description(_description);
         _requests = requests;
+
         _assembling = true;
     }
 
@@ -104,13 +105,14 @@ public class Venue extends User {
     }
 
     /**
-     * Sets the Requests.
+     * Sets the Users of Requests.
      * Will only be done, if it is under assembling.
-     * @return The Requests of this Venue.
+     * @return The Requests of this Artist.
      */
-    public Liszt<Request> set_requests(Liszt<Request> requests) {
+    public Liszt<Request> set_requestUsers() {
         if (_assembling)
-            _requests = requests;
+            for (int i = 1; i <= _requests.size(); i++)
+                _requests.get(i).set_user(this);
         return _requests;
     }
 

@@ -191,9 +191,12 @@ public abstract class User extends Model {
     }
 
     public Liszt<Bulletin> set_bulletinReceivers() {
-        if (_assembling)
-            for (int i = 1; i <= _bulletins.size(); i++)
+        if (_assembling) {
+            for (int i = 1; i <= _bulletins.size(); i++) {
                 _bulletins.get(i).set_reciever(this);
+                _bulletins.get(i).doneAssembling();
+            }
+        }
         return _bulletins;
     }
 

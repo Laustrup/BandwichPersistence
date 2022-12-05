@@ -1,6 +1,7 @@
 package laustrup.bandwichpersistence.services.persistence_services.assembling_services.logic_assemblings;
 
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
+import laustrup.bandwichpersistence.models.chats.Request;
 import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
 import laustrup.bandwichpersistence.models.events.Event;
 import laustrup.bandwichpersistence.models.users.User;
@@ -105,29 +106,58 @@ public class AssemblyDescriber {
     }
 
     /**
-     * Rebuilds the author of the Bulletin from the ids of the authors
+     * Rebuilds the author of the Bulletins from the ids of the authors.
      * @param bulletins The Bulletin objects that should have the authers described.
      * @return The described Bulletins.
      */
-    public Liszt<Bulletin> describeBulletins(Liszt<Bulletin> bulletins) {
+    public Liszt<Bulletin> describeBulletinAuthors(Liszt<Bulletin> bulletins) {
         int bulletinAmount = bulletins.size();
         _ids = new Liszt<>();
         for (Bulletin bulletin : bulletins)
             _ids.add(bulletin.get_author().get_primaryId());
 
-        bulletins = new Liszt<>();
-        ResultSet set = MiscRepository.get_instance().chatRooms(_ids);
+        ResultSet set = UserRepository.get_instance().get(_ids);
 
         for (int i = 1; i <= (_ids.size() == bulletinAmount ? _ids.size() : 0); i++) {
             try {
                 if (set.isBeforeFirst())
                     set.next();
-                bulletins.get(i).set_author(UserAssembly.get_instance().assemble(_ids.get(i)));
+                bulletins.get(i).set_author(UserAssembly.get_instance().assemble(set, false));
             } catch (SQLException e) {
                 Printer.get_instance().print("Couldn't describe Bulletins...", e);
             }
         }
 
         return bulletins;
+    }
+
+    /**
+     * Rebuilds the User or Event of the Requests from ids.
+     * @param requests The Request objects that should be described.
+     * @param forUser If it is for a User, it will describe Event, otherwise describe User.
+     * @return The described Requests.
+     */
+    public Liszt<Request> describeRequests(Liszt<Request> requests, boolean forUser) {
+        _ids = new Liszt<>();
+        for (Request request : requests)
+            if (request.hasSecondaryId())
+                _ids.add(!forUser ? request.get_primaryId() : request.get_secondaryId());
+
+        ResultSet set = !forUser ? UserRepository.get_instance().get(_ids) : EventRepository.get_instance().get(_ids);
+
+        for (int i = 1; i <= _ids.size(); i++) {
+            try {
+                if (set.isBeforeFirst())
+                    set.next();
+                if (!forUser)
+                    requests.get(i).set_event(EventAssembly.get_instance().assemble(set, false));
+                else
+                    requests.get(i).set_user(UserAssembly.get_instance().assemble(set, false));
+            } catch (SQLException e) {
+                Printer.get_instance().print("Couldn't describe Requests...", e);
+            }
+        }
+
+        return requests;
     }
 }
