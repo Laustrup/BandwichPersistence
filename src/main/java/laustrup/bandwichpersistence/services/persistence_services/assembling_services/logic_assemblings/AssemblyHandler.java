@@ -1,4 +1,4 @@
-package laustrup.bandwichpersistence.services.persistence_services.assembling_services;
+package laustrup.bandwichpersistence.services.persistence_services.assembling_services.logic_assemblings;
 
 import laustrup.bandwichpersistence.models.Rating;
 import laustrup.bandwichpersistence.models.albums.Album;

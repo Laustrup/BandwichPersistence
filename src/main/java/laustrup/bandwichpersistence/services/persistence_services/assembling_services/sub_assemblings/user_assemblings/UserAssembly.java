@@ -95,33 +95,6 @@ public class UserAssembly extends Assembler {
     }
 
     /**
-     * Rebuilds Users that are only with ids.
-     * Will be initiated as objects with primitive amounts of attributes.
-     * @param users The User objects that should be described.
-     * @return The described Users.
-     */
-    public Liszt<User> describe(Liszt<User> users) {
-        Liszt<Long> ids = new Liszt<>();
-        for (User user : users)
-            ids.add(user.get_primaryId());
-
-        users = new Liszt<>();
-        ResultSet set = UserRepository.get_instance().get(ids);
-
-        for (long id : ids) {
-            try {
-                if (set.isBeforeFirst())
-                    set.next();
-                users.add(assemble(set, false));
-            } catch (SQLException e) {
-                Printer.get_instance().print("Couldn't describe Users...", e);
-            }
-        }
-
-        return users;
-    }
-
-    /**
      * Assembles the User from a ResultSet.
      * Will not close the Connection to the database, when it is done assembling.
      * @param set A JDBC ResultSet that is gathered from the rows of the SQL statement to the database.
@@ -129,7 +102,7 @@ public class UserAssembly extends Assembler {
      *                   if there is only expected a single entity.
      * @return The assembled User.
      */
-    private User assemble(ResultSet set, boolean preInitiate) {
+    public User assemble(ResultSet set, boolean preInitiate) {
         User user = null;
 
         try {
@@ -146,28 +119,6 @@ public class UserAssembly extends Assembler {
         }
 
         return user;
-    }
-
-    public Liszt<ChatRoom> describeChatRooms(Liszt<ChatRoom> chatRooms) {
-        Liszt<Long> ids = new Liszt<>();
-
-        for (ChatRoom chatRoom : chatRooms)
-            ids.add(chatRoom.get_primaryId());
-
-        chatRooms = new Liszt<>();
-        ResultSet set = UserRepository.get_instance().getChatRooms(ids);
-
-        for (long id : ids) {
-            try {
-                if (set.isBeforeFirst())
-                    set.next();
-                chatRooms.add(assembleChatRoom(set));
-            } catch (SQLException e) {
-                Printer.get_instance().print("Couldn't describe Users...", e);
-            }
-        }
-
-        return chatRooms;
     }
 
     public ChatRoom assembleChatRoom(ResultSet set) throws SQLException {

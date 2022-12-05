@@ -21,7 +21,7 @@ import laustrup.bandwichpersistence.utilities.Printer;
  * finishes details and closes database connections.
  * Only use this assembly class outside of assembly package.
  */
-public class Assembly {
+public class Assembly extends Assembler {
 
     /**
      * Singleton instance of the Service.
@@ -99,12 +99,13 @@ public class Assembly {
     private User assembling(User user, boolean willFinish) {
         if (user.getClass() == Artist.class ||
                 user.getClass() == Band.class) {
-            ((Performer) user).set_idols(UserAssembly.get_instance().describe(((Performer) user).get_idols()));
-            ((Performer) user).set_fans(UserAssembly.get_instance().describe(((Performer) user).get_fans()));
+            ((Performer) user).set_idols(_describer.describeUsers(((Performer) user).get_idols()));
+            ((Performer) user).set_fans(_describer.describeUsers(((Performer) user).get_fans()));
         }
         else if (user.getClass() == Participant.class)
-            ((Participant) user).set_idols(UserAssembly.get_instance().describe(((Participant) user).get_idols()));
+            ((Participant) user).set_idols(_describer.describeUsers(((Participant) user).get_idols()));
 
+        user.set_chatRooms(_describer.describeChatRooms(user.get_chatRooms()));
         /*
         if (user.getClass() == Artist.class)
             //((Artist) user).set_requests();

@@ -202,6 +202,17 @@ public abstract class User extends Model {
     }
 
     /**
+     * Sets the ChatRooms.
+     * Will only be done, if it is under assembling.
+     * @return The ChatRooms of this User.
+     */
+    public Liszt<ChatRoom> set_chatRooms(Liszt<ChatRoom> chatRooms) {
+        if (_assembling)
+            _chatRooms = chatRooms;
+        return _chatRooms;
+    }
+
+    /**
      * Sets the author of the image Album as this User.
      * Is meant for after assembling.
      * @return The images of this User.
