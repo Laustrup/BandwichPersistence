@@ -44,7 +44,7 @@ public class BandPersistenceService extends EntityService<Band> {
      * @return If success, the created Band with its generated key, otherwise null.
      */
     public Band create(Band band, String password) {
-        if (band.get_primaryId() > 0) {
+        if (band.get_primaryId() == 0) {
             ResultSet set = BandRepository.get_instance().create(band, password);
             Subscription subscription = band.get_subscription();
             ContactInfo contactInfo = band.get_contactInfo();
@@ -62,7 +62,8 @@ public class BandPersistenceService extends EntityService<Band> {
             band = new Band(band.get_primaryId(), band.get_username(), band.get_description(),contactInfo,
                     band.get_images(), band.get_ratings(), band.get_events(),band.get_gigs(),band.get_chatRooms(),
                     subscription,band.get_bulletins(),band.get_timestamp(), band.get_music(),band.get_members(),
-                    band.get_runner(), band.get_fans(),band.get_idols());
+                    band.get_runner(), band.get_fans(),band.get_idols()
+            );
 
             if (upsert(band))
                 return band;

@@ -12,7 +12,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * Contains logic for CRUD of Bands.
+ * Contains logic for CRUD of Events.
  */
 public class EventPersistenceService extends EntityService<Event> {
 
@@ -45,7 +45,7 @@ public class EventPersistenceService extends EntityService<Event> {
      * @return If success, the created Event with its generated key, otherwise null.
      */
     public Event create(Event event) {
-        if (event.get_primaryId() > 0) {
+        if (event.get_primaryId() == 0) {
             ResultSet set = EventRepository.get_instance().create(event);
             ContactInfo contactInfo = event.get_contactInfo();
 

@@ -44,7 +44,7 @@ public class ArtistPersistenceService extends EntityService<Artist> {
      * @return If success, the created Artist with its generated key, otherwise null.
      */
     public Artist create(Artist artist, String password) {
-        if (artist.get_primaryId() > 0) {
+        if (artist.get_primaryId() == 0) {
             ResultSet set = ArtistRepository.get_instance().create(artist, password);
             Subscription subscription = artist.get_subscription();
             ContactInfo contactInfo = artist.get_contactInfo();
@@ -63,7 +63,8 @@ public class ArtistPersistenceService extends EntityService<Artist> {
                     artist.get_description(),contactInfo,artist.get_images(), artist.get_ratings(), artist.get_events(),
                     artist.get_gigs(),artist.get_chatRooms(),subscription,artist.get_bulletins(),artist.get_timestamp(),
                     artist.get_music(),artist.get_bands(),artist.get_runner(),
-                    artist.get_fans(),artist.get_idols(),artist.get_requests());
+                    artist.get_fans(),artist.get_idols(),artist.get_requests()
+            );
 
             if (upsert(artist))
                 return artist;
