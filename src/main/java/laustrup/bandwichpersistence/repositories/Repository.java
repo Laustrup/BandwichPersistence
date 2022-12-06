@@ -46,17 +46,19 @@ public abstract class Repository {
      * Opens the connection, if it isn't already open.
      * Are used for making changes such as Update and Delete to the database.
      * Uses the executeUpdate() of PreparedStatement to execute a specified SQL statement.
-     * Will automatically close connection.
+     * Can automatically close connection.
      * @param sql The specified SQL statement, that specifies the action intended for the database.
+     * @param doClose If true the connection will be closed after action.
      * @return The boolean answer of the database success.
      */
-    protected boolean edit(String sql) {
+    protected boolean edit(String sql, boolean doClose) {
         if (handleConnection()) {
             try {
                 PreparedStatement statement = _connector.get_connection().prepareStatement(sql);
                 boolean success = statement.executeUpdate() > 0;
 
-                closeConnection();
+                if (doClose)
+                    closeConnection();
                 return success;
             } catch (SQLException e) { Printer.get_instance().print("Couldn't execute update...",e); }
         }

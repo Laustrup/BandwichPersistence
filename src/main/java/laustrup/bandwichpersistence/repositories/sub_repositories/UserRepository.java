@@ -1,10 +1,14 @@
 package laustrup.bandwichpersistence.repositories.sub_repositories;
 
 import laustrup.bandwichpersistence.models.users.Login;
+import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
+import laustrup.bandwichpersistence.models.users.sub_users.subscriptions.Subscription;
 import laustrup.bandwichpersistence.repositories.Repository;
 import laustrup.bandwichpersistence.utilities.Liszt;
+import laustrup.bandwichpersistence.utilities.Printer;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  * Are handling Repository actions for User's common uses.
@@ -124,5 +128,91 @@ public class UserRepository extends Repository {
                 "INNER JOIN subscriptions ON users.id = subscriptions.user_id " +
                 "INNER JOIN contact_informations ON users.id = contact_informations.user_id " +
                 where + ";");
+    }
+
+    /**
+     * Upserts contact informations depending on the user_id/contact_id.
+     * This means it will insert the values of the contact informations if they don't exist,
+     * otherwise it will update them to the values of the contact informations.
+     * Will not close connection.
+     * @param contactInfo The contact informations that will have influence on the database table.
+     * @return True if any rows have been affected.
+     */
+    public boolean upsert(ContactInfo contactInfo) {
+        return edit("INSERT INTO contact_informations(" +
+                    "user_id," +
+                    "email," +
+                    "first_digits," +
+                    "phone_number," +
+                    "phone_is_mobile," +
+                    "street," +
+                    "floor," +
+                    "postal," +
+                    "city," +
+                    "country_title," +
+                    "country_indexes," +
+                ") " +
+                "VALUES (" +
+                    contactInfo.get_primaryId() + ",'" +
+                    contactInfo.get_email() + "'," +
+                    contactInfo.get_country().get_firstPhoneNumberDigits() + "," +
+                    contactInfo.get_phone().get_numbers() + "," +
+                    contactInfo.get_phone().is_mobile() + ",'" +
+                    contactInfo.get_address().get_street() + "','" +
+                    contactInfo.get_address().get_floor() + "','" +
+                    contactInfo.get_address().get_postal() + "','" +
+                    contactInfo.get_address().get_city() + "','" +
+                    contactInfo.get_country().get_title() + "','" +
+                    contactInfo.get_country().get_indexes() +
+                "') " +
+                "ON DUPLICATE KEY UPDATE " +
+                    "email = '" + contactInfo.get_email() + "'," +
+                    "first_digits = " + contactInfo.get_country().get_firstPhoneNumberDigits() + "," +
+                    "phone_number = " + contactInfo.get_phone().get_numbers() + "," +
+                    "phone_is_mobile = " + contactInfo.get_phone().is_mobile() + "," +
+                    "street = '" + contactInfo.get_address().get_street() + "'," +
+                    "floor = '" + contactInfo.get_address().get_floor() + "'," +
+                    "postal = '" + contactInfo.get_address().get_postal() + "'," +
+                    "city = '" + contactInfo.get_address().get_city() + "'," +
+                    "country_title = '" + contactInfo.get_country().get_title() + "'," +
+                    "country_indexes = '" + contactInfo.get_country().get_indexes() +
+                ";", false);
+    }
+
+    /**
+     * Upserts Subscription depending on the user_id/subscription_id.
+     * This means it will insert the values of the Subscription if they don't exist,
+     * otherwise it will update them to the values of the Subscription.
+     * Will not close connection.
+     * @param subscription The Subscription that will have influence on the database table.
+     * @return True if any rows have been affected.
+     */
+    public boolean upsert(Subscription subscription) {
+        return edit("INSERT INTO subscriptions(" +
+                    "user_id," +
+                    "`status`," +
+                    "subscription_type," +
+                    "offer_type," +
+                    "offer_expires," +
+                    "offer_effect," +
+                    "card_id" +
+                ") " +
+                "VALUES (" +
+                    subscription.get_user().get_primaryId() + ",'" +
+                    subscription.get_status() + "','" +
+                    subscription.get_type() + "','" +
+                    subscription.get_offer().get_type() + "','" +
+                    subscription.get_offer().get_expires() + "'," +
+                    subscription.get_offer().get_effect() + "," +
+                    subscription.get_cardId() +
+                ") " +
+                "ON DUPLICATE KEY UPDATE " +
+                    "`status` = '" + subscription.get_status() + "'," +
+                    "subscription_type = '" + subscription.get_type() + "'," +
+                    "offer_type = '" + subscription.get_offer().get_type() + "'," +
+                    "offer_expires = '" + subscription.get_offer().get_expires() + "'," +
+                    "offer_effect = " + subscription.get_offer().get_effect() + "," +
+                    "card_id = " + subscription.get_cardId() +
+                ";", false);
     }
 }

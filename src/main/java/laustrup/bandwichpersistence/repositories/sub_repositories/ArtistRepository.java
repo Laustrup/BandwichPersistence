@@ -38,18 +38,19 @@ public class ArtistRepository extends Repository {
     /**
      * Will create an Artist and get the generated key value if success.
      * @param artist The Artist that will be created.
+     * @param password The password assigned for the Artist.
      * @return A ResultSet of the created values with the generated keys. If there's an SQLException, it returns null.
      */
     public ResultSet create(Artist artist, String password) {
         try {
-            return create("INSERT INTO(username,`password`,first_name,last_name,`description`,`timestamp`,kind) VALUES ('" +
+            return create("INSERT INTO users(username,`password`,first_name,last_name,`description`,`timestamp`,kind) " +
+                    "VALUES ('" +
                     artist.get_username() + "','" +
                     password + "','" +
                     artist.get_firstName() +"','" +
                     artist.get_lastName() +"','" +
                     artist.get_description() +"'," +
-                    "NOW(),'ARTIST');" +
-                    "INSERT INTO subscriptions() VALUES ();").getGeneratedKeys();
+                    "NOW(),'ARTIST'); ").getGeneratedKeys();
         } catch (SQLException e) {
             Printer.get_instance().print("Couldn't get generated keys of Artist...", e);
         }

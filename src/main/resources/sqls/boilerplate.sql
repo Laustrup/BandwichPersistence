@@ -333,7 +333,7 @@ CREATE TABLE subscriptions(
     offer_expires DATETIME,
     offer_effect DOUBLE,
 
-    card_id BIGINT(8),
+    card_id BIGINT(20) NOT NULL,
     PRIMARY KEY (user_id),
     FOREIGN KEY(user_id) REFERENCES users(id),
     FOREIGN KEY(card_id) REFERENCES cards(id)
@@ -354,8 +354,8 @@ CREATE TABLE contact_informations(
     /* Country */
     country_title VARCHAR(50),
     country_indexes ENUM('DK',
-        'SE',
-        'DE'),
+     'SE',
+     'DE'),
 
     PRIMARY KEY(user_id),
     FOREIGN KEY(user_id) REFERENCES users(id)
