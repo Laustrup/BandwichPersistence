@@ -3,6 +3,7 @@ package laustrup.bandwichpersistence.services.controller_services.sub_controller
 import laustrup.bandwichpersistence.models.events.Event;
 import laustrup.bandwichpersistence.services.controller_services.ControllerService;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembly;
+import laustrup.bandwichpersistence.services.persistence_services.entity_services.sub_entity_services.EventPersistenceService;
 import laustrup.bandwichpersistence.utilities.Liszt;
 
 import org.springframework.http.ResponseEntity;
@@ -43,4 +44,12 @@ public class EventControllerService extends ControllerService<Event> {
      */
     public ResponseEntity<Liszt<Event>> get() { return entityContent(Assembly.get_instance().getEvents()); }
 
+    /**
+     * Will create an Event and afterwards put it in a ResponseEntity.
+     * @param event The Event that is wished to be created.
+     * @return A ResponseEntity with the Event and the HttpStatus.
+     */
+    public ResponseEntity<Event> create(Event event) {
+        return entityContent(EventPersistenceService.get_instance().create(event));
+    }
 }

@@ -7,6 +7,7 @@ import laustrup.bandwichpersistence.utilities.Liszt;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController("api/event/")
@@ -19,5 +20,10 @@ public class EventController {
     @PostMapping("get")
     public ResponseEntity<Liszt<Event>> get() {
         return EventControllerService.get_instance().get();
+    }
+
+    @PostMapping(value = "create", consumes = "application/json")
+    public ResponseEntity<Event> create(@RequestBody Event event) {
+        return EventControllerService.get_instance().create(event);
     }
 }
