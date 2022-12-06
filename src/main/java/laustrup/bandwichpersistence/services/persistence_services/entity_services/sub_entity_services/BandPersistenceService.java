@@ -1,14 +1,11 @@
 package laustrup.bandwichpersistence.services.persistence_services.entity_services.sub_entity_services;
 
 import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
-import laustrup.bandwichpersistence.models.users.sub_users.bands.Artist;
 import laustrup.bandwichpersistence.models.users.sub_users.bands.Band;
 import laustrup.bandwichpersistence.models.users.sub_users.subscriptions.Subscription;
-import laustrup.bandwichpersistence.repositories.sub_repositories.ArtistRepository;
 import laustrup.bandwichpersistence.repositories.sub_repositories.BandRepository;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembly;
 import laustrup.bandwichpersistence.services.persistence_services.entity_services.EntityService;
-import laustrup.bandwichpersistence.utilities.Liszt;
 import laustrup.bandwichpersistence.utilities.Printer;
 
 import java.sql.ResultSet;

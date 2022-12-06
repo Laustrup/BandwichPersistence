@@ -63,6 +63,7 @@ public class Band extends Performer {
     public Band(String username, String description, Subscription subscription, ContactInfo contactInfo, Liszt<Artist> members) throws InputMismatchException {
         super(username, description, subscription);
         _username = username;
+        _contactInfo = contactInfo;
 
         if (_members.size() > 0)
             _members = members;

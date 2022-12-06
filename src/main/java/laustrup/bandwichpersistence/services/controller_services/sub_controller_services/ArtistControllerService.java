@@ -1,8 +1,10 @@
 package laustrup.bandwichpersistence.services.controller_services.sub_controller_services;
 
+import laustrup.bandwichpersistence.models.users.Login;
 import laustrup.bandwichpersistence.models.users.sub_users.bands.Artist;
 import laustrup.bandwichpersistence.services.controller_services.ControllerService;
 import laustrup.bandwichpersistence.services.persistence_services.entity_services.sub_entity_services.ArtistPersistenceService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 public class ArtistControllerService extends ControllerService<Artist> {
@@ -24,9 +26,17 @@ public class ArtistControllerService extends ControllerService<Artist> {
 
     private ArtistControllerService() {}
 
-
+    /**
+     * Will create an Artist and afterwards put it in a ResponseEntity.
+     * @param artist The Artist that is wished to be created.
+     * @param password The password assigned for the Artist.
+     * @return A ResponseEntity with the Artist and the HttpStatus.
+     */
     public ResponseEntity<Artist> create(Artist artist, String password) {
-        return entityContent(ArtistPersistenceService.get_instance().create(artist, password));
+        if (new Login(artist.get_username(), password).passwordIsValid())
+            return entityContent(ArtistPersistenceService.get_instance().create(artist, password));
+        else
+            return new ResponseEntity<>(null, HttpStatus.NOT_ACCEPTABLE);
     }
 
 }
