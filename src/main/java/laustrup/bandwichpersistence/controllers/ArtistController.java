@@ -15,7 +15,8 @@ public class ArtistController {
     @PostMapping(value = "create/{password}", consumes = "application/json")
     public ResponseEntity<Artist> create(@RequestBody Artist artist, @PathVariable(name = "password") String password) {
         return ArtistControllerService.get_instance().create(new Artist(
-                artist.get_username(),artist.get_firstName(),artist.get_lastName(),
-                artist.get_description(), artist.get_subscription(),artist.get_bands(), artist.get_runner()), password);
+                artist.get_username(),artist.get_firstName(),artist.get_lastName(), artist.get_description(),
+                artist.get_subscription(), artist.get_contactInfo(),artist.get_bands(), artist.get_runner()), password
+        );
     }
 }

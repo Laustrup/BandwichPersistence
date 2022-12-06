@@ -50,6 +50,7 @@ public class Band extends Performer {
             throws InputMismatchException {
         super(id, username, description, contactInfo, images, ratings, events, gigs, chatRooms, subscription,
                 bulletins, timestamp, music, fans, idols);
+        _username = username;
 
         _members = members;
         if (_members.size() <= 0)
@@ -59,13 +60,16 @@ public class Band extends Performer {
         _assembling = true;
     }
 
-    public Band(String username, String description, Subscription subscription, Liszt<Artist> members) throws InputMismatchException {
+    public Band(String username, String description, Subscription subscription, ContactInfo contactInfo, Liszt<Artist> members) throws InputMismatchException {
         super(username, description, subscription);
+        _username = username;
 
         if (_members.size() > 0)
             _members = members;
         else
             throw new InputMismatchException();
+
+        _assembling = true;
     }
 
     /**

@@ -64,12 +64,14 @@ public class Artist extends Performer {
         _assembling = true;
     }
 
-    public Artist(String username, String firstName, String lastName, String description, Subscription subscription,
+    public Artist(String username, String firstName, String lastName, String description, Subscription subscription, ContactInfo contactInfo,
                   Liszt<Band> bands, String runner) {
         super(username, firstName, lastName, description, subscription);
+        _contactInfo = contactInfo;
         _bands = bands;
         _runner = runner;
         _requests = new Liszt<>();
+        _assembling = true;
     }
 
     /**

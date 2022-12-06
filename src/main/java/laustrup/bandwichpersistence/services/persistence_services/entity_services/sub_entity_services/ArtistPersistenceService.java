@@ -1,6 +1,8 @@
 package laustrup.bandwichpersistence.services.persistence_services.entity_services.sub_entity_services;
 
+import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
 import laustrup.bandwichpersistence.models.users.sub_users.bands.Artist;
+import laustrup.bandwichpersistence.models.users.sub_users.subscriptions.Subscription;
 import laustrup.bandwichpersistence.repositories.sub_repositories.ArtistRepository;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembly;
 import laustrup.bandwichpersistence.services.persistence_services.entity_services.EntityService;
@@ -9,7 +11,10 @@ import laustrup.bandwichpersistence.utilities.Printer;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class ArtistPersistenceService extends EntityService {
+/**
+ * Contains logic for CRUD of Artists.
+ */
+public class ArtistPersistenceService extends EntityService<Artist> {
 
     /**
      * Singleton instance of the Service.
@@ -41,15 +46,24 @@ public class ArtistPersistenceService extends EntityService {
     public Artist create(Artist artist, String password) {
         if (artist.get_primaryId() == 0) {
             ResultSet set = ArtistRepository.get_instance().create(artist, password);
+            Subscription subscription = artist.get_subscription();
+            ContactInfo contactInfo = artist.get_contactInfo();
 
             try {
                 if (set.isBeforeFirst())
                     set.next();
-                artist = (Artist) Assembly.get_instance().userUnfinished(set.getLong("users.id"));
+                artist = (Artist) Assembly.get_instance().getUserUnAssembelled(set.getLong("users.id"));
             } catch (SQLException e) {
                 Printer.get_instance().print("ResultSet error in Artist create service...", e);
                 return null;
             }
+
+            //Puts in subscription and contactInfo
+            artist = new Artist(artist.get_primaryId(), artist.get_username(), artist.get_firstName(), artist.get_lastName(),
+                    artist.get_description(),contactInfo,artist.get_images(), artist.get_ratings(), artist.get_events(),
+                    artist.get_gigs(),artist.get_chatRooms(),subscription,artist.get_bulletins(),artist.get_timestamp(),
+                    artist.get_music(),artist.get_bands(),artist.get_runner(),
+                    artist.get_fans(),artist.get_idols(),artist.get_requests());
 
             if (upsert(artist))
                 return artist;

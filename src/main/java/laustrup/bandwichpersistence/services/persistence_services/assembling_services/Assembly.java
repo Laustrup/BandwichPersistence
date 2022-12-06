@@ -82,7 +82,7 @@ public class Assembly extends Assembler {
      * @param id The id of the User that is wished to be assembled.
      * @return The assembled User.
      */
-    public User userUnfinished(long id) { return userAssembling(UserAssembly.get_instance().assemble(id), false); }
+    public User getUserUnAssembelled(long id) { return userAssembling(UserAssembly.get_instance().assemble(id), false); }
 
     /**
      * Will get all the Users.
@@ -229,7 +229,7 @@ public class Assembly extends Assembler {
      * @param user The User that will be done assembling.
      * @return The assembled User.
      */
-    private User finish(User user) {
+    public User finish(User user) {
         user.doneAssembling();
 
         Plato connectionStatus = closeConnections();
@@ -244,7 +244,7 @@ public class Assembly extends Assembler {
      * @param users The Users that will be done assembling.
      * @return The assembled Users.
      */
-    private Liszt<User> userFinishing(Liszt<User> users) {
+    public Liszt<User> userFinishing(Liszt<User> users) {
         for (User user : users)
             user.doneAssembling();
 
@@ -260,7 +260,7 @@ public class Assembly extends Assembler {
      * @param event The Event that will be done assembling.
      * @return The assembled Event.
      */
-    private Event finish(Event event) {
+    public Event finish(Event event) {
         event.doneAssembling();
 
         Plato connectionStatus = closeConnections();
@@ -275,7 +275,7 @@ public class Assembly extends Assembler {
      * @param events The Events that will be done assembling.
      * @return The assembled Events.
      */
-    private Liszt<Event> eventFinishing(Liszt<Event> events) {
+    public Liszt<Event> eventFinishing(Liszt<Event> events) {
         for (Event event : events)
             event.doneAssembling();
 
@@ -291,7 +291,7 @@ public class Assembly extends Assembler {
      * @return A Plato object, if the truth is true, then there have been no issue,
      *         if there is an issue, it will have a false truth and a message for the Printer.
      */
-    public Plato closeConnections() {
+    private Plato closeConnections() {
         Plato status;
         Plato situation = new Plato(true);
 
