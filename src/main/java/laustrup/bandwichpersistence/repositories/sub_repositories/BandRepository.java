@@ -41,7 +41,7 @@ public class BandRepository extends Repository {
     public ResultSet create(Band band, String password) {
         try {
             return create("INSERT INTO users(username,`password`,first_name,last_name,`description`,`timestamp`,kind) " +
-                    "VALUES (" +
+                    "VALUES ('" +
                         band.get_username() + "','" +
                         password + "','" +
                         band.get_firstName() +"','" +

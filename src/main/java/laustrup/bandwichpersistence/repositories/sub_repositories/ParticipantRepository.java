@@ -1,6 +1,11 @@
 package laustrup.bandwichpersistence.repositories.sub_repositories;
 
+import laustrup.bandwichpersistence.models.users.sub_users.participants.Participant;
 import laustrup.bandwichpersistence.repositories.Repository;
+import laustrup.bandwichpersistence.utilities.Printer;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  * Are handling Repository actions for Participants.
@@ -26,4 +31,34 @@ public class ParticipantRepository extends Repository {
     }
 
     private ParticipantRepository() {}
+
+    /**
+     * Will create a Participant and get the generated key value if success.
+     * @param participant The Participant that will be created.
+     * @param password The password assigned for the Participant.
+     * @return A ResultSet of the created values with the generated keys. If there's an SQLException, it returns null.
+     */
+    public ResultSet create(Participant participant, String password) {
+        try {
+            return create("INSERT INTO users(" +
+                        "username," +
+                        "`password`," +
+                        "first_name," +
+                        "last_name," +
+                        "`description`," +
+                        "`timestamp`," +
+                        "kind" +
+                    ") " +
+                    "VALUES ('" +
+                        participant.get_username() + "','" +
+                        password + "','" +
+                        participant.get_firstName() + "','" +
+                        participant.get_lastName() + "','" +
+                        participant.get_description() + "'," +
+                    "NOW(),'PARTICIPANT');").getGeneratedKeys();
+        } catch (SQLException e) {
+            Printer.get_instance().print("Couldn't get generated keys of Participant...",e);
+        }
+        return null;
+    }
 }

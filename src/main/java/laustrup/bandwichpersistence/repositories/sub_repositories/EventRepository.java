@@ -126,7 +126,7 @@ public class EventRepository extends Repository {
                         "venue_id," +
                         "`timestamp`" +
                     ") " +
-                    "VALUES (" +
+                    "VALUES ('" +
                         event.get_title() +"','" +
                         event.get_openDoors() + "','" +
                         event.get_description() + "','" +
