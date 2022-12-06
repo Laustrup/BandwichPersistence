@@ -1,14 +1,12 @@
 package laustrup.bandwichpersistence.repositories.sub_repositories;
 
-import laustrup.bandwichpersistence.models.albums.Album;
-import laustrup.bandwichpersistence.models.chats.Request;
-import laustrup.bandwichpersistence.models.events.Gig;
-import laustrup.bandwichpersistence.models.events.Participation;
+import laustrup.bandwichpersistence.models.events.Event;
 import laustrup.bandwichpersistence.repositories.Repository;
 import laustrup.bandwichpersistence.utilities.Liszt;
-import laustrup.bandwichpersistence.utilities.Plato;
+import laustrup.bandwichpersistence.utilities.Printer;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  * Are handling Repository actions for Events.
@@ -105,5 +103,45 @@ public class EventRepository extends Repository {
                     "OR requests.user_id = users.id OR participations.participant_id = users.id " +
                         "OR event_bulletins.author_id = users.id OR album_relations.user_id = users.id " +
                 where + ";");
+    }
+
+    /**
+     * Will create aN Event and get the generated key value if success.
+     * @param event The Event that will be created.
+     * @return A ResultSet of the created values with the generated keys. If there's an SQLException, it returns null.
+     */
+    public ResultSet create(Event event) {
+        try {
+            return create("INSERT INTO `events`(" +
+                        "title," +
+                        "open_doors," +
+                        "`description`," +
+                        "is_voluntary," +
+                        "is_public," +
+                        "is_cancelled," +
+                        "is_sold_out," +
+                        "location," +
+                        "price," +
+                        "tickets_url," +
+                        "venue_id," +
+                        "`timestamp`" +
+                    ") " +
+                    "VALUES (" +
+                        event.get_title() +"','" +
+                        event.get_openDoors() + "','" +
+                        event.get_description() + "','" +
+                        event.get_voluntary().get_argument() + "','" +
+                        event.get_public().get_argument() + "','" +
+                        event.get_cancelled().get_argument() + "','" +
+                        event.get_soldOut().get_argument() + "','" +
+                        event.get_location() + "'," +
+                        event.get_price() + ",'" +
+                        event.get_ticketsURL() + "'," +
+                        event.get_venue().get_primaryId() + "," +
+                    "NOW());").getGeneratedKeys();
+        } catch (SQLException e) {
+            Printer.get_instance().print("Couldn't get generated keys of Event...", e);
+        }
+        return null;
     }
 }

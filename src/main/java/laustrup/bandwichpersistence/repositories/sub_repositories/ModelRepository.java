@@ -80,7 +80,7 @@ public class ModelRepository extends Repository {
      * @return True if any rows have been affected.
      */
     public boolean upsert(ContactInfo contactInfo) {
-        if (contactInfo != null)
+        if (contactInfo != null && contactInfo.get_primaryId() > 0)
             return edit("INSERT INTO contact_informations(" +
                         "user_id," +
                         "email," +
@@ -131,7 +131,7 @@ public class ModelRepository extends Repository {
      * @return True if any rows have been affected.
      */
     public boolean upsert(Subscription subscription) {
-        if (subscription != null)
+        if (subscription != null && subscription.get_user().get_primaryId() > 0)
             return edit("INSERT INTO subscriptions(" +
                         "user_id," +
                         "`status`," +
