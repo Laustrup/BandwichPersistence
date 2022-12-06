@@ -34,7 +34,7 @@ public class BandPersistenceService extends EntityService<Band> {
     private BandPersistenceService() {}
 
     /**
-     * Will create a Band by using ArtistRepository.
+     * Will create a Band by using BandRepository.
      * Only does this, if id doesn't already exist.
      * Will also include the generated key.
      * Uses Assembly to get the values from the database,
@@ -44,7 +44,7 @@ public class BandPersistenceService extends EntityService<Band> {
      * @return If success, the created Band with its generated key, otherwise null.
      */
     public Band create(Band band, String password) {
-        if (band.get_primaryId() == 0) {
+        if (band.get_primaryId() > 0) {
             ResultSet set = BandRepository.get_instance().create(band, password);
             Subscription subscription = band.get_subscription();
             ContactInfo contactInfo = band.get_contactInfo();
@@ -52,7 +52,7 @@ public class BandPersistenceService extends EntityService<Band> {
             try {
                 if (set.isBeforeFirst())
                     set.next();
-                band = (Band) Assembly.get_instance().getUserUnAssembelled(set.getLong("users.id"));
+                band = (Band) Assembly.get_instance().getUserUnassembled(set.getLong("users.id"));
             } catch (SQLException e) {
                 Printer.get_instance().print("ResultSet error in Band create service...", e);
                 return null;

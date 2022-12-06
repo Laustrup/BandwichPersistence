@@ -1,6 +1,10 @@
 package laustrup.bandwichpersistence.services.persistence_services.entity_services;
 
+import laustrup.bandwichpersistence.models.events.Event;
 import laustrup.bandwichpersistence.models.users.User;
+import laustrup.bandwichpersistence.models.users.sub_users.bands.Artist;
+import laustrup.bandwichpersistence.models.users.sub_users.bands.Band;
+import laustrup.bandwichpersistence.models.users.sub_users.venues.Venue;
 import laustrup.bandwichpersistence.repositories.sub_repositories.ModelRepository;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembly;
 
@@ -16,14 +20,46 @@ public class EntityService<E> {
      * @return True if it is a success.
      */
     protected boolean upsert(E element) {
-        if (element.getClass() == User.class) {
-            if (ModelRepository.get_instance().upsert(((User) element).get_contactInfo())) {
-                if (ModelRepository.get_instance().upsert(((User) element).get_subscription())) {
-                    Assembly.get_instance().finish((User) element);
-                    return true;
-                }
+        if (element.getClass() == Artist.class ||
+            element.getClass() == Band.class ||
+            element.getClass() == Venue.class ||
+            element.getClass() == Package.class) {
+            assert element instanceof User;
+            return upsert((User) element);
+        }
+        //if (element.getClass() == Event.class)
+            //return upsert((Event) element);
+
+        return false;
+    }
+
+    //TODO Make EventPersistenceService use this method.
+    /**
+     * Upserts values for User and finishes the User by setting assembling to false and closing connections.
+     * @param user The User that will be upserted.
+     * @return True if it is a success.
+     */
+    private boolean upsert(User user) {
+        if (ModelRepository.get_instance().upsert(user.get_contactInfo())) {
+            if (ModelRepository.get_instance().upsert(user.get_subscription())) {
+                Assembly.get_instance().finish(user);
+                return true;
             }
         }
         return false;
     }
+
+    /*
+    /**
+     * Upserts values for Event and finishes the Event by setting assembling to false and closing connections.
+     * @param event The Event that will be upserted.
+     * @return True if it is a success.
+    private boolean upsert(Event event) {
+        if (ModelRepository.get_instance().upsert(event.get_contactInfo())) {
+            Assembly.get_instance().finish(event);
+            return true;
+        }
+        return false;
+    }
+    */
 }

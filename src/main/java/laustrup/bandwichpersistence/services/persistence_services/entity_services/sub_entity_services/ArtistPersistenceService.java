@@ -44,7 +44,7 @@ public class ArtistPersistenceService extends EntityService<Artist> {
      * @return If success, the created Artist with its generated key, otherwise null.
      */
     public Artist create(Artist artist, String password) {
-        if (artist.get_primaryId() == 0) {
+        if (artist.get_primaryId() > 0) {
             ResultSet set = ArtistRepository.get_instance().create(artist, password);
             Subscription subscription = artist.get_subscription();
             ContactInfo contactInfo = artist.get_contactInfo();
@@ -52,7 +52,7 @@ public class ArtistPersistenceService extends EntityService<Artist> {
             try {
                 if (set.isBeforeFirst())
                     set.next();
-                artist = (Artist) Assembly.get_instance().getUserUnAssembelled(set.getLong("users.id"));
+                artist = (Artist) Assembly.get_instance().getUserUnassembled(set.getLong("users.id"));
             } catch (SQLException e) {
                 Printer.get_instance().print("ResultSet error in Artist create service...", e);
                 return null;

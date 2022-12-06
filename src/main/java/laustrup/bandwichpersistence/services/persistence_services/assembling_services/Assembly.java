@@ -80,9 +80,9 @@ public class Assembly extends Assembler {
      * Will be initiated as the object it is meant to be.
      * Will not finnish connections and therefore not close connections.
      * @param id The id of the User that is wished to be assembled.
-     * @return The assembled User.
+     * @return The unassembled User.
      */
-    public User getUserUnAssembelled(long id) { return userAssembling(UserAssembly.get_instance().assemble(id), false); }
+    public User getUserUnassembled(long id) { return userAssembling(UserAssembly.get_instance().assemble(id), false); }
 
     /**
      * Will get all the Users.
@@ -166,6 +166,15 @@ public class Assembly extends Assembler {
      * @return The assembled Event.
      */
     public Event getEvent(long id) { return assembling(EventAssembly.get_instance().assemble(id), true); }
+
+    /**
+     * Gets an Event object with the informations given from the EventRepository.
+     * Will be initiated as the object it is meant to be.
+     * Will not finnish connections and therefore not close connections.
+     * @param id The id of the Event that is wished to be assembled.
+     * @return The unassembled Event.
+     */
+    public Event getEventUnassembled(long id) { return assembling(EventAssembly.get_instance().assemble(id), false); }
 
     /**
      * Will get all the Events.
