@@ -12,6 +12,7 @@ import laustrup.bandwichpersistence.models.users.sub_users.bands.Band;
 import laustrup.bandwichpersistence.models.users.sub_users.participants.Participant;
 import laustrup.bandwichpersistence.models.users.sub_users.venues.Venue;
 import laustrup.bandwichpersistence.repositories.sub_repositories.*;
+import laustrup.bandwichpersistence.repositories.sub_repositories.ModelRepository;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.sub_assemblings.EventAssembly;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.sub_assemblings.user_assemblings.UserAssembly;
 import laustrup.bandwichpersistence.utilities.Liszt;
@@ -73,6 +74,15 @@ public class Assembly extends Assembler {
     public User getUser(long id) {
         return userAssembling(UserAssembly.get_instance().assemble(id), true);
     }
+
+    /**
+     * Gets a User object with the informations given from the UserRepository.
+     * Will be initiated as the object it is meant to be.
+     * Will not finnish connections and therefore not close connections.
+     * @param id The id of the User that is wished to be assembled.
+     * @return The assembled User.
+     */
+    public User userUnfinished(long id) { return userAssembling(UserAssembly.get_instance().assemble(id), false); }
 
     /**
      * Will get all the Users.
@@ -281,7 +291,7 @@ public class Assembly extends Assembler {
      * @return A Plato object, if the truth is true, then there have been no issue,
      *         if there is an issue, it will have a false truth and a message for the Printer.
      */
-    private Plato closeConnections() {
+    public Plato closeConnections() {
         Plato status;
         Plato situation = new Plato(true);
 

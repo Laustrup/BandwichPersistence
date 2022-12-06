@@ -1,15 +1,15 @@
-package laustrup.bandwichpersistence.services.persistence_services.entity_services;
+package laustrup.bandwichpersistence.services.persistence_services.entity_services.sub_entity_services;
 
-import laustrup.bandwichpersistence.models.users.sub_users.Performer;
 import laustrup.bandwichpersistence.models.users.sub_users.bands.Artist;
 import laustrup.bandwichpersistence.repositories.sub_repositories.ArtistRepository;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembly;
+import laustrup.bandwichpersistence.services.persistence_services.entity_services.EntityService;
 import laustrup.bandwichpersistence.utilities.Printer;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class ArtistPersistenceService {
+public class ArtistPersistenceService extends EntityService {
 
     /**
      * Singleton instance of the Service.
@@ -45,10 +45,14 @@ public class ArtistPersistenceService {
             try {
                 if (set.isBeforeFirst())
                     set.next();
-                return (Artist) Assembly.get_instance().getUser(set.getLong("users.id"));
+                artist = (Artist) Assembly.get_instance().userUnfinished(set.getLong("users.id"));
             } catch (SQLException e) {
                 Printer.get_instance().print("ResultSet error in Artist create service...", e);
+                return null;
             }
+
+            if (upsert(artist))
+                return artist;
         }
         return null;
     }

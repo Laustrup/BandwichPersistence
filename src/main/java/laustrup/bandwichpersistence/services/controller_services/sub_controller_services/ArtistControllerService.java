@@ -1,9 +1,8 @@
 package laustrup.bandwichpersistence.services.controller_services.sub_controller_services;
 
-import laustrup.bandwichpersistence.models.users.sub_users.Performer;
 import laustrup.bandwichpersistence.models.users.sub_users.bands.Artist;
 import laustrup.bandwichpersistence.services.controller_services.ControllerService;
-import laustrup.bandwichpersistence.services.persistence_services.entity_services.ArtistPersistenceService;
+import laustrup.bandwichpersistence.services.persistence_services.entity_services.sub_entity_services.ArtistPersistenceService;
 import org.springframework.http.ResponseEntity;
 
 public class ArtistControllerService extends ControllerService<Artist> {
