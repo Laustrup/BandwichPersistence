@@ -3,6 +3,7 @@ package laustrup.bandwichpersistence.services.controller_services;
 import laustrup.bandwichpersistence.models.Response;
 import laustrup.bandwichpersistence.models.Search;
 import laustrup.bandwichpersistence.utilities.Liszt;
+import laustrup.bandwichpersistence.utilities.Plato;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -45,5 +46,17 @@ public class ControllerService<E> {
         else
             return new ResponseEntity<>(new Response<>(null, Response.StatusType.NO_CONTENT),
                 HttpStatus.NO_CONTENT);
+    }
+
+    protected ResponseEntity<Response<Plato>> platoContent(Plato plato) {
+        if (plato.get_message()!=null) {
+            if (plato.get_message().isEmpty())
+                return new ResponseEntity<>(new Response<>(plato, Response.StatusType.UNKNOWN),
+                        HttpStatus.NOT_ACCEPTABLE);
+            else
+                return new ResponseEntity<>(new Response<>(plato, Response.StatusType.NOT_ACCEPTABLE),
+                        HttpStatus.CONFLICT);
+        }
+        return new ResponseEntity<>(new Response<>(plato),HttpStatus.OK);
     }
 }

@@ -5,8 +5,11 @@ import laustrup.bandwichpersistence.models.events.Event;
 import laustrup.bandwichpersistence.services.controller_services.ControllerService;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembly;
 import laustrup.bandwichpersistence.services.persistence_services.entity_services.sub_entity_services.EventPersistenceService;
+import laustrup.bandwichpersistence.services.persistence_services.entity_services.sub_entity_services.UserPersistenceService;
 import laustrup.bandwichpersistence.utilities.Liszt;
 
+import laustrup.bandwichpersistence.utilities.Plato;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 public class EventControllerService extends ControllerService<Event> {
@@ -52,5 +55,14 @@ public class EventControllerService extends ControllerService<Event> {
      */
     public ResponseEntity<Response<Event>> create(Event event) {
         return entityContent(EventPersistenceService.get_instance().create(event));
+    }
+
+    /**
+     * Will delete Event and create a ResponseEntity with a Response that includes its status of the delete.
+     * @param event The Event that should be deleted.
+     * @return The created ResponseEntity of a Response with the status of the delete.
+     */
+    public ResponseEntity<Response<Plato>> delete(Event event) {
+        return platoContent(EventPersistenceService.get_instance().delete(event));
     }
 }

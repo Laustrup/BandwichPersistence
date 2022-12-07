@@ -81,7 +81,7 @@ public class UserPersistenceService {
         if (user.get_primaryId()>0)
             return new Plato(UserRepository.get_instance().delete(user));
         Plato status = new Plato(false);
-        status.set_message("Couldn't delete user...");
+        status.set_message("Couldn't delete " + user.get_title() + "...");
         return status;
     }
 }

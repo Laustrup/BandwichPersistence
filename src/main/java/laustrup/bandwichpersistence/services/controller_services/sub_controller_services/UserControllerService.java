@@ -90,15 +90,6 @@ public class UserControllerService extends ControllerService<User> {
      * @return The created ResponseEntity of a Response with the status of the delete.
      */
     public ResponseEntity<Response<Plato>> delete(User user) {
-        Plato status = UserPersistenceService.get_instance().delete(user);
-        if (status.get_message()!=null) {
-            if (status.get_message().isEmpty())
-                return new ResponseEntity<>(new Response<>(status, Response.StatusType.UNKNOWN),
-                        HttpStatus.NOT_ACCEPTABLE);
-            else
-                return new ResponseEntity<>(new Response<>(status, Response.StatusType.NOT_ACCEPTABLE),
-                        HttpStatus.CONFLICT);
-        }
-        return new ResponseEntity<>(new Response<>(status),HttpStatus.OK);
+        return platoContent(UserPersistenceService.get_instance().delete(user));
     }
 }

@@ -6,6 +6,7 @@ import laustrup.bandwichpersistence.repositories.sub_repositories.EventRepositor
 import laustrup.bandwichpersistence.repositories.sub_repositories.ModelRepository;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembly;
 import laustrup.bandwichpersistence.services.persistence_services.entity_services.EntityService;
+import laustrup.bandwichpersistence.utilities.Plato;
 import laustrup.bandwichpersistence.utilities.Printer;
 
 import java.sql.ResultSet;
@@ -70,5 +71,18 @@ public class EventPersistenceService extends EntityService<Event> {
             return Assembly.get_instance().finish(event);
         }
         return null;
+    }
+
+    /**
+     * Will delete an Event and connections from repository will be closed.
+     * @param event The Event that will be deleted.
+     * @return A Plato with true truth if success, otherwise false with a message.
+     */
+    public Plato delete(Event event) {
+        if (event.get_primaryId()>0)
+            return new Plato(EventRepository.get_instance().delete(event));
+        Plato status = new Plato(false);
+        status.set_message("Couldn't delete " + event.get_title() + "...");
+        return status;
     }
 }
