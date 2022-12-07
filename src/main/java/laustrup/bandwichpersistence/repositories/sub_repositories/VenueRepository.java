@@ -1,6 +1,12 @@
 package laustrup.bandwichpersistence.repositories.sub_repositories;
 
+import laustrup.bandwichpersistence.models.users.sub_users.venues.Venue;
 import laustrup.bandwichpersistence.repositories.Repository;
+import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembly;
+import laustrup.bandwichpersistence.utilities.Printer;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  * Are handling Repository actions for Venues.
@@ -26,4 +32,63 @@ public class VenueRepository extends Repository {
     }
 
     private VenueRepository() {}
+
+    /**
+     * Will create a Venue with its gear description, size and location and gets the generated key value if success.
+     * Uses Assembly getUserUnassembled(), therefore it must finish and close connection.
+     * @param venue The Venue that will be created.
+     * @param password The password assigned for the Venue.
+     * @return The Venue id created. If there's an SQLException, it returns null.
+     */
+    public Long create(Venue venue, String password) {
+        try {
+            ResultSet set =
+                    create("INSERT INTO users(" +
+                        "username," +
+                        "`password`," +
+                        "first_name," +
+                        "last_name," +
+                        "`description`," +
+                        "`timestamp`," +
+                        "kind" +
+                    ") " +
+                    "VALUES ('" +
+                        venue.get_username() + "','" +
+                        password + "','" +
+                        venue.get_firstName() + "','" +
+                        venue.get_lastName() + "','" +
+                        venue.get_description() + "','" +
+                        venue.get_timestamp() + "'," +
+                    "'VENUE');").getGeneratedKeys();
+
+            if (set.isBeforeFirst())
+                set.next();
+
+            long id = set.getLong("id");
+
+            create("INSERT INTO venues(" +
+                        "user_id," +
+                        "`size`," +
+                        "location" +
+                    ") " +
+                    "VALUES(" +
+                        id + "," +
+                        venue.get_size() + ",'" +
+                        venue.get_location() +
+                    "'); " +
+                    "INSERTS INTO gear(" +
+                        "user_id," +
+                        "`description`" +
+                    ") VALUES (" +
+                        id + ",'" +
+                        venue.get_gearDescription() +
+                    "');");
+
+            return id;
+        } catch (SQLException e) {
+            Printer.get_instance().print("Couldn't get generated keys of Venue...",e);
+        }
+
+        return null;
+    }
 }

@@ -83,7 +83,7 @@ CREATE TABLE gear(
 );
 
 CREATE TABLE venues(
-    user_id BIGINT(20) NOT NULL AUTO_INCREMENT,
+    user_id BIGINT(20) NOT NULL,
     `size` INT(6),
     location VARCHAR(50) NOT NULL,
 

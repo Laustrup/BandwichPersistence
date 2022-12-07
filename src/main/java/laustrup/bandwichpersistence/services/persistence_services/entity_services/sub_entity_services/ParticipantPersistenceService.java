@@ -34,14 +34,14 @@ public class ParticipantPersistenceService extends EntityService<Participant> {
     private ParticipantPersistenceService() {}
 
     /**
-     * Will create a Participant by using BandRepository.
+     * Will create a Participant by using ParticipantRepository.
      * Only does this, if id doesn't already exist.
      * Will also include the generated key.
      * Uses Assembly to get the values from the database,
      * to insure it exists and also to close connections.
      * @param participant The Participant that will be created.
      * @param password The password for the Participant.
-     * @return If success, the created Band with its generated key, otherwise null.
+     * @return If success, the created Participant with its generated key, otherwise null.
      */
     public Participant create(Participant participant, String password) {
         if (participant.get_primaryId() == 0) {
