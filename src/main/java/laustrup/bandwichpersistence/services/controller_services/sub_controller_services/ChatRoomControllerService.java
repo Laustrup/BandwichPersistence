@@ -36,4 +36,15 @@ public class ChatRoomControllerService extends ControllerService<ChatRoom> {
     public ResponseEntity<Response<ChatRoom>> upsert(Mail mail) {
         return entityContent(UserPersistenceService.get_instance().upsert(mail));
     }
+
+    /**
+     * Upserts a ChatRoom, will insert depending on if there is an id
+     * or if the id already exists, in that case it will update it.
+     * Also inserts Chatters if they exist.
+     * @param chatRoom The ChatRoom that will be upserted.
+     * @return A ResponseEntity with the Response of the ChatRoom and the HttpStatus.
+     */
+    public ResponseEntity<Response<ChatRoom>> upsert(ChatRoom chatRoom) {
+        return entityContent(chatRoom);
+    }
 }

@@ -45,7 +45,8 @@ public class UserPersistenceService {
                     set.next();
                 return Assembly.get_instance().finish(
                         Assembly.get_instance().getChatRoomUnassembled(
-                                set.getLong("mails.chat_room_id")));
+                                set.getLong("mails.chat_room_id"))
+                );
             } catch (SQLException e) {
                 Printer.get_instance().print("Couldn't get ChatRoom of upserted Mail...",e);
             }
@@ -63,7 +64,8 @@ public class UserPersistenceService {
         Long id = ModelRepository.get_instance().upsert(chatRoom);
         if (id!=null)
             return Assembly.get_instance().finish(
-                    Assembly.get_instance().getChatRoomUnassembled(id));
+                    Assembly.get_instance().getChatRoomUnassembled(id)
+            );
         return null;
     }
 }

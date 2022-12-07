@@ -19,7 +19,17 @@ public class ChatRoomController {
         return ChatRoomControllerService.get_instance().upsert(new Mail(
                 mail.get_primaryId(),mail.get_chatRoom(),mail.get_author(),
                 mail.get_content(),mail.is_sent(),mail.get_edited(),
-                mail.is_public(),mail.get_timestamp())
+                mail.is_public(),mail.get_timestamp()
+                )
+        );
+    }
+
+    @PostMapping(value = "upsert/chat_room", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Response<ChatRoom>> upsert(@RequestBody ChatRoom chatRoom) {
+        return ChatRoomControllerService.get_instance().upsert(new ChatRoom(
+                chatRoom.get_primaryId(),chatRoom.get_title(),chatRoom.get_mails(),
+                chatRoom.get_chatters(),chatRoom.get_responsible(),chatRoom.get_timestamp()
+                )
         );
     }
 }
