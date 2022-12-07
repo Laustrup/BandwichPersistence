@@ -31,7 +31,7 @@ public class ArtistControllerService extends ControllerService<Artist> {
      * Will create an Artist and afterwards put it in a ResponseEntity.
      * @param artist The Artist that is wished to be created.
      * @param password The password assigned for the Artist.
-     * @return A ResponseEntity with the Artist and the HttpStatus.
+     * @return A ResponseEntity with the Response of Artist and the HttpStatus.
      */
     public ResponseEntity<Response<Artist>> create(Artist artist, String password) {
         if (new Login(artist.get_username(), password).passwordIsValid())

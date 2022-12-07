@@ -32,7 +32,7 @@ public class VenueControllerService extends ControllerService<Venue> {
     /**
      * Will create an Participant and afterwards put it in a ResponseEntity.
      * @param venue The Participant that is wished to be created.
-     * @return A ResponseEntity with the Participant and the HttpStatus.
+     * @return A ResponseEntity with the Response of Venue and the HttpStatus.
      */
     public ResponseEntity<Response<Venue>> create(Venue venue, String password) {
         if (new Login(venue.get_username(), password).passwordIsValid())

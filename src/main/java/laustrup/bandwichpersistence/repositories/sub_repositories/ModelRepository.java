@@ -190,9 +190,9 @@ public class ModelRepository extends Repository {
                         mail.is_sent() + ",'" +
                         mail.get_edited().get_argument() + "'," +
                         mail.is_public() + "," +
-                        mail.get_chatRoom().get_primaryId() + ",'" +
-                        mail.get_timestamp() +
-                    "') " +
+                        mail.get_chatRoom().get_primaryId() + "," +
+                        (mail.get_primaryId() > 0 ? "'"+mail.get_timestamp()+"'" : "NOW()") +
+                    ") " +
                     "ON DUPLICATE KEY UPDATE " +
                         "content = '" + mail.get_content() + "'," +
                         "is_sent = " + mail.is_sent() + "," +

@@ -33,7 +33,7 @@ public class EventControllerService extends ControllerService<Event> {
      * This scenario is for getting an Event by its id.
      * Uses an assemblyService for reading the database and building the Event object.
      * @param id The id of the Event, that is wished to be gathered.
-     * @return The created ResponseEntity of an Event.
+     * @return A ResponseEntity with the Response of Event and the HttpStatus.
      */
     public ResponseEntity<Response<Event>> get(long id) { return entityContent(Assembly.get_instance().getEvent(id)); }
 

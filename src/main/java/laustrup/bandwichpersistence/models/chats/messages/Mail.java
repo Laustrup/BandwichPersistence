@@ -2,8 +2,8 @@ package laustrup.bandwichpersistence.models.chats.messages;
 
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.models.users.User;
-
 import laustrup.bandwichpersistence.utilities.Plato;
+
 import lombok.Getter;
 
 import java.time.LocalDateTime;

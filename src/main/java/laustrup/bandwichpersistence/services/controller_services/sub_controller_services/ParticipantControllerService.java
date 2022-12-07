@@ -30,7 +30,7 @@ public class ParticipantControllerService extends ControllerService<Participant>
     /**
      * Will create an Participant and afterwards put it in a ResponseEntity.
      * @param participant The Participant that is wished to be created.
-     * @return A ResponseEntity with the Participant and the HttpStatus.
+     * @return A ResponseEntity with the Response of Participant and the HttpStatus.
      */
     public ResponseEntity<Response<Participant>> create(Participant participant, String password) {
         if (new Login(participant.get_username(), password).passwordIsValid())

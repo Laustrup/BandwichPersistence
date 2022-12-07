@@ -31,7 +31,7 @@ public class BandControllerService extends ControllerService<Band> {
      * Will create a Band and afterwards put it in a ResponseEntity.
      * @param band The Band that is wished to be created.
      * @param password The password assigned for the Band.
-     * @return A ResponseEntity with the Band and the HttpStatus.
+     * @return A ResponseEntity with the Response of Band and the HttpStatus.
      */
     public ResponseEntity<Response<Band>> create(Band band, String password) {
         if (new Login(band.get_username(), password).passwordIsValid())

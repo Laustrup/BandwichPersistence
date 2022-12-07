@@ -33,9 +33,9 @@ public class UserPersistenceService {
     private UserPersistenceService() {}
 
     /**
-     * Will upsert a Mail
-     * @param mail
-     * @return
+     * Will upsert a Mail.
+     * @param mail The Mail that will be upserted.
+     * @return The ChatRoom of the Mail from the database.
      */
     public ChatRoom upsert(Mail mail) {
         ResultSet set = ModelRepository.get_instance().upsert(mail);
