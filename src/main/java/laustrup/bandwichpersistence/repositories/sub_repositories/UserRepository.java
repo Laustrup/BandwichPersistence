@@ -1,6 +1,8 @@
 package laustrup.bandwichpersistence.repositories.sub_repositories;
 
+import laustrup.bandwichpersistence.models.events.Event;
 import laustrup.bandwichpersistence.models.users.Login;
+import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
 import laustrup.bandwichpersistence.models.users.sub_users.subscriptions.Subscription;
 import laustrup.bandwichpersistence.repositories.Repository;
@@ -128,5 +130,15 @@ public class UserRepository extends Repository {
                 "INNER JOIN subscriptions ON users.id = subscriptions.user_id " +
                 "INNER JOIN contact_informations ON users.id = contact_informations.user_id " +
                 where + ";");
+    }
+
+    /**
+     * Will delete User by its id and all child tables with its foreign key cascade.
+     * Closes connection.
+     * @param user The User that should be deleted.
+     * @return True if connection is closed and the User doesn't exist.
+     */
+    public boolean delete(User user) {
+        return delete(user.get_primaryId(), "users", "id", true);
     }
 }

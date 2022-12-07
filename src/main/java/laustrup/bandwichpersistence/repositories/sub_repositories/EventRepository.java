@@ -144,4 +144,14 @@ public class EventRepository extends Repository {
         }
         return null;
     }
+
+    /**
+     * Will delete Event by its id and all child tables with its foreign key cascade.
+     * Closes connection.
+     * @param event The Event that should be deleted.
+     * @return True if connection is closed and the Event doesn't exist.
+     */
+    public boolean delete(Event event) {
+        return delete(event.get_primaryId(), "`events`", "id", true);
+    }
 }

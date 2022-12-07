@@ -8,13 +8,14 @@ import laustrup.bandwichpersistence.services.controller_services.sub_controller_
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController("/api/chat_room/")
 public class ChatRoomController {
 
-    @PostMapping(value = "upsert/mail", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "upsert", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Response<ChatRoom>> upsert(@RequestBody Mail mail) {
         return ChatRoomControllerService.get_instance().upsert(new Mail(
                 mail.get_primaryId(),mail.get_chatRoom(),mail.get_author(),
@@ -24,7 +25,7 @@ public class ChatRoomController {
         );
     }
 
-    @PostMapping(value = "upsert/chat_room", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "upsert", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Response<ChatRoom>> upsert(@RequestBody ChatRoom chatRoom) {
         return ChatRoomControllerService.get_instance().upsert(new ChatRoom(
                 chatRoom.get_primaryId(),chatRoom.get_title(),chatRoom.get_mails(),

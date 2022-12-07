@@ -70,8 +70,8 @@ CREATE TABLE band_members(
     band_id BIGINT(20) NOT NULL,
 
     PRIMARY KEY(artist_id, band_id),
-    FOREIGN KEY(artist_id) REFERENCES users(id),
-    FOREIGN KEY(band_id) REFERENCES users(id)
+    FOREIGN KEY(artist_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY(band_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE gear(
@@ -79,7 +79,7 @@ CREATE TABLE gear(
     `description` VARCHAR(500) NOT NULL,
 
     PRIMARY KEY(user_id),
-    FOREIGN KEY(user_id) REFERENCES users(id)
+    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE venues(
@@ -88,7 +88,7 @@ CREATE TABLE venues(
     location VARCHAR(50) NOT NULL,
 
     PRIMARY KEY(user_id),
-    FOREIGN KEY(user_id) REFERENCES users(id)
+    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE `events`(
@@ -140,7 +140,7 @@ CREATE TABLE gigs(
     `timestamp` DATETIME,
 
     PRIMARY KEY(id),
-    FOREIGN KEY(event_id) REFERENCES events(id)
+    FOREIGN KEY(event_id) REFERENCES events(id) ON DELETE CASCADE
 );
 
 CREATE TABLE acts(
@@ -149,7 +149,7 @@ CREATE TABLE acts(
 
     PRIMARY KEY(user_id, gig_id),
     FOREIGN KEY(user_id) REFERENCES users(id),
-    FOREIGN KEY(gig_id) REFERENCES gigs(id)
+    FOREIGN KEY(gig_id) REFERENCES gigs(id) ON DELETE CASCADE
 );
 
 CREATE TABLE participations(
@@ -161,7 +161,7 @@ CREATE TABLE participations(
         'INVITED'),
 
     PRIMARY KEY(event_id, participant_id),
-    FOREIGN KEY(event_id) REFERENCES events(id),
+    FOREIGN KEY(event_id) REFERENCES events(id) ON DELETE CASCADE,
     FOREIGN KEY(participant_id) REFERENCES users(id)
 );
 
@@ -181,8 +181,8 @@ CREATE TABLE followings(
         'PARTICIPANT') NOT NULL,
 
     PRIMARY KEY(fan_id,idol_id),
-    FOREIGN KEY(fan_id) REFERENCES users(id),
-    FOREIGN KEY(idol_id) REFERENCES users(id)
+    FOREIGN KEY(fan_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY(idol_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE chat_rooms(
@@ -200,8 +200,8 @@ CREATE TABLE chatters(
     user_id BIGINT(20) NOT NULL,
 
     PRIMARY KEY(chat_room_id, user_id),
-    FOREIGN KEY(chat_room_id) REFERENCES  chat_rooms(id),
-    FOREIGN KEY(user_id) REFERENCES  users(id)
+    FOREIGN KEY(chat_room_id) REFERENCES chat_rooms(id) ON DELETE CASCADE,
+    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE mails(
@@ -220,7 +220,7 @@ CREATE TABLE mails(
 
     PRIMARY KEY(id),
     FOREIGN KEY(author_id) REFERENCES users(id),
-    FOREIGN KEY(chat_room_id) REFERENCES chat_rooms(id)
+    FOREIGN KEY(chat_room_id) REFERENCES chat_rooms(id) ON DELETE CASCADE
 );
 
 CREATE TABLE user_bulletins(
@@ -239,7 +239,7 @@ CREATE TABLE user_bulletins(
 
     PRIMARY KEY(id),
     FOREIGN KEY(author_id) REFERENCES users(id),
-    FOREIGN KEY(receiver_id) REFERENCES users(id)    
+    FOREIGN KEY(receiver_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE event_bulletins(
@@ -258,7 +258,7 @@ CREATE TABLE event_bulletins(
 
     PRIMARY KEY(id),
     FOREIGN KEY(author_id) REFERENCES users(id),
-    FOREIGN KEY(receiver_id) REFERENCES `events`(id)
+    FOREIGN KEY(receiver_id) REFERENCES `events`(id) ON DELETE CASCADE
 );
 
 CREATE TABLE requests(
@@ -273,8 +273,8 @@ CREATE TABLE requests(
     `timestamp` DATETIME NOT NULL,
 
     PRIMARY KEY(user_id,event_id),
-    FOREIGN KEY(user_id) REFERENCES users(id),
-    FOREIGN KEY(event_id) REFERENCES events(id)
+    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY(event_id) REFERENCES events(id) ON DELETE CASCADE
 );
 
 CREATE TABLE ratings(
@@ -284,7 +284,7 @@ CREATE TABLE ratings(
     `timestamp` DATETIME NOT NULL,
 
     PRIMARY KEY(appointed_id, judge_id),
-    FOREIGN KEY(appointed_id) REFERENCES users(id),
+    FOREIGN KEY(appointed_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY(judge_id) REFERENCES users(id)
 );
 
@@ -305,8 +305,8 @@ CREATE TABLE album_relations(
     is_author BOOLEAN NOT NULL,
 
     PRIMARY KEY(user_id, album_id),
-    FOREIGN KEY(user_id) REFERENCES users(id),
-    FOREIGN KEY(album_id) REFERENCES albums(id),
+    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY(album_id) REFERENCES albums(id) ON DELETE CASCADE,
     FOREIGN KEY(event_id) REFERENCES `events`(id)
 );
 
@@ -315,7 +315,7 @@ CREATE TABLE album_endpoints(
     `value` VARCHAR(100) NOT NULL,
 
     PRIMARY KEY(album_id, `value`),
-    FOREIGN KEY(album_id) REFERENCES albums(id)
+    FOREIGN KEY(album_id) REFERENCES albums(id) ON DELETE CASCADE
 );
 
 CREATE TABLE subscriptions(
@@ -335,7 +335,7 @@ CREATE TABLE subscriptions(
 
     card_id BIGINT(20) NOT NULL,
     PRIMARY KEY (user_id),
-    FOREIGN KEY(user_id) REFERENCES users(id),
+    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY(card_id) REFERENCES cards(id)
 );
 
@@ -358,5 +358,5 @@ CREATE TABLE contact_informations(
      'DE'),
 
     PRIMARY KEY(user_id),
-    FOREIGN KEY(user_id) REFERENCES users(id)
+    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
 );

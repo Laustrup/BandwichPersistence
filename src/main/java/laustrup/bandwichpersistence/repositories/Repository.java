@@ -127,6 +127,86 @@ public abstract class Repository {
     private Connection connection() { return _connector.get_connection(); }
 
     /**
+     * Will do a select * of a table, do a where of id and check if the ResultSet contains any rows.
+     * Does not close connection.
+     * @param id The id that should exist.
+     * @param table The table that the id should exist on.
+     * @param column The column that should contain the id.
+     * @return True if the id exists on table.
+     */
+    public boolean exists(long id, String table, String column) {
+        ResultSet set = read("SELECT * FROM " + table + " WHERE " + column + " = " + id + ";");
+        try {
+            return !set.isAfterLast();
+        } catch (SQLException e) {
+            Printer.get_instance().print("ResultSet error in id exists...",e);
+        }
+        return false;
+    }
+
+    /**
+     * Will do a select * of a table, do a where of ids and check if the ResultSet contains any rows.
+     * Does not close connection.
+     * @param table The table that the id should exist on.
+     * @param primaryId An id that should exist.
+     * @param primaryColumn A column that should contain an id.
+     * @param secondaryId Another id that should exist.
+     * @param secondaryColumn Another column that should contain an id.
+     * @return True if the ids exists on table.
+     */
+    public boolean exists(String table, long primaryId, String primaryColumn,
+                          long secondaryId, String secondaryColumn) {
+        ResultSet set = read("SELECT * FROM " + table + " WHERE " + primaryColumn + " = " + primaryId + " AND " +
+                secondaryColumn + " = " + secondaryId + ";");
+        try {
+            return !set.isAfterLast();
+        } catch (SQLException e) {
+            Printer.get_instance().print("ResultSet error in ids exists...",e);
+        }
+        return false;
+    }
+
+    /**
+     * Will delete rows where the id matches the column of the table.
+     * Checks if rows exists.
+     * @param id The id of the rows that will be deleted.
+     * @param table The table that the id should be deleted from.
+     * @param column The column that should contain the id.
+     * @param closeConnection Will close Connection if true.
+     * @return True if connection is closed if intended and the rows doesn't exist.
+     */
+    protected boolean delete(long id, String table, String column, boolean closeConnection) {
+        if (edit("DELETE FROM " + table + " WHERE " + column + " = " + id + ";",false)) {
+            boolean doesExists = exists(id, table, column);
+            return !doesExists && (closeConnection ? closeConnection().get_truth() : true);
+        }
+        return (closeConnection ? closeConnection().get_truth() : true);
+    }
+
+    /**
+     * Will delete rows where the two id matches two columns of a table.
+     * Checks if rows exists.
+     * @param table The table that the ids should be deleted from.
+     * @param primaryId An id of the rows that will be deleted.
+     * @param primaryColumn A column that should contain an id.
+     * @param secondaryId Another id of the rows that will be deleted.
+     * @param secondaryColumn Another column that should contain an id.
+     * @param closeConnection Will close Connection if true.
+     * @return True if connection is closed if intended and the rows doesn't exist.
+     */
+    protected boolean delete(String table, long primaryId, String primaryColumn,
+                             long secondaryId, String secondaryColumn,
+                             boolean closeConnection) {
+        if (edit("DELETE FROM " + table +
+                " WHERE " + primaryColumn + " = " + primaryId + " AND " +
+                secondaryColumn + " = " + secondaryId + ";",false)) {
+            boolean doesExists = exists(table, primaryId, primaryColumn, secondaryId, secondaryColumn);
+            return !doesExists && (closeConnection ? closeConnection().get_truth() : true);
+        }
+        return (closeConnection ? closeConnection().get_truth() : true);
+    }
+
+    /**
      * Are handling the connections of databases and this application.
      * May only be used for the abstract Repository.
      */
