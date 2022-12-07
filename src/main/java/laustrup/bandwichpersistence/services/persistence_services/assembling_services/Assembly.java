@@ -1,6 +1,7 @@
 package laustrup.bandwichpersistence.services.persistence_services.assembling_services;
 
 import laustrup.bandwichpersistence.models.Search;
+import laustrup.bandwichpersistence.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.models.chats.Request;
 import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
 import laustrup.bandwichpersistence.models.events.Event;
@@ -18,6 +19,8 @@ import laustrup.bandwichpersistence.services.persistence_services.assembling_ser
 import laustrup.bandwichpersistence.utilities.Liszt;
 import laustrup.bandwichpersistence.utilities.Plato;
 import laustrup.bandwichpersistence.utilities.Printer;
+
+import java.sql.SQLException;
 
 /**
  * This class uses other assemblies to build objects from database,
@@ -89,6 +92,18 @@ public class Assembly extends Assembler {
      * @return All Users.
      */
     public Liszt<User> getUsers() { return userAssembling(UserAssembly.get_instance().assembles()); }
+
+    public ChatRoom getChatRoomUnassembled(long id) {
+        try {
+            return _describer.describeChatRooms(_handler.handleChatRooms(
+                    ModelRepository.get_instance().chatRooms(new Liszt<>(new Long[]{id})),
+                    new Liszt<>())
+            ).get(1);
+        } catch (SQLException e) {
+            Printer.get_instance().print("Couldn't get ChatRoom...", e);
+        }
+        return null;
+    }
 
     /**
      * Finishes the last assembling of Users, in order to get all values.
@@ -226,10 +241,7 @@ public class Assembly extends Assembler {
      * @return The assembled Search.
      */
     private Search finish(Search search) {
-        Plato connectionStatus = closeConnections();
-        if (!connectionStatus.get_truth())
-            Printer.get_instance().print(connectionStatus.get_message(), new Exception());
-
+        closeConnectionsHandling();
         return search;
     }
 
@@ -240,11 +252,7 @@ public class Assembly extends Assembler {
      */
     public User finish(User user) {
         user.doneAssembling();
-
-        Plato connectionStatus = closeConnections();
-        if (!connectionStatus.get_truth())
-            Printer.get_instance().print(connectionStatus.get_message(), new Exception());
-
+        closeConnectionsHandling();
         return user;
     }
 
@@ -256,11 +264,7 @@ public class Assembly extends Assembler {
     public Liszt<User> userFinishing(Liszt<User> users) {
         for (User user : users)
             user.doneAssembling();
-
-        Plato connectionStatus = closeConnections();
-        if (!connectionStatus.get_truth())
-            Printer.get_instance().print(connectionStatus.get_message(), new Exception());
-
+        closeConnectionsHandling();
         return users;
     }
 
@@ -271,11 +275,7 @@ public class Assembly extends Assembler {
      */
     public Event finish(Event event) {
         event.doneAssembling();
-
-        Plato connectionStatus = closeConnections();
-        if (!connectionStatus.get_truth())
-            Printer.get_instance().print(connectionStatus.get_message(), new Exception());
-
+        closeConnectionsHandling();
         return event;
     }
 
@@ -287,12 +287,22 @@ public class Assembly extends Assembler {
     public Liszt<Event> eventFinishing(Liszt<Event> events) {
         for (Event event : events)
             event.doneAssembling();
+        closeConnectionsHandling();
+        return events;
+    }
 
+    public ChatRoom finish(ChatRoom chatRoom) {
+        chatRoom.doneAssembling();
+        closeConnectionsHandling();
+        return chatRoom;
+    }
+
+    private Plato closeConnectionsHandling() {
         Plato connectionStatus = closeConnections();
         if (!connectionStatus.get_truth())
             Printer.get_instance().print(connectionStatus.get_message(), new Exception());
 
-        return events;
+        return connectionStatus;
     }
 
     /**
