@@ -1,6 +1,8 @@
 package laustrup.bandwichpersistence.repositories.sub_repositories;
 
+import laustrup.bandwichpersistence.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.models.chats.messages.Mail;
+import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
 import laustrup.bandwichpersistence.models.users.sub_users.subscriptions.Subscription;
 import laustrup.bandwichpersistence.repositories.Repository;
@@ -204,5 +206,58 @@ public class ModelRepository extends Repository {
         }
 
         return null;
+    }
+
+    public Long upsert(ChatRoom chatRoom) {
+        boolean idExists = chatRoom.get_primaryId() > 0;
+        try {
+            ResultSet set = create("INSERT INTO chat_room(" +
+                        (idExists ? "id," : "") +
+                        "title," +
+                        "responsible_id," +
+                        "`timestamp`" +
+                    ") " +
+                    "VALUES(" +
+                        (idExists ? chatRoom.get_primaryId()+"," : "") + "'" +
+                        chatRoom.get_title() + "'," +
+                        chatRoom.get_responsible().get_primaryId() + "," +
+                        (idExists ? "'"+chatRoom.get_timestamp()+"'" : "NOW()") +
+                    ") " +
+                    "ON DUPLICATE KEY UPDATE " +
+                        "title = '" + chatRoom.get_title() + "'" +
+                    ";").getGeneratedKeys();
+
+            if (set.isBeforeFirst())
+                set.next();
+
+            long id = idExists ? chatRoom.get_primaryId() : set.getLong("id");
+
+            if (chatRoom.get_chatters().size() > 0)
+                if (insertChattersOf(new ChatRoom(
+                        id,chatRoom.get_title(),chatRoom.get_mails(),
+                        chatRoom.get_chatters(),chatRoom.get_responsible(),
+                        chatRoom.get_timestamp())
+                )) return id;
+            return id;
+        } catch (SQLException e) {
+            Printer.get_instance().print("Couldn't get generated keys of upserting ChatRoom...",e);
+        }
+        return null;
+    }
+
+    public boolean insertChattersOf(ChatRoom chatRoom) {
+        String sql = new String();
+
+        for (User chatter : chatRoom.get_chatters())
+            sql += "INSERT IGNORE INTO chatters(" +
+                        "chat_room_id," +
+                        "user_id" +
+                    ") " +
+                    "VALUES (" +
+                        chatRoom.get_primaryId() + "," +
+                        chatter.get_primaryId() +
+                    "); ";
+
+        return edit(sql,false);
     }
 }

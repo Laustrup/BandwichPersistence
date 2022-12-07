@@ -76,8 +76,11 @@ public abstract class Repository {
     protected PreparedStatement create(String sql) {
         if (handleConnection()) {
             try {
-                return _connector.get_connection().prepareStatement(sql,
+                PreparedStatement statement = _connector.get_connection().prepareStatement(sql,
                         PreparedStatement.RETURN_GENERATED_KEYS);
+
+                statement.executeUpdate();
+                return statement;
             } catch (SQLException e) { Printer.get_instance().print("Couldn't execute update...",e); }
         }
         return null;
