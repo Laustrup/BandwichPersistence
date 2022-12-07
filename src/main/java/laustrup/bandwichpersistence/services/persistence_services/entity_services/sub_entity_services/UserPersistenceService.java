@@ -2,8 +2,11 @@ package laustrup.bandwichpersistence.services.persistence_services.entity_servic
 
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.models.chats.messages.Mail;
+import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.repositories.sub_repositories.ModelRepository;
+import laustrup.bandwichpersistence.repositories.sub_repositories.UserRepository;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembly;
+import laustrup.bandwichpersistence.utilities.Plato;
 import laustrup.bandwichpersistence.utilities.Printer;
 
 import java.sql.ResultSet;
@@ -67,5 +70,18 @@ public class UserPersistenceService {
                     Assembly.get_instance().getChatRoomUnassembled(id)
             );
         return null;
+    }
+
+    /**
+     * Will delete a User and connections from repository will be closed.
+     * @param user The User that will be deleted.
+     * @return A Plato with true truth if success, otherwise false with a message.
+     */
+    public Plato delete(User user) {
+        if (user.get_primaryId()>0)
+            return new Plato(UserRepository.get_instance().delete(user));
+        Plato status = new Plato(false);
+        status.set_message("Couldn't delete user...");
+        return status;
     }
 }

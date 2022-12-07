@@ -11,6 +11,7 @@ import laustrup.bandwichpersistence.services.persistence_services.assembling_ser
 import laustrup.bandwichpersistence.services.persistence_services.entity_services.sub_entity_services.UserPersistenceService;
 import laustrup.bandwichpersistence.utilities.Liszt;
 
+import laustrup.bandwichpersistence.utilities.Plato;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -82,4 +83,22 @@ public class UserControllerService extends ControllerService<User> {
      * @return The created ResponseEntity of a Response of Search.
      */
     public ResponseEntity<Response<Search>> search(String query) { return searchContent(Assembly.get_instance().search(query)); }
+
+    /**
+     * Will delete User and create a ResponseEntity with a Response that includes its status of the delete.
+     * @param user The User that should be deleted.
+     * @return The created ResponseEntity of a Response with the status of the delete.
+     */
+    public ResponseEntity<Response<Plato>> delete(User user) {
+        Plato status = UserPersistenceService.get_instance().delete(user);
+        if (status.get_message()!=null) {
+            if (status.get_message().isEmpty())
+                return new ResponseEntity<>(new Response<>(status, Response.StatusType.UNKNOWN),
+                        HttpStatus.NOT_ACCEPTABLE);
+            else
+                return new ResponseEntity<>(new Response<>(status, Response.StatusType.NOT_ACCEPTABLE),
+                        HttpStatus.CONFLICT);
+        }
+        return new ResponseEntity<>(new Response<>(status),HttpStatus.OK);
+    }
 }

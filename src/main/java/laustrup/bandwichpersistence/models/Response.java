@@ -104,6 +104,7 @@ public class Response<E> {
      */
     public enum StatusType {
         OK,
+        UNKNOWN,
         NO_CONTENT,
         NOT_ACCEPTABLE,
         WRONG_PASSWORD,
@@ -168,6 +169,9 @@ public class Response<E> {
                 }
                 case INVALID_PASSWORD_FORMAT -> {
                     return "Password is not allowed... Please check the requirements.";
+                }
+                case UNKNOWN -> {
+                    return "Unknown issue for response...";
                 }
                 default -> {
                     Printer.get_instance().print("No message to write in response...");
