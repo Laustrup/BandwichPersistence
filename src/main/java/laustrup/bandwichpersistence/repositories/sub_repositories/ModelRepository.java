@@ -1,11 +1,14 @@
 package laustrup.bandwichpersistence.repositories.sub_repositories;
 
+import laustrup.bandwichpersistence.models.chats.messages.Mail;
 import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
 import laustrup.bandwichpersistence.models.users.sub_users.subscriptions.Subscription;
 import laustrup.bandwichpersistence.repositories.Repository;
 import laustrup.bandwichpersistence.utilities.Liszt;
+import laustrup.bandwichpersistence.utilities.Printer;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  * Are handling Repository actions for objects that aren't of a specific User.
@@ -159,5 +162,47 @@ public class ModelRepository extends Repository {
                         "card_id = " + subscription.get_cardId() +
                     ";", false);
         return false;
+    }
+
+    /**
+     * Upserts Mail, might generate an id if there isn't any in the Mail.
+     * It will insert the values of the Mail if they don't exist,
+     * otherwise it will update them to the values of the Mail.
+     * Will not close connection.
+     * @param mail The Mail that will have influence on the database table.
+     * @return A ResultSet of the created values with, if any, the generated keys. If there's an SQLException, it returns null.
+     */
+    public ResultSet upsert(Mail mail) {
+        try {
+            return create("INSERT INTO mails(" +
+                        (mail.get_primaryId() > 0 ? "id," : "") +
+                        "author_id," +
+                        "content," +
+                        "is_sent," +
+                        "is_edited," +
+                        "is_public," +
+                        "chat_room_id," +
+                        "`timestamp`) " +
+                    "VALUES (" +
+                        (mail.get_primaryId() > 0 ? mail.get_primaryId() + "," : "") +
+                        mail.get_author().get_primaryId() + ",'" +
+                        mail.get_content() + "'," +
+                        mail.is_sent() + ",'" +
+                        mail.get_edited().get_argument() + "'," +
+                        mail.is_public() + "," +
+                        mail.get_chatRoom().get_primaryId() + ",'" +
+                        mail.get_timestamp() +
+                    "') " +
+                    "ON DUPLICATE KEY UPDATE " +
+                        "content = '" + mail.get_content() + "'," +
+                        "is_sent = " + mail.is_sent() + "," +
+                        "is_edited = '" + mail.get_edited().get_argument() + "'," +
+                        "is_public = " + mail.is_public() +
+                    ";").getGeneratedKeys();
+        } catch (SQLException e) {
+            Printer.get_instance().print("Couldn't get generated keys of Mail...",e);
+        }
+
+        return null;
     }
 }
