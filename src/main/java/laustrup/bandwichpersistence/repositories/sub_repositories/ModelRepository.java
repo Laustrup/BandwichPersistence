@@ -208,6 +208,14 @@ public class ModelRepository extends Repository {
         return null;
     }
 
+    /**
+     * Upserts ChatRoom, might generate an id if there isn't any in the ChatRoom.
+     * It will insert the values of the ChatRoom if they don't exist,
+     * otherwise it will update them to the values of the ChatRoom.
+     * Will not close connection.
+     * @param chatRoom The ChatRoom that will have influence on the database table.
+     * @return A ResultSet of the created values with, if any, the generated keys. If there's an SQLException, it returns null.
+     */
     public Long upsert(ChatRoom chatRoom) {
         boolean idExists = chatRoom.get_primaryId() > 0;
         try {
@@ -245,6 +253,13 @@ public class ModelRepository extends Repository {
         return null;
     }
 
+    /**
+     * Inserts the chatters of a ChatRoom.
+     * If they already exist, it will just ignore the SQL statement.
+     * Doesn't close the connection.
+     * @param chatRoom The ChatRoom that contains the chatters to insert.
+     * @return True if it is a success.
+     */
     public boolean insertChattersOf(ChatRoom chatRoom) {
         String sql = new String();
 
