@@ -5,6 +5,7 @@ import laustrup.bandwichpersistence.models.events.Event;
 import laustrup.bandwichpersistence.services.controller_services.sub_controller_services.EventControllerService;
 import laustrup.bandwichpersistence.utilities.Liszt;
 
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,7 +24,7 @@ public class EventController {
         return EventControllerService.get_instance().get();
     }
 
-    @PostMapping(value = "create", consumes = "application/json")
+    @PostMapping(value = "create", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Response<Event>> create(@RequestBody Event event) {
         return EventControllerService.get_instance().create(event);
     }

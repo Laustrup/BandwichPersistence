@@ -1,8 +1,14 @@
 package laustrup.bandwichpersistence.services.controller_services.sub_controller_services;
 
 
+import laustrup.bandwichpersistence.models.Response;
+import laustrup.bandwichpersistence.models.users.Login;
 import laustrup.bandwichpersistence.models.users.sub_users.venues.Venue;
 import laustrup.bandwichpersistence.services.controller_services.ControllerService;
+import laustrup.bandwichpersistence.services.persistence_services.entity_services.sub_entity_services.VenuePersistenceService;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 public class VenueControllerService extends ControllerService<Venue> {
 
@@ -23,9 +29,16 @@ public class VenueControllerService extends ControllerService<Venue> {
 
     private VenueControllerService() {}
 
-    /*
-    public HttpEntity<Venue> getVenue() {
-
-    }
+    /**
+     * Will create an Participant and afterwards put it in a ResponseEntity.
+     * @param venue The Participant that is wished to be created.
+     * @return A ResponseEntity with the Participant and the HttpStatus.
      */
+    public ResponseEntity<Response<Venue>> create(Venue venue, String password) {
+        if (new Login(venue.get_username(), password).passwordIsValid())
+            return entityContent(VenuePersistenceService.get_instance().create(venue,password));
+        else
+            return new ResponseEntity<>(new Response<>(null, Response.StatusType.INVALID_PASSWORD_FORMAT),
+                    HttpStatus.NOT_ACCEPTABLE);
+    }
 }

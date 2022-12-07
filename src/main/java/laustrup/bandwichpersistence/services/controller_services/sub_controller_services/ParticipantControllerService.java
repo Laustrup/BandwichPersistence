@@ -36,6 +36,7 @@ public class ParticipantControllerService extends ControllerService<Participant>
         if (new Login(participant.get_username(), password).passwordIsValid())
             return entityContent(ParticipantPersistenceService.get_instance().create(participant,password));
         else
-            return new ResponseEntity<>(null, HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity<>(new Response<>(null, Response.StatusType.INVALID_PASSWORD_FORMAT),
+                    HttpStatus.NOT_ACCEPTABLE);
     }
 }
