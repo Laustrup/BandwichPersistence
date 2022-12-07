@@ -1,5 +1,6 @@
 package laustrup.bandwichpersistence.controllers;
 
+import laustrup.bandwichpersistence.models.Response;
 import laustrup.bandwichpersistence.models.Search;
 import laustrup.bandwichpersistence.models.users.Login;
 import laustrup.bandwichpersistence.models.users.User;
@@ -13,22 +14,22 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     @PostMapping(value = "login", consumes = "application/json")
-    public ResponseEntity<User> logIn(@RequestBody Login login) {
+    public ResponseEntity<Response<User>> logIn(@RequestBody Login login) {
         return UserControllerService.get_instance().get(login);
     }
 
     @PostMapping("get/{id}")
-    public ResponseEntity<User> get(@PathVariable(name = "id") long id) {
+    public ResponseEntity<Response<User>> get(@PathVariable(name = "id") long id) {
         return UserControllerService.get_instance().get(id);
     }
 
     @PostMapping("get")
-    public ResponseEntity<Liszt<User>> get() {
+    public ResponseEntity<Response<Liszt<User>>> get() {
         return UserControllerService.get_instance().get();
     }
 
     @PostMapping("search/{search_query}")
-    public ResponseEntity<Search> search(@PathVariable(name = "search_query") String searchQuery) {
+    public ResponseEntity<Response<Search>> search(@PathVariable(name = "search_query") String searchQuery) {
         return UserControllerService.get_instance().search(searchQuery);
     }
 }

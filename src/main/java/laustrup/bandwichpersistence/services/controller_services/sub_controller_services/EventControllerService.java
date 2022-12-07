@@ -1,5 +1,6 @@
 package laustrup.bandwichpersistence.services.controller_services.sub_controller_services;
 
+import laustrup.bandwichpersistence.models.Response;
 import laustrup.bandwichpersistence.models.events.Event;
 import laustrup.bandwichpersistence.services.controller_services.ControllerService;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembly;
@@ -34,7 +35,7 @@ public class EventControllerService extends ControllerService<Event> {
      * @param id The id of the Event, that is wished to be gathered.
      * @return The created ResponseEntity of an Event.
      */
-    public ResponseEntity<Event> get(long id) { return entityContent(Assembly.get_instance().getEvent(id)); }
+    public ResponseEntity<Response<Event>> get(long id) { return entityContent(Assembly.get_instance().getEvent(id)); }
 
     /**
      * Creates a ResponseEntity for a controller to send to client.
@@ -42,14 +43,14 @@ public class EventControllerService extends ControllerService<Event> {
      * Uses an assemblyService for reading the database and building the Event objects.
      * @return The created ResponseEntity of all Events.
      */
-    public ResponseEntity<Liszt<Event>> get() { return entityContent(Assembly.get_instance().getEvents()); }
+    public ResponseEntity<Response<Liszt<Event>>> get() { return entityContent(Assembly.get_instance().getEvents()); }
 
     /**
      * Will create an Event and afterwards put it in a ResponseEntity.
      * @param event The Event that is wished to be created.
      * @return A ResponseEntity with the Event and the HttpStatus.
      */
-    public ResponseEntity<Event> create(Event event) {
+    public ResponseEntity<Response<Event>> create(Event event) {
         return entityContent(EventPersistenceService.get_instance().create(event));
     }
 }

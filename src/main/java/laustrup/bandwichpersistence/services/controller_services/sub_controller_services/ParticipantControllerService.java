@@ -1,5 +1,6 @@
 package laustrup.bandwichpersistence.services.controller_services.sub_controller_services;
 
+import laustrup.bandwichpersistence.models.Response;
 import laustrup.bandwichpersistence.models.users.Login;
 import laustrup.bandwichpersistence.models.users.sub_users.participants.Participant;
 import laustrup.bandwichpersistence.services.controller_services.ControllerService;
@@ -31,7 +32,7 @@ public class ParticipantControllerService extends ControllerService<Participant>
      * @param participant The Participant that is wished to be created.
      * @return A ResponseEntity with the Participant and the HttpStatus.
      */
-    public ResponseEntity<Participant> create(Participant participant, String password) {
+    public ResponseEntity<Response<Participant>> create(Participant participant, String password) {
         if (new Login(participant.get_username(), password).passwordIsValid())
             return entityContent(ParticipantPersistenceService.get_instance().create(participant,password));
         else

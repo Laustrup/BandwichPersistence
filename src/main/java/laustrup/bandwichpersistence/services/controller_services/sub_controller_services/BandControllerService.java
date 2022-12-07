@@ -1,5 +1,6 @@
 package laustrup.bandwichpersistence.services.controller_services.sub_controller_services;
 
+import laustrup.bandwichpersistence.models.Response;
 import laustrup.bandwichpersistence.models.users.Login;
 import laustrup.bandwichpersistence.models.users.sub_users.bands.Band;
 import laustrup.bandwichpersistence.services.controller_services.ControllerService;
@@ -32,10 +33,10 @@ public class BandControllerService extends ControllerService<Band> {
      * @param password The password assigned for the Band.
      * @return A ResponseEntity with the Band and the HttpStatus.
      */
-    public ResponseEntity<Band> create(Band band, String password) {
+    public ResponseEntity<Response<Band>> create(Band band, String password) {
         if (new Login(band.get_username(), password).passwordIsValid())
             return entityContent(BandPersistenceService.get_instance().create(band, password));
         else
-            return new ResponseEntity<>(null, HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity<>(new Response<>(band, Response.StatusType.INVALID_PASSWORD_FORMAT), HttpStatus.NOT_ACCEPTABLE);
     }
 }

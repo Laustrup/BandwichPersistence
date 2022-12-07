@@ -1,5 +1,6 @@
 package laustrup.bandwichpersistence.services.controller_services.sub_controller_services;
 
+import laustrup.bandwichpersistence.models.Response;
 import laustrup.bandwichpersistence.models.Search;
 import laustrup.bandwichpersistence.models.users.Login;
 import laustrup.bandwichpersistence.models.users.User;
@@ -37,11 +38,14 @@ public class UserControllerService extends ControllerService<User> {
      * @param login An object containing username and password.
      * @return The created ResponseEntity of a User.
      */
-    public ResponseEntity<User> get(Login login) {
+    public ResponseEntity<Response<User>> get(Login login) {
         User user = Assembly.get_instance().getUser(login);
+        if (user == null)
+            return new ResponseEntity<>(new Response<>(null, Response.StatusType.WRONG_PASSWORD),
+                    HttpStatus.NOT_ACCEPTABLE);
 
         if ((login.usernameIsEmailKind() &&
-                (user.get_contactInfo().get_email() == null || user.get_contactInfo().get_email().isEmpty())) ||
+                (user.get_contactInfo().get_email() != null || !user.get_contactInfo().get_email().isEmpty())) ||
                 !login.usernameIsEmailKind())
             return entityContent(user);
 
@@ -55,7 +59,7 @@ public class UserControllerService extends ControllerService<User> {
      * @param id The id of the User, that is wished to be gathered.
      * @return The created ResponseEntity of a User.
      */
-    public ResponseEntity<User> get(long id) {
+    public ResponseEntity<Response<User>> get(long id) {
         return entityContent(Assembly.get_instance().getUser(id));
     }
 
@@ -65,7 +69,7 @@ public class UserControllerService extends ControllerService<User> {
      * Uses an assemblyService for reading the database and building the User objects.
      * @return The created ResponseEntity of all Users.
      */
-    public ResponseEntity<Liszt<User>> get() { return entityContent(Assembly.get_instance().getUsers()); }
+    public ResponseEntity<Response<Liszt<User>>> get() { return entityContent(Assembly.get_instance().getUsers()); }
 
     /**
      * Creates a ResponseEntity for a controller to send to client.
@@ -74,5 +78,5 @@ public class UserControllerService extends ControllerService<User> {
      * @param query The String query of the Search, that is wished to be gathered.
      * @return The created ResponseEntity of a Search.
      */
-    public ResponseEntity<Search> search(String query) { return searchContent(Assembly.get_instance().search(query)); }
+    public ResponseEntity<Response<Search>> search(String query) { return searchContent(Assembly.get_instance().search(query)); }
 }

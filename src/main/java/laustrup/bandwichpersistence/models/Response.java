@@ -45,6 +45,7 @@ public class Response<E> {
 
     public Response(E element) {
         _element = element;
+        _status = StatusType.OK;
     }
 
     public Response(E element, StatusType status) {
@@ -157,7 +158,7 @@ public class Response<E> {
         private String describeMessage(E element) {
             switch (_type) {
                 case NO_CONTENT -> {
-                    return "There wasn't found any " + ((Model) element).get_title();
+                    return "There wasn't found any matching element...";
                 }
                 case NOT_ACCEPTABLE -> {
                     return "That action is not allowed...";
@@ -166,7 +167,7 @@ public class Response<E> {
                     return "Password is wrong...";
                 }
                 case INVALID_PASSWORD_FORMAT -> {
-                    return "Password is not allowed. Please check the requirements.";
+                    return "Password is not allowed... Please check the requirements.";
                 }
                 default -> {
                     Printer.get_instance().print("No message to write in response...");
