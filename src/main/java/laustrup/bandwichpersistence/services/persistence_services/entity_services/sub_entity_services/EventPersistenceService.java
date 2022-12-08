@@ -79,10 +79,22 @@ public class EventPersistenceService extends EntityService<Event> {
      * @return A Plato with true truth if success, otherwise false with a message.
      */
     public Plato delete(Event event) {
-        if (event.get_primaryId()>0)
+        if (event != null && event.get_primaryId()>0)
             return new Plato(EventRepository.get_instance().delete(event));
         Plato status = new Plato(false);
-        status.set_message("Couldn't delete " + event.get_title() + "...");
+        status.set_message("Couldn't delete " + (event == null ? "event of null " : event.get_title()) + "...");
         return status;
+    }
+
+    /**
+     * Will update an Event and connections from repository will be closed.
+     * @param event The Event that will be updated.
+     * @return The Event of current state of database.
+     */
+    public Event update(Event event) {
+        if (event != null && event.get_primaryId()>0)
+            if (EventRepository.get_instance().update(event))
+                event = Assembly.get_instance().getEvent(event.get_primaryId());
+        return event;
     }
 }

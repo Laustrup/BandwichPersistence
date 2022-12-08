@@ -65,4 +65,13 @@ public class EventControllerService extends ControllerService<Event> {
     public ResponseEntity<Response<Plato>> delete(Event event) {
         return platoContent(EventPersistenceService.get_instance().delete(event));
     }
+
+    /**
+     * Will update Event and create a ResponseEntity with a Response of the current state of Event.
+     * @param event The Event that should be updated.
+     * @return The created ResponseEntity of a Response with the current state of Event.
+     */
+    public ResponseEntity<Response<Event>> update(Event event) {
+        return entityContent(EventPersistenceService.get_instance().update(event));
+    }
 }

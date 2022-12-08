@@ -37,4 +37,9 @@ public class EventController {
     public ResponseEntity<Response<Plato>> delete(@RequestBody Event event) {
         return EventControllerService.get_instance().delete(event);
     }
+
+    @PatchMapping(value = "update", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Response<Event>> update(@RequestBody Event event) {
+        return EventControllerService.get_instance().update(event);
+    }
 }
