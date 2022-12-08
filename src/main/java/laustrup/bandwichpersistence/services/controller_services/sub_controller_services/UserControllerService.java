@@ -1,5 +1,6 @@
 package laustrup.bandwichpersistence.services.controller_services.sub_controller_services;
 
+import laustrup.bandwichpersistence.models.Rating;
 import laustrup.bandwichpersistence.models.Response;
 import laustrup.bandwichpersistence.models.Search;
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
@@ -101,5 +102,14 @@ public class UserControllerService extends ControllerService<User> {
      */
     public ResponseEntity<Response<User>> upsert(Bulletin bulletin) {
         return entityContent(UserPersistenceService.get_instance().upsert(bulletin));
+    }
+
+    /**
+     * Will upsert Rating of a User and create a ResponseEntity with a Response of the current state of Appointed.
+     * @param rating The Rating that should be upserted.
+     * @return The created ResponseEntity of a Response with the current state of Appointed.
+     */
+    public ResponseEntity<Response<User>> upsert(Rating rating) {
+        return entityContent(UserPersistenceService.get_instance().upsert(rating));
     }
 }

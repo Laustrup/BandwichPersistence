@@ -1,5 +1,6 @@
 package laustrup.bandwichpersistence.services.persistence_services.entity_services.sub_entity_services;
 
+import laustrup.bandwichpersistence.models.Rating;
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
 import laustrup.bandwichpersistence.models.chats.messages.Mail;
@@ -95,6 +96,20 @@ public class UserPersistenceService {
     public User upsert(Bulletin bulletin) {
         if (ModelRepository.get_instance().upsert(bulletin, true))
             return Assembly.get_instance().getUser(bulletin.get_receiver().get_primaryId());
+        ModelRepository.get_instance().closeConnection();
         return (User) bulletin.get_receiver();
+    }
+
+    /**
+     * Will upsert a Rating of a User.
+     * Closes database connections and sets User into assembled.
+     * @param rating The Rating that will be upserted.
+     * @return The Appointed from the database.
+     */
+    public User upsert(Rating rating) {
+        if (ModelRepository.get_instance().upsert(rating))
+            return Assembly.get_instance().getUser(rating.get_appointed().get_primaryId());
+        ModelRepository.get_instance().closeConnection();
+        return rating.get_appointed();
     }
 }

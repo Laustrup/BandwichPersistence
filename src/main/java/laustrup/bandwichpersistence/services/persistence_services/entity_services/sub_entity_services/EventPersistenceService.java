@@ -134,6 +134,7 @@ public class EventPersistenceService extends EntityService<Event> {
     public Event upsert(Bulletin bulletin) {
         if (ModelRepository.get_instance().upsert(bulletin, false))
             return Assembly.get_instance().getEvent(bulletin.get_receiver().get_primaryId());
+        ModelRepository.get_instance().closeConnection();
         return (Event) bulletin.get_receiver();
     }
 }

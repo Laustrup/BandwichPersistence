@@ -44,32 +44,21 @@ public class Rating extends Model {
 
     public Rating(int value, User appointed, User judge, LocalDateTime timestamp) throws InputMismatchException {
         super(appointed.get_primaryId(), judge.get_primaryId(), appointed.get_username()+"-"+judge.get_username(), timestamp);
-        if (0 < value && value <= 5 ) {
-            _value = value;
-            _appointed = appointed;
-            _judge = judge;
-        }
-        else
-            throw new InputMismatchException();
+        _value = set_value(value);
+        _appointed = appointed;
+        _judge = judge;
     }
 
     public Rating(int value, long appointedId, long judgeId, LocalDateTime timestamp) throws InputMismatchException {
         super(appointedId, judgeId, appointedId+"-"+judgeId, timestamp);
-        if (0 < value && value <= 5 )
-            _value = value;
-        else
-            throw new InputMismatchException();
+        _value = set_value(value);
     }
 
     public Rating(int value, User appointed, User judge) throws InputMismatchException {
         super(appointed.get_username() + "-" + judge.get_username() + "-" + value);
-        if (0 < value && value <= 5 ) {
-            _value = value;
-            _appointed = appointed;
-            _judge = judge;
-        }
-        else
-            throw new InputMismatchException();
+        _value = set_value(value);
+        _appointed = appointed;
+        _judge = judge;
     }
 
     /**
