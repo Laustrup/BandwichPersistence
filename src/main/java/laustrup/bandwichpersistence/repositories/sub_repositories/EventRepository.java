@@ -1,6 +1,6 @@
 package laustrup.bandwichpersistence.repositories.sub_repositories;
 
-import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
+import laustrup.bandwichpersistence.models.chats.Request;
 import laustrup.bandwichpersistence.models.events.Event;
 import laustrup.bandwichpersistence.models.events.Gig;
 import laustrup.bandwichpersistence.models.events.Participation;
@@ -177,7 +177,7 @@ public class EventRepository extends Repository {
     }
 
     /**
-     * Will update Event and its Gigs.
+     * Will update Event with its Gigs and Requests.
      * Doesn't close connection.
      * @param event The Event that will be updated.
      * @return True if it is a success.
@@ -229,7 +229,37 @@ public class EventRepository extends Repository {
                         "); ";
         }
 
-        return edit(sql, false);
+        return edit(sql + upsertRequestSQL(event.get_requests()), false);
+    }
+
+    /**
+     * Makes an Upserts Requests SQL statement.
+     * If the User and Events are already inserted, it will update is approved and message.
+     * Doesn't close connection.
+     * @param requests The Requests that will be upserted.
+     * @return The SQL statement.
+     */
+    private String upsertRequestSQL(Liszt<Request> requests) {
+        String sql = new String();
+        for (Request request : requests)
+            sql += "INSERT INTO requests(" +
+                        "user_id," +
+                        "event_id," +
+                        "is_approved," +
+                        "message," +
+                        "`timestamp`" +
+                    ") " +
+                    "VALUES(" +
+                        request.get_user().get_primaryId() + "," +
+                        request.get_event().get_primaryId() + ",'" +
+                        request.get_approved().get_argument() + "','" +
+                        request.get_message() + "'," +
+                    "NOW()); " +
+                    "ON DUPLICATE KEY UPDATE " +
+                        "is_approved = '" + request.get_approved().get_argument() + "' " +
+                        "message = '" + request.get_message() + "' " +
+                    "; ";
+        return sql;
     }
 
     /**
