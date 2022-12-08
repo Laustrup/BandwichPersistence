@@ -1,6 +1,7 @@
 package laustrup.bandwichpersistence.services.persistence_services.entity_services.sub_entity_services;
 
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
+import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
 import laustrup.bandwichpersistence.models.chats.messages.Mail;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.repositories.sub_repositories.ModelRepository;
@@ -83,5 +84,17 @@ public class UserPersistenceService {
         Plato status = new Plato(false);
         status.set_message("Couldn't delete " + user.get_title() + "...");
         return status;
+    }
+
+    /**
+     * Will upsert a Bulletin of a User.
+     * Closes database connections and sets User into assembled.
+     * @param bulletin The Bulletin that will be upserted.
+     * @return The Receiver from the database.
+     */
+    public User upsert(Bulletin bulletin) {
+        if (ModelRepository.get_instance().upsert(bulletin, true))
+            return Assembly.get_instance().getUser(bulletin.get_receiver().get_primaryId());
+        return (User) bulletin.get_receiver();
     }
 }

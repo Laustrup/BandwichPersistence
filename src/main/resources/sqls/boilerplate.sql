@@ -226,7 +226,7 @@ CREATE TABLE mails(
 );
 
 CREATE TABLE user_bulletins(
-    id BIGINT(20) NOT NULL,
+    id BIGINT(20) NOT NULL AUTO_INCREMENT,
     author_id BIGINT(20) NOT NULL,
     content VARCHAR(1000),
     is_sent BOOL NOT NULL,
@@ -245,7 +245,7 @@ CREATE TABLE user_bulletins(
 );
 
 CREATE TABLE event_bulletins(
-    id BIGINT(20) NOT NULL,
+    id BIGINT(20) NOT NULL AUTO_INCREMENT,
     author_id BIGINT(20) NOT NULL,
     content VARCHAR(1000),
     is_sent BOOL NOT NULL,

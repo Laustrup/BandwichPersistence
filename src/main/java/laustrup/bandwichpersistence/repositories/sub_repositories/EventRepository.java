@@ -1,8 +1,10 @@
 package laustrup.bandwichpersistence.repositories.sub_repositories;
 
+import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
 import laustrup.bandwichpersistence.models.events.Event;
 import laustrup.bandwichpersistence.models.events.Gig;
 import laustrup.bandwichpersistence.models.events.Participation;
+import laustrup.bandwichpersistence.models.users.sub_users.Performer;
 import laustrup.bandwichpersistence.repositories.Repository;
 import laustrup.bandwichpersistence.utilities.Liszt;
 import laustrup.bandwichpersistence.utilities.Printer;
@@ -194,14 +196,38 @@ public class EventRepository extends Repository {
                     "tickets_url = '" + event.get_ticketsURL() + "', " +
                     "venue_id = " + event.get_venue().get_primaryId() + " " +
                 "WHERE id = " + event.get_primaryId() + "; ";
-        for (Gig gig : event.get_gigs())
-            sql += "UPDATE gigs " +
-                    "event_id = " + event.get_primaryId() + ", " +
-                    "`start` = '" + gig.get_start() + "', " +
-                    "`end` = '" + gig.get_end() + "' " +
-                "WHERE id = " + gig.get_primaryId() +
-                    " AND event_id = " + event.get_primaryId() +
+
+        for (Gig gig : event.get_gigs()) {
+            boolean idExists = gig.get_primaryId() > 0;
+            sql += "INSERT INTO gigs(" +
+                        (idExists ? "id," : "") +
+                        "event_id," +
+                        "`start`," +
+                        "`end`," +
+                        "`timestamp`" +
+                    ") " +
+                    "VALUES(" +
+                        (idExists ? gig.get_primaryId()+"," : "") +
+                        gig.get_event().get_primaryId() + ",'" +
+                        gig.get_start() + "','" +
+                        gig.get_end() + "'," +
+                    "NOW()) " +
+                    "ON DUPLICATE KEY UPDATE " +
+                        "`start` = '" + gig.get_start() + "', " +
+                        "`end` = '" + gig.get_end() + "'" +
                     "; ";
+
+            //TODO Add timestamp to database table of acts
+            for (Performer performer : gig.get_act())
+                sql += "INSERT INTO IGNORE acts(" +
+                            "user_id," +
+                            "gig_id" +
+                        ") " +
+                        "VALUES(" +
+                            performer.get_primaryId() + "," +
+                            gig.get_primaryId() +
+                        "); ";
+        }
 
         return edit(sql, false);
     }
@@ -222,7 +248,7 @@ public class EventRepository extends Repository {
      * If the Participants and Events are already inserted, it will update type.
      * Doesn't close connection.
      * @param participations The Participations that will be upserted.
-     * @return True if it is a success.
+     * @return True if it is a success and the Participations aren't empty.
      */
     public boolean upsert(Liszt<Participation> participations) {
         String sql = new String();

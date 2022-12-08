@@ -1,7 +1,9 @@
 package laustrup.bandwichpersistence.services.persistence_services.entity_services.sub_entity_services;
 
+import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
 import laustrup.bandwichpersistence.models.events.Event;
 import laustrup.bandwichpersistence.models.events.Participation;
+import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
 import laustrup.bandwichpersistence.repositories.sub_repositories.EventRepository;
 import laustrup.bandwichpersistence.repositories.sub_repositories.ModelRepository;
@@ -13,8 +15,6 @@ import laustrup.bandwichpersistence.utilities.Printer;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Contains logic for CRUD of Events.
@@ -123,5 +123,17 @@ public class EventPersistenceService extends EntityService<Event> {
                 return Assembly.get_instance().getEvent(participations.get(1).get_event().get_primaryId());
         EventRepository.get_instance().closeConnection();
         return null;
+    }
+
+    /**
+     * Will upsert a Bulletin of an Event.
+     * Closes database connections and sets Event into assembled.
+     * @param bulletin The Event that will be upserted.
+     * @return The Event from the database.
+     */
+    public Event upsert(Bulletin bulletin) {
+        if (ModelRepository.get_instance().upsert(bulletin, false))
+            return Assembly.get_instance().getEvent(bulletin.get_receiver().get_primaryId());
+        return (Event) bulletin.get_receiver();
     }
 }

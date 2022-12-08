@@ -1,6 +1,7 @@
 package laustrup.bandwichpersistence.repositories.sub_repositories;
 
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
+import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
 import laustrup.bandwichpersistence.models.chats.messages.Mail;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
@@ -37,6 +38,11 @@ public class ModelRepository extends Repository {
 
     private ModelRepository() {}
 
+    /**
+     * Will collect a JDBC ResultSet of a ChatRooms from the database, by using a SQL statement.
+     * @param ids The ids of the ChatRooms.
+     * @return The collected JDBC ResultSet.
+     */
     public ResultSet chatRooms(Liszt<Long> ids) {
         StringBuilder where = new StringBuilder("WHERE ");
 
@@ -52,6 +58,11 @@ public class ModelRepository extends Repository {
                 where + ";");
     }
 
+    /**
+     * Will collect a JDBC ResultSet of a Bulletins from the database, by using a SQL statement.
+     * @param ids The ids of the Bulletins.
+     * @return The collected JDBC ResultSet.
+     */
     public ResultSet bulletins(Liszt<Long> ids) {
         StringBuilder where = new StringBuilder("WHERE ");
 
@@ -65,6 +76,45 @@ public class ModelRepository extends Repository {
                 "INNER JOIN chatters ON chat_rooms.id = chatters.chat_room_id " +
                 "INNER JOIN mails ON chat_rooms.id = mails.chat_room id " +
                 where + ";");
+    }
+
+    //TODO Make bulletin tables the same.
+
+    /**
+     * Upserts Bulletin depending on the id.
+     * This means it will insert the values of the Bulletin if they don't exist,
+     * otherwise it will update them to the values of the Bulletin.
+     * Will not close connection.
+     * @param bulletin The Bulletin that will have influence on the database table.
+     * @return True if any rows have been affected.
+     */
+    public boolean upsert(Bulletin bulletin, boolean ofUser) {
+        boolean idExists = bulletin.get_primaryId() > 0;
+        return edit("INSERT INTO " + (ofUser ? "user_bulletins" : "event_bulletins") + "(" +
+                    (idExists ? "id," : "") +
+                    "author_id," +
+                    "content," +
+                    "is_sent," +
+                    "is_edited," +
+                    "is_public," +
+                    "receiver_id," +
+                    "`timestamp`" +
+                ") " +
+                "VALUES(" +
+                    (idExists ? bulletin.get_primaryId()+"," : "") +
+                    bulletin.get_author().get_primaryId() + ",'" +
+                    bulletin.get_content() + "'," +
+                    bulletin.is_sent() + ",'" +
+                    bulletin.get_edited().get_argument() + "'," +
+                    bulletin.is_public() + "," +
+                    bulletin.get_receiver().get_primaryId() + "," +
+                "NOW()) " +
+                "ON DUPLICATE KEY UPDATE " +
+                    "content = '" + bulletin.get_content() + "'," +
+                    "is_sent = " + bulletin.is_sent() + "," +
+                    "is_edited = '" + bulletin.get_edited().get_argument() + "'," +
+                    "is_public = " + bulletin.is_public() +
+                ";", false);
     }
 
     /**
