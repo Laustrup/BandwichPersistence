@@ -1,5 +1,6 @@
 package laustrup.bandwichpersistence.repositories.sub_repositories;
 
+import laustrup.bandwichpersistence.models.Rating;
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
 import laustrup.bandwichpersistence.models.chats.messages.Mail;
@@ -324,5 +325,30 @@ public class ModelRepository extends Repository {
                     "); ";
 
         return edit(sql,false);
+    }
+
+    /**
+     * Upserts Ratings.
+     * It will insert the values of the Rating if it doesn't exist,
+     * otherwise it will update the value of the Rating.
+     * Will not close connection.
+     * @param rating The Rating that will have influence on the database table.
+     * @return True if it is a success.
+     */
+    public boolean upsert(Rating rating) {
+        return edit("INSERT INTO ratings(" +
+                    "appointed_id," +
+                    "judge_id," +
+                    "`value`," +
+                    "`timestamp`" +
+                ") " +
+                "VALUES(" +
+                    rating.get_appointed().get_primaryId() + "," +
+                    rating.get_judge().get_primaryId() + "," +
+                    rating.get_value() + "," +
+                "NOW()) " +
+                "ON DUPLICATE KEY " +
+                    "`value` = " + rating.get_value() +
+                ";", false);
     }
 }
