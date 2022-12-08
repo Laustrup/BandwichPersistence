@@ -3,6 +3,7 @@ package laustrup.bandwichpersistence.services.controller_services.sub_controller
 import laustrup.bandwichpersistence.models.Response;
 import laustrup.bandwichpersistence.models.Search;
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
+import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
 import laustrup.bandwichpersistence.models.chats.messages.Mail;
 import laustrup.bandwichpersistence.models.users.Login;
 import laustrup.bandwichpersistence.models.users.User;
@@ -91,5 +92,14 @@ public class UserControllerService extends ControllerService<User> {
      */
     public ResponseEntity<Response<Plato>> delete(User user) {
         return platoContent(UserPersistenceService.get_instance().delete(user));
+    }
+
+    /**
+     * Will upsert Bulletin of a User and create a ResponseEntity with a Response of the current state of Receiver.
+     * @param bulletin The Bulletin that should be upserted.
+     * @return The created ResponseEntity of a Response with the current state of Receiver.
+     */
+    public ResponseEntity<Response<User>> upsert(Bulletin bulletin) {
+        return entityContent(UserPersistenceService.get_instance().upsert(bulletin));
     }
 }

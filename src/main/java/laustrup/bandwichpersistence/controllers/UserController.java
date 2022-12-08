@@ -1,7 +1,9 @@
 package laustrup.bandwichpersistence.controllers;
 
+import laustrup.bandwichpersistence.models.Model;
 import laustrup.bandwichpersistence.models.Response;
 import laustrup.bandwichpersistence.models.Search;
+import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
 import laustrup.bandwichpersistence.models.users.Login;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.sub_users.participants.Participant;
@@ -44,5 +46,15 @@ public class UserController {
     @DeleteMapping(value = "delete", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Response<Plato>> delete(@RequestBody User user) {
         return UserControllerService.get_instance().delete(user);
+    }
+
+    @PatchMapping(value = "upsert/bulletin", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Response<User>> upsert(@RequestBody Bulletin bulletin) {
+        return UserControllerService.get_instance().upsert(new Bulletin(
+                    bulletin.get_primaryId(),bulletin.get_author(),bulletin.get_receiver(),
+                    bulletin.get_content(),bulletin.is_sent(),bulletin.get_edited(),
+                    bulletin.is_public(), bulletin.get_timestamp()
+                )
+        );
     }
 }

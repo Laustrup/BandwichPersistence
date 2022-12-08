@@ -16,7 +16,9 @@ public class Bulletin extends Message {
     @Getter
     public Model _receiver;
 
-    public Bulletin(long id, User author, Model receiver, String content, boolean isSent, Plato isEdited, boolean isPublic, LocalDateTime timestamp) {
+    public Bulletin(long id, User author, Model receiver, String content,
+                    boolean isSent, Plato isEdited, boolean isPublic,
+                    LocalDateTime timestamp) {
         super(id, author, content, isSent, isEdited, isPublic, timestamp);
         _receiver = receiver;
     }
