@@ -224,6 +224,18 @@ public class Event extends Model {
     }
 
     /**
+     * Sets the Participations.
+     * Will only be done, if it is under assembling.
+     * @param participations The Participations that will be set.
+     * @return The Participations of the Event.
+     */
+    public Liszt<Participation> set_participations(Liszt<Participation> participations) {
+        if (_assembling)
+            _participations = participations;
+        return _participations;
+    }
+
+    /**
      * Sets the Gigs. Is only allowed under assembling.
      * @param gigs The Gigs that will be set to be the Gigs.
      * @return All the Gigs.

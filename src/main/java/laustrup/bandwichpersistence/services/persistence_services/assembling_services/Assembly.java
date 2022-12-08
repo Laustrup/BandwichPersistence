@@ -224,10 +224,13 @@ public class Assembly extends Assembler {
         for (int i = 1; i <= event.get_bulletins().size(); i++)
             event.get_bulletins().set(i, bulletins.get(i));
 
+        event.set_participations(_describer.describeParticipations(event));
+
         Liszt<Request> requests = _describer.describeRequests(event.get_requests(), false);
         for (int i = 1; i <= event.get_requests().size(); i++)
             event.get_requests().set(i, requests.get(i));
         event.set_requestEvents();
+
 
         if (willFinish)
             return finish(event);

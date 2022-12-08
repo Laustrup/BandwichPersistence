@@ -2,6 +2,7 @@ package laustrup.bandwichpersistence.repositories.sub_repositories;
 
 import laustrup.bandwichpersistence.models.events.Event;
 import laustrup.bandwichpersistence.models.events.Gig;
+import laustrup.bandwichpersistence.models.events.Participation;
 import laustrup.bandwichpersistence.repositories.Repository;
 import laustrup.bandwichpersistence.utilities.Liszt;
 import laustrup.bandwichpersistence.utilities.Printer;
@@ -33,6 +34,23 @@ public class EventRepository extends Repository {
     }
 
     private EventRepository() {}
+
+    /**
+     * Will collect a JDBC ResultSet of Participations from the database, by using a SQL statement.
+     * @param ids The ids of the Events of the Participations
+     * @return The collected JDBC ResultSet.
+     */
+    public ResultSet participations(Liszt<Long> ids) {
+        StringBuilder where = new StringBuilder("WHERE ");
+
+        for (int i = 1; i <= ids.size(); i++) {
+            where.append("event_id.id = ").append(ids.get(i));
+            if (i < ids.size())
+                where.append(" OR ");
+        }
+
+        return read("SELECT * FROM participations " + where + ";");
+    }
 
     /**
      * Will collect a JDBC ResultSet of all Events from the database, by using a SQL statement.
@@ -186,5 +204,43 @@ public class EventRepository extends Repository {
                     "; ";
 
         return edit(sql, false);
+    }
+
+    /**
+     * Upserts a single Participation.
+     * If the Participant and Event is already inserted, it will update type.
+     * Doesn't close connection.
+     * @param participation The Participation that will be upserted.
+     * @return True if it is a success.
+     */
+    public boolean upsert(Participation participation) {
+        return upsert(new Liszt<>(new Participation[]{participation}));
+    }
+
+    /**
+     * Upserts Participations.
+     * If the Participants and Events are already inserted, it will update type.
+     * Doesn't close connection.
+     * @param participations The Participations that will be upserted.
+     * @return True if it is a success.
+     */
+    public boolean upsert(Liszt<Participation> participations) {
+        String sql = new String();
+        for (Participation participation : participations)
+            sql += "INSERT INTO participations(" +
+                        "event_id," +
+                        "participant_id," +
+                        "`type`" +
+                        "`timestamp`" +
+                    ") " +
+                    "VALUES(" +
+                        participation.get_event().get_primaryId() + "," +
+                        participation.get_participant() + ",'" +
+                        participation.get_type() + "'" +
+                    "NOW()) " +
+                    "ON DUPLICATE KEY UPDATE " +
+                        "`type` = '" + participation.get_type() +
+                    "'; ";
+        return (!sql.isEmpty() ? edit(sql,false) : false);
     }
 }

@@ -8,6 +8,7 @@ import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
 import laustrup.bandwichpersistence.models.chats.messages.Mail;
 import laustrup.bandwichpersistence.models.events.Event;
 import laustrup.bandwichpersistence.models.events.Gig;
+import laustrup.bandwichpersistence.models.events.Participation;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.sub_users.Performer;
 import laustrup.bandwichpersistence.models.users.sub_users.bands.Artist;
@@ -112,12 +113,27 @@ public class AssemblyHandler {
                 new Plato(Plato.Argument.valueOf(set.getString(table+".is_sold_out"))),
                 set.getString(table+".location"),set.getDouble(table+".price"),
                 set.getString(table+".tickets_url"),null,new Liszt<>(),null,new Liszt<>(),
-                new Liszt<>(),new Liszt<>(),new Album(),set.getTimestamp(table+".timestamp").toLocalDateTime());
+                new Liszt<>(),new Liszt<>(),new Album(),set.getTimestamp(table+".timestamp").toLocalDateTime()
+        );
 
         if (!events.contains(event.toString()))
             events.add(event);
 
         return events;
+    }
+
+    public Liszt<Participation> handleParticipations(ResultSet set, Liszt<Participation> participations) throws SQLException {
+        String table = "participations";
+        Participation participation = new Participation(
+                new Participant(set.getLong(table+".participant_id")),
+                new Event(set.getLong(table+".event_id")),
+                Participation.ParticipationType.valueOf(set.getString(table+".`type`"))
+        );
+
+        if (!participations.contains(participation))
+            participations.add(participation);
+
+        return participations;
     }
 
     public Liszt<ChatRoom> handleChatRooms(ResultSet set, Liszt<ChatRoom> chatRooms) throws SQLException {

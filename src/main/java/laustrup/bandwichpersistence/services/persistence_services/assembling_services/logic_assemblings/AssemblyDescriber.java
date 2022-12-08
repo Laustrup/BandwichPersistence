@@ -5,11 +5,14 @@ import laustrup.bandwichpersistence.models.chats.Request;
 import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
 import laustrup.bandwichpersistence.models.events.Event;
 import laustrup.bandwichpersistence.models.events.Gig;
+import laustrup.bandwichpersistence.models.events.Participation;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.sub_users.Performer;
+import laustrup.bandwichpersistence.models.users.sub_users.participants.Participant;
 import laustrup.bandwichpersistence.repositories.sub_repositories.EventRepository;
 import laustrup.bandwichpersistence.repositories.sub_repositories.ModelRepository;
 import laustrup.bandwichpersistence.repositories.sub_repositories.UserRepository;
+import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembly;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.sub_assemblings.EventAssembly;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.sub_assemblings.user_assemblings.UserAssembly;
 import laustrup.bandwichpersistence.utilities.Liszt;
@@ -212,5 +215,32 @@ public class AssemblyDescriber {
         }
 
         return acts;
+    }
+
+    public Liszt<Participation> describeParticipations(Event event) {
+        Liszt<Participation> participations = event.get_participations();
+        Liszt<Long> ids = new Liszt<>();
+        for (Participation participation : participations)
+            ids.add(participation.get_primaryId());
+
+        ResultSet set = EventRepository.get_instance().participations(ids);
+        try {
+            if (set.isBeforeFirst())
+                set.next();
+
+            for (int i = 1; i <= participations.size(); i++) {
+                participations.set(i, new Participation(
+                            (Participant) Assembly.get_instance().getUser(participations.get(i).get_primaryId()),
+                            event, Participation.ParticipationType.valueOf(set.getString("participations.`type`")),
+                            set.getTimestamp("participations.`timestamp`").toLocalDateTime()
+                        )
+                );
+                set.next();
+            }
+        } catch (SQLException e) {
+            Printer.get_instance().print("Couldn't describe Participations...",e);
+        }
+
+        return participations;
     }
 }

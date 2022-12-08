@@ -160,6 +160,8 @@ CREATE TABLE participations(
         'CANCEL',
         'INVITED'),
 
+    `timestamp` DATETIME NOT NULL,
+
     PRIMARY KEY(event_id, participant_id),
     FOREIGN KEY(event_id) REFERENCES events(id) ON DELETE CASCADE,
     FOREIGN KEY(participant_id) REFERENCES users(id)

@@ -331,7 +331,7 @@ public class TestItems extends JTest {
                     _random.nextDouble(498)+1, "https://www.Billetlugen.dk/"+id,
                     _contactInfo[_random.nextInt(_contactInfo.length)],
                     generateGigs(new Event(id), startOfLatestGig, gigAmount, gigLengths),
-                    _venues[_random.nextInt(_venues.length)], new Liszt<>(), generateParticipations(), new Liszt<>(),
+                    _venues[_random.nextInt(_venues.length)], new Liszt<>(), generateParticipations(id), new Liszt<>(),
                     images.get(_random.nextInt(images.size())+1), LocalDateTime.now());
 
             for (Gig gig : _events[i].get_gigs())
@@ -412,7 +412,7 @@ public class TestItems extends JTest {
         return requests;
     }
 
-    public Liszt<Participation> generateParticipations() {
+    public Liszt<Participation> generateParticipations(long id) {
         Liszt<Participation> participations = new Liszt<>();
         Set<Participant> set = new HashSet<>();
         int amount = _random.nextInt(_artistAmount+_participantAmount);
@@ -424,7 +424,7 @@ public class TestItems extends JTest {
                     _participants[_random.nextInt(_participantAmount)];
             set.add(participant);
 
-            participations.add(new Participation(participant,generateParticipationType()));
+            participations.add(new Participation(participant,new Event(id),generateParticipationType()));
         }
 
         return participations;

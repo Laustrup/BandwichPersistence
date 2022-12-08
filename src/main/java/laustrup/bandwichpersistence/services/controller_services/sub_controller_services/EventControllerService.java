@@ -5,11 +5,9 @@ import laustrup.bandwichpersistence.models.events.Event;
 import laustrup.bandwichpersistence.services.controller_services.ControllerService;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembly;
 import laustrup.bandwichpersistence.services.persistence_services.entity_services.sub_entity_services.EventPersistenceService;
-import laustrup.bandwichpersistence.services.persistence_services.entity_services.sub_entity_services.UserPersistenceService;
 import laustrup.bandwichpersistence.utilities.Liszt;
 
 import laustrup.bandwichpersistence.utilities.Plato;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 public class EventControllerService extends ControllerService<Event> {
