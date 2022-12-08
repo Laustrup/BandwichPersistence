@@ -1,6 +1,7 @@
 package laustrup.bandwichpersistence.repositories.sub_repositories;
 
 import laustrup.bandwichpersistence.models.events.Event;
+import laustrup.bandwichpersistence.models.events.Gig;
 import laustrup.bandwichpersistence.repositories.Repository;
 import laustrup.bandwichpersistence.utilities.Liszt;
 import laustrup.bandwichpersistence.utilities.Printer;
@@ -153,5 +154,37 @@ public class EventRepository extends Repository {
      */
     public boolean delete(Event event) {
         return delete(event.get_primaryId(), "`events`", "id", true);
+    }
+
+    /**
+     * Will update Event and its Gigs.
+     * Doesn't close connection.
+     * @param event The Event that will be updated.
+     * @return True if it is a success.
+     */
+    public boolean update(Event event) {
+        String sql = "UPDATE `events` " +
+                    "title = '" + event.get_title() + "', " +
+                    "open_doors = '" + event.get_openDoors() + "', " +
+                    "`description` = '" + event.get_description() + "', " +
+                    "is_voluntary = '" + event.get_voluntary() + "', " +
+                    "is_public = '" + event.get_public() + "', " +
+                    "is_cancelled = '" + event.get_cancelled() + "', " +
+                    "is_sold_out = '" + event.get_soldOut() + "', " +
+                    "location = '" + event.get_location() + "', " +
+                    "price = " + event.get_price() + ", " +
+                    "tickets_url = '" + event.get_ticketsURL() + "', " +
+                    "venue_id = " + event.get_venue().get_primaryId() + " " +
+                "WHERE id = " + event.get_primaryId() + "; ";
+        for (Gig gig : event.get_gigs())
+            sql += "UPDATE gigs " +
+                    "event_id = " + event.get_primaryId() + ", " +
+                    "`start` = '" + gig.get_start() + "', " +
+                    "`end` = '" + gig.get_end() + "' " +
+                "WHERE id = " + gig.get_primaryId() +
+                    " AND event_id = " + event.get_primaryId() +
+                    "; ";
+
+        return edit(sql, false);
     }
 }

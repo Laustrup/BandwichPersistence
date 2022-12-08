@@ -148,7 +148,7 @@ CREATE TABLE acts(
     gig_id BIGINT(20) NOT NULL,
 
     PRIMARY KEY(user_id, gig_id),
-    FOREIGN KEY(user_id) REFERENCES users(id),
+    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY(gig_id) REFERENCES gigs(id) ON DELETE CASCADE
 );
 
