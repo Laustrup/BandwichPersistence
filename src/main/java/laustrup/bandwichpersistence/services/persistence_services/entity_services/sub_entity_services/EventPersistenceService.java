@@ -1,16 +1,20 @@
 package laustrup.bandwichpersistence.services.persistence_services.entity_services.sub_entity_services;
 
 import laustrup.bandwichpersistence.models.events.Event;
+import laustrup.bandwichpersistence.models.events.Participation;
 import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
 import laustrup.bandwichpersistence.repositories.sub_repositories.EventRepository;
 import laustrup.bandwichpersistence.repositories.sub_repositories.ModelRepository;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembly;
 import laustrup.bandwichpersistence.services.persistence_services.entity_services.EntityService;
+import laustrup.bandwichpersistence.utilities.Liszt;
 import laustrup.bandwichpersistence.utilities.Plato;
 import laustrup.bandwichpersistence.utilities.Printer;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Contains logic for CRUD of Events.
@@ -96,5 +100,28 @@ public class EventPersistenceService extends EntityService<Event> {
             if (EventRepository.get_instance().update(event))
                 event = Assembly.get_instance().getEvent(event.get_primaryId());
         return event;
+    }
+
+    /**
+     * Will upsert multiple Participations and close connections.
+     * Is meant to be the Participations from same Event.
+     * @param participations The Participations that should be upserted.
+     * @return The Event of current state of database.
+     *         Will return null if Participations is not from same Event.
+     */
+    public Event upsert(Liszt<Participation> participations) {
+        long eventId = participations.get(1).get_event().get_primaryId();
+        boolean eventIsSame = true;
+        for (Participation participation : participations) {
+            if (eventId != participation.get_event().get_primaryId()) {
+                eventIsSame = false;
+                break;
+            }
+        }
+        if (eventIsSame)
+            if (EventRepository.get_instance().upsert(participations))
+                return Assembly.get_instance().getEvent(participations.get(1).get_event().get_primaryId());
+        EventRepository.get_instance().closeConnection();
+        return null;
     }
 }

@@ -2,6 +2,7 @@ package laustrup.bandwichpersistence.services.controller_services.sub_controller
 
 import laustrup.bandwichpersistence.models.Response;
 import laustrup.bandwichpersistence.models.events.Event;
+import laustrup.bandwichpersistence.models.events.Participation;
 import laustrup.bandwichpersistence.services.controller_services.ControllerService;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembly;
 import laustrup.bandwichpersistence.services.persistence_services.entity_services.sub_entity_services.EventPersistenceService;
@@ -71,5 +72,14 @@ public class EventControllerService extends ControllerService<Event> {
      */
     public ResponseEntity<Response<Event>> update(Event event) {
         return entityContent(EventPersistenceService.get_instance().update(event));
+    }
+
+    /**
+     * Will upsert Participations of an Event and create a ResponseEntity with a Response of the current state of Event.
+     * @param participations The Participations that should be upserted.
+     * @return The created ResponseEntity of a Response with the current state of Event.
+     */
+    public ResponseEntity<Response<Event>> upsert(Liszt<Participation> participations) {
+        return entityContent(EventPersistenceService.get_instance().upsert(participations));
     }
 }

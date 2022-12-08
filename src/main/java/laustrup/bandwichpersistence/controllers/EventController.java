@@ -2,6 +2,7 @@ package laustrup.bandwichpersistence.controllers;
 
 import laustrup.bandwichpersistence.models.Response;
 import laustrup.bandwichpersistence.models.events.Event;
+import laustrup.bandwichpersistence.models.events.Participation;
 import laustrup.bandwichpersistence.services.controller_services.sub_controller_services.EventControllerService;
 import laustrup.bandwichpersistence.utilities.Liszt;
 import laustrup.bandwichpersistence.utilities.Plato;
@@ -41,5 +42,10 @@ public class EventController {
     @PatchMapping(value = "update", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Response<Event>> update(@RequestBody Event event) {
         return EventControllerService.get_instance().update(event);
+    }
+
+    @PutMapping(value = "upsert/participations", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Response<Event>> upsert(@RequestBody Participation[] participations) {
+        return EventControllerService.get_instance().upsert(new Liszt<>(participations));
     }
 }
