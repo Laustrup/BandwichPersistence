@@ -1,6 +1,7 @@
 package laustrup.bandwichpersistence.services.persistence_services.entity_services.sub_entity_services;
 
 import laustrup.bandwichpersistence.models.Rating;
+import laustrup.bandwichpersistence.models.albums.Album;
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
 import laustrup.bandwichpersistence.models.chats.messages.Mail;
@@ -111,5 +112,13 @@ public class UserPersistenceService {
             return Assembly.get_instance().getUser(rating.get_appointed().get_primaryId());
         ModelRepository.get_instance().closeConnection();
         return rating.get_appointed();
+    }
+
+    public User upsert(Album album) {
+        ResultSet set = ModelRepository.get_instance().upsert(album);
+        if (set != null)
+            return Assembly.get_instance().getUser(album.get_author().get_primaryId());
+
+        return null;
     }
 }

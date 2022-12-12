@@ -40,11 +40,11 @@ public class DbGate {
      * @return True if the connection could open, otherwise false.
      */
     public boolean open() {
-        if (isClosed()) {
+        if (isClosed().get_truth()) {
             Crate crate = Crate.get_instance();
             try {
                 _connection = DriverManager.getConnection(crate.get_dbPath(), crate.get_dbUser(), crate.get_dbPassword());
-                return !isClosed();
+                return isOpen().get_truth();
             } catch (SQLException e) {
                 Printer.get_instance().print("Couldn't open connection...",e);
             }
@@ -59,7 +59,7 @@ public class DbGate {
     public Plato close() {
         if (_connection != null) {
             try {
-                if (isOpen()) {
+                if (isOpen().get_truth()) {
                     _connection.close();
                     return new Plato(true);
                 }
@@ -77,19 +77,20 @@ public class DbGate {
      * Determine whether the connection is open.
      * @return True if it is open, false if it is closed.
      */
-    public boolean isOpen() {
-        return !isClosed();
+    public Plato isOpen() {
+        return new Plato(!isClosed().get_truth());
     }
 
     /**
      * Determine whether the connection is closed.
      * @return True if it is closed, false if it is open.
      */
-    public boolean isClosed() {
+    public Plato isClosed() {
         try {
-            return _connection.isClosed();
+            return new Plato(_connection.isClosed());
         } catch (SQLException e) {
-            return false;
+            Printer.get_instance().print("Trouble determine if the connection is closed...",e);
         }
+        return new Plato();
     }
 }

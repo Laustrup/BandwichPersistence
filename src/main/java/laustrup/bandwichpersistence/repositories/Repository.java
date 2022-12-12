@@ -113,12 +113,7 @@ public abstract class Repository {
      *         All as Plato type.
      */
     public Plato connectionIsClosed() {
-        try {
-            return new Plato(connection().isClosed());
-        } catch (SQLException e) {
-            Printer.get_instance().print("Trouble determine if the connection is closed...",e);
-        }
-        return new Plato();
+        return DbGate.get_instance().isClosed();
     }
     /**
      * Defines the database connection of this repository by getting it from its DBConnector.
@@ -226,7 +221,7 @@ public abstract class Repository {
          * @throws SQLException Will be thrown if there is a problem with the connection.
          */
         private void openConnection() {
-            if (DbGate.get_instance().isClosed())
+            if (DbGate.get_instance().isClosed().get_truth())
                 DbGate.get_instance().isOpen();
         }
 

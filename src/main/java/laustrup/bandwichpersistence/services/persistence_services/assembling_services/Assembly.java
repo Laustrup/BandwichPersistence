@@ -12,6 +12,7 @@ import laustrup.bandwichpersistence.models.users.sub_users.bands.Artist;
 import laustrup.bandwichpersistence.models.users.sub_users.bands.Band;
 import laustrup.bandwichpersistence.models.users.sub_users.participants.Participant;
 import laustrup.bandwichpersistence.models.users.sub_users.venues.Venue;
+import laustrup.bandwichpersistence.repositories.DbGate;
 import laustrup.bandwichpersistence.repositories.sub_repositories.*;
 import laustrup.bandwichpersistence.repositories.sub_repositories.ModelRepository;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.sub_assemblings.EventAssembly;
@@ -119,6 +120,7 @@ public class Assembly extends Assembler {
 
     /**
      * Finishes the last assembling of a User, in order to get all values.
+     * Closes connection.
      * @param user The User that will be further assembled.
      * @param willFinish Will set assembling as done and close connections, if true.
      * @return The assembled User.
@@ -301,7 +303,7 @@ public class Assembly extends Assembler {
     }
 
     private Plato closeConnectionsHandling() {
-        Plato connectionStatus = closeConnections();
+        Plato connectionStatus = closeConnection();
         if (!connectionStatus.get_truth())
             Printer.get_instance().print(connectionStatus.get_message(), new Exception());
 
@@ -309,71 +311,17 @@ public class Assembly extends Assembler {
     }
 
     /**
-     * Checks if all connections are closed, if they are open, they will be closed.
+     * Checks if database connection is closed, if it's open, it will be closed.
      * @return A Plato object, if the truth is true, then there have been no issue,
      *         if there is an issue, it will have a false truth and a message for the Printer.
      */
-    private Plato closeConnections() {
+    private Plato closeConnection() {
         Plato status;
         Plato situation = new Plato(true);
 
-        status = ArtistRepository.get_instance().connectionIsClosed();
+        status = DbGate.get_instance().isClosed();
         if (!status.get_truth() && status.get_argument() != Plato.Argument.UNDEFINED) {
             status = ArtistRepository.get_instance().closeConnection();
-            if (!status.get_truth()) {
-                situation.set_message("Couldn't close ArtistRepository at Assembly...");
-                situation.set_argument(false);
-            }
-        }
-
-        status = BandRepository.get_instance().connectionIsClosed();
-        if (!status.get_truth() && status.get_argument() != Plato.Argument.UNDEFINED) {
-            status = BandRepository.get_instance().closeConnection();
-            if (!status.get_truth()) {
-                situation.set_message("Couldn't close ArtistRepository at Assembly...");
-                situation.set_argument(false);
-            }
-        }
-
-        status = EventRepository.get_instance().connectionIsClosed();
-        if (!status.get_truth() && status.get_argument() != Plato.Argument.UNDEFINED) {
-            status = EventRepository.get_instance().closeConnection();
-            if (!status.get_truth()) {
-                situation.set_message("Couldn't close ArtistRepository at Assembly...");
-                situation.set_argument(false);
-            }
-        }
-
-        status = ParticipantRepository.get_instance().connectionIsClosed();
-        if (!status.get_truth() && status.get_argument() != Plato.Argument.UNDEFINED) {
-            status = ParticipantRepository.get_instance().closeConnection();
-            if (!status.get_truth()) {
-                situation.set_message("Couldn't close ArtistRepository at Assembly...");
-                situation.set_argument(false);
-            }
-        }
-
-        status = ModelRepository.get_instance().connectionIsClosed();
-        if (!status.get_truth() && status.get_argument() != Plato.Argument.UNDEFINED) {
-            status = ModelRepository.get_instance().closeConnection();
-            if (!status.get_truth()) {
-                situation.set_message("Couldn't close ArtistRepository at Assembly...");
-                situation.set_argument(false);
-            }
-        }
-
-        status = UserRepository.get_instance().connectionIsClosed();
-        if (!status.get_truth() && status.get_argument() != Plato.Argument.UNDEFINED) {
-            status = UserRepository.get_instance().closeConnection();
-            if (!status.get_truth()) {
-                situation.set_message("Couldn't close ArtistRepository at Assembly...");
-                situation.set_argument(false);
-            }
-        }
-
-        status = VenueRepository.get_instance().connectionIsClosed();
-        if (!status.get_truth() && status.get_argument() != Plato.Argument.UNDEFINED) {
-            status = VenueRepository.get_instance().closeConnection();
             if (!status.get_truth()) {
                 situation.set_message("Couldn't close ArtistRepository at Assembly...");
                 situation.set_argument(false);
