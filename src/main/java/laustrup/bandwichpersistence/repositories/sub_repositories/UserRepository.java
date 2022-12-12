@@ -218,6 +218,13 @@ public class UserRepository extends Repository {
                 false);
     }
 
+    /**
+     * Generates a SQL statement for updating contact informations such as
+     * email, first_digits, phone_number, phone_is_mobile, street, floor, postal
+     * city, country_title, and country indexes.
+     * @param user The User with the values to update in database.
+     * @return The generated SQL statement.
+     */
     private String updateContactInfoSQL(User user) {
         ContactInfo info = user.get_contactInfo();
         return "UPDATE contact_informations SET " +
@@ -235,6 +242,11 @@ public class UserRepository extends Repository {
                     "user_id = " + user.get_primaryId() + "; ";
     }
 
+    /**
+     * Generates a SQL statement for updating gear descriptions of a User.
+     * @param user The User with the gear description to update in database.
+     * @return The generated SQL statement.
+     */
     private String updateGearSQL(User user) {
         return "UPDATE gear SET " +
                     "`description` = '" +
@@ -244,6 +256,11 @@ public class UserRepository extends Repository {
                 "WHERE user_id = " + user.get_primaryId() + "; ";
     }
 
+    /**
+     * Generates a SQL statement for updating a Venue of values size and location.
+     * @param venue The Venue with the values to update in database.
+     * @return The generated SQL statement.
+     */
     private String updateVenueSQL(Venue venue) {
         return "UPDATE venues SET " +
                     "`size` = " + venue.get_size() + ", " +
@@ -251,6 +268,13 @@ public class UserRepository extends Repository {
                 "WHERE user_id = " + venue.get_primaryId() +"; ";
     }
 
+    /**
+     * Upserts a Card, if it doesn't exist, it will insert it,
+     * otherwise update it.
+     * Doesn't close Connection.
+     * @param card The Card with the values to update in Database.
+     * @return A ResultSet with generated values, if they are genereated. Otherwise, null.
+     */
     public ResultSet upsert(Card card) {
         try {
             return create("INSERT INTO cards(" +
@@ -286,38 +310,39 @@ public class UserRepository extends Repository {
         return null;
     }
 
-    public ResultSet upsert(Subscription subscription) {
-        try {
-            return create("INSERT INTO subscriptions(" +
-                        (subscription.get_primaryId() > 0 ? "user_id," : "") +
-                        "`status`," +
-                        "subscription_type," +
-                        "offer_type," +
-                        "offer_expires," +
-                        "offer_effect," +
-                        "card_id" +
-                    ") " +
-                    "VALUES(" +
-                        (subscription.get_primaryId() > 0 ? subscription.get_user().get_primaryId()+",'" : "'") +
-                        subscription.get_status() + "','" +
-                        subscription.get_type() + "','" +
-                        subscription.get_offer().get_type() + "','" +
-                        subscription.get_offer().get_expires() + "'," +
-                        subscription.get_offer().get_effect() + "," +
-                        subscription.get_cardId() +
-                    ") " +
-                    "ON DUPLICATE KEY UPDATE " +
-                        "`status` = '" + subscription.get_status() + "', " +
-                        "subscription_type = '" + subscription.get_type() + "', " +
-                        "offer_type = '" + subscription.get_offer().get_type() + "', " +
-                        "offer_expires = '" + subscription.get_offer().get_expires() + "', " +
-                        "offer_effect = " + subscription.get_offer().get_effect() + ", " +
-                        "card_id = " + subscription.get_cardId() +
-                    "; ").getGeneratedKeys();
-        } catch (SQLException e) {
-            Printer.get_instance().print("Couldn't generate key for Subscription",e );
-        }
-
-        return null;
+    /**
+     * Upserts a Subscription, if it doesn't exist, it will insert it,
+     * otherwise update it.
+     * Doesn't close Connection.
+     * @param subscription The Subscription with the values to update in database.
+     * @return True if it is a success.
+     */
+    public boolean upsert(Subscription subscription) {
+        return edit("INSERT INTO subscriptions(" +
+                    (subscription.get_primaryId() > 0 ? "user_id," : "") +
+                    "`status`," +
+                    "subscription_type," +
+                    "offer_type," +
+                    "offer_expires," +
+                    "offer_effect," +
+                    "card_id" +
+                ") " +
+                "VALUES(" +
+                    (subscription.get_primaryId() > 0 ? subscription.get_user().get_primaryId()+",'" : "'") +
+                    subscription.get_status() + "','" +
+                    subscription.get_type() + "','" +
+                    subscription.get_offer().get_type() + "','" +
+                    subscription.get_offer().get_expires() + "'," +
+                    subscription.get_offer().get_effect() + "," +
+                    subscription.get_cardId() +
+                ") " +
+                "ON DUPLICATE KEY UPDATE " +
+                    "`status` = '" + subscription.get_status() + "', " +
+                    "subscription_type = '" + subscription.get_type() + "', " +
+                    "offer_type = '" + subscription.get_offer().get_type() + "', " +
+                    "offer_expires = '" + subscription.get_offer().get_expires() + "', " +
+                    "offer_effect = " + subscription.get_offer().get_effect() + ", " +
+                    "card_id = " + subscription.get_cardId() +
+                "; ", false);
     }
 }

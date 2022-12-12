@@ -7,6 +7,9 @@ import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
 import laustrup.bandwichpersistence.models.chats.messages.Mail;
 import laustrup.bandwichpersistence.models.users.Login;
 import laustrup.bandwichpersistence.models.users.User;
+import laustrup.bandwichpersistence.models.users.sub_users.subscriptions.Card;
+import laustrup.bandwichpersistence.models.users.sub_users.subscriptions.Subscription;
+import laustrup.bandwichpersistence.models.users.sub_users.subscriptions.SubscriptionOffer;
 import laustrup.bandwichpersistence.repositories.DbGate;
 import laustrup.bandwichpersistence.repositories.sub_repositories.ModelRepository;
 import laustrup.bandwichpersistence.repositories.sub_repositories.UserRepository;
@@ -17,6 +20,7 @@ import laustrup.bandwichpersistence.utilities.Printer;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 
 /**
  * Contains logic for CRUD of Participants.
@@ -177,12 +181,43 @@ public class UserPersistenceService {
      */
     public User update(User user, Login login, String password) {
         if (login.passwordIsValid()) {
-            User current = Assembly.get_instance().getUser(login);
-
-            if (current.get_primaryId() == user.get_primaryId())
+            if (Assembly.get_instance().getUserUnassembled(login).get_primaryId() == user.get_primaryId())
                 if (UserRepository.get_instance().update(user, login, password))
                     return Assembly.get_instance().getUser(user.get_primaryId());
         }
-        return null;
+
+        return Assembly.get_instance().getUser(user.get_primaryId());
+    }
+
+    /**
+     * Will upsert Card if it isn't null. If it is null it will upsert Subscription of User.
+     * @param user The User with the Subscription to update in database.
+     * @param login This Login is used to insure the action is permitted.
+     * @param card The Card that will be upserted in database, if it isn't null.
+     * @return The User of this upsert of values in database.
+     */
+    public User upsert(User user, Login login, Card card) {
+        if (login.passwordIsValid()) {
+            if (Assembly.get_instance().getUserUnassembled(login).get_primaryId() == user.get_primaryId()) {
+                if (card != null) {
+                    ResultSet set = UserRepository.get_instance().upsert(card);
+                    if (set!=null) {
+                        try {
+                            UserRepository.get_instance().upsert(new Subscription(
+                                    user, user.get_subscription().get_type(), user.get_subscription().get_status(),
+                                    user.get_subscription().get_offer(), set.getLong("id"),
+                                    user.get_subscription().get_timestamp()
+                            ));
+                        } catch (SQLException e) {
+                            Printer.get_instance().print("Couldn't get generated key of Card...",e);
+                        }
+                    }
+                } else {
+                    UserRepository.get_instance().upsert(user.get_subscription());
+                }
+            }
+        }
+
+        return Assembly.get_instance().getUser(user.get_primaryId());
     }
 }

@@ -83,10 +83,19 @@ public class Assembly extends Assembler {
      * Gets a User object with the informations given from the UserRepository.
      * Will be initiated as the object it is meant to be.
      * Will not finnish connections and therefore not close connections.
-     * @param id The id of the User that is wished to be assembled.
+     * @param id The id of the User that is wished to be gathered.
      * @return The unassembled User.
      */
     public User getUserUnassembled(long id) { return userAssembling(UserAssembly.get_instance().assemble(id), false); }
+
+    /**
+     * Gets a User object with the informations given from the UserRepository.
+     * Will be initiated as the object it is meant to be.
+     * Will not finnish connections and therefore not close connections.
+     * @param login The Login of the User that is wished to be gathered.
+     * @return The unassembled User.
+     */
+    public User getUserUnassembled(Login login) { return userAssembling(UserAssembly.get_instance().assemble(login), false); }
 
     /**
      * Will get all the Users.
