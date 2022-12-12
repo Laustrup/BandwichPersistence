@@ -2,14 +2,19 @@ package laustrup.bandwichpersistence.repositories.sub_repositories;
 
 import laustrup.bandwichpersistence.models.users.Login;
 import laustrup.bandwichpersistence.models.users.User;
+import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
 import laustrup.bandwichpersistence.models.users.sub_users.bands.Artist;
 import laustrup.bandwichpersistence.models.users.sub_users.bands.Band;
 import laustrup.bandwichpersistence.models.users.sub_users.participants.Participant;
+import laustrup.bandwichpersistence.models.users.sub_users.subscriptions.Card;
+import laustrup.bandwichpersistence.models.users.sub_users.subscriptions.Subscription;
 import laustrup.bandwichpersistence.models.users.sub_users.venues.Venue;
 import laustrup.bandwichpersistence.repositories.Repository;
 import laustrup.bandwichpersistence.utilities.Liszt;
+import laustrup.bandwichpersistence.utilities.Printer;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  * Are handling Repository actions for User's common uses.
@@ -204,6 +209,115 @@ public class UserRepository extends Repository {
                 "WHERE " +
                     "id = " + user.get_primaryId() + " AND " +
                     "`password` = '" + login.get_password() +
-                "';", false);
+                "'; " +
+                        (user.getClass() == Artist.class
+                                || user.getClass() == Band.class
+                                || user.getClass() == Venue.class ? updateGearSQL(user) : "") +
+                        (user.getClass() == Venue.class ? updateVenueSQL((Venue) user) : "") +
+                        (user.get_contactInfo() != null ? updateContactInfoSQL(user) : ""),
+                false);
+    }
+
+    private String updateContactInfoSQL(User user) {
+        ContactInfo info = user.get_contactInfo();
+        return "UPDATE contact_informations SET " +
+                    "email = '" + info.get_email() + "', " +
+                    "first_digits = " + info.get_country().get_firstPhoneNumberDigits() + ", " +
+                    "phone_number = " + info.get_phone().get_numbers() + ", " +
+                    "phone_is_mobile = " + info.get_phone().is_mobile() + ", " +
+                    "street = '" + info.get_address().get_street() + "', " +
+                    "floor = '" + info.get_address().get_floor() + "', " +
+                    "postal = '" + info.get_address().get_postal() + "', " +
+                    "city = '" + info.get_address().get_city() + "', " +
+                    "country_title = '" + info.get_country().get_title() + "', " +
+                    "country_indexes = '" + info.get_country().get_indexes() + "' " +
+                "WHERE " +
+                    "user_id = " + user.get_primaryId() + "; ";
+    }
+
+    private String updateGearSQL(User user) {
+        return "UPDATE gear SET " +
+                    "`description` = '" +
+                        (user.getClass() == Artist.class ? ((Artist) user).get_runner()
+                            : user.getClass() == Band.class ? ((Band) user).get_runner()
+                                : user.getClass() == Venue.class ? ((Venue) user).get_gearDescription() : "") + "' " +
+                "WHERE user_id = " + user.get_primaryId() + "; ";
+    }
+
+    private String updateVenueSQL(Venue venue) {
+        return "UPDATE venues SET " +
+                    "`size` = " + venue.get_size() + ", " +
+                    "location = '" + venue.get_location() + "' " +
+                "WHERE user_id = " + venue.get_primaryId() +"; ";
+    }
+
+    public ResultSet upsert(Card card) {
+        try {
+            return create("INSERT INTO cards(" +
+                        (card.get_id() > 0 ? "id," : "") +
+                        "`type`," +
+                        "`owner`," +
+                        "numbers," +
+                        "expiration_month," +
+                        "expiration_year," +
+                        "cvv" +
+                    ") " +
+                    "VALUES(" +
+                        (card.get_id() > 0 ? card.get_id()+",'" : "'") +
+                        card.get_type() + "','" +
+                        card.get_owner() + "'," +
+                        card.get_cardNumbers() + "," +
+                        card.get_expirationMonth() + "," +
+                        card.get_expirationMonth() + "," +
+                        card.get_cVV() +
+                    ");" +
+                    "ON DUPLICATE KEY UPDATE " +
+                        "`type` = '" + card.get_type() + "', " +
+                        "`owner` = '" + card.get_owner() + "', " +
+                        "numbers = " + card.get_cardNumbers() + ", " +
+                        "expiration_month = " + card.get_expirationMonth() + ", " +
+                        "expiration_year = " + card.get_expirationYear() + ", " +
+                        "cvv = " + card.get_cVV() +
+                    "; ").getGeneratedKeys();
+        } catch (SQLException e) {
+            Printer.get_instance().print("Couldn't generate key for card...", e);
+        }
+
+        return null;
+    }
+
+    public ResultSet upsert(Subscription subscription) {
+        try {
+            return create("INSERT INTO subscriptions(" +
+                        (subscription.get_primaryId() > 0 ? "user_id," : "") +
+                        "`status`," +
+                        "subscription_type," +
+                        "offer_type," +
+                        "offer_expires," +
+                        "offer_effect," +
+                        "card_id" +
+                    ") " +
+                    "VALUES(" +
+                        (subscription.get_primaryId() > 0 ? subscription.get_user().get_primaryId()+",'" : "'") +
+                        subscription.get_status() + "','" +
+                        subscription.get_type() + "','" +
+                        subscription.get_offer().get_type() + "','" +
+                        subscription.get_offer().get_expires() + "'," +
+                        subscription.get_offer().get_effect() + "," +
+                        subscription.get_cardId() +
+                    ") " +
+                    "ON DUPLICATE KEY UPDATE " +
+                        "`status` = '" + subscription.get_status() + "', " +
+                        "subscription_type = '" + subscription.get_type() + "', " +
+                        "offer_type = '" + subscription.get_offer().get_type() + "', " +
+                        "offer_expires = '" + subscription.get_offer().get_expires() + "', " +
+                        "offer_effect = " + subscription.get_offer().get_effect() + ", " +
+                        "card_id = " + subscription.get_cardId() +
+                    "; ").getGeneratedKeys();
+        } catch (SQLException e) {
+            Printer.get_instance().print("Couldn't generate key for Subscription",e );
+        }
+
+        return null;
     }
 }
