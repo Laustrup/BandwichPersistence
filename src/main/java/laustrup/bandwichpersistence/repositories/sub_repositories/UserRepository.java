@@ -1,20 +1,15 @@
 package laustrup.bandwichpersistence.repositories.sub_repositories;
 
-import laustrup.bandwichpersistence.models.events.Event;
 import laustrup.bandwichpersistence.models.users.Login;
 import laustrup.bandwichpersistence.models.users.User;
-import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
 import laustrup.bandwichpersistence.models.users.sub_users.bands.Artist;
 import laustrup.bandwichpersistence.models.users.sub_users.bands.Band;
 import laustrup.bandwichpersistence.models.users.sub_users.participants.Participant;
-import laustrup.bandwichpersistence.models.users.sub_users.subscriptions.Subscription;
 import laustrup.bandwichpersistence.models.users.sub_users.venues.Venue;
 import laustrup.bandwichpersistence.repositories.Repository;
 import laustrup.bandwichpersistence.utilities.Liszt;
-import laustrup.bandwichpersistence.utilities.Printer;
 
 import java.sql.ResultSet;
-import java.sql.SQLException;
 
 /**
  * Are handling Repository actions for User's common uses.
@@ -181,40 +176,34 @@ public class UserRepository extends Repository {
 
     /**
      * Will remove a following relation.
-     * Closes Connection.
+     * Doesn't closes Connection.
      * @param fan The User that is following an idol.
      * @param idol The User that is followed by a fan.
      * @return True if it is a success.
      */
     public boolean remove(User fan, User idol) {
         return delete("followings", fan.get_primaryId(), "fan_id",
-                idol.get_primaryId(), "idol_id", true);
+                idol.get_primaryId(), "idol_id", false);
     }
 
     /**
      * Updates a User table of values username, first_name, last_name and description.
      * Doesn't close connection.
      * @param user The User with values that will be updated and an id.
+     * @param login Is needed to insure the User has access to this update.
+     * @param password A password that will be changed.
      * @return True if it is a success.
      */
-    public boolean update(User user) {
+    public boolean update(User user, Login login, String password) {
         return edit("UPDATE users SET " +
                     "username = '" + user.get_username() + "' " +
+                    "`password` = '" + password + "' " +
                     "first_name = '" + user.get_firstName() + "' " +
                     "last_name = '" + user.get_lastName() + "' " +
                     "`description` = '" + user.get_description() + "' " +
-                "WHERE id = " + user.get_primaryId() + ";", false);
-    }
-
-    /**
-     * Updates password of a User of a specific id.
-     * @param id The id of the User, that will have its password updated.
-     * @param password The password that will be updated as the new password.
-     * @return True if it is a success.
-     */
-    public boolean update(long id, String password) {
-        return edit("UPDATE users SET " +
-                    "`password` = '" + password + "' " +
-                "WHERE id = " + id + ";", false);
+                "WHERE " +
+                    "id = " + user.get_primaryId() + " AND " +
+                    "`password` = '" + login.get_password() +
+                "';", false);
     }
 }

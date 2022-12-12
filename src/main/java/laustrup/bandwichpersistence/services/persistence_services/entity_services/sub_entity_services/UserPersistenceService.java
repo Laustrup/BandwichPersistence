@@ -5,10 +5,13 @@ import laustrup.bandwichpersistence.models.albums.Album;
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
 import laustrup.bandwichpersistence.models.chats.messages.Mail;
+import laustrup.bandwichpersistence.models.users.Login;
 import laustrup.bandwichpersistence.models.users.User;
+import laustrup.bandwichpersistence.repositories.DbGate;
 import laustrup.bandwichpersistence.repositories.sub_repositories.ModelRepository;
 import laustrup.bandwichpersistence.repositories.sub_repositories.UserRepository;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembly;
+import laustrup.bandwichpersistence.utilities.Liszt;
 import laustrup.bandwichpersistence.utilities.Plato;
 import laustrup.bandwichpersistence.utilities.Printer;
 
@@ -125,6 +128,61 @@ public class UserPersistenceService {
         if (set != null)
             return Assembly.get_instance().getUser(album.get_author().get_primaryId());
 
+        return null;
+    }
+
+    /**
+     * Adds a following between two Users.
+     * @param fan The User that should follow an idol.
+     * @param idol The User that should being followed by a fan.
+     * @return The two updated Users if success.
+     */
+    public Liszt<User> follow(User fan, User idol) {
+        Liszt<User> users = new Liszt<>();
+
+        if (UserRepository.get_instance().insert(fan,idol))
+            users = new Liszt<>(new User[]{
+                    Assembly.get_instance().getUserUnassembled(fan.get_primaryId()),
+                    Assembly.get_instance().getUserUnassembled(idol.get_primaryId())
+            });
+
+        return users;
+    }
+
+    /**
+     * Removes a following between two Users.
+     * @param fan The User that is following an idol.
+     * @param idol The User that is being followed by a fan.
+     * @return The two updated Users if success.
+     */
+    public Liszt<User> unfollow(User fan, User idol) {
+        Liszt<User> users = new Liszt<>();
+
+        if (UserRepository.get_instance().remove(fan, idol))
+            users = new Liszt<>(new User[]{
+                    Assembly.get_instance().getUserUnassembled(fan.get_primaryId()),
+                    Assembly.get_instance().getUserUnassembled(idol.get_primaryId())
+            });
+
+        DbGate.get_instance().close();
+        return users;
+    }
+
+    /**
+     * Will update a User, but only if the login fits the User.
+     * @param user The User with values that will be updated and an id.
+     * @param login Is needed to insure the User has access to this update.
+     * @param password A password that will be changed.
+     * @return The updated User of database values.
+     */
+    public User update(User user, Login login, String password) {
+        if (login.passwordIsValid()) {
+            User current = Assembly.get_instance().getUser(login);
+
+            if (current.get_primaryId() == user.get_primaryId())
+                if (UserRepository.get_instance().update(user, login, password))
+                    return Assembly.get_instance().getUser(user.get_primaryId());
+        }
         return null;
     }
 }
