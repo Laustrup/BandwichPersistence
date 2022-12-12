@@ -3,6 +3,7 @@ package laustrup.bandwichpersistence.services.controller_services.sub_controller
 import laustrup.bandwichpersistence.models.Rating;
 import laustrup.bandwichpersistence.models.Response;
 import laustrup.bandwichpersistence.models.Search;
+import laustrup.bandwichpersistence.models.albums.Album;
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
 import laustrup.bandwichpersistence.models.chats.messages.Mail;
@@ -111,5 +112,15 @@ public class UserControllerService extends ControllerService<User> {
      */
     public ResponseEntity<Response<User>> upsert(Rating rating) {
         return entityContent(UserPersistenceService.get_instance().upsert(rating));
+    }
+
+    /**
+     * Will upsert an Album of a User with its items
+     * and create a ResponseEntity with a Response of the current state of Author.
+     * @param album The Album that should be upserted.
+     * @return The created ResponseEntity of the author of the Album.
+     */
+    public ResponseEntity<Response<User>> upsert(Album album) {
+        return entityContent(UserPersistenceService.get_instance().upsert(album));
     }
 }

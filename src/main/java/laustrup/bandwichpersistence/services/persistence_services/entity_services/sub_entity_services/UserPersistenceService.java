@@ -39,7 +39,7 @@ public class UserPersistenceService {
 
     /**
      * Will upsert a Mail.
-     * Closes database connections and sets Mail into assembled.
+     * Closes database connection and sets Mail into assembled.
      * @param mail The Mail that will be upserted.
      * @return The ChatRoom of the Mail from the database.
      */
@@ -62,7 +62,7 @@ public class UserPersistenceService {
 
     /**
      * Will upsert a ChatRoom and inserts its chatters if they exist.
-     * Closes database connections and sets ChatRoom into assembled.
+     * Closes database connection and sets ChatRoom into assembled.
      * @param chatRoom The ChatRoom that will be upserted.
      * @return The ChatRoom from the database.
      */
@@ -90,7 +90,7 @@ public class UserPersistenceService {
 
     /**
      * Will upsert a Bulletin of a User.
-     * Closes database connections and sets User into assembled.
+     * Closes database connection and sets User into assembled.
      * @param bulletin The Bulletin that will be upserted.
      * @return The Receiver from the database.
      */
@@ -103,7 +103,7 @@ public class UserPersistenceService {
 
     /**
      * Will upsert a Rating of a User.
-     * Closes database connections and sets User into assembled.
+     * Closes database connection and sets User into assembled.
      * @param rating The Rating that will be upserted.
      * @return The Appointed from the database.
      */
@@ -114,6 +114,12 @@ public class UserPersistenceService {
         return rating.get_appointed();
     }
 
+    /**
+     * Will upsert an Album of a User.
+     * Closes database connection and sets User into assembled.
+     * @param album The Album that will be upserted.
+     * @return The author from the database.
+     */
     public User upsert(Album album) {
         ResultSet set = ModelRepository.get_instance().upsert(album);
         if (set != null)

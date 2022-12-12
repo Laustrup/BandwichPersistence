@@ -3,6 +3,7 @@ package laustrup.bandwichpersistence.controllers;
 import laustrup.bandwichpersistence.models.Rating;
 import laustrup.bandwichpersistence.models.Response;
 import laustrup.bandwichpersistence.models.Search;
+import laustrup.bandwichpersistence.models.albums.Album;
 import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
 import laustrup.bandwichpersistence.models.users.Login;
 import laustrup.bandwichpersistence.models.users.User;
@@ -63,6 +64,14 @@ public class UserController {
         return UserControllerService.get_instance().upsert(new Rating(
                     rating.get_value(), rating.get_appointed(),
                     rating.get_judge(), rating.get_timestamp()
+                )
+        );
+    }
+
+    @PatchMapping(value = "upsert/album", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Response<User>> upsert(@RequestBody Album album) {
+        return UserControllerService.get_instance().upsert(new Album(
+                    album.get_title(), album.get_items(), album.get_author()
                 )
         );
     }
