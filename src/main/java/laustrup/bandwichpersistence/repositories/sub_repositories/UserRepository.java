@@ -4,7 +4,11 @@ import laustrup.bandwichpersistence.models.events.Event;
 import laustrup.bandwichpersistence.models.users.Login;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
+import laustrup.bandwichpersistence.models.users.sub_users.bands.Artist;
+import laustrup.bandwichpersistence.models.users.sub_users.bands.Band;
+import laustrup.bandwichpersistence.models.users.sub_users.participants.Participant;
 import laustrup.bandwichpersistence.models.users.sub_users.subscriptions.Subscription;
+import laustrup.bandwichpersistence.models.users.sub_users.venues.Venue;
 import laustrup.bandwichpersistence.repositories.Repository;
 import laustrup.bandwichpersistence.utilities.Liszt;
 import laustrup.bandwichpersistence.utilities.Printer;
@@ -117,8 +121,7 @@ public class UserRepository extends Repository {
                 "INNER JOIN gigs ON gigs.event_id = `events`.id " +
                 "INNER JOIN acts ON acts.gig_id = gigs.id OR acts.user_id = users.id " +
                 "INNER JOIN participations ON participations.event_id = `events`.id" +
-                "INNER JOIN followings ON followings.follower_id = users.id OR followings.lead_id = users.id " +
-                "INNER JOIN fans ON fans.fan_id = users.id OR fans.idol_id = users.id " +
+                "INNER JOIN followings ON followings.fan_id = users.id OR followings.idol_id = users.id " +
                 "INNER JOIN chatters ON chatters.user_id = users.id " +
                 "INNER JOIN chat_rooms ON chatters.chat_room_id = chat_rooms.id " +
                 "INNER JOIN user_bulletins ON users.id = bulletins.receiver_id " +
@@ -140,5 +143,78 @@ public class UserRepository extends Repository {
      */
     public boolean delete(User user) {
         return delete(user.get_primaryId(), "users", "id", true);
+    }
+
+    /**
+     * Inserts a new following between a fan and idol.
+     * Doesn't close connection.
+     * @param fan The User that is following an idol.
+     * @param idol The User that is followed by a fan.
+     * @return True if it is a success.
+     */
+    public boolean insert(User fan, User idol) {
+        return edit("INSERT IGNORE INTO followings(" +
+                    "fan_id," +
+                    "fan_kind," +
+                    "idol_id," +
+                    "idol_kind" +
+                ") " +
+                "VALUES(" +
+                    fan.get_primaryId() + ",'" +
+                    determineClass(fan) + "'," +
+                    idol.get_primaryId() + ",'" +
+                    determineClass(idol) + "'" +
+                ");", false);
+    }
+
+    /**
+     * Will determine which class the User is of.
+     * @param user The specific User of determination.
+     * @return A String of the class name.
+     */
+    private String determineClass(User user) {
+        return (user.getClass() == Band.class ? "BAND" :
+                    user.getClass() == Artist.class ? "ARTIST" :
+                            user.getClass() == Venue.class ? "VENUE" :
+                                    user.getClass() == Participant.class ? "PARTICIPANT" : "");
+    }
+
+    /**
+     * Will remove a following relation.
+     * Closes Connection.
+     * @param fan The User that is following an idol.
+     * @param idol The User that is followed by a fan.
+     * @return True if it is a success.
+     */
+    public boolean remove(User fan, User idol) {
+        return delete("followings", fan.get_primaryId(), "fan_id",
+                idol.get_primaryId(), "idol_id", true);
+    }
+
+    /**
+     * Updates a User table of values username, first_name, last_name and description.
+     * Doesn't close connection.
+     * @param user The User with values that will be updated and an id.
+     * @return True if it is a success.
+     */
+    public boolean update(User user) {
+        return edit("UPDATE users SET " +
+                    "username = '" + user.get_username() + "' " +
+                    "first_name = '" + user.get_firstName() + "' " +
+                    "last_name = '" + user.get_lastName() + "' " +
+                    "`description` = '" + user.get_description() + "' " +
+                "WHERE id = " + user.get_primaryId() + ";", false);
+    }
+
+    /**
+     * Updates password of a User of a specific id.
+     * @param id The id of the User, that will have its password updated.
+     * @param password The password that will be updated as the new password.
+     * @return True if it is a success.
+     */
+    public boolean update(long id, String password) {
+        return edit("UPDATE users SET " +
+                    "`password` = '" + password + "' " +
+                "WHERE id = " + id + ";", false);
     }
 }

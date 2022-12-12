@@ -1,9 +1,7 @@
 package laustrup.bandwichpersistence.repositories;
 
-import laustrup.bandwichpersistence.miscs.Crate;
 import laustrup.bandwichpersistence.utilities.Plato;
 import laustrup.bandwichpersistence.utilities.Printer;
-import lombok.Getter;
 
 import java.sql.*;
 
@@ -42,6 +40,7 @@ public abstract class Repository {
         return null;
     }
 
+    //TODO Remove doClose parameter and references.
     /**
      * Opens the connection, if it isn't already open.
      * Are used for making changes such as Update and Delete to the database.
@@ -91,13 +90,10 @@ public abstract class Repository {
      * @return True if it has opened it and false if not.
      */
     public boolean handleConnection() {
-        try {
-            if (connection().isClosed()) {
-                this._connector.createConnection();
-                return true;
-            }
-        } catch (SQLException e) { Printer.get_instance().print("Couldn't open connection...",e); }
-
+        if (DbGate.get_instance().isClosed().get_truth()) {
+            this._connector.createConnection();
+            return true;
+        }
         return false;
     }
 
