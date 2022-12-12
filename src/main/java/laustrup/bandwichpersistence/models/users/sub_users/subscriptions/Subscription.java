@@ -11,6 +11,7 @@ import lombok.ToString;
 
 import java.time.LocalDateTime;
 
+//TODO Insert when User is inserted in database.
 /**
  * Defines the kind of subscription a user is having.
  * Only Artists and Bands can have a paying subscription.

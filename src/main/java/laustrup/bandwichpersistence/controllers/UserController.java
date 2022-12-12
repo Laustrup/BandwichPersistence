@@ -8,6 +8,7 @@ import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
 import laustrup.bandwichpersistence.models.users.Login;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.sub_users.participants.Participant;
+import laustrup.bandwichpersistence.models.users.sub_users.subscriptions.Card;
 import laustrup.bandwichpersistence.services.controller_services.sub_controller_services.UserControllerService;
 import laustrup.bandwichpersistence.utilities.Liszt;
 import laustrup.bandwichpersistence.utilities.Plato;
@@ -93,5 +94,22 @@ public class UserController {
                                                  @PathVariable(name = "login_password") String loginPassword,
                                                  @PathVariable(name = "password") String password) {
         return UserControllerService.get_instance().update(user,new Login(username,loginPassword),password);
+    }
+
+    @PatchMapping(value = "upsert/card/{user_id}/{login_username}/{login_password}",
+            consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Response<User>> upsert(@RequestBody Card card,
+                                                 @PathVariable(name = "user_id") long id,
+                                                 @PathVariable(name = "login_username") String username,
+                                                 @PathVariable(name = "login_password") String password) {
+        return UserControllerService.get_instance().upsert(id, new Login(username,password), card);
+    }
+
+    @PatchMapping(value = "upsert/subscription/{login_username}/{login_password}",
+            consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Response<User>> upsert(@RequestBody User user,
+                                                 @PathVariable(name = "login_username") String username,
+                                                 @PathVariable(name = "login_password") String password) {
+        return UserControllerService.get_instance().upsert(user, new Login(username, password));
     }
 }

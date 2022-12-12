@@ -9,18 +9,15 @@ import laustrup.bandwichpersistence.models.users.Login;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.sub_users.subscriptions.Card;
 import laustrup.bandwichpersistence.models.users.sub_users.subscriptions.Subscription;
-import laustrup.bandwichpersistence.models.users.sub_users.subscriptions.SubscriptionOffer;
 import laustrup.bandwichpersistence.repositories.DbGate;
 import laustrup.bandwichpersistence.repositories.sub_repositories.ModelRepository;
 import laustrup.bandwichpersistence.repositories.sub_repositories.UserRepository;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembly;
-import laustrup.bandwichpersistence.utilities.Liszt;
 import laustrup.bandwichpersistence.utilities.Plato;
 import laustrup.bandwichpersistence.utilities.Printer;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
 
 /**
  * Contains logic for CRUD of Participants.

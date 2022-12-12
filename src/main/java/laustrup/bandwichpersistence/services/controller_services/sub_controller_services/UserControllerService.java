@@ -9,6 +9,7 @@ import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
 import laustrup.bandwichpersistence.models.chats.messages.Mail;
 import laustrup.bandwichpersistence.models.users.Login;
 import laustrup.bandwichpersistence.models.users.User;
+import laustrup.bandwichpersistence.models.users.sub_users.subscriptions.Card;
 import laustrup.bandwichpersistence.services.controller_services.ControllerService;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembly;
 import laustrup.bandwichpersistence.services.persistence_services.entity_services.sub_entity_services.UserPersistenceService;
@@ -153,5 +154,28 @@ public class UserControllerService extends ControllerService<User> {
      */
     public ResponseEntity<Response<User>> update(User user, Login login, String password) {
         return entityContent(UserPersistenceService.get_instance().update(user, login, password));
+    }
+
+    /**
+     * Will upsert Card for a User.
+     * @param userId The if of the User with values that will be updated and an id.
+     * @param login Is needed to insure the User has access to this update.
+     * @param card The Card that will be upserted in database.
+     * @return The User of the upserted Card.
+     */
+    public ResponseEntity<Response<User>> upsert(long userId, Login login, Card card) {
+        return entityContent(UserPersistenceService.get_instance().upsert(
+                Assembly.get_instance().getUserUnassembled(userId), login, card)
+        );
+    }
+
+    /**
+     * Will upsert Subscription for a User.
+     * @param user The User with values that will be updated and an id.
+     * @param login Is needed to insure the User has access to this update.
+     * @return The User of the upserted Subscription.
+     */
+    public ResponseEntity<Response<User>> upsert(User user, Login login) {
+        return entityContent(UserPersistenceService.get_instance().upsert(user,login,null));
     }
 }
