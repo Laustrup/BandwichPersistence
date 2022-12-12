@@ -137,14 +137,14 @@ public class UserPersistenceService {
      * @param idol The User that should being followed by a fan.
      * @return The two updated Users if success.
      */
-    public Liszt<User> follow(User fan, User idol) {
-        Liszt<User> users = new Liszt<>();
+    public User[] follow(User fan, User idol) {
+        User[] users = new User[2];
 
         if (UserRepository.get_instance().insert(fan,idol))
-            users = new Liszt<>(new User[]{
+            users = new User[]{
                     Assembly.get_instance().getUserUnassembled(fan.get_primaryId()),
                     Assembly.get_instance().getUserUnassembled(idol.get_primaryId())
-            });
+            };
 
         return users;
     }
@@ -155,14 +155,14 @@ public class UserPersistenceService {
      * @param idol The User that is being followed by a fan.
      * @return The two updated Users if success.
      */
-    public Liszt<User> unfollow(User fan, User idol) {
-        Liszt<User> users = new Liszt<>();
+    public User[] unfollow(User fan, User idol) {
+        User[] users = new User[2];
 
         if (UserRepository.get_instance().remove(fan, idol))
-            users = new Liszt<>(new User[]{
+            users = new User[]{
                     Assembly.get_instance().getUserUnassembled(fan.get_primaryId()),
                     Assembly.get_instance().getUserUnassembled(idol.get_primaryId())
-            });
+            };
 
         DbGate.get_instance().close();
         return users;

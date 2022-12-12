@@ -75,4 +75,23 @@ public class UserController {
                 )
         );
     }
+
+    @PutMapping(value = "follow", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Response<User[]>> follow(@RequestBody User[] users) {
+        return UserControllerService.get_instance().follow(users[0], users[1]);
+    }
+
+    @DeleteMapping(value = "unfollow", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Response<User[]>> unfollow(@RequestBody User[] users) {
+        return UserControllerService.get_instance().unfollow(users[0], users[1]);
+    }
+
+    @PatchMapping(value = "update/{login_username}/{login_password}/{password}",
+            consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Response<User>> update(@RequestBody User user,
+                                                 @PathVariable(name = "login_username") String username,
+                                                 @PathVariable(name = "login_password") String loginPassword,
+                                                 @PathVariable(name = "password") String password) {
+        return UserControllerService.get_instance().update(user,new Login(username,loginPassword),password);
+    }
 }

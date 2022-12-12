@@ -123,4 +123,35 @@ public class UserControllerService extends ControllerService<User> {
     public ResponseEntity<Response<User>> upsert(Album album) {
         return entityContent(UserPersistenceService.get_instance().upsert(album));
     }
+
+    /**
+     * Makes a following between two Users.
+     * @param fan The User that should follow an idol.
+     * @param idol The User that should being followed by a fan.
+     * @return A Response of the updated Users.
+     */
+    public ResponseEntity<Response<User[]>> follow(User fan, User idol) {
+        return entityContent(UserPersistenceService.get_instance().follow(fan, idol));
+    }
+
+    /**
+     * Removes a following between two Users.
+     * @param fan The User that shouldn't follow an idol.
+     * @param idol The User that shouldn't being followed by a fan.
+     * @return A Response of the updated Users.
+     */
+    public ResponseEntity<Response<User[]>> unfollow(User fan, User idol) {
+        return entityContent(UserPersistenceService.get_instance().unfollow(fan, idol));
+    }
+
+    /**
+     * Will update a User, but only if the login fits the User.
+     * @param user The User with values that will be updated and an id.
+     * @param login Is needed to insure the User has access to this update.
+     * @param password A password that will be changed.
+     * @return A Response of the updated User.
+     */
+    public ResponseEntity<Response<User>> update(User user, Login login, String password) {
+        return entityContent(UserPersistenceService.get_instance().update(user, login, password));
+    }
 }
