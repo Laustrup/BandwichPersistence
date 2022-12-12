@@ -2,7 +2,6 @@ package laustrup.bandwichpersistence.repositories.sub_repositories;
 
 import laustrup.bandwichpersistence.models.users.sub_users.venues.Venue;
 import laustrup.bandwichpersistence.repositories.Repository;
-import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembly;
 import laustrup.bandwichpersistence.utilities.Printer;
 
 import java.sql.ResultSet;

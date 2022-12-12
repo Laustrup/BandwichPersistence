@@ -31,7 +31,7 @@ public abstract class Repository {
     protected ResultSet read(String sql) {
         if (handleConnection()) {
             try {
-                PreparedStatement statement = _connector.get_connection().prepareStatement(sql);
+                PreparedStatement statement = connection().prepareStatement(sql);
                 return statement.executeQuery();
             } catch (SQLException e) {
                 Printer.get_instance().print("Couldn't read sql statement...",e);
@@ -54,7 +54,7 @@ public abstract class Repository {
     protected boolean edit(String sql, boolean doClose) {
         if (handleConnection()) {
             try {
-                PreparedStatement statement = _connector.get_connection().prepareStatement(sql);
+                PreparedStatement statement = connection().prepareStatement(sql);
                 boolean success = statement.executeUpdate() > 0;
 
                 if (doClose)
@@ -76,7 +76,7 @@ public abstract class Repository {
     protected PreparedStatement create(String sql) {
         if (handleConnection()) {
             try {
-                PreparedStatement statement = _connector.get_connection().prepareStatement(sql,
+                PreparedStatement statement = connection().prepareStatement(sql,
                         PreparedStatement.RETURN_GENERATED_KEYS);
 
                 statement.executeUpdate();
@@ -93,7 +93,7 @@ public abstract class Repository {
     public boolean handleConnection() {
         try {
             if (connection().isClosed()) {
-                _connector.createConnection();
+                this._connector.createConnection();
                 return true;
             }
         } catch (SQLException e) { Printer.get_instance().print("Couldn't open connection...",e); }
@@ -105,7 +105,7 @@ public abstract class Repository {
      * Will close the database connection of this instance.
      * @return The success of the closing as a Plato. Will be undefined, if there is a SQLException and null if the connection is null.
      */
-    public Plato closeConnection() { return _connector.closeConnection(); }
+    public Plato closeConnection() { return this._connector.closeConnection(); }
 
     /**
      * Will determine if the Connection of this Repository is closed.
@@ -124,7 +124,7 @@ public abstract class Repository {
      * Defines the database connection of this repository by getting it from its DBConnector.
      * @return The database connection from the DBConnector.
      */
-    private Connection connection() { return _connector.get_connection(); }
+    private Connection connection() { return DbGate.get_instance().get_connection(); }
 
     /**
      * Will do a select * of a table, do a where of id and check if the ResultSet contains any rows.
@@ -213,35 +213,21 @@ public abstract class Repository {
     private class DBConnector {
 
         /**
-         * The database connection for this entity's connector.
-         * Must be closed after use, for better performance.
-         */
-        @Getter
-        private Connection _connection;
-
-        /**
          * Will create a connection, if it is closed at the moment.
          * @return If it opens the connection, it will return the opened connection, else it will return null.
          */
         public Connection createConnection() {
-            try {
-                if (_connection.isClosed()) {
-                    openConnection();
-                    return _connection;
-                }
-            } catch (SQLException e) {
-                Printer.get_instance().print("Couldn't create connection...",e);
-            }
-            return null;
+            openConnection();
+            return DbGate.get_instance().get_connection();
         }
 
         /**
          * Opens the connection with the DriverManager and the Crate information.
          * @throws SQLException Will be thrown if there is a problem with the connection.
          */
-        private void openConnection() throws SQLException {
-            Crate crate = Crate.get_instance();
-            _connection = DriverManager.getConnection(crate.get_dbPath(), crate.get_dbUser(), crate.get_dbPassword());
+        private void openConnection() {
+            if (DbGate.get_instance().isClosed())
+                DbGate.get_instance().isOpen();
         }
 
         /**
@@ -249,18 +235,7 @@ public abstract class Repository {
          * @return The success of the closing as a Plato. Will be undefined, if there is a SQLException and null if the connection is null.
          */
         public Plato closeConnection() {
-            if (_connection != null) {
-                try {
-                    if (!_connection.isClosed()) {
-                        _connection.close();
-                        return new Plato(true);
-                    }
-                } catch (SQLException e) {
-                    Printer.get_instance().print("Couldn't close connection...",e);
-                    return new Plato();
-                }
-            }
-            return null;
+            return DbGate.get_instance().close();
         }
     }
 }
