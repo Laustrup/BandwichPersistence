@@ -64,11 +64,14 @@ public class ParticipantAssembly extends UserAssembler {
             if (_id != set.getLong("users.id"))
                 break;
 
+            _albums = _handler.handleAlbums(set, _albums);
             idols = _handler.handleIdols(set, idols);
         } while (set.next());
 
-        resetUserAttributes();
-        return new Participant(_id, _username, _firstName, _lastName, _description, _contactInfo, _images, _ratings,
+        Participant participant = new Participant(_id, _username, _firstName, _lastName, _description, _contactInfo, _albums, _ratings,
                 _events, _chatRooms, _subscription, _bulletins, _timestamp, idols);
+
+        resetUserAttributes();
+        return participant;
     }
 }

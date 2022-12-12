@@ -43,13 +43,13 @@ public class Band extends Performer {
         super(id);
     }
 
-    public Band(long id, String username, String description, ContactInfo contactInfo, Album images,
+    public Band(long id, String username, String description, ContactInfo contactInfo, Liszt<Album> albums,
                 Liszt<Rating> ratings, Liszt<Event> events, Liszt<Gig> gigs, Liszt<ChatRoom> chatRooms, Subscription subscription,
-                Liszt<Bulletin> bulletins, LocalDateTime timestamp, Liszt<Album> music, Liszt<Artist> members,
+                Liszt<Bulletin> bulletins, LocalDateTime timestamp, Liszt<Artist> members,
                 String runner, Liszt<User> fans, Liszt<User> idols)
             throws InputMismatchException {
-        super(id, username, description, contactInfo, images, ratings, events, gigs, chatRooms, subscription,
-                bulletins, timestamp, music, fans, idols);
+        super(id, username, description, contactInfo, albums, ratings, events, gigs, chatRooms, subscription,
+                bulletins, timestamp, fans, idols);
         _username = username;
 
         _members = members;

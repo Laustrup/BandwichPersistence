@@ -1,6 +1,8 @@
 package laustrup.bandwichpersistence.repositories.sub_repositories;
 
 import laustrup.bandwichpersistence.models.Rating;
+import laustrup.bandwichpersistence.models.albums.Album;
+import laustrup.bandwichpersistence.models.albums.AlbumItem;
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
 import laustrup.bandwichpersistence.models.chats.messages.Mail;
@@ -328,7 +330,7 @@ public class ModelRepository extends Repository {
     }
 
     /**
-     * Upserts Ratings.
+     * Upserts a Rating.
      * It will insert the values of the Rating if it doesn't exist,
      * otherwise it will update the value of the Rating.
      * Will not close connection.
@@ -350,5 +352,86 @@ public class ModelRepository extends Repository {
                 "ON DUPLICATE KEY " +
                     "`value` = " + rating.get_value() +
                 ";", false);
+    }
+
+    /**
+     * Upserts an Album and its items.
+     * It will insert the values of the Album and its items if they don't exist,
+     * otherwise it will update the values instead.
+     * In case it did insert, it will generate a key.
+     * Will not close connection.
+     * @param album The Album with its items that will have influence on the database table.
+     * @return A ResultSet with a generated key.
+     */
+    public ResultSet upsert(Album album) {
+        try {
+            boolean idExists = album.get_primaryId() > 0;
+            return create("INSERT INTO albums(" +
+                        (idExists ? "id," : "") +
+                        "title," +
+                        "author_id," +
+                        "`timestamp`" +
+                    ") " +
+                    "VALUES(" +
+                        (idExists ? album.get_primaryId()+",'" : "'") +
+                        album.get_title() + "'," +
+                        album.get_author().get_primaryId() + "," +
+                    "NOW()) " +
+                    "ON DUPLICATE KEY UPDATE " +
+                        "title = '" + album.get_title() + "' " +
+                    "; " +
+                    upsertAlbumItemsSql(album)).getGeneratedKeys();
+        } catch (SQLException e) {
+            Printer.get_instance().print("Couldn't upsert Album " + album.get_title() + "...",e);
+        }
+        return null;
+    }
+
+    /**
+     * Generates an Album item upsert SQL statement.
+     * The SQL will insert the values of the items if they don't exist,
+     * otherwise it will update the values instead.
+     * @param album The Album that has the items.
+     * @return The generated SQL string.
+     */
+    private String upsertAlbumItemsSql(Album album) {
+        String sql = "";
+        for (AlbumItem item : album.get_items())
+            sql += "INSERT IGNORE INTO album_endpoints(" +
+                        "title," +
+                        "endpoint," +
+                        "kind," +
+                        "album_id," +
+                        "event_id" +
+                    ") VALUES('" +
+                        item.get_title() + "','" +
+                        item.get_endpoint() + "','" +
+                        item.get_kind() + "'," +
+                        album.get_primaryId() + "," +
+                        item.get_event().get_primaryId() +
+                    "); " +
+                        upsertTags(item);
+        return sql;
+    }
+
+    /**
+     * Generates a upsert SQL for tags of an Album item.
+     * The SQL will insert the values of the tags if they don't exist,
+     * otherwise it will update the values instead.
+     * @param item The items that has the tags.
+     * @return The generated SQL string.
+     */
+    private String upsertTags(AlbumItem item) {
+        String sql = "";
+        for (User tag : item.get_tags())
+            sql += "INSERT IGNORE INTO tags(" +
+                    "user_id," +
+                    "item_endpoint" +
+                    ") " +
+                    "VALUES(" +
+                        tag.get_primaryId() + ",'" +
+                        item.get_endpoint() + "'" +
+                    "); ";
+        return sql;
     }
 }

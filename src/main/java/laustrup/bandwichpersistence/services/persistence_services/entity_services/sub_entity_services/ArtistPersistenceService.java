@@ -60,10 +60,9 @@ public class ArtistPersistenceService extends EntityService<Artist> {
 
             //Puts in subscription and contactInfo
             artist = new Artist(artist.get_primaryId(), artist.get_username(), artist.get_firstName(), artist.get_lastName(),
-                    artist.get_description(),contactInfo,artist.get_images(), artist.get_ratings(), artist.get_events(),
+                    artist.get_description(),contactInfo,artist.get_albums(), artist.get_ratings(), artist.get_events(),
                     artist.get_gigs(),artist.get_chatRooms(),subscription,artist.get_bulletins(),artist.get_timestamp(),
-                    artist.get_music(),artist.get_bands(),artist.get_runner(),
-                    artist.get_fans(),artist.get_idols(),artist.get_requests()
+                    artist.get_bands(),artist.get_runner(), artist.get_fans(),artist.get_idols(),artist.get_requests()
             );
 
             if (upsert(artist))

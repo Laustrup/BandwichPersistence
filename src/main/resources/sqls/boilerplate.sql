@@ -11,8 +11,8 @@ USE bandwich_db;
 
 DROP TABLE IF EXISTS contact_informations;
 DROP TABLE IF EXISTS subscriptions;
-DROP TABLE IF EXISTS album_endpoints;
-DROP TABLE IF EXISTS album_relations;
+DROP TABLE IF EXISTS tags;
+DROP TABLE IF EXISTS album_items;
 DROP TABLE IF EXISTS albums;
 DROP TABLE IF EXISTS ratings;
 DROP TABLE IF EXISTS requests;
@@ -293,31 +293,36 @@ CREATE TABLE ratings(
 CREATE TABLE albums(
     id BIGINT(20) NOT NULL AUTO_INCREMENT,
     title VARCHAR(100),
-    kind ENUM('IMAGE',
-        'MUSIC') NOT NULL,
+
+    author_id BIGINT(20) NOT NULL,
+
     `timestamp` DATETIME NOT NULL,
 
-    PRIMARY KEY(id)
+    PRIMARY KEY(id),
+    FOREIGN KEY(author_id) REFERENCES users(id)
 );
 
-CREATE TABLE album_relations(
-    user_id BIGINT(20) NOT NULL,
+CREATE TABLE album_items(
+    title VARCHAR(100),
+    endpoint VARCHAR(100) NOT NULL,
+    kind ENUM('IMAGE',
+        'MUSIC') NOT NULL,
+
     album_id BIGINT(20) NOT NULL,
     event_id BIGINT(20),
-    is_author BOOLEAN NOT NULL,
 
-    PRIMARY KEY(user_id, album_id),
-    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
+    PRIMARY KEY(endpoint),
     FOREIGN KEY(album_id) REFERENCES albums(id) ON DELETE CASCADE,
     FOREIGN KEY(event_id) REFERENCES `events`(id)
 );
 
-CREATE TABLE album_endpoints(
-    album_id BIGINT(20) NOT NULL,
-    `value` VARCHAR(100) NOT NULL,
+CREATE TABLE tags(
+    user_id BIGINT(20) NOT NULL,
+    item_endpoint VARCHAR(100) NOT NULL,
 
-    PRIMARY KEY(album_id, `value`),
-    FOREIGN KEY(album_id) REFERENCES albums(id) ON DELETE CASCADE
+    PRIMARY KEY(user_id, item_endpoint),
+    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY(item_endpoint) REFERENCES album_items(endpoint) ON DELETE CASCADE
 );
 
 CREATE TABLE subscriptions(

@@ -34,11 +34,11 @@ public class Participant extends User {
         super(id);
     }
     public Participant(long id, String username, String firstName, String lastName, String description,
-                       ContactInfo contactInfo, Album images, Liszt<Rating> ratings, Liszt<Event> events,
+                       ContactInfo contactInfo, Liszt<Album> albums, Liszt<Rating> ratings, Liszt<Event> events,
                        Liszt<ChatRoom> chatRooms, Subscription.Status subscriptionStatus,
                        SubscriptionOffer subscriptionOffer, Liszt<Bulletin> bulletins,
                        LocalDateTime timestamp, Liszt<User> idols) {
-        super(id, username, firstName, lastName, description, contactInfo, images, ratings, events, chatRooms,
+        super(id, username, firstName, lastName, description, contactInfo, albums, ratings, events, chatRooms,
                 new Subscription(id, Subscription.Type.FREEMIUM, subscriptionStatus, subscriptionOffer, null),
                 bulletins, timestamp);
         _idols = idols;
@@ -48,11 +48,11 @@ public class Participant extends User {
     }
 
     public Participant(long id, String username, String description,
-                       ContactInfo contactInfo, Album images, Liszt<Rating> ratings, Liszt<Event> events,
+                       ContactInfo contactInfo, Liszt<Album> albums, Liszt<Rating> ratings, Liszt<Event> events,
                        Liszt<ChatRoom> chatRooms, Subscription.Status subscriptionStatus,
                        SubscriptionOffer subscriptionOffer, Liszt<Bulletin> bulletins,
                        LocalDateTime timestamp, Liszt<User> idols) {
-        super(id, username, description, contactInfo, images, ratings, events, chatRooms,
+        super(id, username, description, contactInfo, albums, ratings, events, chatRooms,
                 new Subscription(id, Subscription.Type.FREEMIUM, subscriptionStatus, subscriptionOffer, null),
                 bulletins, timestamp);
         _idols = idols;
@@ -62,10 +62,10 @@ public class Participant extends User {
     }
 
     public Participant(long id, String username, String firstName, String lastName, String description,
-                       ContactInfo contactInfo, Album images, Liszt<Rating> ratings, Liszt<Event> events,
+                       ContactInfo contactInfo, Liszt<Album> albums, Liszt<Rating> ratings, Liszt<Event> events,
                        Liszt<ChatRoom> chatRooms, Subscription subscription,
                        Liszt<Bulletin> bulletins, LocalDateTime timestamp, Liszt<User> idols) {
-        super(id, username, firstName, lastName, description, contactInfo, images, ratings, events, chatRooms,
+        super(id, username, firstName, lastName, description, contactInfo, albums, ratings, events, chatRooms,
                 subscription, bulletins, timestamp);
         _idols = idols;
         _subscription.get_user().set_username(_username);
@@ -73,10 +73,10 @@ public class Participant extends User {
     }
 
     public Participant(long id, String username, String description,
-                       ContactInfo contactInfo, Album images, Liszt<Rating> ratings, Liszt<Event> events,
+                       ContactInfo contactInfo, Liszt<Album> albums, Liszt<Rating> ratings, Liszt<Event> events,
                        Liszt<ChatRoom> chatRooms, Subscription subscription,
                        Liszt<Bulletin> bulletins, LocalDateTime timestamp, Liszt<User> idols) {
-        super(id, username, description, contactInfo, images, ratings, events, chatRooms,
+        super(id, username, description, contactInfo, albums, ratings, events, chatRooms,
                 subscription, bulletins, timestamp);
         _idols = idols;
         _subscription.get_user().set_username(_username);

@@ -1,6 +1,7 @@
 package laustrup.bandwichpersistence;
 
 import laustrup.bandwichpersistence.models.Model;
+import laustrup.bandwichpersistence.models.albums.AlbumItem;
 import laustrup.bandwichpersistence.models.events.Event;
 import laustrup.bandwichpersistence.models.Rating;
 import laustrup.bandwichpersistence.models.albums.Album;
@@ -196,17 +197,26 @@ public class TestItems extends JTest {
     private void setupAlbums() {
         _albums = new Album[_albumAmount];
 
-        for (int i = 0; i < _albums.length; i++) {
-            Album.Kind kind = _random.nextBoolean() ? Album.Kind.MUSIC : Album.Kind.IMAGE;
-            if (i == 0)
-                kind = Album.Kind.MUSIC;
-            if (i == 1)
-                kind = Album.Kind.IMAGE;
+        for (int i = 0; i < _albums.length; i++)
+            _albums[i] = new Album(i+1, "Album title",generateAlbumItems(),
+                    new Participant(), LocalDateTime.now());
+    }
 
-            _albums[i] = new Album(i+1, kind == Album.Kind.MUSIC ? "Debut album" : "Gig photos",
-                    new Liszt<>(new String[]{kind == Album.Kind.MUSIC ? "MusicEndpoint" : "PhotoEndpoint"},false),
-                    new Participant(), new Liszt<>(), null, kind, LocalDateTime.now());
+    private Liszt<AlbumItem> generateAlbumItems() {
+        Liszt<AlbumItem> items = new Liszt<>();
+        for (int i = 1; i <= _random.nextInt(10)+1;i++) {
+            AlbumItem.Kind kind = _random.nextBoolean() ? AlbumItem.Kind.MUSIC : AlbumItem.Kind.IMAGE;
+            if (i == 0)
+                kind = AlbumItem.Kind.MUSIC;
+            if (i == 1)
+                kind = AlbumItem.Kind.IMAGE;
+
+            items.add(new AlbumItem(kind == AlbumItem.Kind.MUSIC ? "Debut title" : "Gig photos title",
+                    kind == AlbumItem.Kind.MUSIC ? "MusicEndpoint" : "PhotoEndpoint", kind,new Liszt<>(),
+                    LocalDateTime.now()));
         }
+
+            return items;
     }
 
     private void setupRatings() {
@@ -218,14 +228,14 @@ public class TestItems extends JTest {
 
     private void setupParticipants() {
         _participants = new Participant[_participantAmount];
-        Liszt<Album> images = sortImageAlbums();
 
         for (int i = 0; i < _participants.length; i++) {
             int id = i+1;
             boolean gender = _random.nextBoolean();
             _participants[i] = new Participant(id, gender ? "Hansinator "+id : "Ursulanator "+id,
                     gender ? "Hans "+id : "Ursula "+id, "Hansen "+id, "Description "+id,
-                    _contactInfo[_random.nextInt(_contactInfo.length)], images.get(_random.nextInt(images.size())+1),
+                    _contactInfo[_random.nextInt(_contactInfo.length)],
+                    new Liszt<>(new Album[]{_albums[_random.nextInt(_albums.length)]}),
                     randomizeRatings(), new Liszt<>(), new Liszt<>(), Subscription.Status.ACCEPTED,
                     new SubscriptionOffer(TimeService.get_instance().generateRandom(),
                             _random.nextBoolean() ? SubscriptionOffer.Type.SALE : SubscriptionOffer.Type.FREE_TRIAL,
@@ -235,23 +245,20 @@ public class TestItems extends JTest {
 
     private void setupArtists() {
         _artists = new Artist[_artistAmount];
-        Liszt<Album> images = sortImageAlbums();
 
         for (int i = 0; i < _artists.length; i++) {
-            int id = i+1;
+            long id = i+1;
             boolean gender = _random.nextBoolean();
             _artists[i] = new Artist(id, gender ? "Hansinator "+id : "Ursulanator "+id,
                     gender ? "Hans "+id : "Ursula "+id, "Hansen "+id, "Description "+id,
-                    _contactInfo[_random.nextInt(_contactInfo.length)], images.get(_random.nextInt(images.size())+1),
+                    _contactInfo[_random.nextInt(_contactInfo.length)], new Liszt<>(new Album[]{_albums[_random.nextInt(_albums.length)]}),
                     randomizeRatings(), new Liszt<>(), new Liszt<>(), new Liszt<>(), setupSubscription(new Artist()), new Liszt<>(),
-                    LocalDateTime.now(), sortMusicAlbums(),new Liszt<>(), "Gear "+id, new Liszt<>(), new Liszt<>(),
-                    new Liszt<>());
+                    LocalDateTime.now(), new Liszt<>(), "Gear "+id, new Liszt<>(), new Liszt<>(), new Liszt<>());
         }
     }
 
     private void setupBands() {
         _bands = new Band[_bandAmount];
-        Liszt<Album> images = sortImageAlbums();
 
         for (int i = 0; i < _bands.length; i++) {
             int id = i+1;
@@ -282,9 +289,9 @@ public class TestItems extends JTest {
             }
 
             _bands[i] = new Band(id, "Band "+id, "Description "+id,
-                    _contactInfo[_random.nextInt(_contactInfo.length)], images.get(_random.nextInt(images.size())+1),
+                    _contactInfo[_random.nextInt(_contactInfo.length)], new Liszt<>(new Album[]{_albums[_random.nextInt(_albums.length)]}),
                     randomizeRatings(), new Liszt<>(), new Liszt<>(), new Liszt<>(), setupSubscription(new Band()), new Liszt<>(),
-                    LocalDateTime.now(), sortMusicAlbums(), members, "Gear "+id,fans, new Liszt<>());
+                    LocalDateTime.now(), members, "Gear "+id,fans, new Liszt<>());
 
             for (Artist member : _bands[i].get_members()) _artists[(int) (member.get_primaryId()-1)].addBand(_bands[i]);
             for (User fan : _bands[i].get_fans()) _participants[(int) (fan.get_primaryId() - 1)].add(_bands[i]);
@@ -301,13 +308,13 @@ public class TestItems extends JTest {
 
     private void setupVenues() {
         _venues = new Venue[_venueAmount];
-        Liszt<Album> images = sortImageAlbums();
 
         for (int i = 0; i < _venues.length; i++) {
             int id = i+1;
             _venues[i] = new Venue(id, "Venue "+id, "Description "+id,
-                    _contactInfo[_random.nextInt(_contactInfo.length)], images.get(_random.nextInt(images.size())+1),
-                    randomizeRatings(), new Liszt<>(), new Liszt<>(), LocalDateTime.now(), "Location "+id,
+                    _contactInfo[_random.nextInt(_contactInfo.length)],
+                    new Liszt<>(new Album[]{_albums[_random.nextInt(_albums.length)]}), randomizeRatings(),
+                    new Liszt<>(), new Liszt<>(), LocalDateTime.now(), "Location "+id,
                     "Gear "+id, Subscription.Status.ACCEPTED,
                     new SubscriptionOffer(TimeService.get_instance().generateRandom(),
                             _random.nextBoolean() ? SubscriptionOffer.Type.SALE : SubscriptionOffer.Type.FREE_TRIAL,
@@ -317,7 +324,6 @@ public class TestItems extends JTest {
 
     private void setupEvents() {
         _events = new Event[_eventAmount];
-        Liszt<Album> images = sortImageAlbums();
 
         for (int i = 0; i < _events.length; i++) {
             int id = i+1;
@@ -332,7 +338,7 @@ public class TestItems extends JTest {
                     _contactInfo[_random.nextInt(_contactInfo.length)],
                     generateGigs(new Event(id), startOfLatestGig, gigAmount, gigLengths),
                     _venues[_random.nextInt(_venues.length)], new Liszt<>(), generateParticipations(id), new Liszt<>(),
-                    images.get(_random.nextInt(images.size())+1), LocalDateTime.now());
+                    _albums[_random.nextInt(_albums.length)], LocalDateTime.now());
 
             for (Gig gig : _events[i].get_gigs())
                 _events[i].add(generateRequests(gig.get_act(), _events[i]));
@@ -510,22 +516,5 @@ public class TestItems extends JTest {
         for (int i = 0; i < amount; i++) ratings.add(_ratings[_random.nextInt(_ratings.length)]);
 
         return ratings;
-    }
-
-    private Liszt<Album> sortMusicAlbums() {
-        Liszt<Album> music = new Liszt<>();
-        for (Album album : _albums)
-            if (album.get_kind() == Album.Kind.MUSIC) music.add(album);
-
-        return music;
-    }
-
-    private Liszt<Album> sortImageAlbums() {
-        Liszt<Album> images = new Liszt<>();
-        for (Album album : _albums)
-            if (album.get_kind() == Album.Kind.IMAGE)
-                images.add(album);
-
-        return images;
     }
 }

@@ -387,6 +387,8 @@ public class Liszt<E> implements List<E>, ILiszt<E> {
         return null;
     }
 
+    public E getLast() { return _data[size()-1]; }
+
     @Override
     public String toString() {
         return "Liszt(size:"+size()+

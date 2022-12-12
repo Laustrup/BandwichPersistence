@@ -62,11 +62,11 @@ public class Venue extends User {
         super(id);
     }
     public Venue(long id, String username, String description,
-                 ContactInfo contactInfo, Album images, Liszt<Rating> ratings, Liszt<Event> events,
+                 ContactInfo contactInfo, Liszt<Album> albums, Liszt<Rating> ratings, Liszt<Event> events,
                  Liszt<ChatRoom> chatRooms, LocalDateTime timestamp,
                  String location, String gearDescription, Subscription.Status subscriptionStatus,
                  SubscriptionOffer subscriptionOffer, Liszt<Bulletin> bulletins, int size, Liszt<Request> requests) {
-        super(id, username, null, null, description, contactInfo, images, ratings, events, chatRooms,
+        super(id, username, null, null, description, contactInfo, albums, ratings, events, chatRooms,
                 new Subscription(new Venue(), Subscription.Type.FREEMIUM, subscriptionStatus, subscriptionOffer, null),
                 bulletins, timestamp);
 

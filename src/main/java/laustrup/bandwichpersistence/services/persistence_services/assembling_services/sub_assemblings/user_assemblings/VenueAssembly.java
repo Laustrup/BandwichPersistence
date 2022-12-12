@@ -1,7 +1,6 @@
 package laustrup.bandwichpersistence.services.persistence_services.assembling_services.sub_assemblings.user_assemblings;
 
 import laustrup.bandwichpersistence.models.chats.Request;
-import laustrup.bandwichpersistence.models.users.sub_users.subscriptions.Subscription;
 import laustrup.bandwichpersistence.models.users.sub_users.venues.Venue;
 import laustrup.bandwichpersistence.utilities.Liszt;
 
@@ -65,11 +64,14 @@ public class VenueAssembly extends UserAssembler {
         Liszt<Request> requests = new Liszt<>();
 
         do {
+            _albums = _handler.handleAlbums(set,_albums);
             requests = _handler.handleRequests(set, requests, new Venue(_id));
         } while (set.next());
 
-        resetUserAttributes();
-        return new Venue(_id, _username, _description, _contactInfo, _images, _ratings, _events, _chatRooms, _timestamp,
+        Venue venue = new Venue(_id, _username, _description, _contactInfo, _albums, _ratings, _events, _chatRooms, _timestamp,
                 location, gear, _subscription.get_status(), _subscription.get_offer(), _bulletins, size, requests);
+
+        resetUserAttributes();
+        return venue;
     }
 }

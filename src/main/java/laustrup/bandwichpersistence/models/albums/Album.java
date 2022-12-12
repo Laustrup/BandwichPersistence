@@ -1,13 +1,13 @@
 package laustrup.bandwichpersistence.models.albums;
 
 import laustrup.bandwichpersistence.models.Model;
-import laustrup.bandwichpersistence.models.events.Event;
 import laustrup.bandwichpersistence.models.users.User;
+import laustrup.bandwichpersistence.models.users.sub_users.bands.Artist;
+import laustrup.bandwichpersistence.models.users.sub_users.bands.Band;
 import laustrup.bandwichpersistence.utilities.Liszt;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 
@@ -18,7 +18,7 @@ public class Album extends Model {
      * These endpoints are being used for getting the image/music file.
      */
     @Getter
-    private Liszt<String> _endpoints;
+    private Liszt<AlbumItem> _items;
 
     /**
      * The main author of the current Album.
@@ -29,116 +29,96 @@ public class Album extends Model {
     @Getter
     private User _author;
 
-    /**
-     * Categories the tagged people, who have participated on the album.
-     */
-    @Getter
-    private Liszt<User> _tags;
-
-    /**
-     * An Album can have a relation to an Event, but doesn't necessarily have to.
-     */
-    @Getter @Setter
-    private Event _event;
-
-    /**
-     * This is an Enum.
-     * The Album might either be a MUSIC or IMAGE Album.
-     */
-    @Getter
-    private Kind _kind;
-
-    public Album(long id, String title, Liszt<String> urls, User author, Liszt<User> tags, Event event,
-                 Kind kind, LocalDateTime timestamp) {
+    public Album(long id, String title, Liszt<AlbumItem> items, User author,
+                 LocalDateTime timestamp) {
         super(id, title, timestamp);
-        _endpoints = urls;
+        _items = items;
         _author = author;
-        _tags = tags;
-        _event = event;
-        _kind = kind;
+        _assembling = true;
     }
 
-    public Album(String title, Liszt<String> endpoints, User author, Liszt<User> tags, Event event, Kind kind) {
+    public Album(String title, Liszt<AlbumItem> items, User author) {
         super(title);
-        _endpoints = endpoints;
+        _items = items;
         _author = author;
-        _tags = tags;
-        _event = event;
-        _kind = kind;
     }
 
+    /**
+     * Will set the author only if it is being assembled.
+     * @param author The author of the Album.
+     * @return The author of the Album.
+     */
     public Model setAuthor(User author) {
-        if (_author==null)
+        if (_assembling)
             _author = author;
 
         return _author;
     }
 
     /**
-     * Will add an endpoint to the Album.
-     * @param endpoint will be used for getting the file of the content.
-     * @return All the endpoints of the Album.
+     * Will add an item to the Album.
+     * @param item The item that will be added to the Album.
+     * @return All the endpoints of the item.
      */
-    public Liszt<String> add(String endpoint) { return add(new String[]{endpoint}); }
-
-    /**
-     * Will add endpoints to the Album.
-     * @param endpoints will be used for getting the files of the contents.
-     * @return All the endpoints of the Album.
-     */
-    public Liszt<String> add(String[] endpoints) {
-        _endpoints.add(endpoints);
-        return _endpoints;
+    public Liszt<AlbumItem> add(AlbumItem item) {
+        return add(new AlbumItem[]{item});
     }
 
     /**
-     * Will add a User as a tag to the Album.
-     * @param tag The User that will be added as a tag.
-     * @return All the tags of the Album.
+     * Will add items to the Album.
+     * @param items Items of the contents of the Album.
+     * @return All the items of the Album.
      */
-    public Liszt<User> add(User tag) { return add(new User[]{tag}); }
-
-    /**
-     * Will add some Users as tags to the Album.
-     * @param tags The Users that will be added as tags.
-     * @return All the tags of the Album.
-     */
-    public Liszt<User> add(User[] tags) {
-        _tags.add(tags);
-        return _tags;
+    public Liszt<AlbumItem> add(AlbumItem[] items) {
+        for (AlbumItem item : items)
+            if (item.get_kind() == AlbumItem.Kind.IMAGE ||
+                    (item.get_kind() == AlbumItem.Kind.MUSIC &&
+                        (_author.getClass() == Band.class ||
+                        _author.getClass() == Artist.class)))
+                _items.add(item);
+        return _items;
     }
 
     /**
-     * Removes a tagged User of the Album.
-     * @param tag The User that will be removed as a tag.
-     * @return All the tags of the Album.
+     * Will add an item to the items of the Album.
+     * @param item The item that should be replaced with its common id in items.
+     * @return All the items.
      */
-    public Liszt<User> remove(User tag) {
-        _tags.remove(tag);
-        return _tags;
+    public Liszt<AlbumItem> set(AlbumItem item) { return set(new Liszt<>(new AlbumItem[]{item})); }
+
+    /**
+     * Will set an item of the Album.
+     * @param items The Items that will be replaced with its common id in items.
+     * @return All the items.
+     */
+    public Liszt<AlbumItem> set(Liszt<AlbumItem> items) {
+        for (AlbumItem item : items) {
+            for (int i = 1; i <= _items.size(); i++) {
+                if (_items.get(i).get_primaryId() == item.get_primaryId()) {
+                    _items.set(i,item);
+                    break;
+                }
+            }
+        }
+
+        return _items;
     }
 
     /**
-     * Removes an endpoint of the Album.
-     * @param endpoint Will be used for getting the file of the content.
-     * @return All the endpoints of the Album.
+     * Will remove an item of the Album.
+     * @param item The item that should be removed from the Album.
+     * @return All the items.
      */
-    public Liszt<String> remove(String endpoint) {
-        _endpoints.remove(endpoint);
-        return _endpoints;
+    public Liszt<AlbumItem> remove(AlbumItem item) {
+        _items.remove(item);
+        return _items;
     }
 
     @Override
     public String toString() {
         return "Album(id:"+_primaryId+
-                ",title:"+_title+
-                ",kind:"+_kind+
-                "timestamp:"+_timestamp+
+                    ",title:"+_title+
+                    "timestamp:"+_timestamp+
                 ")";
     }
-
-    /**
-     * An enum that will describe the type of Album.
-     */
-    public enum Kind { IMAGE,MUSIC; }
 }

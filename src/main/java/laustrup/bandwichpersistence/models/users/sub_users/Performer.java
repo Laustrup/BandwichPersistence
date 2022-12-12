@@ -1,12 +1,10 @@
 package laustrup.bandwichpersistence.models.users.sub_users;
 
-import laustrup.bandwichpersistence.models.chats.Request;
 import laustrup.bandwichpersistence.models.events.Event;
 import laustrup.bandwichpersistence.models.Rating;
 import laustrup.bandwichpersistence.models.albums.Album;
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
-import laustrup.bandwichpersistence.models.chats.messages.Message;
 import laustrup.bandwichpersistence.models.events.Gig;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
@@ -27,12 +25,6 @@ import java.time.LocalDateTime;
 public abstract class Performer extends Participant {
 
     /**
-     * Contains the music Albums of the Performer.
-     */
-    @Getter
-    protected Liszt<Album> _music;
-
-    /**
      * Describes all the gigs, that the Performer is a part of an act.
      */
     @Getter
@@ -48,37 +40,33 @@ public abstract class Performer extends Participant {
         super(id);
     }
     public Performer(long id, String username, String firstName, String lastName, String description,
-                     ContactInfo contactInfo, Album images, Liszt<Rating> ratings, Liszt<Event> events, Liszt<Gig> gigs,
+                     ContactInfo contactInfo, Liszt<Album> albums, Liszt<Rating> ratings, Liszt<Event> events, Liszt<Gig> gigs,
                      Liszt<ChatRoom> chatRooms, Subscription subscription, Liszt<Bulletin> bulletins,
-                     LocalDateTime timestamp, Liszt<Album> music, Liszt<User> fans, Liszt<User> idols) {
-        super(id, username, firstName, lastName, description, contactInfo, images, ratings, events,
+                     LocalDateTime timestamp, Liszt<User> fans, Liszt<User> idols) {
+        super(id, username, firstName, lastName, description, contactInfo, albums, ratings, events,
                 chatRooms, subscription, bulletins, timestamp, idols);
-        _music = music;
         _gigs = gigs;
         _fans = fans;
     }
 
-    public Performer(long id, String username, String description, ContactInfo contactInfo, Album images,
+    public Performer(long id, String username, String description, ContactInfo contactInfo, Liszt<Album> albums,
                      Liszt<Rating> ratings, Liszt<Event> events, Liszt<Gig> gigs, Liszt<ChatRoom> chatRooms,
-                     Subscription subscription, Liszt<Bulletin> bulletins, LocalDateTime timestamp, Liszt<Album> music,
+                     Subscription subscription, Liszt<Bulletin> bulletins, LocalDateTime timestamp,
                      Liszt<User> fans, Liszt<User> idols) {
-        super(id, username, description, contactInfo, images, ratings, events,
+        super(id, username, description, contactInfo, albums, ratings, events,
                 chatRooms, subscription, bulletins, timestamp, idols);
-        _music = music;
         _gigs = gigs;
         _fans = fans;
     }
 
     public Performer(String username, String firstName, String lastName, String description, Subscription subscription) {
         super(username, firstName, lastName, description, subscription);
-        _music = new Liszt<>();
         _gigs = new Liszt<>();
         _fans = new Liszt<>();
     }
 
     public Performer(String username, String description, Subscription subscription) {
         super(username, description, subscription);
-        _music = new Liszt<>();
         _gigs = new Liszt<>();
         _fans = new Liszt<>();
     }
@@ -89,7 +77,7 @@ public abstract class Performer extends Participant {
      * @return All the fans.
      */
     public Liszt<User> set_fans(Liszt<User> fans) {
-        if (fans != null && _assembling)
+        if (_assembling)
             _fans = fans;
         return _fans;
     }
@@ -110,9 +98,8 @@ public abstract class Performer extends Participant {
      * Only use for assembly.
      */
     public void setAuthorOfAlbums() {
-        _images.setAuthor(this);
-        for (int i = 1; i <= _music.size(); i++)
-            _music.get(i).setAuthor(this);
+        for (int i = 1; i <= _albums.size(); i++)
+            _albums.get(i).setAuthor(this);
     }
 
     /**
@@ -138,38 +125,6 @@ public abstract class Performer extends Participant {
     public Subscription change_subscriptionType(Subscription.Type type) {
         _subscription.set_type(type);
         return _subscription;
-    }
-
-    /**
-     * Will add an endpoint to an Album of the Performer.
-     * @param endpoint An endpoint from a link containing a music file.
-     * @param albumId The id of the Album, that is wished to add the endpoint.
-     * @return The Album the has been added the new endpoint. Null if it hasn't been added.
-     */
-    public Album add(String endpoint, long albumId) {
-        for (int i = 1; i <= _music.size(); i++) {
-            if (_music.get(i).get_primaryId() == albumId) {
-                _music.get(i).add(endpoint);
-                return _music.get(i);
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Removes an endpoint from an Album of the Performer.
-     * @param endpoint An endpoint from a link containing a music file.
-     * @param albumId The id of the Album, that is wished to remove the endpoint.
-     * @return The Album of the removed endpoint. Null if it hasn't been removed.
-     */
-    public Album remove(String endpoint, long albumId) {
-        for (Album album : _music) {
-            if (album.get_primaryId() == albumId) {
-                album.remove(endpoint);
-                return album;
-            }
-        }
-        return null;
     }
 
     /**

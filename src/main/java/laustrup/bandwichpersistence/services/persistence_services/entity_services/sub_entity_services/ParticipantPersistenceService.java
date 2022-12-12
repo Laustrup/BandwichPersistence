@@ -61,7 +61,7 @@ public class ParticipantPersistenceService extends EntityService<Participant> {
             //Puts in subscription and contactInfo
             participant = new Participant(participant.get_primaryId(), participant.get_username(),
                     participant.get_firstName(), participant.get_lastName(), participant.get_description(),contactInfo,
-                    participant.get_images(), participant.get_ratings(), participant.get_events(),participant.get_chatRooms(),
+                    participant.get_albums(), participant.get_ratings(), participant.get_events(),participant.get_chatRooms(),
                     subscription,participant.get_bulletins(),participant.get_timestamp(), participant.get_idols()
             );
 

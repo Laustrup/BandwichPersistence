@@ -10,7 +10,6 @@ import laustrup.bandwichpersistence.models.events.Gig;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
 import laustrup.bandwichpersistence.models.users.sub_users.Performer;
-import laustrup.bandwichpersistence.models.users.sub_users.participants.Participant;
 import laustrup.bandwichpersistence.models.users.sub_users.subscriptions.Subscription;
 import laustrup.bandwichpersistence.utilities.Liszt;
 
@@ -50,13 +49,12 @@ public class Artist extends Performer {
     }
 
     public Artist(long id, String username, String firstName, String lastName, String description,
-                  ContactInfo contactInfo, Album images, Liszt<Rating> ratings, Liszt<Event> events, Liszt<Gig> gigs,
-                  Liszt<ChatRoom> chatRooms, Subscription subscription,
-                  Liszt<Bulletin> bulletins, LocalDateTime timestamp, Liszt<Album> music,
-                  Liszt<Band> bands, String runner, Liszt<User> fans, Liszt<User> idols,
+                  ContactInfo contactInfo, Liszt<Album> albums, Liszt<Rating> ratings, Liszt<Event> events,
+                  Liszt<Gig> gigs, Liszt<ChatRoom> chatRooms, Subscription subscription, Liszt<Bulletin> bulletins,
+                  LocalDateTime timestamp, Liszt<Band> bands, String runner, Liszt<User> fans, Liszt<User> idols,
                   Liszt<Request> requests) {
-        super(id, username, firstName, lastName, description, contactInfo, images, ratings,
-                events, gigs, chatRooms, subscription, bulletins, timestamp, music, fans, idols);
+        super(id, username, firstName, lastName, description, contactInfo, albums, ratings,
+                events, gigs, chatRooms, subscription, bulletins, timestamp, fans, idols);
         _bands = bands;
         _runner = runner;
         _requests = requests;
@@ -64,8 +62,8 @@ public class Artist extends Performer {
         _assembling = true;
     }
 
-    public Artist(String username, String firstName, String lastName, String description, Subscription subscription, ContactInfo contactInfo,
-                  Liszt<Band> bands, String runner) {
+    public Artist(String username, String firstName, String lastName, String description, Subscription subscription,
+                  ContactInfo contactInfo, Liszt<Band> bands, String runner) {
         super(username, firstName, lastName, description, subscription);
         _contactInfo = contactInfo;
         _bands = bands;

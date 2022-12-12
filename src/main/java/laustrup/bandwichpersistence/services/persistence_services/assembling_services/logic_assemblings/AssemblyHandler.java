@@ -2,6 +2,7 @@ package laustrup.bandwichpersistence.services.persistence_services.assembling_se
 
 import laustrup.bandwichpersistence.models.Rating;
 import laustrup.bandwichpersistence.models.albums.Album;
+import laustrup.bandwichpersistence.models.albums.AlbumItem;
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.models.chats.Request;
 import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
@@ -24,45 +25,51 @@ import java.sql.SQLException;
 
 public class AssemblyHandler {
 
-    public Liszt<Album> handleMusic(ResultSet set, Liszt<Album> music, User user) throws SQLException {
-        String table = "album";
+    public Liszt<Album> handleAlbums(ResultSet set, Liszt<Album> albums) throws SQLException {
+        String table = "albums";
 
-        Album album = null;
-        if (set.getBoolean("album_relations.is_author"))
-            album = new Album(set.getLong(table+".id"),
-                set.getString(table+".title"), new Liszt<>(), user, new Liszt<>(),
-                    (((Long) set.getLong("album_relations.event_id")) != null ?
-                        new Event(set.getLong("album_relations.event_id")) : null),
-                    Album.Kind.MUSIC, set.getTimestamp(table+".`timestamp`").toLocalDateTime());
-        else
-            for (int i = 1; i <= music.size(); i++) {
-                if (music.get(i).get_primaryId() == set.getLong("album_relations.album_id")) {
-                    music.get(i).add(user);
-                    break;
-                }
-            }
+        Album album = new Album(set.getLong(table+".id"),set.getString(table+".title"),
+                new Liszt<>(),new Participant(set.getLong(table+".author_id")),
+                set.getTimestamp(table+".`timestamp`").toLocalDateTime());
 
-        if (music != null) {
-            assert album != null;
-            if (!music.contains(album.toString()))
-                music.add(album);
-        }
+        if (!albums.contains(album.toString()))
+            albums.add(handleAlbumItems(set,album));
+        else if (!albums.getLast().get_items().getLast().get_endpoint()
+                .equals(set.getString("albums_items.endpoint")))
+            albums.set(albums.size(),handleAlbumItems(set,albums.getLast()));
+        else if (albums.getLast().get_items().getLast().get_tags()
+                .getLast().get_primaryId() != set.getLong("tags.user_id"))
+            albums.set(albums.size(),handleTags(set,albums.getLast()));
 
-        try {
-            music.replace(handleEndpoints(set, music.get(music.size())),music.size());
-        } catch (ClassNotFoundException e) {
-            music.set(music.size(), handleEndpoints(set, music.get(music.size())));
-        }
-
-        return music;
+        return albums;
     }
 
-    public Album handleEndpoints(ResultSet set, Album album) throws SQLException {
-        String table = "album_endpoints";
-        String endpoint = set.getString(table+".`value`");
-        if (album.get_primaryId() == set.getLong(table+".album_id") &&
-                !album.get_endpoints().contains(endpoint))
-            album.add(endpoint);
+    public Album handleAlbumItems(ResultSet set, Album album) throws SQLException {
+        String table = "album_items";
+
+        AlbumItem item = new AlbumItem(set.getString(table+".title"),
+                set.getString(table+".endpoint"),
+                AlbumItem.Kind.valueOf(set.getString(table+".kind")),new Liszt<>(),
+                new Event(set.getLong(table+".event_id")),
+                set.getTimestamp(table+".`timestamp`").toLocalDateTime());
+
+        if (!album.get_items().contains(item))
+            album.add(item);
+
+        if (album.get_items().getLast().get_tags().getLast().get_primaryId()
+                != set.getLong("tags.user_id"))
+            album = handleTags(set,album);
+
+        return album;
+    }
+
+    public Album handleTags(ResultSet set, Album album) throws SQLException {
+        String table = "tags";
+
+        User user = new Participant(set.getLong(table+".user_id"));
+
+        if (album.get_items().getLast().get_tags().getLast().get_primaryId() != user.get_primaryId())
+            album.get_items().getLast().get_tags().add(user);
 
         return album;
     }

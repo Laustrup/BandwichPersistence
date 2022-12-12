@@ -60,8 +60,8 @@ public class BandPersistenceService extends EntityService<Band> {
 
             //Puts in subscription and contactInfo
             band = new Band(band.get_primaryId(), band.get_username(), band.get_description(),contactInfo,
-                    band.get_images(), band.get_ratings(), band.get_events(),band.get_gigs(),band.get_chatRooms(),
-                    subscription,band.get_bulletins(),band.get_timestamp(), band.get_music(),band.get_members(),
+                    band.get_albums(), band.get_ratings(), band.get_events(),band.get_gigs(),band.get_chatRooms(),
+                    subscription,band.get_bulletins(),band.get_timestamp(),band.get_members(),
                     band.get_runner(), band.get_fans(),band.get_idols()
             );
 

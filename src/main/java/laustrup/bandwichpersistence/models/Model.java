@@ -87,6 +87,11 @@ public abstract class Model {
         _timestamp = timestamp;
     }
 
+    public Model(String title, LocalDateTime timestamp) {
+        _title = title;
+        _timestamp = timestamp;
+    }
+
     /**
      * Checks if secondary id is null.
      * @return True if secondary id isn't null.

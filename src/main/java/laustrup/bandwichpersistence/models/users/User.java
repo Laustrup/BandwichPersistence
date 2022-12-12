@@ -6,7 +6,6 @@ import laustrup.bandwichpersistence.models.Rating;
 import laustrup.bandwichpersistence.models.albums.Album;
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
-import laustrup.bandwichpersistence.models.chats.messages.Message;
 import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
 import laustrup.bandwichpersistence.models.users.sub_users.subscriptions.Subscription;
 import laustrup.bandwichpersistence.services.TimeService;
@@ -76,7 +75,7 @@ public abstract class User extends Model {
      * An album consisting of images.
      */
     @Getter
-    protected Album _images;
+    protected Liszt<Album> _albums;
 
     /**
      * Ratings made from other users on this user based on a value.
@@ -115,7 +114,7 @@ public abstract class User extends Model {
         super(id);
     }
     public User(long id, String username, String firstName, String lastName, String description,
-                ContactInfo contactInfo, Album images, Liszt<Rating> ratings, Liszt<Event> events,
+                ContactInfo contactInfo, Liszt<Album> albums, Liszt<Rating> ratings, Liszt<Event> events,
                 Liszt<ChatRoom> chatRooms, Subscription subscription,
                 Liszt<Bulletin> bulletins, LocalDateTime timestamp) {
         super(id,username + "-" + id,timestamp);
@@ -125,7 +124,7 @@ public abstract class User extends Model {
         get_fullName();
         _contactInfo = contactInfo;
         _description = description;
-        _images = images;
+        _albums = albums;
         _ratings = ratings;
         _events = events;
         _chatRooms = chatRooms;
@@ -133,14 +132,14 @@ public abstract class User extends Model {
         _bulletins = bulletins;
     }
 
-    public User(long id, String username, String description, ContactInfo contactInfo, Album images,
+    public User(long id, String username, String description, ContactInfo contactInfo, Liszt<Album> albums,
                 Liszt<Rating> ratings, Liszt<Event> events, Liszt<ChatRoom> chatRooms, Subscription subscription,
                 Liszt<Bulletin> bulletins, LocalDateTime timestamp) {
         super(id,username + "-" + id,timestamp);
         _username = username;
         _contactInfo = contactInfo;
         _description = description;
-        _images = images;
+        _albums = albums;
         _ratings = ratings;
         _events = events;
         _chatRooms = chatRooms;
@@ -156,7 +155,7 @@ public abstract class User extends Model {
         get_fullName();
         _description = description;
 
-        _images = new Album();
+        _albums = new Liszt<>();
         _ratings = new Liszt<>();
         _events = new Liszt<>();
         _chatRooms = new Liszt<>();
@@ -170,7 +169,7 @@ public abstract class User extends Model {
         _username = username;
         _description = description;
 
-        _images = new Album();
+        _albums = new Liszt<>();
         _ratings = new Liszt<>();
         _events = new Liszt<>();
         _chatRooms = new Liszt<>();
@@ -223,13 +222,15 @@ public abstract class User extends Model {
     }
 
     /**
-     * Sets the author of the image Album as this User.
+     * Sets the author of the Albums as this User.
      * Is meant for after assembling.
      * @return The images of this User.
      */
-    public Album setImagesAuthor() {
-        _images.setAuthor(this);
-        return _images;
+    public Liszt<Album> setAlbumsAuthor() {
+        if (_assembling)
+            for (int i = 1; i <= _albums.size(); i++)
+                _albums.get(i).setAuthor(this);
+        return _albums;
     }
 
     /**
@@ -249,16 +250,6 @@ public abstract class User extends Model {
     public Subscription changeSubscriptionStatus(Subscription.Status status) {
         _subscription.set_status(status);
         return _subscription;
-    }
-
-    /**
-     * Adds an endpoint linked to an image file.
-     * @param endpoint An endpoint to a link, that contains an image file.
-     * @return The whole Album of the User.
-     */
-    public Album add(String endpoint) {
-        _images.add(endpoint);
-        return _images;
     }
 
     /**
@@ -290,16 +281,6 @@ public abstract class User extends Model {
     public Liszt<ChatRoom> add(ChatRoom chatRoom) {
         _chatRooms.add(chatRoom);
         return _chatRooms;
-    }
-
-    /**
-     * Removes an endpoint for an image file of this User.
-     * @param endpoint An endpoint for a URL containing an image file, that is wished to be removed from this User.
-     * @return The whole Album of this User.
-     */
-    public Album remove(String endpoint) {
-        _images.remove(endpoint);
-        return _images;
     }
 
     /**

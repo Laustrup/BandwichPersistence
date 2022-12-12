@@ -164,7 +164,7 @@ public class Assembly extends Assembler {
         }
 
         user.setSubscriptionUser();
-        user.setImagesAuthor();
+        user.setAlbumsAuthor();
         if (user.getClass() == Artist.class || user.getClass() == Band.class)
             ((Performer) user).setAuthorOfAlbums();
 

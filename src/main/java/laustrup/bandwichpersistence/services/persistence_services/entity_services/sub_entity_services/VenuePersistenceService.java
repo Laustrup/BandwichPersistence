@@ -50,7 +50,7 @@ public class VenuePersistenceService extends EntityService<Venue> {
 
             //Puts in subscription and contactInfo
             venue = new Venue(venue.get_primaryId(),venue.get_username(),venue.get_description(),contactInfo,
-                    venue.get_images(),venue.get_ratings(),venue.get_events(),venue.get_chatRooms(),venue.get_timestamp(),
+                    venue.get_albums(),venue.get_ratings(),venue.get_events(),venue.get_chatRooms(),venue.get_timestamp(),
                     venue.get_location(), venue.get_gearDescription(), subscription.get_status(),subscription.get_offer(),
                     venue.get_bulletins(),venue.get_size(),venue.get_requests());
 

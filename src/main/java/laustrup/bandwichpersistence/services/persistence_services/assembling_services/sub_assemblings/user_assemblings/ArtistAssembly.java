@@ -1,13 +1,10 @@
 package laustrup.bandwichpersistence.services.persistence_services.assembling_services.sub_assemblings.user_assemblings;
 
-import laustrup.bandwichpersistence.models.albums.Album;
 import laustrup.bandwichpersistence.models.chats.Request;
 import laustrup.bandwichpersistence.models.events.Gig;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.sub_users.bands.Artist;
 import laustrup.bandwichpersistence.models.users.sub_users.bands.Band;
-import laustrup.bandwichpersistence.models.users.sub_users.participants.Participant;
-import laustrup.bandwichpersistence.models.users.sub_users.venues.Venue;
 import laustrup.bandwichpersistence.repositories.sub_repositories.UserRepository;
 import laustrup.bandwichpersistence.utilities.Liszt;
 
@@ -66,7 +63,6 @@ public class ArtistAssembly extends UserAssembler {
     public Artist assemble(ResultSet set) throws SQLException {
         setupUserAttributes(set);
         Liszt<Gig> gigs = new Liszt<>();
-        Liszt<Album> music = new Liszt<>();
         String runner = set.getString("gear.`description`");
         Liszt<User> fans = new Liszt<>();
         Liszt<User> idols = new Liszt<>();
@@ -77,12 +73,7 @@ public class ArtistAssembly extends UserAssembler {
             if (_id != set.getLong("users.id"))
                 break;
 
-            if (Album.Kind.valueOf(set.getString("albums.kind")).equals(Album.Kind.IMAGE))
-                _images = _handler.handleEndpoints(set, _images);
-            else
-                // User is by default set to Artist, but that might change, when Album is described.
-                music = _handler.handleMusic(set, music, new Artist(set.getLong("album_relations.user_id")));
-
+            _albums = _handler.handleAlbums(set, _albums);
             _ratings = _handler.handleRatings(set, _ratings);
             gigs = _handler.handleGigs(set, gigs);
             _events = _handler.handleEvents(set, _events);
@@ -100,10 +91,12 @@ public class ArtistAssembly extends UserAssembler {
                 bandIds.add(set.getLong("band_members.band_id"));
         } while (set.next());
 
-        Liszt<Band> bands = BandAssembly.get_instance().assembles(UserRepository.get_instance().get(bandIds));
+        Artist artist = new Artist(_id, _username, _firstName, _lastName, _description, _contactInfo, _albums, _ratings, _events, gigs,
+                _chatRooms, _subscription, _bulletins, _timestamp,
+                BandAssembly.get_instance().assembles(UserRepository.get_instance().get(bandIds)),
+                runner, fans, idols, requests);
 
         resetUserAttributes();
-        return new Artist(_id, _username, _firstName, _lastName, _description, _contactInfo, _images, _ratings, _events, gigs,
-                _chatRooms, _subscription, _bulletins, _timestamp, music, bands, runner, fans, idols, requests);
+        return artist;
     }
 }
