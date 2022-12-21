@@ -40,33 +40,38 @@ public abstract class Performer extends Participant {
         super(id);
     }
     public Performer(long id, String username, String firstName, String lastName, String description,
-                     ContactInfo contactInfo, Liszt<Album> albums, Liszt<Rating> ratings, Liszt<Event> events, Liszt<Gig> gigs,
-                     Liszt<ChatRoom> chatRooms, Subscription subscription, Liszt<Bulletin> bulletins,
-                     LocalDateTime timestamp, Liszt<User> fans, Liszt<User> idols) {
+                     ContactInfo contactInfo, Authority authority, Liszt<Album> albums, Liszt<Rating> ratings,
+                     Liszt<Event> events, Liszt<Gig> gigs, Liszt<ChatRoom> chatRooms, Subscription subscription,
+                     Liszt<Bulletin> bulletins, Liszt<User> fans, Liszt<User> idols, LocalDateTime timestamp) {
         super(id, username, firstName, lastName, description, contactInfo, albums, ratings, events,
-                chatRooms, subscription, bulletins, timestamp, idols);
+                chatRooms, subscription, bulletins, idols, timestamp);
+        _authority = authority;
         _gigs = gigs;
         _fans = fans;
     }
 
-    public Performer(long id, String username, String description, ContactInfo contactInfo, Liszt<Album> albums,
-                     Liszt<Rating> ratings, Liszt<Event> events, Liszt<Gig> gigs, Liszt<ChatRoom> chatRooms,
-                     Subscription subscription, Liszt<Bulletin> bulletins, LocalDateTime timestamp,
-                     Liszt<User> fans, Liszt<User> idols) {
+    public Performer(long id, String username, String description, ContactInfo contactInfo, Authority authority,
+                     Liszt<Album> albums, Liszt<Rating> ratings, Liszt<Event> events, Liszt<Gig> gigs,
+                     Liszt<ChatRoom> chatRooms, Subscription subscription, Liszt<Bulletin> bulletins, Liszt<User> fans,
+                     Liszt<User> idols, LocalDateTime timestamp) {
         super(id, username, description, contactInfo, albums, ratings, events,
                 chatRooms, subscription, bulletins, timestamp, idols);
+        _authority = authority;
         _gigs = gigs;
         _fans = fans;
     }
 
-    public Performer(String username, String firstName, String lastName, String description, Subscription subscription) {
+    public Performer(String username, String firstName, String lastName, String description, Subscription subscription,
+                     Authority authority) {
         super(username, firstName, lastName, description, subscription);
+        _authority = authority;
         _gigs = new Liszt<>();
         _fans = new Liszt<>();
     }
 
-    public Performer(String username, String description, Subscription subscription) {
+    public Performer(String username, String description, Subscription subscription, Authority authority) {
         super(username, description, subscription);
+        _authority = authority;
         _gigs = new Liszt<>();
         _fans = new Liszt<>();
     }

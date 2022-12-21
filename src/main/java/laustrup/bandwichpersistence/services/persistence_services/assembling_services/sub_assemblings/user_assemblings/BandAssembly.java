@@ -90,8 +90,9 @@ public class BandAssembly extends UserAssembler {
         } while (set.next());
 
         Band band = new Band(_id, _username, _description, _contactInfo, _albums, _ratings, _events, gigs, _chatRooms,
-                _subscription, _bulletins, _timestamp,
-                ArtistAssembly.get_instance().assembles(UserRepository.get_instance().get(memberIds)), runner, fans, idols);
+                _subscription, _bulletins,
+                ArtistAssembly.get_instance().assembles(UserRepository.get_instance().get(memberIds)),
+                runner, fans, idols, _timestamp);
 
         resetUserAttributes();
         return band;

@@ -1,13 +1,13 @@
---------------------------------------------------------
+-- ------------------------------------------------------
 -- Will set the tables with the default values assigned.
 -- Deletes former tables.
 -- ONLY EXECUTE THIS SCRIPT WHEN DEVELOPING.
---------------------------------------------------------
+-- ------------------------------------------------------
 USE bandwich_db;
 
---------------------------------------------------------
+-- ------------------------------------------------------
 -- Deleting tables, if they exists.
---------------------------------------------------------
+-- ------------------------------------------------------
 
 DROP TABLE IF EXISTS contact_informations;
 DROP TABLE IF EXISTS subscriptions;
@@ -32,9 +32,9 @@ DROP TABLE IF EXISTS band_members;
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS cards;
 
---------------------------------------------------------
+-- ------------------------------------------------------
 -- Creating tables.
---------------------------------------------------------
+-- ------------------------------------------------------
 CREATE TABLE cards(
     id BIGINT(20) NOT NULL AUTO_INCREMENT,
     `type` ENUM('VISA',
@@ -164,7 +164,7 @@ CREATE TABLE participations(
 
     PRIMARY KEY(event_id, participant_id),
     FOREIGN KEY(event_id) REFERENCES events(id) ON DELETE CASCADE,
-    FOREIGN KEY(participant_id) REFERENCES users(id)
+    FOREIGN KEY(participant_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE followings(

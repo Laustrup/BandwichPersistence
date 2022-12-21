@@ -126,9 +126,7 @@ public class EventAssembly extends Assembler {
         Liszt<Request> requests = new Liszt<>();
         Liszt<Participation> participations = new Liszt<>();
         Liszt<Bulletin> bulletins = new Liszt<>();
-        Album images = new Album(set.getLong("albums.id"),
-                title+":images", new Liszt<>(), defineUserType(set), new Liszt<>(), null,
-                Album.Kind.IMAGE, set.getTimestamp("albums.`timestamp`").toLocalDateTime());
+        Liszt<Album> albums = new Liszt<>();
         LocalDateTime timestamp = set.getTimestamp("`events`.`timestamp`").toLocalDateTime();
 
         try {
@@ -143,7 +141,7 @@ public class EventAssembly extends Assembler {
                                 : new Venue(set.getLong("requests.user_id")));
                 participations = _handler.handleParticipations(set, participations);
                 bulletins = _handler.handleBulletins(set, bulletins, true);
-                images = _handler.handleEndpoints(set, images);
+                albums = _handler.handleAlbums(set, albums);
             } while (set.next());
         } catch (SQLException e) {
             Printer.get_instance().print("Couldn't assemble Event...",e);
@@ -151,6 +149,6 @@ public class EventAssembly extends Assembler {
         }
 
         return new Event(id,title,description,openDoors,isVoluntary,isPublic,isCancelled,isSoldOut,location,price,
-                ticketsURL,contactInfo,gigs,venue,requests,participations,bulletins,images,timestamp);
+                ticketsURL,contactInfo,gigs,venue,requests,participations,bulletins,albums,timestamp);
     }
 }

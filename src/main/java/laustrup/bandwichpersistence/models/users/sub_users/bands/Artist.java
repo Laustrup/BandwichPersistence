@@ -51,10 +51,10 @@ public class Artist extends Performer {
     public Artist(long id, String username, String firstName, String lastName, String description,
                   ContactInfo contactInfo, Liszt<Album> albums, Liszt<Rating> ratings, Liszt<Event> events,
                   Liszt<Gig> gigs, Liszt<ChatRoom> chatRooms, Subscription subscription, Liszt<Bulletin> bulletins,
-                  LocalDateTime timestamp, Liszt<Band> bands, String runner, Liszt<User> fans, Liszt<User> idols,
-                  Liszt<Request> requests) {
-        super(id, username, firstName, lastName, description, contactInfo, albums, ratings,
-                events, gigs, chatRooms, subscription, bulletins, timestamp, fans, idols);
+                  Liszt<Band> bands, String runner, Liszt<User> fans, Liszt<User> idols, Liszt<Request> requests,
+                  LocalDateTime timestamp) {
+        super(id, username, firstName, lastName, description, contactInfo, Authority.ARTIST, albums, ratings,
+                events, gigs, chatRooms, subscription, bulletins, fans, idols, timestamp);
         _bands = bands;
         _runner = runner;
         _requests = requests;
@@ -64,7 +64,7 @@ public class Artist extends Performer {
 
     public Artist(String username, String firstName, String lastName, String description, Subscription subscription,
                   ContactInfo contactInfo, Liszt<Band> bands, String runner) {
-        super(username, firstName, lastName, description, subscription);
+        super(username, firstName, lastName, description, subscription, Authority.ARTIST);
         _contactInfo = contactInfo;
         _bands = bands;
         _runner = runner;

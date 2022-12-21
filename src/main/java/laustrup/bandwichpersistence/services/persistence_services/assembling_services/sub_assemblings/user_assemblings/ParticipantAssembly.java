@@ -69,7 +69,7 @@ public class ParticipantAssembly extends UserAssembler {
         } while (set.next());
 
         Participant participant = new Participant(_id, _username, _firstName, _lastName, _description, _contactInfo, _albums, _ratings,
-                _events, _chatRooms, _subscription, _bulletins, _timestamp, idols);
+                _events, _chatRooms, _subscription, _bulletins, idols, _timestamp);
 
         resetUserAttributes();
         return participant;

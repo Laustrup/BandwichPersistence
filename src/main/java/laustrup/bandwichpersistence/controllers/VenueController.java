@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController("api/venue/")
+@RestController("/api/venue/")
 public class VenueController {
 
     @PostMapping(value = "create/{password}", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -19,10 +19,10 @@ public class VenueController {
                                                   @PathVariable(name = "password") String password) {
         return VenueControllerService.get_instance().create(new Venue(venue.get_primaryId(),venue.get_username(),
                         venue.get_description(),venue.get_contactInfo(), venue.get_albums(),venue.get_ratings(),
-                        venue.get_events(),venue.get_chatRooms(),venue.get_timestamp(), venue.get_location(),
+                        venue.get_events(),venue.get_chatRooms(), venue.get_location(),
                         venue.get_gearDescription(), venue.get_subscription().get_status(),
                         venue.get_subscription().get_offer(), venue.get_bulletins(),
-                        venue.get_size(),venue.get_requests()),
+                        venue.get_size(),venue.get_requests(),venue.get_timestamp()),
                 password
         );
     }

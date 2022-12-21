@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController("api/artist/")
+@RestController("/api/artist/")
 public class ArtistController {
 
     @PostMapping(value = "create/{password}", consumes = MediaType.APPLICATION_JSON_VALUE)

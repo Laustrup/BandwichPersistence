@@ -110,13 +110,16 @@ public abstract class User extends Model {
     @Getter
     protected Liszt<Bulletin> _bulletins;
 
+    @Getter
+    protected Authority _authority;
+
     public User(long id) {
         super(id);
     }
     public User(long id, String username, String firstName, String lastName, String description,
                 ContactInfo contactInfo, Liszt<Album> albums, Liszt<Rating> ratings, Liszt<Event> events,
                 Liszt<ChatRoom> chatRooms, Subscription subscription,
-                Liszt<Bulletin> bulletins, LocalDateTime timestamp) {
+                Liszt<Bulletin> bulletins, Authority authority, LocalDateTime timestamp) {
         super(id,username + "-" + id,timestamp);
         _username = username;
         _firstName = firstName;
@@ -130,11 +133,12 @@ public abstract class User extends Model {
         _chatRooms = chatRooms;
         _subscription = subscription;
         _bulletins = bulletins;
+        _authority = authority;
     }
 
     public User(long id, String username, String description, ContactInfo contactInfo, Liszt<Album> albums,
                 Liszt<Rating> ratings, Liszt<Event> events, Liszt<ChatRoom> chatRooms, Subscription subscription,
-                Liszt<Bulletin> bulletins, LocalDateTime timestamp) {
+                Liszt<Bulletin> bulletins, Authority authority, LocalDateTime timestamp) {
         super(id,username + "-" + id,timestamp);
         _username = username;
         _contactInfo = contactInfo;
@@ -145,9 +149,11 @@ public abstract class User extends Model {
         _chatRooms = chatRooms;
         _subscription = subscription;
         _bulletins = bulletins;
+        _authority = authority;
     }
 
-    public User(String username, String firstName, String lastName, String description, Subscription subscription) {
+    public User(String username, String firstName, String lastName, String description,
+                Subscription subscription, Authority authority) {
         super(username);
         _username = username;
         _firstName = firstName;
@@ -162,9 +168,10 @@ public abstract class User extends Model {
         _bulletins = new Liszt<>();
 
         _subscription = subscription;
+        _authority = authority;
     }
 
-    public User(String username, String description, Subscription subscription) {
+    public User(String username, String description, Subscription subscription, Authority authority) {
         super(username);
         _username = username;
         _description = description;
@@ -176,6 +183,7 @@ public abstract class User extends Model {
         _bulletins = new Liszt<>();
 
         _subscription = subscription;
+        _authority = authority;
     }
 
     /**
@@ -338,5 +346,12 @@ public abstract class User extends Model {
     public Long get_answeringTime() {
         _answeringTime = TimeService.get_instance().getTotalAnswerTimes(_chatRooms);
         return _answeringTime;
+    }
+
+    public enum Authority {
+        VENUE,
+        ARTIST,
+        BAND,
+        PARTICIPANT
     }
 }

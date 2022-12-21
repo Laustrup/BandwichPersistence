@@ -4,9 +4,7 @@ import laustrup.bandwichpersistence.models.Response;
 import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
 import laustrup.bandwichpersistence.models.events.Event;
 import laustrup.bandwichpersistence.models.events.Participation;
-import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.services.controller_services.sub_controller_services.EventControllerService;
-import laustrup.bandwichpersistence.services.controller_services.sub_controller_services.UserControllerService;
 import laustrup.bandwichpersistence.utilities.Liszt;
 import laustrup.bandwichpersistence.utilities.Plato;
 
@@ -14,7 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RestController("api/event/")
+@RestController("/api/event/")
 public class EventController {
 
     @PostMapping("get/{id}")

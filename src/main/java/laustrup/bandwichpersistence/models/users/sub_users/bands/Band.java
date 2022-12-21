@@ -44,30 +44,30 @@ public class Band extends Performer {
     }
 
     public Band(long id, String username, String description, ContactInfo contactInfo, Liszt<Album> albums,
-                Liszt<Rating> ratings, Liszt<Event> events, Liszt<Gig> gigs, Liszt<ChatRoom> chatRooms, Subscription subscription,
-                Liszt<Bulletin> bulletins, LocalDateTime timestamp, Liszt<Artist> members,
-                String runner, Liszt<User> fans, Liszt<User> idols)
+                Liszt<Rating> ratings, Liszt<Event> events, Liszt<Gig> gigs, Liszt<ChatRoom> chatRooms,
+                Subscription subscription, Liszt<Bulletin> bulletins, Liszt<Artist> members,
+                String runner, Liszt<User> fans, Liszt<User> idols, LocalDateTime timestamp)
             throws InputMismatchException {
-        super(id, username, description, contactInfo, albums, ratings, events, gigs, chatRooms, subscription,
-                bulletins, timestamp, fans, idols);
+        super(id, username, description, contactInfo, Authority.BAND, albums, ratings, events, gigs, chatRooms,
+                subscription, bulletins, fans, idols, timestamp);
         _username = username;
 
         _members = members;
-        if (_members.size() <= 0)
+        if (_members.isEmpty())
             throw new InputMismatchException();
 
         _runner = runner;
         _assembling = true;
     }
 
-    public Band(String username, String description, Subscription subscription, ContactInfo contactInfo, Liszt<Artist> members) throws InputMismatchException {
-        super(username, description, subscription);
+    public Band(String username, String description, Subscription subscription, ContactInfo contactInfo,
+                Liszt<Artist> members) throws InputMismatchException {
+        super(username, description, subscription, Authority.BAND);
         _username = username;
         _contactInfo = contactInfo;
 
-        if (_members.size() > 0)
-            _members = members;
-        else
+        _members = members;
+        if (_members.isEmpty())
             throw new InputMismatchException();
 
         _assembling = true;

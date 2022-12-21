@@ -149,17 +149,17 @@ public class Event extends Model {
      * An Album of images, that can be used to promote this Event.
      */
     @Getter @Setter
-    private Album _images;
+    private Liszt<Album> _albums;
 
     public Event(long id) {
         super(id);
     }
 
-    public Event(long id, String title, String description, LocalDateTime openDoors,
-                 Plato isVoluntary, Plato isPublic, Plato isCancelled, Plato isSoldOut, String location, double price,
-                 String ticketsURL, ContactInfo contactInfo, Liszt<Gig> gigs, Venue venue, Liszt<Request> requests,
-                 Liszt<Participation> participations, Liszt<Bulletin> bulletins, Album images, LocalDateTime timestamp)
-            throws InputMismatchException {
+    public Event(long id, String title, String description, LocalDateTime openDoors, Plato isVoluntary, Plato isPublic,
+                 Plato isCancelled, Plato isSoldOut, String location, double price, String ticketsURL,
+                 ContactInfo contactInfo, Liszt<Gig> gigs, Venue venue, Liszt<Request> requests,
+                 Liszt<Participation> participations, Liszt<Bulletin> bulletins, Liszt<Album> albums,
+                 LocalDateTime timestamp) throws InputMismatchException {
         super(id, title, timestamp);
 
         _description = description;
@@ -190,7 +190,7 @@ public class Event extends Model {
         _requests = requests;
         _participations = participations;
         _bulletins = bulletins;
-        _images = images;
+        _albums = albums;
 
         _assembling = true;
     }
@@ -199,13 +199,13 @@ public class Event extends Model {
         super(title);
 
         _gigs = new Liszt<>();
-        if (user.getClass() == Performer.class)
+        if (user.get_authority() == User.Authority.BAND || user.get_authority() == User.Authority.ARTIST)
             _gigs.add(new Gig(new Performer[]{(Performer) user}));
         else _venue = (Venue) user;
 
         _participations = new Liszt<>();
         _bulletins = new Liszt<>();
-        _images = new Album();
+        _albums = new Liszt<>();
 
         _length = 0;
         _cancelled = new Plato();
@@ -529,40 +529,6 @@ public class Event extends Model {
     public Liszt<Bulletin> add(Bulletin[] bulletins) {
         _bulletins.add(bulletins);
         return _bulletins;
-    }
-
-    /**
-     * Adds an image to the Event in the sense of an endpoint, used for getting the file elsewhere.
-     * @param endpoint The endpoint, for retrieving the file.
-     * @return The whole Album of the Event.
-     */
-    public Album addImage(String endpoint) { return addImages(new String[]{endpoint}); }
-
-    /**
-     * Adds some images to the Event in the sense of some endpoints, used for getting the files elsewhere.
-     * @param endpoints The endpoints, for retrieving the files.
-     * @return The whole Album of the Event.
-     */
-    public Album addImages(String[] endpoints) {
-        _images.add(endpoints);
-        return _images;
-    }
-
-    /**
-     * Removes an image of the Event in the sense of an endpoint, used for getting the file elsewhere.
-     * @param endpoint The endpoint, for retrieving the file.
-     * @return The whole Album of the Event.
-     */
-    public Album removeImage(String endpoint) { return removeImages(new String[]{endpoint}); }
-
-    /**
-     * Removes some images of the Event in the sense of some endpoints, used for getting the files elsewhere.
-     * @param endpoints The endpoints, for retrieving the files.
-     * @return The whole Album of the Event.
-     */
-    public Album removeImages(String[] endpoints) {
-        _images.add(endpoints);
-        return _images;
     }
 
     /**

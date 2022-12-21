@@ -61,14 +61,13 @@ public class Venue extends User {
     public Venue(long id) {
         super(id);
     }
-    public Venue(long id, String username, String description,
-                 ContactInfo contactInfo, Liszt<Album> albums, Liszt<Rating> ratings, Liszt<Event> events,
-                 Liszt<ChatRoom> chatRooms, LocalDateTime timestamp,
-                 String location, String gearDescription, Subscription.Status subscriptionStatus,
-                 SubscriptionOffer subscriptionOffer, Liszt<Bulletin> bulletins, int size, Liszt<Request> requests) {
+    public Venue(long id, String username, String description, ContactInfo contactInfo, Liszt<Album> albums,
+                 Liszt<Rating> ratings, Liszt<Event> events, Liszt<ChatRoom> chatRooms, String location,
+                 String gearDescription, Subscription.Status subscriptionStatus, SubscriptionOffer subscriptionOffer,
+                 Liszt<Bulletin> bulletins, int size, Liszt<Request> requests, LocalDateTime timestamp) {
         super(id, username, null, null, description, contactInfo, albums, ratings, events, chatRooms,
                 new Subscription(new Venue(), Subscription.Type.FREEMIUM, subscriptionStatus, subscriptionOffer, null),
-                bulletins, timestamp);
+                bulletins, Authority.VENUE, timestamp);
 
         if (location == null)
             _location = _contactInfo.getAddressInfo();
@@ -85,11 +84,10 @@ public class Venue extends User {
         _assembling = true;
     }
 
-    public Venue(String username, String description,
-                 String location, String gearDescription, SubscriptionOffer subscriptionOffer, int size) {
+    public Venue(String username, String description, String location, String gearDescription, int size) {
         super(username, null, null, description,
                 new Subscription(new Venue(), Subscription.Type.FREEMIUM,
-                        Subscription.Status.ACCEPTED, subscriptionOffer, null));
+                        Subscription.Status.ACCEPTED, null, null), Authority.VENUE);
 
         if (location == null)
             _location = _contactInfo.getAddressInfo();

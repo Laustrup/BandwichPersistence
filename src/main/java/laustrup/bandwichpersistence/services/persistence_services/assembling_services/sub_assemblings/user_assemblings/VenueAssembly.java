@@ -68,8 +68,9 @@ public class VenueAssembly extends UserAssembler {
             requests = _handler.handleRequests(set, requests, new Venue(_id));
         } while (set.next());
 
-        Venue venue = new Venue(_id, _username, _description, _contactInfo, _albums, _ratings, _events, _chatRooms, _timestamp,
-                location, gear, _subscription.get_status(), _subscription.get_offer(), _bulletins, size, requests);
+        Venue venue = new Venue(_id, _username, _description, _contactInfo, _albums, _ratings, _events, _chatRooms,
+                location, gear, _subscription.get_status(), _subscription.get_offer(), _bulletins, size, requests,
+                _timestamp);
 
         resetUserAttributes();
         return venue;

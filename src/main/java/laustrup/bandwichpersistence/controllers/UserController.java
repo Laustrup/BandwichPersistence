@@ -17,7 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RestController("api/user/")
+@RestController("/api/user/")
 public class UserController {
 
     @PostMapping(value = "login", consumes = MediaType.APPLICATION_JSON_VALUE)

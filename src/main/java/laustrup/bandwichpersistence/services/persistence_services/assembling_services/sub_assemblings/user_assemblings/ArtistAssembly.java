@@ -92,9 +92,9 @@ public class ArtistAssembly extends UserAssembler {
         } while (set.next());
 
         Artist artist = new Artist(_id, _username, _firstName, _lastName, _description, _contactInfo, _albums, _ratings, _events, gigs,
-                _chatRooms, _subscription, _bulletins, _timestamp,
+                _chatRooms, _subscription, _bulletins,
                 BandAssembly.get_instance().assembles(UserRepository.get_instance().get(bandIds)),
-                runner, fans, idols, requests);
+                runner, fans, idols, requests, _timestamp);
 
         resetUserAttributes();
         return artist;
