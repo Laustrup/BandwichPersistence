@@ -3,6 +3,7 @@
 -- Deletes former tables.
 -- ONLY EXECUTE THIS SCRIPT WHEN DEVELOPING.
 -- ------------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS bandwich_db;
 USE bandwich_db;
 
 -- ------------------------------------------------------

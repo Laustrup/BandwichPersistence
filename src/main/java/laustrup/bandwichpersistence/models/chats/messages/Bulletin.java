@@ -3,7 +3,6 @@ package laustrup.bandwichpersistence.models.chats.messages;
 import laustrup.bandwichpersistence.models.Model;
 import laustrup.bandwichpersistence.models.users.User;
 
-import laustrup.bandwichpersistence.utilities.Liszt;
 import laustrup.bandwichpersistence.utilities.Plato;
 import lombok.Getter;
 import lombok.ToString;
@@ -30,6 +29,7 @@ public class Bulletin extends Message {
 
     public Bulletin(User author, String content) {
         super(author);
+        _content = content;
     }
 
     public Model set_reciever(Model reciever) {
