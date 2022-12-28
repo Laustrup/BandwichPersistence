@@ -2,14 +2,12 @@ package laustrup.bandwichpersistence.models.chats.messages;
 
 import laustrup.bandwichpersistence.models.Model;
 import laustrup.bandwichpersistence.models.users.User;
-
 import laustrup.bandwichpersistence.utilities.Plato;
+
 import lombok.Getter;
-import lombok.ToString;
 
 import java.time.LocalDateTime;
 
-@ToString
 public class Bulletin extends Message {
 
     @Getter
@@ -42,5 +40,15 @@ public class Bulletin extends Message {
         if (_assembling)
             _author = author;
         return _author;
+    }
+
+    @Override
+    public String toString() {
+        return "Bulletin(id:" + _primaryId +
+                ",content:" + _content +
+                ",isSent:" + _sent +
+                ",isEdited:" + _edited.get_argument() +
+                ",isPublic:" + _public +
+                ")";
     }
 }

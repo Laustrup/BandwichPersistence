@@ -6,17 +6,15 @@ import laustrup.bandwichpersistence.models.Rating;
 import laustrup.bandwichpersistence.models.albums.Album;
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
-import laustrup.bandwichpersistence.models.chats.messages.Message;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
-import laustrup.bandwichpersistence.models.users.sub_users.subscriptions.Subscription;
-import laustrup.bandwichpersistence.models.users.sub_users.subscriptions.SubscriptionOffer;
+import laustrup.bandwichpersistence.models.users.subscriptions.Subscription;
+import laustrup.bandwichpersistence.models.users.subscriptions.SubscriptionOffer;
 import laustrup.bandwichpersistence.utilities.Liszt;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 import java.time.LocalDateTime;
 

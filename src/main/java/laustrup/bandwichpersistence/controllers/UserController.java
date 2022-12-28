@@ -8,7 +8,7 @@ import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
 import laustrup.bandwichpersistence.models.users.Login;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.sub_users.participants.Participant;
-import laustrup.bandwichpersistence.models.users.sub_users.subscriptions.Card;
+import laustrup.bandwichpersistence.models.users.subscriptions.Card;
 import laustrup.bandwichpersistence.services.controller_services.sub_controller_services.UserControllerService;
 import laustrup.bandwichpersistence.utilities.Liszt;
 import laustrup.bandwichpersistence.utilities.Plato;

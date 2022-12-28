@@ -1,4 +1,4 @@
-package laustrup.bandwichpersistence.models.users.sub_users.subscriptions;
+package laustrup.bandwichpersistence.models.users.subscriptions;
 
 import lombok.Getter;
 import lombok.Setter;

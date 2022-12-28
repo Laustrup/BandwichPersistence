@@ -120,7 +120,7 @@ public class AssemblyHandler {
                 new Plato(Plato.Argument.valueOf(set.getString(table+".is_sold_out"))),
                 set.getString(table+".location"),set.getDouble(table+".price"),
                 set.getString(table+".tickets_url"),null,new Liszt<>(),null,new Liszt<>(),
-                new Liszt<>(),new Liszt<>(),new Album(),set.getTimestamp(table+".timestamp").toLocalDateTime()
+                new Liszt<>(),new Liszt<>(),new Liszt<>(),set.getTimestamp(table+".timestamp").toLocalDateTime()
         );
 
         if (!events.contains(event.toString()))

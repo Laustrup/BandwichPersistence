@@ -1,7 +1,7 @@
 package laustrup.bandwichpersistence.services.persistence_services.entity_services.sub_entity_services;
 
 import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
-import laustrup.bandwichpersistence.models.users.sub_users.subscriptions.Subscription;
+import laustrup.bandwichpersistence.models.users.subscriptions.Subscription;
 import laustrup.bandwichpersistence.models.users.sub_users.venues.Venue;
 import laustrup.bandwichpersistence.repositories.sub_repositories.VenueRepository;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembly;
@@ -50,9 +50,9 @@ public class VenuePersistenceService extends EntityService<Venue> {
 
             //Puts in subscription and contactInfo
             venue = new Venue(venue.get_primaryId(),venue.get_username(),venue.get_description(),contactInfo,
-                    venue.get_albums(),venue.get_ratings(),venue.get_events(),venue.get_chatRooms(),venue.get_timestamp(),
+                    venue.get_albums(),venue.get_ratings(),venue.get_events(),venue.get_chatRooms(),
                     venue.get_location(), venue.get_gearDescription(), subscription.get_status(),subscription.get_offer(),
-                    venue.get_bulletins(),venue.get_size(),venue.get_requests());
+                    venue.get_bulletins(),venue.get_size(),venue.get_requests(),venue.get_timestamp());
 
             if (upsert(venue))
                 return venue;

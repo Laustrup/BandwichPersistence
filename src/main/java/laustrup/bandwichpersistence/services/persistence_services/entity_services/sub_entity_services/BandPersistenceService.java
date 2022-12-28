@@ -2,7 +2,7 @@ package laustrup.bandwichpersistence.services.persistence_services.entity_servic
 
 import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
 import laustrup.bandwichpersistence.models.users.sub_users.bands.Band;
-import laustrup.bandwichpersistence.models.users.sub_users.subscriptions.Subscription;
+import laustrup.bandwichpersistence.models.users.subscriptions.Subscription;
 import laustrup.bandwichpersistence.repositories.sub_repositories.BandRepository;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembly;
 import laustrup.bandwichpersistence.services.persistence_services.entity_services.EntityService;
@@ -61,8 +61,8 @@ public class BandPersistenceService extends EntityService<Band> {
             //Puts in subscription and contactInfo
             band = new Band(band.get_primaryId(), band.get_username(), band.get_description(),contactInfo,
                     band.get_albums(), band.get_ratings(), band.get_events(),band.get_gigs(),band.get_chatRooms(),
-                    subscription,band.get_bulletins(),band.get_timestamp(),band.get_members(),
-                    band.get_runner(), band.get_fans(),band.get_idols()
+                    subscription,band.get_bulletins(),band.get_members(),
+                    band.get_runner(), band.get_fans(),band.get_idols(), band.get_timestamp()
             );
 
             if (upsert(band))

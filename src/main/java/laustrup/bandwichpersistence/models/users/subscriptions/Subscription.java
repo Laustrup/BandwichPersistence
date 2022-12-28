@@ -1,4 +1,4 @@
-package laustrup.bandwichpersistence.models.users.sub_users.subscriptions;
+package laustrup.bandwichpersistence.models.users.subscriptions;
 
 import laustrup.bandwichpersistence.models.Model;
 import laustrup.bandwichpersistence.models.users.User;

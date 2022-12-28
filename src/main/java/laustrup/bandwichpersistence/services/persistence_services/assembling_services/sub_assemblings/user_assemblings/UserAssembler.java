@@ -6,7 +6,7 @@ import laustrup.bandwichpersistence.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
 import laustrup.bandwichpersistence.models.events.Event;
 import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
-import laustrup.bandwichpersistence.models.users.sub_users.subscriptions.Subscription;
+import laustrup.bandwichpersistence.models.users.subscriptions.Subscription;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembler;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.sub_assemblings.ModelAssembly;
 import laustrup.bandwichpersistence.utilities.Liszt;

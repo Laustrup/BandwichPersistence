@@ -8,7 +8,7 @@ import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
 import laustrup.bandwichpersistence.models.chats.messages.Mail;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
-import laustrup.bandwichpersistence.models.users.sub_users.subscriptions.Subscription;
+import laustrup.bandwichpersistence.models.users.subscriptions.Subscription;
 import laustrup.bandwichpersistence.repositories.Repository;
 import laustrup.bandwichpersistence.utilities.Liszt;
 import laustrup.bandwichpersistence.utilities.Printer;
@@ -201,7 +201,7 @@ public class ModelRepository extends Repository {
                     ") " +
                     "VALUES (" +
                         subscription.get_user().get_primaryId() + ",'" +
-                        subscription.get_status() + "','" +
+                        subscription.get_situation() + "','" +
                         subscription.get_type() + "','" +
                         subscription.get_offer().get_type() + "','" +
                         subscription.get_offer().get_expires() + "'," +
@@ -209,7 +209,7 @@ public class ModelRepository extends Repository {
                         subscription.get_cardId() +
                     ") " +
                     "ON DUPLICATE KEY UPDATE " +
-                        "`status` = '" + subscription.get_status() + "'," +
+                        "`status` = '" + subscription.get_situation() + "'," +
                         "subscription_type = '" + subscription.get_type() + "'," +
                         "offer_type = '" + subscription.get_offer().get_type() + "'," +
                         "offer_expires = '" + subscription.get_offer().get_expires() + "'," +

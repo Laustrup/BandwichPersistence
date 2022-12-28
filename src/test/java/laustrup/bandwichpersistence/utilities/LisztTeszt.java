@@ -118,8 +118,8 @@ class LisztTeszt extends JTest {
                     original.get_description(), original.get_contactInfo(),
                     original.get_albums(), original.get_ratings(), original.get_events(), original.get_gigs(),
                     original.get_chatRooms(), original.get_subscription(), original.get_bulletins(),
-                    original.get_timestamp(), original.get_members(), original.get_runner(),
-                    original.get_fans(), original.get_idols());
+                    original.get_members(), original.get_runner(),
+                    original.get_fans(), original.get_idols(), original.get_timestamp());
             replacement.set_runner("This is a replacement!");
 
             try {
@@ -152,8 +152,8 @@ class LisztTeszt extends JTest {
                     original.get_description(), original.get_contactInfo(),
                     original.get_albums(), original.get_ratings(), original.get_events(), original.get_gigs(),
                     original.get_chatRooms(), original.get_subscription(), original.get_bulletins(),
-                    original.get_timestamp(), original.get_members(), original.get_runner(),
-                    original.get_fans(), original.get_idols());
+                    original.get_members(), original.get_runner(),
+                    original.get_fans(), original.get_idols(), original.get_timestamp());
             replacement.set_runner("This is a replacement!");
 
             try {

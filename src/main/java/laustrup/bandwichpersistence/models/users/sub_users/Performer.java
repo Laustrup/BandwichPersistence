@@ -9,7 +9,7 @@ import laustrup.bandwichpersistence.models.events.Gig;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
 import laustrup.bandwichpersistence.models.users.sub_users.participants.Participant;
-import laustrup.bandwichpersistence.models.users.sub_users.subscriptions.Subscription;
+import laustrup.bandwichpersistence.models.users.subscriptions.Subscription;
 import laustrup.bandwichpersistence.utilities.Liszt;
 
 import lombok.Getter;
@@ -55,7 +55,7 @@ public abstract class Performer extends Participant {
                      Liszt<ChatRoom> chatRooms, Subscription subscription, Liszt<Bulletin> bulletins, Liszt<User> fans,
                      Liszt<User> idols, LocalDateTime timestamp) {
         super(id, username, description, contactInfo, albums, ratings, events,
-                chatRooms, subscription, bulletins, timestamp, idols);
+                chatRooms, subscription, bulletins, idols, timestamp);
         _authority = authority;
         _gigs = gigs;
         _fans = fans;

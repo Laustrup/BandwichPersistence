@@ -2,7 +2,7 @@ package laustrup.bandwichpersistence.services.persistence_services.entity_servic
 
 import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
 import laustrup.bandwichpersistence.models.users.sub_users.participants.Participant;
-import laustrup.bandwichpersistence.models.users.sub_users.subscriptions.Subscription;
+import laustrup.bandwichpersistence.models.users.subscriptions.Subscription;
 import laustrup.bandwichpersistence.repositories.sub_repositories.ParticipantRepository;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembly;
 import laustrup.bandwichpersistence.services.persistence_services.entity_services.EntityService;
@@ -62,7 +62,7 @@ public class ParticipantPersistenceService extends EntityService<Participant> {
             participant = new Participant(participant.get_primaryId(), participant.get_username(),
                     participant.get_firstName(), participant.get_lastName(), participant.get_description(),contactInfo,
                     participant.get_albums(), participant.get_ratings(), participant.get_events(),participant.get_chatRooms(),
-                    subscription,participant.get_bulletins(),participant.get_timestamp(), participant.get_idols()
+                    subscription,participant.get_bulletins(), participant.get_idols(),participant.get_timestamp()
             );
 
             if (upsert(participant))
