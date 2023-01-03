@@ -66,6 +66,20 @@ public abstract class JTest {
         return performance;
     }
 
+    /**
+     * Calculates the performance time from start to this moment and prints it in milliseconds.
+     * @param title The title of the ACT
+     * @return The duration of the performance in milliseconds
+     */
+    protected long calculatePerformance(String title) {
+        long performance = Duration.between(_start, LocalDateTime.now()).toMillis();
+
+        Printer.get_instance().print("The performance of current " + title + " is " + performance +
+                " in milliseconds and " + (performance / 1000) + " in minutes." );
+
+        return performance;
+    }
+
     protected void compare(Participant expected, Participant actual) {
     }
 

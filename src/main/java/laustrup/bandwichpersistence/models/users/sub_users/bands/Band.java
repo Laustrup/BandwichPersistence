@@ -28,7 +28,6 @@ public class Band extends Performer {
 
     /**
      * Contains all the Artists, that are members of this band.
-     *
      */
     @Getter
     private Liszt<Artist> _members;
