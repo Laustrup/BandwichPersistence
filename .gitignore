@@ -31,3 +31,5 @@ build/
 
 ### VS Code ###
 .vscode/
+/src/main/java/laustrup/bandwichpersistence/miscs/Crate.java
+/src/main/resources/sqls/default_values.sql

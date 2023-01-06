@@ -40,5 +40,4 @@ public class ArtistControllerService extends ControllerService<Artist> {
             return new ResponseEntity<>(new Response<>(artist, Response.StatusType.INVALID_PASSWORD_FORMAT),
                     HttpStatus.NOT_ACCEPTABLE);
     }
-
 }

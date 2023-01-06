@@ -218,7 +218,7 @@ public abstract class Repository {
          */
         private void openConnection() {
             if (DbGate.get_instance().isClosed().get_truth())
-                DbGate.get_instance().isOpen();
+                DbGate.get_instance().open();
         }
 
         /**
