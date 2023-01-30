@@ -36,3 +36,6 @@ build/
 /src/main/java/laustrup/bandwichpersistence/miscs/Crate.java
 /src/main/resources/sqls/default_values.sql
 /src/main/resources/application.properties
+
+### Build ###
+/out/artifacts/BandwichPersistence_jar/BandwichPersistence.jar

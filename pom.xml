@@ -11,9 +11,10 @@
 
     <groupId>laustrup</groupId>
     <artifactId>BandwichPersistence</artifactId>
-    <version>0.0.1</version>
+    <version>0.0.1-SNAPSHOT</version>
     <name>BandwichPersistence</name>
-    <description>BandwichPersistence</description>
+    <description>This repository project is responsible for handling persistence logic of Bandwich.</description>
+    <packaging>jar</packaging>
 
     <properties>
         <java.version>18</java.version>
