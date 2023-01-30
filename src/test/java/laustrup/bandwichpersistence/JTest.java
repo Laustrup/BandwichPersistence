@@ -1,7 +1,6 @@
 package laustrup.bandwichpersistence;
 
-import laustrup.bandwichpersistence.models.users.User;
-import laustrup.bandwichpersistence.models.users.sub_users.participants.Participant;
+import laustrup.bandwichpersistence.services.RandomCreatorService;
 import laustrup.bandwichpersistence.utilities.Printer;
 import org.junit.jupiter.api.BeforeEach;
 
@@ -9,12 +8,13 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Random;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Adds a few functions to test methods to reuse.
  */
-public abstract class JTest {
+public abstract class JTest extends Asserter {
 
     /**
      * Will be the start of the ACT in tests
@@ -30,6 +30,11 @@ public abstract class JTest {
     protected TestItems _items;
 
     /**
+     * A default password, with the purpose of creating, logging in and various alike features.
+     */
+    protected String _password;
+
+    /**
      * This Random is the java Random utility, that can be reused throughout tests.
      */
     protected Random _random = new Random();
@@ -42,6 +47,7 @@ public abstract class JTest {
      */
     @BeforeEach
     public void setup() {
+        _password = RandomCreatorService.get_instance().generatePassword();
         _items = new TestItems();
         begin();
     }
@@ -61,7 +67,7 @@ public abstract class JTest {
         long performance = Duration.between(_start, LocalDateTime.now()).toMillis();
 
         Printer.get_instance().print("The performance of current test is " + performance +
-                " in milliseconds and " + (performance / 1000) + " in minutes." );
+                " in milliseconds, " + (performance / 1000) + " in seconds and " + ((performance / 1000)/60)  + " in minutes");
 
         return performance;
     }
@@ -75,17 +81,8 @@ public abstract class JTest {
         long performance = Duration.between(_start, LocalDateTime.now()).toMillis();
 
         Printer.get_instance().print("The performance of current " + title + " is " + performance +
-                " in milliseconds and " + (performance / 1000) + " in minutes." );
+                " in milliseconds, " + (performance / 1000) + " in seconds and " + ((performance / 1000)/60)  + " in minutes");
 
         return performance;
     }
-
-    protected void compare(Participant expected, Participant actual) {
-    }
-
-    /*
-    private void compare(User expected, User actual) {
-        assertEquals(expected.,);
-    }
-     */
 }

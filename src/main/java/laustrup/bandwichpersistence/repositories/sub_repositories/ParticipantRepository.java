@@ -42,6 +42,7 @@ public class ParticipantRepository extends Repository {
         try {
             return create("INSERT INTO users(" +
                         "username," +
+                        "email," +
                         "`password`," +
                         "first_name," +
                         "last_name," +
@@ -51,6 +52,7 @@ public class ParticipantRepository extends Repository {
                     ") " +
                     "VALUES ('" +
                         participant.get_username() + "','" +
+                        participant.get_contactInfo().get_email() + "','" +
                         password + "','" +
                         participant.get_firstName() + "','" +
                         participant.get_lastName() + "','" +

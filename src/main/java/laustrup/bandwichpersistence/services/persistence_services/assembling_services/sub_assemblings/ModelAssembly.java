@@ -36,7 +36,7 @@ public class ModelAssembly {
 
     public ContactInfo assembleContactInfo(ResultSet set) throws SQLException {
         String table = "contact_informations";
-        return new ContactInfo(set.getString(table+".user_id"),
+        return new ContactInfo(set.getString("users.email"),
                 new Phone(new Country(set.getString(table+".country_title"),
                             Country.CountryIndexes.valueOf(set.getString(table+".country_indexes")),
                             set.getInt(table+".first_digits")),
@@ -54,13 +54,20 @@ public class ModelAssembly {
 
     public Subscription assembleSubscription(ResultSet set) throws SQLException {
         String table = "subscriptions";
-        return new Subscription(set.getLong(table+".id"), Subscription.Type.valueOf(set.getString(table+".subscription_type")),
+
+        Subscription subscription = new Subscription(set.getLong(table+".user_id"),
+                Subscription.Type.valueOf(set.getString(table+".subscription_type")),
                 Subscription.Status.valueOf(set.getString(table+".status")),
-                new SubscriptionOffer(set.getTimestamp(table+".offer_expires").toLocalDateTime(),
-                        SubscriptionOffer.Type.valueOf(set.getString(table+".offer_type")),
+                new SubscriptionOffer(
+                        set.getTimestamp(table+".offer_expires") == null ? null :
+                                set.getTimestamp(table+".offer_expires").toLocalDateTime(),
+                        set.getString(table+".offer_type") == null ? null :
+                                SubscriptionOffer.Type.valueOf(set.getString(table+".offer_type")),
                         set.getDouble(table+".offer_effect")
-                        ),
+                ),
                 set.getLong(table+".card_id")
         );
+
+        return subscription;
     }
 }

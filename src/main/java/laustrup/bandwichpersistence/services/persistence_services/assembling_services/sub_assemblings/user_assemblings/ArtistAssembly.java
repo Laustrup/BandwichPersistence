@@ -4,7 +4,6 @@ import laustrup.bandwichpersistence.models.chats.Request;
 import laustrup.bandwichpersistence.models.events.Gig;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.sub_users.bands.Artist;
-import laustrup.bandwichpersistence.models.users.sub_users.bands.Band;
 import laustrup.bandwichpersistence.repositories.sub_repositories.UserRepository;
 import laustrup.bandwichpersistence.utilities.Liszt;
 
@@ -41,13 +40,16 @@ public class ArtistAssembly extends UserAssembler {
      * @return Artists made from the values of the ResultSet.
      * @throws SQLException Will be triggered from the ResultSet, if there is an error.
      */
-    public Liszt<Artist> assembles(ResultSet set) throws SQLException {
+    public Liszt<Artist> assembles(ResultSet set, boolean isTemplate) throws SQLException {
         Liszt<Artist> artists = new Liszt<>();
 
-        while (!set.isAfterLast()) {
-            if (set.isBeforeFirst())
+        if (set != null) {
+            while (!set.isAfterLast()) {
+                if (set.isBeforeFirst())
+                    set.next();
+                artists.add(assemble(set,isTemplate));
                 set.next();
-            artists.add(assemble(set));
+            }
         }
 
         return artists;
@@ -60,40 +62,42 @@ public class ArtistAssembly extends UserAssembler {
      * @return An Artist object made from the values of the ResultSet.
      * @throws SQLException Will be triggered from the ResultSet, if there is an error.
      */
-    public Artist assemble(ResultSet set) throws SQLException {
+    public Artist assemble(ResultSet set, boolean isTemplate) throws SQLException {
         setupUserAttributes(set);
         Liszt<Gig> gigs = new Liszt<>();
-        String runner = set.getString("gear.`description`");
+        String runner = set.getString("gear.description");
         Liszt<User> fans = new Liszt<>();
         Liszt<User> idols = new Liszt<>();
         Liszt<Request> requests = new Liszt<>();
         Liszt<Long> bandIds = new Liszt<>();
 
-        do {
-            if (_id != set.getLong("users.id"))
-                break;
+        if (!isTemplate) {
+            do {
+                if (_id != set.getLong("users.id"))
+                    break;
 
-            _albums = _handler.handleAlbums(set, _albums);
-            _ratings = _handler.handleRatings(set, _ratings);
-            gigs = _handler.handleGigs(set, gigs);
-            _events = _handler.handleEvents(set, _events);
-            _chatRooms = _handler.handleChatRooms(set, _chatRooms);
-            _bulletins = _handler.handleBulletins(set, _bulletins, false);
+                _albums = _handler.handleAlbums(set, _albums);
+                _ratings = _handler.handleRatings(set, _ratings);
+                gigs = _handler.handleGigs(set, gigs);
+                _events = _handler.handleEvents(set, _events);
+                _chatRooms = _handler.handleChatRooms(set, _chatRooms);
+                _bulletins = _handler.handleBulletins(set, _bulletins, false);
 
-            if (set.getLong("followings.idol_id") == _id)
-                fans = _handler.handleFans(set, fans);
-            else
-                idols = _handler.handleIdols(set, idols);
+                if (set.getLong("followings.idol_id") == _id)
+                    fans = _handler.handleFans(set, fans);
+                else
+                    idols = _handler.handleIdols(set, idols);
 
-            requests = _handler.handleRequests(set, requests, new Artist(_id));
+                requests = _handler.handleRequests(set, requests, new Artist(_id));
 
-            if (!bandIds.contains(set.getLong("band_members.band_id")))
-                bandIds.add(set.getLong("band_members.band_id"));
-        } while (set.next());
+                if (!bandIds.contains(set.getLong("band_members.band_id")))
+                    bandIds.add(set.getLong("band_members.band_id"));
+            } while (set.next());
+        }
 
         Artist artist = new Artist(_id, _username, _firstName, _lastName, _description, _contactInfo, _albums, _ratings, _events, gigs,
                 _chatRooms, _subscription, _bulletins,
-                BandAssembly.get_instance().assembles(UserRepository.get_instance().get(bandIds)),
+                !isTemplate&&!bandIds.isEmpty() ? BandAssembly.get_instance().assembles(UserRepository.get_instance().get(bandIds), true) : new Liszt<>(),
                 runner, fans, idols, requests, _timestamp);
 
         resetUserAttributes();

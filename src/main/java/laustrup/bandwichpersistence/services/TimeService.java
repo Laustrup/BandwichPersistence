@@ -3,6 +3,8 @@ package laustrup.bandwichpersistence.services;
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.utilities.Liszt;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -30,6 +32,8 @@ public class TimeService {
         if (_instance == null) _instance = new TimeService();
         return _instance;
     }
+
+    private TimeService() {}
 
     /**
      * Calculates the amount of minutes, that it has taken for the first message to be answered.
@@ -72,4 +76,14 @@ public class TimeService {
         return total;
     }
 
+    /**
+     * Will convert a DateTime row from the database into a java LocalDateTime.
+     * @param set The ResultSet from the database.
+     * @param row The row column title of the DataTime.
+     * @return If the row value is null, it will return null, otherwise the converted java LocalDateTime.
+     * @throws SQLException The exception from the ResultSet, if it occurs.
+     */
+    public LocalDateTime convertFromDatabase(ResultSet set, String row) throws SQLException {
+        return set.getTimestamp(row) == null ? null : set.getTimestamp(row).toLocalDateTime();
+    }
 }

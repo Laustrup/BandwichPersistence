@@ -44,7 +44,9 @@ public class EventAssembly extends Assembler {
      * @param id The id of the Event that is wished to be assembled.
      * @return The assembled Event.
      */
-    public Event assemble(long id) { return assemble(EventRepository.get_instance().get(id),true); }
+    public Event assemble(long id) {
+        return assemble(EventRepository.get_instance().get(id),true);
+    }
 
     /**
      * Builds all Event objects with the informations given from the EventRepository.
@@ -74,13 +76,11 @@ public class EventAssembly extends Assembler {
         Liszt<Event> events = new Liszt<>();
 
         try {
-            while (!set.isAfterLast()) {
-                if (set.isBeforeFirst())
-                    set.next();
+            while (set.next()) {
                 events.add(assemble(set, false));
             }
         } catch (SQLException e) {
-            Printer.get_instance().print("Couldn't assemble Events...", e);
+            Printer.get_instance().print("Couldn't assemble events...", e);
         }
 
         return events;
@@ -98,40 +98,49 @@ public class EventAssembly extends Assembler {
         Event event = null;
 
         try {
-            if (preInitiate)
-                set.next();
-            event = assemble(set);
+            if (!set.isAfterLast()) {
+                if (preInitiate)
+                    set.next();
+                if (!set.isAfterLast())
+                    event = assemble(set);
+            }
         } catch (SQLException e) {
-            Printer.get_instance().print("Trouble assembling user...", e);
+            Printer.get_instance().print("Trouble assembling event...", e);
         }
 
         return event;
     }
 
     public Event assemble(ResultSet set) throws SQLException {
-        long id = set.getLong("`events`.id");
-        String title = set.getString("`events`.title"),
-            description = set.getString("`events`.`description`");
-        LocalDateTime openDoors = set.getTimestamp("`events`.open_doors").toLocalDateTime();
-        Plato isVoluntary = new Plato(Plato.Argument.valueOf(set.getString("`events`.is_voluntary"))),
-            isPublic = new Plato(Plato.Argument.valueOf(set.getString("`events`.is_public"))),
-            isCancelled = new Plato(Plato.Argument.valueOf(set.getString("`events`.is_cancelled"))),
-            isSoldOut = new Plato(Plato.Argument.valueOf(set.getString("`events`.is_sold_out")));
-        String location = set.getString("`events`.location");
-        double price = set.getDouble("`events`.price");
-        String ticketsURL = set.getString("`events`.tickets_url");
-        ContactInfo contactInfo = ModelAssembly.get_instance().assembleContactInfo(set);
-        Liszt<Gig> gigs = new Liszt<>();
-        Venue venue = new Venue(set.getLong("`events`.venue_id"));
-        Liszt<Request> requests = new Liszt<>();
-        Liszt<Participation> participations = new Liszt<>();
-        Liszt<Bulletin> bulletins = new Liszt<>();
-        Liszt<Album> albums = new Liszt<>();
-        LocalDateTime timestamp = set.getTimestamp("`events`.`timestamp`").toLocalDateTime();
-
         try {
+            long id = set.getLong("events.id");
+            String title = set.getString("events.title"),
+                description = set.getString("events.description");
+            LocalDateTime openDoors = set.getTimestamp("events.open_doors") != null ?
+                    set.getTimestamp("events.open_doors").toLocalDateTime() : null;
+            Plato isVoluntary = set.getString("events.is_voluntary") != null ?
+                    new Plato(Plato.Argument.valueOf(set.getString("events.is_voluntary"))) : null,
+                isPublic = set.getString("events.is_public") != null ?
+                        new Plato(Plato.Argument.valueOf(set.getString("events.is_public"))) : null,
+                isCancelled = set.getString("events.is_cancelled") != null ?
+                        new Plato(Plato.Argument.valueOf(set.getString("events.is_cancelled"))) : null,
+                isSoldOut = set.getString("events.is_sold_out") != null ?
+                        new Plato(Plato.Argument.valueOf(set.getString("events.is_sold_out"))) : null;
+            String location = set.getString("events.location");
+            double price = set.getDouble("events.price");
+            String ticketsURL = set.getString("events.tickets_url");
+            ContactInfo contactInfo = ModelAssembly.get_instance().assembleContactInfo(set);
+            Liszt<Gig> gigs = new Liszt<>();
+            Venue venue = new Venue(set.getLong("events.venue_id"));
+            Liszt<Request> requests = new Liszt<>();
+            Liszt<Participation> participations = new Liszt<>();
+            Liszt<Bulletin> bulletins = new Liszt<>();
+            Liszt<Album> albums = new Liszt<>();
+            LocalDateTime timestamp = set.getTimestamp("events.timestamp") != null ?
+                set.getTimestamp("events.timestamp").toLocalDateTime() : null;
+
             do {
-                if (id != set.getLong("`events`.id"))
+                if (id != set.getLong("events.id"))
                     break;
 
                 gigs = _handler.handleGigs(set, gigs);
@@ -143,12 +152,16 @@ public class EventAssembly extends Assembler {
                 bulletins = _handler.handleBulletins(set, bulletins, true);
                 albums = _handler.handleAlbums(set, albums);
             } while (set.next());
+
+            return new Event(id,title,description,openDoors,isVoluntary,isPublic,isCancelled,isSoldOut,location,price,
+                    ticketsURL,contactInfo,gigs,venue,requests,participations,bulletins,albums,timestamp);
         } catch (SQLException e) {
             Printer.get_instance().print("Couldn't assemble Event...",e);
             return null;
         }
-
-        return new Event(id,title,description,openDoors,isVoluntary,isPublic,isCancelled,isSoldOut,location,price,
-                ticketsURL,contactInfo,gigs,venue,requests,participations,bulletins,albums,timestamp);
+        catch (Exception e) {
+            Printer.get_instance().print("Couldn't assemble Event...",e);
+            return null;
+        }
     }
 }

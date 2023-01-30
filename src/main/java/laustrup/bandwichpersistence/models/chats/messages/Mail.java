@@ -1,7 +1,9 @@
 package laustrup.bandwichpersistence.models.chats.messages;
 
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
+import laustrup.bandwichpersistence.models.dtos.chats.messages.MailDTO;
 import laustrup.bandwichpersistence.models.users.User;
+import laustrup.bandwichpersistence.services.DTOService;
 import laustrup.bandwichpersistence.utilities.Plato;
 
 import lombok.Getter;
@@ -13,6 +15,11 @@ public class Mail extends Message {
     @Getter
     private ChatRoom _chatRoom;
 
+    public Mail(MailDTO mail) {
+        super(mail.getPrimaryId(), DTOService.get_instance().convertFromDTO(mail.getAuthor()),
+                mail.getContent(), mail.isSent(), new Plato(mail.getIsEdited()), mail.isPublic(), mail.getTimestamp());
+        _chatRoom = new ChatRoom(mail.getChatRoom());
+    }
     public Mail(long id, ChatRoom chatRoom, User author, String content,
                 boolean isSent, Plato isEdited, boolean isPublic,
                 LocalDateTime timestamp) {
@@ -52,7 +59,7 @@ public class Mail extends Message {
                     "timestamp:" + _timestamp;
         else
             return "Mail(id:" + _primaryId +
-                    "ChatRoom:" + _chatRoom. toString() +
+                    "ChatRoom:" + (_chatRoom != null ? _chatRoom. toString() : null) +
                     "author:" + _author.toString() +
                     "content:" + _content +
                     "isSent:" + _sent +

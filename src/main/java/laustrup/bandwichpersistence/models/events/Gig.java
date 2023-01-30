@@ -1,10 +1,12 @@
 package laustrup.bandwichpersistence.models.events;
 
 import laustrup.bandwichpersistence.models.Model;
+import laustrup.bandwichpersistence.models.dtos.events.GigDTO;
+import laustrup.bandwichpersistence.models.dtos.users.sub_users.PerformerDTO;
 import laustrup.bandwichpersistence.models.users.sub_users.Performer;
 
+import laustrup.bandwichpersistence.services.DTOService;
 import lombok.Data;
-import lombok.ToString;
 
 import java.time.LocalDateTime;
 
@@ -32,6 +34,20 @@ public class Gig extends Model {
      * The end of the Gig, where the act will end.
      */
     private LocalDateTime _end;
+
+    public Gig(GigDTO gig) {
+        super(gig.getPrimaryId(), "Gig:"+gig.getPrimaryId(), gig.getTimestamp());
+        _event = new Event(gig.getEvent());
+        _act = new Performer[gig.getAct().length];
+        _act = convert(gig.getAct());
+        _start = gig.getStart();
+        _end = gig.getEnd();
+    }
+    private Performer[] convert(PerformerDTO[] act) {
+        for (int i = 0; i < act.length; i++)
+            _act[i] = (Performer) DTOService.get_instance().convertFromDTO(act[i]);
+        return _act;
+    }
 
     public Gig(Performer[] act) {
         super("New gig");
@@ -89,9 +105,10 @@ public class Gig extends Model {
 
     @Override
     public String toString() {
-        return "Gig(id:" + _primaryId +
-                "start:" + _start.toString() +
-                "end:" + _end.toString() +
+        return "Gig(" +
+                    "id:" + _primaryId +
+                    ",start:" + _start.toString() +
+                    ",end:" + _end.toString() +
                 ")";
     }
 }

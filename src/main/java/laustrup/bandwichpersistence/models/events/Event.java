@@ -4,10 +4,17 @@ import laustrup.bandwichpersistence.models.Model;
 import laustrup.bandwichpersistence.models.albums.Album;
 import laustrup.bandwichpersistence.models.chats.Request;
 import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
+import laustrup.bandwichpersistence.models.dtos.albums.AlbumDTO;
+import laustrup.bandwichpersistence.models.dtos.chats.RequestDTO;
+import laustrup.bandwichpersistence.models.dtos.chats.messages.BulletinDTO;
+import laustrup.bandwichpersistence.models.dtos.events.EventDTO;
+import laustrup.bandwichpersistence.models.dtos.events.GigDTO;
+import laustrup.bandwichpersistence.models.dtos.events.ParticipationDTO;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
 import laustrup.bandwichpersistence.models.users.sub_users.Performer;
 import laustrup.bandwichpersistence.models.users.sub_users.venues.Venue;
+import laustrup.bandwichpersistence.services.DTOService;
 import laustrup.bandwichpersistence.utilities.Liszt;
 import laustrup.bandwichpersistence.utilities.Plato;
 import laustrup.bandwichpersistence.utilities.Printer;
@@ -21,7 +28,6 @@ import java.util.*;
 /**
  * An Event is placed a gig, where a venue is having bands playing at specific times.
  */
-@NoArgsConstructor
 public class Event extends Model {
 
     /**
@@ -151,6 +157,62 @@ public class Event extends Model {
     @Getter @Setter
     private Liszt<Album> _albums;
 
+    public Event(EventDTO event) {
+        super(event.getPrimaryId(), event.getTitle(), event.getTimestamp());
+
+        _description = event.getDescription();
+
+        _gigs = new Liszt<>();
+        for (GigDTO gig : event.getGigs())
+            _gigs.add(new Gig(gig));
+
+        if (!_gigs.isEmpty())
+            try {
+                calculateTime();
+            } catch (InputMismatchException e) {
+                Printer.get_instance().print("End date is before beginning date of " + _title + "...", e);
+            }
+        else {
+            _start = event.getOpenDoors() != null ? event.getOpenDoors() : null;
+            _end = event.getEnd() != null ? event.getEnd() : (event.getOpenDoors() != null ? event.getOpenDoors() : null);
+            _length = _start != null && _end != null ? Duration.between(_start,_end).toMinutes() : 0;
+        }
+
+        if (_start != null && _end != null)
+            if (Duration.between(event.getOpenDoors(), _start).toMinutes() >= 0)
+                _openDoors = event.getOpenDoors();
+            else
+                throw new InputMismatchException();
+
+        _voluntary = new Plato(event.getIsVoluntary());
+        _public = new Plato(event.getIsPublic());
+        _cancelled = new Plato(event.getIsCancelled());
+        _soldOut = new Plato(event.getIsSoldOut());
+        _price = event.getPrice();
+        _ticketsURL = event.getTicketsURL();
+        _contactInfo = new ContactInfo(event.getContactInfo());
+        _venue = (Venue) DTOService.get_instance().convertFromDTO(event.getVenue());
+
+        _location = event.getLocation() == null || event.getLocation().isEmpty() ?
+                (event.getVenue() != null ? (event.getLocation() != null ? event.getLocation() : null)
+                        : null) : event.getLocation();
+
+        _requests = new Liszt<>();
+        for (RequestDTO request : event.getRequests())
+            _requests.add(new Request(request));
+
+        _participations = new Liszt<>();
+        for (ParticipationDTO participation : event.getParticipations())
+            _participations.add(new Participation(participation));
+
+        _bulletins = new Liszt<>();
+        for (BulletinDTO bulletin : event.getBulletins())
+            _bulletins.add(new Bulletin(bulletin));
+
+        _albums = new Liszt<>();
+        for (AlbumDTO album : event.getAlbums())
+            _albums.add(new Album(album));
+    }
     public Event(long id) {
         super(id);
     }
@@ -165,16 +227,20 @@ public class Event extends Model {
         _description = description;
         _gigs = gigs;
 
-        try {
-            calculateTime();
-        } catch (InputMismatchException e) {
-            Printer.get_instance().print("End date is before beginning date of " + _title + "...", e);
-        }
-
-        if (Duration.between(openDoors, _start).toMinutes() >= 0)
-            _openDoors = openDoors;
+        if (!_gigs.isEmpty())
+            try {
+                calculateTime();
+            } catch (InputMismatchException e) {
+                Printer.get_instance().print("End date is before beginning date of " + _title + "...", e);
+            }
         else
-            throw new InputMismatchException();
+            _start = openDoors;
+
+        if (_start != null && _end != null)
+            if (Duration.between(openDoors, _start).toMinutes() >= 0)
+                _openDoors = openDoors;
+            else
+                throw new InputMismatchException();
 
         _voluntary = isVoluntary;
         _public = isPublic;
@@ -185,7 +251,9 @@ public class Event extends Model {
         _contactInfo = contactInfo;
         _venue = venue;
 
-        _location = location == null || location.isEmpty() ? venue.get_location() : location;
+        _location = location == null || location.isEmpty() ?
+                (venue != null ? (venue.get_location() != null ? venue.get_location() : null)
+                    : null) : location;
 
         _requests = requests;
         _participations = participations;
@@ -596,24 +664,25 @@ public class Event extends Model {
      * @throws InputMismatchException In case that the end is before the beginning.
      */
     private long calculateTime() throws InputMismatchException {
-        _start = _gigs.get(1).get_start();
-        _end = _gigs.get(1).get_end();
+        _start = _gigs.isEmpty() ? null : _gigs.get(1).get_start();
+        _end = _gigs.isEmpty() ? null : _gigs.get(1).get_end();
 
-        if (_end.isAfter(_start)) {
+        if ((_end != null && _start != null) && Duration.between(_end, _start).getSeconds() > 0)
+            throw new InputMismatchException();
 
-            if (_gigs.size() > 1)
-                for (Gig gig : _gigs) {
-                    if (gig.get_start().isBefore(_start)) _start = gig.get_start();
-                    if (gig.get_end().isAfter(_end)) _end = gig.get_end();
-                }
+        if (_start != null && _end != null)
+            if (_end.isAfter(_start)) {
 
-            _length = Duration.between(_start, _end).toMillis();
-            return _length;
-        }
+                if (_gigs.size() > 1)
+                    for (Gig gig : _gigs) {
+                        if (gig.get_start().isBefore(_start)) _start = gig.get_start();
+                        if (gig.get_end().isAfter(_end)) _end = gig.get_end();
+                    }
 
-        _start = null;
-        _end = null;
-        throw new InputMismatchException();
+                _length = Duration.between(_start, _end).toMillis();
+            }
+
+        return _length;
     }
 
     @Override

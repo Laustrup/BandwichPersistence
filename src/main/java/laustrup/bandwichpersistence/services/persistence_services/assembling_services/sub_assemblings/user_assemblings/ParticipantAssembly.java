@@ -31,12 +31,11 @@ public class ParticipantAssembly extends UserAssembler {
 
     private ParticipantAssembly() {}
 
-    /**
+    /*
      * Assembles Participants with values from the ResultSet.
      * @param set A ResultSet from the database, must include the values intended for the assembled object.
      * @return Participants made from the values of the ResultSet.
      * @throws SQLException Will be triggered from the ResultSet, if there is an error.
-     */
     public Liszt<Participant> assembles(ResultSet set) throws SQLException {
         Liszt<Participant> participants = new Liszt<>();
 
@@ -48,6 +47,7 @@ public class ParticipantAssembly extends UserAssembler {
 
         return participants;
     }
+     */
 
     /**
      * Assembles a Participant with values from the ResultSet.
@@ -56,17 +56,19 @@ public class ParticipantAssembly extends UserAssembler {
      * @return A Participant object made from the values of the ResultSet.
      * @throws SQLException Will be triggered from the ResultSet, if there is an error.
      */
-    public Participant assemble(ResultSet set) throws SQLException {
+    public Participant assemble(ResultSet set, boolean isTemplate) throws SQLException {
         setupUserAttributes(set);
         Liszt<User> idols = new Liszt<>();
 
-        do {
-            if (_id != set.getLong("users.id"))
-                break;
+        if (!isTemplate) {
+            do {
+                if (_id != set.getLong("users.id"))
+                    break;
 
-            _albums = _handler.handleAlbums(set, _albums);
-            idols = _handler.handleIdols(set, idols);
-        } while (set.next());
+                _albums = _handler.handleAlbums(set, _albums);
+                idols = _handler.handleIdols(set, idols);
+            } while (set.next());
+        }
 
         Participant participant = new Participant(_id, _username, _firstName, _lastName, _description, _contactInfo, _albums, _ratings,
                 _events, _chatRooms, _subscription, _bulletins, idols, _timestamp);

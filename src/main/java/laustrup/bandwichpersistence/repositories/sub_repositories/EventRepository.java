@@ -46,7 +46,7 @@ public class EventRepository extends Repository {
         StringBuilder where = new StringBuilder("WHERE ");
 
         for (int i = 1; i <= ids.size(); i++) {
-            where.append("event_id.id = ").append(ids.get(i));
+            where.append("event_id = ").append(ids.get(i));
             if (i < ids.size())
                 where.append(" OR ");
         }
@@ -77,6 +77,9 @@ public class EventRepository extends Repository {
      * @return The collected JDBC ResultSet.
      */
     public ResultSet get(Liszt<Long> ids) {
+        if (ids.isEmpty())
+            return null;
+
         StringBuilder where = new StringBuilder("WHERE ");
 
         for (int i = 1; i <= ids.size(); i++) {
@@ -111,18 +114,18 @@ public class EventRepository extends Repository {
      */
     private ResultSet get(String where) {
         return read("SELECT * FROM `events` " +
-                "INNER JOIN contact_informations ON `events`.venue_id = contact_informations.id " +
-                "INNER JOIN gigs ON `events`.id = gigs.event_id " +
-                "INNER JOIN acts ON gigs.id = acts.gig_id " +
-                "INNER JOIN requests ON `events`.id = requests.event_id " +
-                "INNER JOIN participations ON `events`.id = participations.event_id " +
-                "INNER JOIN event_bulletins ON `events`.id = event_bulletins.receiver_id " +
-                "INNER JOIN album_relations ON `events`.id = album_relations.event_id " +
-                "INNER JOIN albums ON album_relations.album_id = albums.id " +
-                "INNER JOIN album_endpoints ON album.id = album_endpoints " +
-                "INNER JOIN users ON `events`.venue_id = users.id OR acts.user_id = users.id " +
-                    "OR requests.user_id = users.id OR participations.participant_id = users.id " +
-                        "OR event_bulletins.author_id = users.id OR album_relations.user_id = users.id " +
+                "INNER JOIN contact_informations ON `events`.venue_id = contact_informations.user_id " +
+                "LEFT JOIN gigs ON `events`.id = gigs.event_id " +
+                "LEFT JOIN acts ON gigs.id = acts.gig_id " +
+                "LEFT JOIN requests ON `events`.id = requests.event_id " +
+                "LEFT JOIN participations ON `events`.id = participations.event_id " +
+                "LEFT JOIN event_bulletins ON `events`.id = event_bulletins.receiver_id " +
+                "LEFT JOIN albums ON `events`.id = albums.event_id " +
+                "LEFT JOIN album_items ON albums.id = album_items.album_id " +
+                "LEFT JOIN users ON `events`.venue_id = users.id " +
+                    "OR acts.user_id = users.id " +
+                        "OR requests.user_id = users.id OR participations.participant_id = users.id " +
+                            "OR event_bulletins.author_id = users.id " +
                 where + ";");
     }
 

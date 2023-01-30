@@ -1,15 +1,15 @@
 package laustrup.bandwichpersistence.services.persistence_services.assembling_services.sub_assemblings.user_assemblings;
 
-import laustrup.bandwichpersistence.models.albums.Album;
 import laustrup.bandwichpersistence.models.events.Gig;
 import laustrup.bandwichpersistence.models.users.User;
-import laustrup.bandwichpersistence.models.users.sub_users.bands.Artist;
 import laustrup.bandwichpersistence.models.users.sub_users.bands.Band;
 import laustrup.bandwichpersistence.repositories.sub_repositories.UserRepository;
 import laustrup.bandwichpersistence.utilities.Liszt;
+import laustrup.bandwichpersistence.utilities.Printer;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.InputMismatchException;
 
 /**
  * Is only used for database read functions.
@@ -41,13 +41,13 @@ public class BandAssembly extends UserAssembler {
      * @return Bands made from the values of the ResultSet.
      * @throws SQLException Will be triggered from the ResultSet, if there is an error.
      */
-    public Liszt<Band> assembles(ResultSet set) throws SQLException {
+    public Liszt<Band> assembles(ResultSet set, boolean isTemplate) throws SQLException {
         Liszt<Band> bands = new Liszt<>();
 
-        while (!set.isAfterLast()) {
-            if (set.isBeforeFirst())
-                set.next();
-            bands.add(assemble(set));
+        if (set != null) {
+            while (set.next()) {
+                bands.add(assemble(set, isTemplate));
+            }
         }
 
         return bands;
@@ -60,41 +60,49 @@ public class BandAssembly extends UserAssembler {
      * @return A Band object made from the values of the ResultSet.
      * @throws SQLException Will be triggered from the ResultSet, if there is an error.
      */
-    public Band assemble(ResultSet set) throws SQLException {
+    public Band assemble(ResultSet set, boolean isTemplate) throws SQLException {
         setupUserAttributes(set);
         Liszt<Gig> gigs = new Liszt<>();
         Liszt<Long> memberIds = new Liszt<>();
-        String runner = set.getString("gear.`description`");
+        String runner = set.getString("gear.description");
         Liszt<User> fans = new Liszt<>();
         Liszt<User> idols = new Liszt<>();
 
-        do {
-            if (_id != set.getLong("users.id"))
-                break;
+        if (!isTemplate) {
+            do {
+                if (_id != set.getLong("users.id"))
+                    break;
 
-            _albums = _handler.handleAlbums(set, _albums);
-            _ratings = _handler.handleRatings(set, _ratings);
-            gigs = _handler.handleGigs(set, gigs);
-            _events = _handler.handleEvents(set, _events);
-            _chatRooms = _handler.handleChatRooms(set, _chatRooms);
-            _bulletins = _handler.handleBulletins(set, _bulletins, false);
+                _albums = _handler.handleAlbums(set, _albums);
+                _ratings = _handler.handleRatings(set, _ratings);
+                gigs = _handler.handleGigs(set, gigs);
+                _events = _handler.handleEvents(set, _events);
+                _chatRooms = _handler.handleChatRooms(set, _chatRooms);
+                _bulletins = _handler.handleBulletins(set, _bulletins, false);
 
-            if (set.getLong("followings.idol_id") == _id)
-                fans = _handler.handleFans(set, fans);
-            else
-                idols = _handler.handleIdols(set, idols);
+                if (set.getLong("followings.idol_id") == _id)
+                    fans = _handler.handleFans(set, fans);
+                else
+                    idols = _handler.handleIdols(set, idols);
 
-            if (!memberIds.contains(set.getLong("band_members.artist_id")))
-                memberIds.add(set.getLong("band_members.artist_id"));
+                if (!memberIds.contains(set.getLong("band_members.artist_id")))
+                    memberIds.add(set.getLong("band_members.artist_id"));
+            } while (set.next());
+        }
 
-        } while (set.next());
 
-        Band band = new Band(_id, _username, _description, _contactInfo, _albums, _ratings, _events, gigs, _chatRooms,
-                _subscription, _bulletins,
-                ArtistAssembly.get_instance().assembles(UserRepository.get_instance().get(memberIds)),
-                runner, fans, idols, _timestamp);
+        try {
+            Band band = new Band(_id, _username, _description, _contactInfo, _albums, _ratings, _events, gigs, _chatRooms,
+                    _subscription, _bulletins,
+                    !isTemplate&&!memberIds.isEmpty() ? ArtistAssembly.get_instance().assembles(UserRepository.get_instance().get(memberIds),true) : new Liszt<>(),
+                    runner, fans, idols, _timestamp);
 
-        resetUserAttributes();
-        return band;
+            resetUserAttributes();
+            return band;
+        } catch (InputMismatchException e) {
+            Printer.get_instance().print("Couldn't assemble band...",e);
+        }
+
+        return null;
     }
 }

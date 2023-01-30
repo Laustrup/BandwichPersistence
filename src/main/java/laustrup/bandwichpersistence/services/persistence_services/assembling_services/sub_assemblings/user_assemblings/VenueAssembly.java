@@ -31,12 +31,11 @@ public class VenueAssembly extends UserAssembler {
 
     private VenueAssembly() {}
 
-    /**
+    /*
      * Assembles Venues with values from the ResultSet.
      * @param set A ResultSet from the database, must include the values intended for the assembled object.
      * @return Venues made from the values of the ResultSet.
      * @throws SQLException Will be triggered from the ResultSet, if there is an error.
-     */
     public Liszt<Venue> assembles(ResultSet set) throws SQLException {
         Liszt<Venue> venues = new Liszt<>();
 
@@ -48,6 +47,7 @@ public class VenueAssembly extends UserAssembler {
 
         return venues;
     }
+     */
 
     /**
      * Assembles a Venue with values from the ResultSet.
@@ -56,17 +56,19 @@ public class VenueAssembly extends UserAssembler {
      * @return A Venue object made from the values of the ResultSet.
      * @throws SQLException Will be triggered from the ResultSet, if there is an error.
      */
-    public Venue assemble(ResultSet set) throws SQLException {
+    public Venue assemble(ResultSet set, boolean isTemplate) throws SQLException {
         setupUserAttributes(set);
         String location = set.getString("venues.location");
-        String gear = set.getString("gear.`description`");
-        int size = set.getInt("venues.`size`");
+        String gear = set.getString("gear.description");
+        int size = set.getInt("venues.size");
         Liszt<Request> requests = new Liszt<>();
 
-        do {
-            _albums = _handler.handleAlbums(set,_albums);
-            requests = _handler.handleRequests(set, requests, new Venue(_id));
-        } while (set.next());
+        if (!isTemplate) {
+            do {
+                _albums = _handler.handleAlbums(set,_albums);
+                requests = _handler.handleRequests(set, requests, new Venue(_id));
+            } while (set.next());
+        }
 
         Venue venue = new Venue(_id, _username, _description, _contactInfo, _albums, _ratings, _events, _chatRooms,
                 location, gear, _subscription.get_status(), _subscription.get_offer(), _bulletins, size, requests,

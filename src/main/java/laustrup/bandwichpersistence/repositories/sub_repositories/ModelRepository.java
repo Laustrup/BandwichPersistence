@@ -47,6 +47,9 @@ public class ModelRepository extends Repository {
      * @return The collected JDBC ResultSet.
      */
     public ResultSet chatRooms(Liszt<Long> ids) {
+        if (ids.isEmpty())
+            return null;
+
         StringBuilder where = new StringBuilder("WHERE ");
 
         for (int i = 1; i <= ids.size(); i++) {
@@ -57,7 +60,7 @@ public class ModelRepository extends Repository {
 
         return read("SELECT * FROM chat_rooms " +
                 "INNER JOIN chatters ON chat_rooms.id = chatters.chat_room_id " +
-                "INNER JOIN mails ON chat_rooms.id = mails.chat_room id " +
+                "LEFT JOIN mails ON chat_rooms.id = mails.chat_room_id " +
                 where + ";");
     }
 
@@ -66,7 +69,7 @@ public class ModelRepository extends Repository {
      * @param ids The ids of the Bulletins.
      * @return The collected JDBC ResultSet.
      */
-    public ResultSet bulletins(Liszt<Long> ids) {
+    public ResultSet bulletins(Liszt<Long> ids, boolean isUser) {
         StringBuilder where = new StringBuilder("WHERE ");
 
         for (int i = 1; i <= ids.size(); i++) {
@@ -75,14 +78,13 @@ public class ModelRepository extends Repository {
                 where.append(" OR ");
         }
 
-        return read("SELECT * FROM user_ " +
-                "INNER JOIN chatters ON chat_rooms.id = chatters.chat_room_id " +
-                "INNER JOIN mails ON chat_rooms.id = mails.chat_room id " +
+        String table = (isUser ? "user_bulletins " : "event_bulletins ");
+        return read("SELECT * FROM " + table +
+                "INNER JOIN users ON " + table +".author_id = users.id OR " + table + ".receiver_id = users.id " +
                 where + ";");
     }
 
     //TODO Make bulletin tables the same.
-
     /**
      * Upserts Bulletin depending on the id.
      * This means it will insert the values of the Bulletin if they don't exist,
@@ -141,7 +143,6 @@ public class ModelRepository extends Repository {
         if (contactInfo != null && contactInfo.get_primaryId() > 0)
             return edit("INSERT INTO contact_informations(" +
                         "user_id," +
-                        "email," +
                         "first_digits," +
                         "phone_number," +
                         "phone_is_mobile," +
@@ -154,7 +155,6 @@ public class ModelRepository extends Repository {
                     ") " +
                     "VALUES (" +
                         contactInfo.get_primaryId() + ",'" +
-                        contactInfo.get_email() + "'," +
                         contactInfo.get_country().get_firstPhoneNumberDigits() + "," +
                         contactInfo.get_phone().get_numbers() + "," +
                         contactInfo.get_phone().is_mobile() + ",'" +
@@ -272,7 +272,7 @@ public class ModelRepository extends Repository {
     public Long upsert(ChatRoom chatRoom) {
         boolean idExists = chatRoom.get_primaryId() > 0;
         try {
-            ResultSet set = create("INSERT INTO chat_room(" +
+            ResultSet set = create("INSERT INTO chat_rooms(" +
                         (idExists ? "id," : "") +
                         "title," +
                         "responsible_id," +
@@ -291,7 +291,7 @@ public class ModelRepository extends Repository {
             if (set.isBeforeFirst())
                 set.next();
 
-            long id = idExists ? chatRoom.get_primaryId() : set.getLong("id");
+            long id = idExists ? chatRoom.get_primaryId() : set.getLong(1);
 
             if (chatRoom.get_chatters().size() > 0)
                 if (insertChattersOf(new ChatRoom(
@@ -349,7 +349,7 @@ public class ModelRepository extends Repository {
                     rating.get_judge().get_primaryId() + "," +
                     rating.get_value() + "," +
                 "NOW()) " +
-                "ON DUPLICATE KEY " +
+                "ON DUPLICATE KEY UPDATE " +
                     "`value` = " + rating.get_value() +
                 ";", false);
     }
@@ -361,12 +361,12 @@ public class ModelRepository extends Repository {
      * In case it did insert, it will generate a key.
      * Will not close connection.
      * @param album The Album with its items that will have influence on the database table.
-     * @return A ResultSet with a generated key.
+     * @return The generated key of Album.
      */
-    public ResultSet upsert(Album album) {
+    public long upsert(Album album) {
         try {
             boolean idExists = album.get_primaryId() > 0;
-            return create("INSERT INTO albums(" +
+            ResultSet set =  create("INSERT INTO albums(" +
                         (idExists ? "id," : "") +
                         "title," +
                         "author_id," +
@@ -379,12 +379,17 @@ public class ModelRepository extends Repository {
                     "NOW()) " +
                     "ON DUPLICATE KEY UPDATE " +
                         "title = '" + album.get_title() + "' " +
-                    "; " +
-                    upsertAlbumItemsSql(album)).getGeneratedKeys();
+                    "; ").getGeneratedKeys();
+            set.next();
+            long id = set.getLong(1);
+
+            edit(upsertAlbumItemsSql(album),false);
+
+            return id;
         } catch (SQLException e) {
             Printer.get_instance().print("Couldn't upsert Album " + album.get_title() + "...",e);
         }
-        return null;
+        return 0;
     }
 
     /**
@@ -397,19 +402,20 @@ public class ModelRepository extends Repository {
     private String upsertAlbumItemsSql(Album album) {
         String sql = "";
         for (AlbumItem item : album.get_items())
-            sql += "INSERT IGNORE INTO album_endpoints(" +
+            sql += "INSERT IGNORE INTO album_items(" +
                         "title," +
                         "endpoint," +
                         "kind," +
                         "album_id," +
-                        "event_id" +
+                        (item.get_event() != null ? "event_id," : "") +
+                        "timestamp" +
                     ") VALUES('" +
                         item.get_title() + "','" +
                         item.get_endpoint() + "','" +
                         item.get_kind() + "'," +
                         album.get_primaryId() + "," +
-                        item.get_event().get_primaryId() +
-                    "); " +
+                        (item.get_event() != null ? item.get_event().get_primaryId() + "," : "") +
+                    "NOW()); " +
                         upsertTags(item);
         return sql;
     }

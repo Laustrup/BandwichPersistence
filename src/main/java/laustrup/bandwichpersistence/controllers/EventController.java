@@ -2,6 +2,9 @@ package laustrup.bandwichpersistence.controllers;
 
 import laustrup.bandwichpersistence.models.Response;
 import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
+import laustrup.bandwichpersistence.models.dtos.chats.messages.BulletinDTO;
+import laustrup.bandwichpersistence.models.dtos.events.EventDTO;
+import laustrup.bandwichpersistence.models.dtos.events.ParticipationDTO;
 import laustrup.bandwichpersistence.models.events.Event;
 import laustrup.bandwichpersistence.models.events.Participation;
 import laustrup.bandwichpersistence.services.controller_services.sub_controller_services.EventControllerService;
@@ -12,51 +15,51 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RestController("/api/event/")
+@CrossOrigin(origins = "*") @RestController
 public class EventController {
 
-    @PostMapping("get/{id}")
-    public ResponseEntity<Response<Event>> get(@PathVariable(name = "id") long id) {
+    private final String _endpointDirectory = "/api/event/";
+
+    @PostMapping(_endpointDirectory + "get/{id}")
+    public ResponseEntity<Response<EventDTO>> get(@PathVariable(name = "id") long id) {
         return EventControllerService.get_instance().get(id);
     }
 
-    @PostMapping("get")
-    public ResponseEntity<Response<Liszt<Event>>> get() {
+    @PostMapping(_endpointDirectory + "get")
+    public ResponseEntity<Response<EventDTO[]>> get() {
         return EventControllerService.get_instance().get();
     }
 
-    @PostMapping(value = "create", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Response<Event>> create(@RequestBody Event event) {
-        return EventControllerService.get_instance().create(event);
+    @PostMapping(value = _endpointDirectory + "create", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Response<EventDTO>> create(@RequestBody EventDTO event) {
+        return EventControllerService.get_instance().create(new Event(event));
     }
 
-    @DeleteMapping("{id}")
-    public ResponseEntity<Response<Plato>> delete(@PathVariable(name = "id") long id) {
+    @DeleteMapping(_endpointDirectory + "{id}")
+    public ResponseEntity<Response<Plato.Argument>> delete(@PathVariable(name = "id") long id) {
         return EventControllerService.get_instance().delete(new Event(id));
     }
 
-    @DeleteMapping(value = "delete", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Response<Plato>> delete(@RequestBody Event event) {
-        return EventControllerService.get_instance().delete(event);
+    @DeleteMapping(value = _endpointDirectory + "delete", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Response<Plato.Argument>> delete(@RequestBody EventDTO event) {
+        return EventControllerService.get_instance().delete(new Event(event));
     }
 
-    @PatchMapping(value = "update", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Response<Event>> update(@RequestBody Event event) {
-        return EventControllerService.get_instance().update(event);
+    @PatchMapping(value = _endpointDirectory + "update", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Response<EventDTO>> update(@RequestBody EventDTO event) {
+        return EventControllerService.get_instance().update(new Event(event));
     }
 
-    @PutMapping(value = "upsert/participations", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Response<Event>> upsert(@RequestBody Participation[] participations) {
-        return EventControllerService.get_instance().upsert(new Liszt<>(participations));
+    @PutMapping(value = _endpointDirectory + "upsert/participations", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Response<EventDTO>> upsert(@RequestBody ParticipationDTO[] dtos) {
+        Liszt<Participation> participations = new Liszt<>();
+        for (ParticipationDTO participation : dtos)
+            participations.add(new Participation(participation));
+        return EventControllerService.get_instance().upsert(participations);
     }
 
     @PatchMapping(value = "upsert/bulletin", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Response<Event>> upsert(@RequestBody Bulletin bulletin) {
-        return EventControllerService.get_instance().upsert(new Bulletin(
-                        bulletin.get_primaryId(),bulletin.get_author(),bulletin.get_receiver(),
-                        bulletin.get_content(),bulletin.is_sent(),bulletin.get_edited(),
-                        bulletin.is_public(), bulletin.get_timestamp()
-                )
-        );
+    public ResponseEntity<Response<EventDTO>> upsert(@RequestBody BulletinDTO bulletin) {
+        return EventControllerService.get_instance().upsert(new Bulletin(bulletin));
     }
 }

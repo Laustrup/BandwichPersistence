@@ -1,33 +1,48 @@
 package laustrup.bandwichpersistence.models.events;
 
 import laustrup.bandwichpersistence.models.Model;
+import laustrup.bandwichpersistence.models.dtos.events.ParticipationDTO;
 import laustrup.bandwichpersistence.models.users.sub_users.participants.Participant;
-import lombok.Data;
-import lombok.ToString;
+import laustrup.bandwichpersistence.services.DTOService;
+
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 /**
  * Determines type of which a Participant is participating in an Event.
  */
-@Data @ToString
 public class Participation extends Model {
 
     /**
      * The Participant of the participation.
      */
+    @Getter
     private Participant _participant;
 
     /**
      * The Event of the participation.
      */
+    @Getter
     private Event _event;
 
     /**
      * The type of which participant is participating in the participation.
      */
+    @Getter @Setter
     private ParticipationType _type;
 
+    public Participation(ParticipationDTO participation) {
+        super(participation.getEvent().getPrimaryId(), participation.getParticipant().getPrimaryId(),
+                "Participation of participant " +
+                        participation.getParticipant().getPrimaryId() + " AND Event " +
+                        participation.getEvent().getPrimaryId()
+        );
+        _participant = (Participant) DTOService.get_instance().convertFromDTO(participation.getParticipant());
+        _event = new Event(participation.getEvent());
+        _type = ParticipationType.valueOf(participation.getType().toString());
+    }
     public Participation(Participant participant, Event event, ParticipationType type) {
         super(event.get_primaryId(), participant.get_primaryId(),
                 "Participation of participant " +
@@ -46,6 +61,16 @@ public class Participation extends Model {
         _participant = participant;
         _event = event;
         _type = type;
+    }
+
+    @Override
+    public String toString() {
+        return "Participation(" +
+                    "primaryId:" + _primaryId +
+                    ",secondaryId:" + _secondaryId +
+                    ",title:" + _title +
+                    ",type:" + _type +
+                ")";
     }
 
     /**

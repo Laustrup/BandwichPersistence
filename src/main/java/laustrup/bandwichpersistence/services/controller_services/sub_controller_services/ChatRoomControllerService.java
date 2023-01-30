@@ -3,12 +3,13 @@ package laustrup.bandwichpersistence.services.controller_services.sub_controller
 import laustrup.bandwichpersistence.models.Response;
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.models.chats.messages.Mail;
+import laustrup.bandwichpersistence.models.dtos.chats.ChatRoomDTO;
 import laustrup.bandwichpersistence.services.controller_services.ControllerService;
 import laustrup.bandwichpersistence.services.persistence_services.entity_services.sub_entity_services.UserPersistenceService;
 
 import org.springframework.http.ResponseEntity;
 
-public class ChatRoomControllerService extends ControllerService<ChatRoom> {
+public class ChatRoomControllerService extends ControllerService<ChatRoomDTO> {
 
     /**
      * Singleton instance of the Service.
@@ -33,8 +34,8 @@ public class ChatRoomControllerService extends ControllerService<ChatRoom> {
      * @param mail The Mail that will be upserted.
      * @return A ResponseEntity with the Response of the ChatRoom of the Mail and the HttpStatus.
      */
-    public ResponseEntity<Response<ChatRoom>> upsert(Mail mail) {
-        return entityContent(UserPersistenceService.get_instance().upsert(mail));
+    public ResponseEntity<Response<ChatRoomDTO>> upsert(Mail mail) {
+        return entityContent(new ChatRoomDTO(UserPersistenceService.get_instance().upsert(mail)));
     }
 
     /**
@@ -44,7 +45,7 @@ public class ChatRoomControllerService extends ControllerService<ChatRoom> {
      * @param chatRoom The ChatRoom that will be upserted.
      * @return A ResponseEntity with the Response of the ChatRoom and the HttpStatus.
      */
-    public ResponseEntity<Response<ChatRoom>> upsert(ChatRoom chatRoom) {
-        return entityContent(chatRoom);
+    public ResponseEntity<Response<ChatRoomDTO>> upsert(ChatRoom chatRoom) {
+        return entityContent(new ChatRoomDTO(UserPersistenceService.get_instance().upsert(chatRoom)));
     }
 }

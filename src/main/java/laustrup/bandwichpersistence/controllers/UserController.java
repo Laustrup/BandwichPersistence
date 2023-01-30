@@ -5,111 +5,120 @@ import laustrup.bandwichpersistence.models.Response;
 import laustrup.bandwichpersistence.models.Search;
 import laustrup.bandwichpersistence.models.albums.Album;
 import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
+import laustrup.bandwichpersistence.models.dtos.RatingDTO;
+import laustrup.bandwichpersistence.models.dtos.albums.AlbumDTO;
+import laustrup.bandwichpersistence.models.dtos.chats.messages.BulletinDTO;
+import laustrup.bandwichpersistence.models.dtos.users.LoginDTO;
+import laustrup.bandwichpersistence.models.dtos.users.UserDTO;
+import laustrup.bandwichpersistence.models.dtos.users.subscriptions.CardDTO;
 import laustrup.bandwichpersistence.models.users.Login;
-import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.sub_users.participants.Participant;
 import laustrup.bandwichpersistence.models.users.subscriptions.Card;
+import laustrup.bandwichpersistence.services.DTOService;
 import laustrup.bandwichpersistence.services.controller_services.sub_controller_services.UserControllerService;
-import laustrup.bandwichpersistence.utilities.Liszt;
 import laustrup.bandwichpersistence.utilities.Plato;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RestController("/api/user/")
+@CrossOrigin(origins = "*") @RestController
 public class UserController {
 
-    @PostMapping(value = "login", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Response<User>> logIn(@RequestBody Login login) {
-        return UserControllerService.get_instance().get(login);
+    private final String _endpointDirectory = "/api/user/";
+
+    @GetMapping("/api") public String main() { return "This is the API of Bandwich"; }
+    @PostMapping(value = _endpointDirectory + "login", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Response<UserDTO>> logIn(@RequestBody LoginDTO login) {
+        return UserControllerService.get_instance().get(new Login(login));
     }
 
-    @PostMapping("get/{id}")
-    public ResponseEntity<Response<User>> get(@PathVariable(name = "id") long id) {
+    @PostMapping(_endpointDirectory + "get/{id}")
+    public ResponseEntity<Response<UserDTO>> get(@PathVariable(name = "id") long id) {
         return UserControllerService.get_instance().get(id);
     }
 
-    @PostMapping("get")
-    public ResponseEntity<Response<Liszt<User>>> get() {
+    @PostMapping(_endpointDirectory + "get")
+    public ResponseEntity<Response<UserDTO[]>> get() {
         return UserControllerService.get_instance().get();
     }
 
-    @PostMapping("search/{search_query}")
+    @PostMapping(_endpointDirectory + "search/{search_query}")
     public ResponseEntity<Response<Search>> search(@PathVariable(name = "search_query") String searchQuery) {
         return UserControllerService.get_instance().search(searchQuery);
     }
 
-    @DeleteMapping("{id}")
-    public ResponseEntity<Response<Plato>> delete(@PathVariable(name = "id") long id) {
+    @DeleteMapping(_endpointDirectory + "{id}")
+    public ResponseEntity<Response<Plato.Argument>> delete(@PathVariable(name = "id") long id) {
         return UserControllerService.get_instance().delete(new Participant(id));
     }
 
-    @DeleteMapping(value = "delete", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Response<Plato>> delete(@RequestBody User user) {
-        return UserControllerService.get_instance().delete(user);
+    @DeleteMapping(value = _endpointDirectory + "delete", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Response<Plato.Argument>> delete(@RequestBody UserDTO user) {
+        return UserControllerService.get_instance().delete(DTOService.get_instance().convertFromDTO(user));
     }
 
-    @PatchMapping(value = "upsert/bulletin", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Response<User>> upsert(@RequestBody Bulletin bulletin) {
-        return UserControllerService.get_instance().upsert(new Bulletin(
-                    bulletin.get_primaryId(),bulletin.get_author(),bulletin.get_receiver(),
-                    bulletin.get_content(),bulletin.is_sent(),bulletin.get_edited(),
-                    bulletin.is_public(), bulletin.get_timestamp()
-                )
+    @PatchMapping(value = _endpointDirectory + "upsert/bulletin", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Response<UserDTO>> upsert(@RequestBody BulletinDTO bulletin) {
+        return UserControllerService.get_instance().upsert(new Bulletin(bulletin));
+    }
+
+    @PatchMapping(value = _endpointDirectory + "upsert/rating", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Response<UserDTO>> upsert(@RequestBody RatingDTO rating) {
+        return UserControllerService.get_instance().upsert(new Rating(rating));
+    }
+
+    @PatchMapping(value = _endpointDirectory + "upsert/album", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Response<UserDTO>> upsert(@RequestBody AlbumDTO album) {
+        return UserControllerService.get_instance().upsert(new Album(album));
+    }
+
+    @PutMapping(value = _endpointDirectory + "follow", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Response<UserDTO[]>> follow(@RequestBody UserDTO[] users) {
+        return UserControllerService.get_instance().follow(
+                DTOService.get_instance().convertFromDTO(users[0]),
+                DTOService.get_instance().convertFromDTO(users[1])
         );
     }
 
-    @PatchMapping(value = "upsert/rating", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Response<User>> upsert(@RequestBody Rating rating) {
-        return UserControllerService.get_instance().upsert(new Rating(
-                    rating.get_value(), rating.get_appointed(),
-                    rating.get_judge(), rating.get_timestamp()
-                )
-        );
+    @DeleteMapping(value = _endpointDirectory + "unfollow", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Response<UserDTO[]>> unfollow(@RequestBody UserDTO[] users) {
+        return UserControllerService.get_instance().unfollow(
+                DTOService.get_instance().convertFromDTO(users[0]),
+                DTOService.get_instance().convertFromDTO(users[1])
+                );
     }
 
-    @PatchMapping(value = "upsert/album", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Response<User>> upsert(@RequestBody Album album) {
-        return UserControllerService.get_instance().upsert(new Album(
-                    album.get_title(), album.get_items(), album.get_author()
-                )
-        );
-    }
-
-    @PutMapping(value = "follow", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Response<User[]>> follow(@RequestBody User[] users) {
-        return UserControllerService.get_instance().follow(users[0], users[1]);
-    }
-
-    @DeleteMapping(value = "unfollow", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Response<User[]>> unfollow(@RequestBody User[] users) {
-        return UserControllerService.get_instance().unfollow(users[0], users[1]);
-    }
-
-    @PatchMapping(value = "update/{login_username}/{login_password}/{password}",
+    @PatchMapping(value = _endpointDirectory + "update/{login_username}/{login_password}/{password}",
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Response<User>> update(@RequestBody User user,
+    public ResponseEntity<Response<UserDTO>> update(@RequestBody UserDTO user,
                                                  @PathVariable(name = "login_username") String username,
                                                  @PathVariable(name = "login_password") String loginPassword,
                                                  @PathVariable(name = "password") String password) {
-        return UserControllerService.get_instance().update(user,new Login(username,loginPassword),password);
+        return UserControllerService.get_instance().update(
+                DTOService.get_instance().convertFromDTO(user),
+                new Login(username,loginPassword),
+                password
+        );
     }
 
-    @PatchMapping(value = "upsert/card/{user_id}/{login_username}/{login_password}",
+    @PatchMapping(value = _endpointDirectory + "upsert/card/{user_id}/{login_username}/{login_password}",
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Response<User>> upsert(@RequestBody Card card,
+    public ResponseEntity<Response<UserDTO>> upsert(@RequestBody CardDTO card,
                                                  @PathVariable(name = "user_id") long id,
                                                  @PathVariable(name = "login_username") String username,
                                                  @PathVariable(name = "login_password") String password) {
-        return UserControllerService.get_instance().upsert(id, new Login(username,password), card);
+        return UserControllerService.get_instance().upsert(id, new Login(username,password), new Card(card));
     }
 
-    @PatchMapping(value = "upsert/subscription/{login_username}/{login_password}",
+    @PatchMapping(value = _endpointDirectory + "upsert/subscription/{login_username}/{login_password}",
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Response<User>> upsert(@RequestBody User user,
+    public ResponseEntity<Response<UserDTO>> upsert(@RequestBody UserDTO user,
                                                  @PathVariable(name = "login_username") String username,
                                                  @PathVariable(name = "login_password") String password) {
-        return UserControllerService.get_instance().upsert(user, new Login(username, password));
+        return UserControllerService.get_instance().upsert(
+                DTOService.get_instance().convertFromDTO(user),
+                new Login(username, password)
+        );
     }
 }

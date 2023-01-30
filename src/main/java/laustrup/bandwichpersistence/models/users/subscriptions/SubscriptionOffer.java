@@ -1,5 +1,7 @@
 package laustrup.bandwichpersistence.models.users.subscriptions;
 
+import laustrup.bandwichpersistence.models.dtos.users.subscriptions.SubscriptionOfferDTO;
+import laustrup.bandwichpersistence.utilities.Printer;
 import lombok.Getter;
 import lombok.ToString;
 
@@ -30,10 +32,23 @@ public class SubscriptionOffer {
      */
     private double _effect;
 
-    public SubscriptionOffer(LocalDateTime expires, Type type, double effect) throws InputMismatchException {
+    public SubscriptionOffer(SubscriptionOfferDTO offer) {
+        _expires = offer.getExpires();
+        _type = Type.valueOf(offer.getType().toString());
+        try {
+            set_effect(offer.getEffect());
+        } catch (InputMismatchException e) {
+            Printer.get_instance().print("Couldn't create effect to subscription offer...", e);
+        }
+    }
+    public SubscriptionOffer(LocalDateTime expires, Type type, double effect) {
         _expires = expires;
         _type = type;
-        set_effect(effect);
+        try {
+            set_effect(effect);
+        } catch (InputMismatchException e) {
+            Printer.get_instance().print("Couldn't create effect to subscription offer...", e);
+        }
     }
 
     /**
@@ -54,7 +69,7 @@ public class SubscriptionOffer {
      * @throws InputMismatchException Will be thrown, if the effect value is not between 0 -> 1.
      */
     public double set_effect(double effect) throws InputMismatchException {
-        if (effect > 0 && effect <= 1)
+        if (effect >= 0 && effect <= 1)
             _effect = effect;
         else
             throw new InputMismatchException();

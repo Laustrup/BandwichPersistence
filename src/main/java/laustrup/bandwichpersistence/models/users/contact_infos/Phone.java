@@ -1,5 +1,6 @@
 package laustrup.bandwichpersistence.models.users.contact_infos;
 
+import laustrup.bandwichpersistence.models.dtos.users.contact_infos.PhoneDTO;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -28,6 +29,11 @@ public class Phone {
     @Getter
     private boolean _mobile;
 
+    public Phone(PhoneDTO phone) {
+        _country = new Country(phone.getCountry());
+        _numbers = phone.getNumbers();
+        _mobile = phone.isMobile();
+    }
     public Phone(Country country, long numbers, boolean mobile) {
         _country = country;
         _numbers = numbers;

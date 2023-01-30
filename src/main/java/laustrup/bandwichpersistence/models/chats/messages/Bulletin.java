@@ -1,7 +1,9 @@
 package laustrup.bandwichpersistence.models.chats.messages;
 
 import laustrup.bandwichpersistence.models.Model;
+import laustrup.bandwichpersistence.models.dtos.chats.messages.BulletinDTO;
 import laustrup.bandwichpersistence.models.users.User;
+import laustrup.bandwichpersistence.services.DTOService;
 import laustrup.bandwichpersistence.utilities.Plato;
 
 import lombok.Getter;
@@ -13,6 +15,12 @@ public class Bulletin extends Message {
     @Getter
     public Model _receiver;
 
+    public Bulletin(BulletinDTO bulletin) {
+        super(bulletin.getPrimaryId(), DTOService.get_instance().convertFromDTO(bulletin.getAuthor()),
+                bulletin.getContent(), bulletin.isSent(), new Plato(bulletin.getIsEdited()), bulletin.isPublic(),
+                bulletin.getTimestamp());
+        _receiver = DTOService.get_instance().convertFromDTO(bulletin.getReceiver());
+    }
     public Bulletin(long id, User author, Model receiver, String content,
                     boolean isSent, Plato isEdited, boolean isPublic,
                     LocalDateTime timestamp) {
@@ -44,11 +52,12 @@ public class Bulletin extends Message {
 
     @Override
     public String toString() {
-        return "Bulletin(id:" + _primaryId +
-                ",content:" + _content +
-                ",isSent:" + _sent +
-                ",isEdited:" + _edited.get_argument() +
-                ",isPublic:" + _public +
+        return "Bulletin(" +
+                    "id:" + _primaryId +
+                    ",content:" + _content +
+                    ",isSent:" + _sent +
+                    (_edited == null ? "" : ",isEdited:" + _edited.get_argument()) +
+                    ",isPublic:" + _public +
                 ")";
     }
 }

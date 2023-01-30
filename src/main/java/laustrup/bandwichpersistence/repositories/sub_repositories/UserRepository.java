@@ -58,10 +58,10 @@ public class UserRepository extends Repository {
      */
     public ResultSet get(Login login) {
         return login.usernameIsEmailKind() ?
-                get("WHERE contact_informations.email = " + login.get_username() +
-                        " AND users.`password` = " + login.get_password())
-                : get("WHERE users.username = " + login.get_username() +
-                        " AND users.`password` = " + login.get_password());
+                get("WHERE users.email = '" + login.get_username() +
+                        "' AND users.`password` = " + login.get_password() + "';")
+                : get("WHERE users.username = '" + login.get_username() +
+                        "' AND users.`password` = '" + login.get_password() + "';");
     }
 
     /**
@@ -79,6 +79,9 @@ public class UserRepository extends Repository {
      * @return The collected JDBC ResultSet.
      */
     public ResultSet get(Liszt<Long> ids) {
+        if (ids.isEmpty())
+            return null;
+
         StringBuilder where = new StringBuilder("WHERE ");
 
         for (int i = 1; i <= ids.size(); i++) {
@@ -101,9 +104,9 @@ public class UserRepository extends Repository {
     public ResultSet search(String query) {
         query = query.replaceAll("%","");
         return get("WHERE users.username LIKE '%" + query + "%' OR " +
-                "users.firstname LIKE '%" + query + "%' OR " +
-                "users.lastname LIKE '%" + query + "%' OR " +
-                "users.`description LIKE '%" + query + "%'");
+                "users.first_name LIKE '%" + query + "%' OR " +
+                "users.last_name LIKE '%" + query + "%' OR " +
+                "users.`description` LIKE '%" + query + "%'");
     }
 
     /**
@@ -114,25 +117,75 @@ public class UserRepository extends Repository {
      */
     private ResultSet get(String where) {
         return read("SELECT * FROM users " +
-                "INNER JOIN band_members ON band_members.artist_id = users.id OR band_members.band_id = users.id " +
-                "INNER JOIN gear ON gear.user_id = users.id " +
-                "INNER JOIN venues ON venues.user_id = users.id " +
-                "INNER JOIN `events` ON `events`.venue_id = users.id " +
-                "INNER JOIN gigs ON gigs.event_id = `events`.id " +
-                "INNER JOIN acts ON acts.gig_id = gigs.id OR acts.user_id = users.id " +
-                "INNER JOIN participations ON participations.event_id = `events`.id" +
-                "INNER JOIN followings ON followings.fan_id = users.id OR followings.idol_id = users.id " +
-                "INNER JOIN chatters ON chatters.user_id = users.id " +
-                "INNER JOIN chat_rooms ON chatters.chat_room_id = chat_rooms.id " +
-                "INNER JOIN user_bulletins ON users.id = bulletins.receiver_id " +
-                "INNER JOIN requests ON users.id = requests.user_id " +
-                "INNER JOIN ratings ON users.id = ratings.appointed_id " +
-                "INNER JOIN album_relations ON users.id = album_relations.user_id " +
-                "INNER JOIN albums ON user_albums.album_id = albums.id " +
-                "INNER JOIN album_endpoints ON albums.id = album_endpoints.album_id " +
+                "LEFT JOIN band_members ON band_members.artist_id = users.id OR band_members.band_id = users.id " +
+                "LEFT JOIN gear ON gear.user_id = users.id " +
+                "LEFT JOIN venues ON venues.user_id = users.id " +
+                "LEFT JOIN `events` ON `events`.venue_id = users.id " +
+                "LEFT JOIN gigs ON gigs.event_id = `events`.id " +
+                "LEFT JOIN acts ON acts.gig_id = gigs.id OR acts.user_id = users.id " +
+                "LEFT JOIN participations ON participations.event_id = `events`.id " +
+                "LEFT JOIN followings ON followings.fan_id = users.id OR followings.idol_id = users.id " +
+                "LEFT JOIN chatters ON chatters.user_id = users.id " +
+                "LEFT JOIN chat_rooms ON chatters.chat_room_id = chat_rooms.id " +
+                "LEFT JOIN user_bulletins ON users.id = user_bulletins.receiver_id " +
+                "LEFT JOIN requests ON users.id = requests.user_id " +
+                "LEFT JOIN ratings ON users.id = ratings.appointed_id " +
+                "LEFT JOIN albums ON users.id = albums.author_id " +
+                "LEFT JOIN album_items ON albums.id = album_items.album_id " +
                 "INNER JOIN subscriptions ON users.id = subscriptions.user_id " +
                 "INNER JOIN contact_informations ON users.id = contact_informations.user_id " +
                 where + ";");
+    }
+
+    /**
+     * Will insert both ContactInformation and a generated Subscription.
+     * Is meant to be used, when a User will be inserted
+     * @param user The User that has been inserted.
+     * @return True if any rows has been affected.
+     */
+    public boolean createSubscriptionAndContactInfo(User user) {
+        return edit("INSERT INTO subscriptions(" +
+                    "user_id," +
+                    "`status`," +
+                    "subscription_type," +
+                    "offer_type," +
+                    "offer_expires," +
+                    "offer_effect," +
+                    "card_id" +
+                ") " +
+                "VALUES (" +
+                    user.get_primaryId() +
+                    ",'ACCEPTED'" +
+                    ",'FREEMIUM'" +
+                    ",NULL" +
+                    ",NULL" +
+                    ",NULL" +
+                    ",NULL" +
+                "); " +
+                "INSERT INTO contact_informations(" +
+                    "user_id," +
+                    "first_digits," +
+                    "phone_number," +
+                    "phone_is_mobile," +
+                    "street," +
+                    "floor," +
+                    "postal," +
+                    "city," +
+                    "country_title," +
+                    "country_indexes" +
+                ") " +
+                "VALUES (" +
+                    user.get_primaryId() + "," +
+                    user.get_contactInfo().get_phone().get_country().get_firstPhoneNumberDigits() + "," +
+                    user.get_contactInfo().get_phone().get_numbers() + "," +
+                    user.get_contactInfo().get_phone().is_mobile() + ",'" +
+                    user.get_contactInfo().get_address().get_street() + "','" +
+                    user.get_contactInfo().get_address().get_floor() + "','" +
+                    user.get_contactInfo().get_address().get_postal() + "','" +
+                    user.get_contactInfo().get_address().get_city() + "','" +
+                    user.get_contactInfo().get_country().get_title() + "','" +
+                    user.get_contactInfo().get_country().get_indexes() + "'" +
+                ");", false);
     }
 
     /**
@@ -202,10 +255,10 @@ public class UserRepository extends Repository {
     public boolean update(User user, Login login, String password) {
         return edit("UPDATE users SET " +
                     "username = '" + user.get_username() + "' " +
-                    "`password` = '" + password + "' " +
-                    "first_name = '" + user.get_firstName() + "' " +
-                    "last_name = '" + user.get_lastName() + "' " +
-                    "`description` = '" + user.get_description() + "' " +
+                    ",`password` = '" + password + "' " +
+                    ",first_name = '" + user.get_firstName() + "' " +
+                    ",last_name = '" + user.get_lastName() + "' " +
+                    ",`description` = '" + user.get_description() + "' " +
                 "WHERE " +
                     "id = " + user.get_primaryId() + " AND " +
                     "`password` = '" + login.get_password() +
@@ -220,7 +273,7 @@ public class UserRepository extends Repository {
 
     /**
      * Generates a SQL statement for updating contact informations such as
-     * email, first_digits, phone_number, phone_is_mobile, street, floor, postal
+     * first_digits, phone_number, phone_is_mobile, street, floor, postal
      * city, country_title, and country indexes.
      * @param user The User with the values to update in database.
      * @return The generated SQL statement.
@@ -228,7 +281,6 @@ public class UserRepository extends Repository {
     private String updateContactInfoSQL(User user) {
         ContactInfo info = user.get_contactInfo();
         return "UPDATE contact_informations SET " +
-                    "email = '" + info.get_email() + "', " +
                     "first_digits = " + info.get_country().get_firstPhoneNumberDigits() + ", " +
                     "phone_number = " + info.get_phone().get_numbers() + ", " +
                     "phone_is_mobile = " + info.get_phone().is_mobile() + ", " +
@@ -239,7 +291,11 @@ public class UserRepository extends Repository {
                     "country_title = '" + info.get_country().get_title() + "', " +
                     "country_indexes = '" + info.get_country().get_indexes() + "' " +
                 "WHERE " +
-                    "user_id = " + user.get_primaryId() + "; ";
+                    "user_id = " + user.get_primaryId() + "; " +
+                "UPDATE users SET " +
+                    "email = '" + info.get_email() + "' " +
+                "WHERE " +
+                    "users.id = " + user.get_primaryId() + "; ";
     }
 
     /**

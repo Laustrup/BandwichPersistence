@@ -1,6 +1,8 @@
 package laustrup.bandwichpersistence.models.users.sub_users.venues;
 
 import laustrup.bandwichpersistence.models.chats.Request;
+import laustrup.bandwichpersistence.models.dtos.chats.RequestDTO;
+import laustrup.bandwichpersistence.models.dtos.users.sub_users.venues.VenueDTO;
 import laustrup.bandwichpersistence.models.events.Event;
 import laustrup.bandwichpersistence.models.Rating;
 import laustrup.bandwichpersistence.models.albums.Album;
@@ -13,7 +15,6 @@ import laustrup.bandwichpersistence.models.users.subscriptions.SubscriptionOffer
 import laustrup.bandwichpersistence.utilities.Liszt;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
@@ -23,7 +24,6 @@ import java.time.LocalDateTime;
  * itself and the opportunities for Events.
  * Extends from User, which means it also contains ChatRooms and other alike attributes.
  */
-@NoArgsConstructor
 public class Venue extends User {
 
     /**
@@ -56,6 +56,23 @@ public class Venue extends User {
     @Getter
     private Liszt<Request> _requests;
 
+    public Venue(VenueDTO venue) {
+        super(venue.getPrimaryId(), venue.getUsername(), venue.getDescription(), new ContactInfo(venue.getContactInfo()),
+                venue.getAlbums(), venue.getRatings(), venue.getEvents(), venue.getChatRooms(),
+                new Subscription(venue.getSubscription()), venue.getBulletins(), Authority.VENUE, venue.getTimestamp());
+
+        if (venue.getLocation() == null)
+            _location = _contactInfo.getAddressInfo();
+        else
+            _location = venue.getLocation();
+
+        _gearDescription = venue.getGearDescription();
+        _size = venue.getSize();
+
+        _requests = new Liszt<>();
+        for (RequestDTO request : venue.getRequests())
+            _requests.add(new Request(request));
+    }
     public Venue(long id) {
         super(id);
     }
@@ -63,8 +80,8 @@ public class Venue extends User {
                  Liszt<Rating> ratings, Liszt<Event> events, Liszt<ChatRoom> chatRooms, String location,
                  String gearDescription, Subscription.Status subscriptionStatus, SubscriptionOffer subscriptionOffer,
                  Liszt<Bulletin> bulletins, int size, Liszt<Request> requests, LocalDateTime timestamp) {
-        super(id, username, null, null, description, contactInfo, albums, ratings, events, chatRooms,
-                new Subscription(new Venue(), Subscription.Type.FREEMIUM, subscriptionStatus, subscriptionOffer, null),
+        super(id, username, description, contactInfo, albums, ratings, events, chatRooms,
+                new Subscription(new Venue(id), Subscription.Type.FREEMIUM, subscriptionStatus, subscriptionOffer, null),
                 bulletins, Authority.VENUE, timestamp);
 
         if (location == null)
@@ -73,7 +90,6 @@ public class Venue extends User {
             _location = location;
 
         _gearDescription = gearDescription;
-        _events = events;
         _size = size;
         _subscription.get_user().set_username(_username);
         _subscription.get_user().set_description(_description);
@@ -84,7 +100,7 @@ public class Venue extends User {
 
     public Venue(String username, String description, String location, String gearDescription, int size) {
         super(username, null, null, description,
-                new Subscription(new Venue(), Subscription.Type.FREEMIUM,
+                new Subscription(new Venue(0), Subscription.Type.FREEMIUM,
                         Subscription.Status.ACCEPTED, null, null), Authority.VENUE);
 
         if (location == null)
@@ -105,11 +121,16 @@ public class Venue extends User {
      * Will only be done, if it is under assembling.
      * @return The Requests of this Artist.
      */
-    public Liszt<Request> set_requestUsers() {
+    public Venue set_requestUsers() {
+        Liszt<Request> requests = _requests;
+        _requests = null;
+
         if (_assembling)
-            for (int i = 1; i <= _requests.size(); i++)
-                _requests.get(i).set_user(this);
-        return _requests;
+            for (int i = 1; i <= requests.size(); i++)
+                requests.get(i).set_user(this);
+
+        _requests = requests;
+        return this;
     }
 
     /**

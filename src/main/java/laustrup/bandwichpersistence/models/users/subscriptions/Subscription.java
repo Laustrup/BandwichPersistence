@@ -1,22 +1,20 @@
 package laustrup.bandwichpersistence.models.users.subscriptions;
 
 import laustrup.bandwichpersistence.models.Model;
+import laustrup.bandwichpersistence.models.dtos.users.subscriptions.SubscriptionDTO;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.sub_users.bands.Artist;
 import laustrup.bandwichpersistence.models.users.sub_users.bands.Band;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 import java.time.LocalDateTime;
 
-//TODO Insert when User is inserted in database.
 /**
  * Defines the kind of subscription a user is having.
  * Only Artists and Bands can have a paying subscription.
  */
-@ToString
 public class Subscription extends Model {
 
     /**
@@ -56,6 +54,15 @@ public class Subscription extends Model {
     @Getter
     private Long _cardId;
 
+    public Subscription(SubscriptionDTO subscription) {
+        super(subscription.getPrimaryId(), subscription.getSecondaryId(),
+                subscription.getUser().getUsername()+"-Subscription: " + subscription.getUser().getPrimaryId(),
+                subscription.getTimestamp());
+        _type = defineType(Type.valueOf(subscription.getType().toString()));
+        _status = Status.valueOf(subscription.getStatus().toString());
+        _offer = new SubscriptionOffer(subscription.getOffer());
+        _cardId = subscription.getCardId();
+    }
     public Subscription(User user, Type type, Status status, SubscriptionOffer offer, Long cardId, LocalDateTime timestamp) {
         super(user.get_primaryId(), cardId, user.get_username()+"-Subscription: " + user.get_primaryId(), timestamp);
         _type = defineType(type);
@@ -102,8 +109,10 @@ public class Subscription extends Model {
      * @return The User of this Subscription.
      */
     public User set_user(User user) {
-        if (user == null)
+        if (_user == null) {
             _user = user;
+            defineType(_type);
+        }
 
         return _user;
     }
@@ -123,7 +132,7 @@ public class Subscription extends Model {
     private Type defineType(Type type) {
         _type = type;
 
-        if (_user.getClass() != Artist.class && _user.getClass() != Band.class) {
+        if (_user != null && (_user.getClass() != Artist.class && _user.getClass() != Band.class)) {
             switch (_type) {
                 case PREMIUM_BAND -> {
                     if (_user.getClass() == Band.class) _price = 100;
@@ -147,7 +156,7 @@ public class Subscription extends Model {
     public double get_price() {
         if (_user != null &&
                 ((_user.getClass() == Band.class || _user.getClass() == Artist.class) &&
-                (_offer.get_type() != SubscriptionOffer.Type.FREE_TRIAL && !isOfferExpired())))
+                        (_offer != null && (_offer.get_type() != SubscriptionOffer.Type.FREE_TRIAL && !isOfferExpired()))))
             return isOfferExpired() ? _price : _price * _offer.get_effect();
         else return 0;
     }
@@ -157,7 +166,21 @@ public class Subscription extends Model {
      * Counts from LocalDateTime.now.
      * @return True if the moment now is after the date that the offer of this Subscription will expire, otherwise false.
      */
-    public boolean isOfferExpired() { return LocalDateTime.now().isAfter(_offer.get_expires()); }
+    public boolean isOfferExpired() {
+        if (_offer == null || _offer.get_expires() == null)
+            return true;
+        return LocalDateTime.now().isAfter(_offer.get_expires());
+    }
+
+    @Override
+    public String toString() {
+        return "Subscription(" +
+                    "id:" + _primaryId +
+                    ",status:" + _status +
+                    ",type:" + _type +
+                    ",price:" + _price +
+                ")";
+    }
 
     /**
      * An enum that can be of different types, determining the type of Subscription.

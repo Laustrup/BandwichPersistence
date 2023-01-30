@@ -1,5 +1,6 @@
 package laustrup.bandwichpersistence.models.users.subscriptions;
 
+import laustrup.bandwichpersistence.models.dtos.users.subscriptions.CardDTO;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -58,6 +59,15 @@ public class Card {
     @Getter
     private int _cVV;
 
+    public Card(CardDTO card) throws InputMismatchException {
+        _id = card.getId();
+        _type = Type.valueOf(card.getType().toString());
+        _owner = card.getOwner();
+        set_cardNumbers(card.getCardNumbers());
+        set_expirationMonth(card.getExpirationMonth());
+        _expirationYear = card.getExpirationYear();
+        set_cVV(card.getCVV());
+    }
     public Card(long id, Type type, String owner, long numbers,
                 int expirationMonth, int expirationYear,
                 int cVV) throws InputMismatchException {
@@ -126,5 +136,4 @@ public class Card {
         AMERICAN_EXPRESS,
         DANCARD,
     }
-
 }

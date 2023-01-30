@@ -98,14 +98,15 @@ public abstract class UserAssembler extends Assembler {
         _username = set.getString("users.username");
         _firstName = set.getString("users.first_name");
         _lastName = set.getString("users.last_name");
-        _description = set.getString("users.`description`");
+        _description = set.getString("users.description");
         _contactInfo = ModelAssembly.get_instance().assembleContactInfo(set);
+        _albums = new Liszt<>();
         _ratings = new Liszt<>();
         _events = new Liszt<>();
         _chatRooms = new Liszt<>();
         _subscription = ModelAssembly.get_instance().assembleSubscription(set);
         _bulletins = new Liszt<>();
-        _timestamp = set.getTimestamp("users.`timestamp`").toLocalDateTime();
+        _timestamp = set.getTimestamp("users.timestamp").toLocalDateTime();
     }
 
     protected void resetUserAttributes() {

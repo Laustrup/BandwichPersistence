@@ -2,14 +2,16 @@ package laustrup.bandwichpersistence.models.chats;
 
 import laustrup.bandwichpersistence.models.Model;
 import laustrup.bandwichpersistence.models.chats.messages.Mail;
+import laustrup.bandwichpersistence.models.dtos.chats.ChatRoomDTO;
+import laustrup.bandwichpersistence.models.dtos.chats.messages.MailDTO;
+import laustrup.bandwichpersistence.models.dtos.users.UserDTO;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.sub_users.bands.Artist;
 import laustrup.bandwichpersistence.models.users.sub_users.bands.Band;
+import laustrup.bandwichpersistence.services.DTOService;
 import laustrup.bandwichpersistence.utilities.Liszt;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -18,7 +20,6 @@ import java.util.List;
 /**
  * This is used for multiple Users to communicate with each other through Mails.
  */
-@NoArgsConstructor @ToString
 public class ChatRoom extends Model {
 
     /**
@@ -53,6 +54,25 @@ public class ChatRoom extends Model {
     @Getter
     private boolean _answered;
 
+    public ChatRoom(ChatRoomDTO chatRoom) {
+        _mails = new Liszt<>();
+        convert(chatRoom.getMails());
+        _chatters = new Liszt<>();
+        convert(chatRoom.getChatters());
+        _responsible = DTOService.get_instance().convertFromDTO(chatRoom.getResponsible());
+
+        isTheChatRoomAnswered();
+    }
+    private Liszt<Mail> convert(MailDTO[] mails) {
+        for (MailDTO mail : mails)
+            _mails.add(new Mail(mail));
+        return _mails;
+    }
+    private Liszt<User> convert(UserDTO[] chatters) {
+        for (UserDTO chatter : chatters)
+            _chatters.add(DTOService.get_instance().convertFromDTO(chatter));
+        return _chatters;
+    }
     public ChatRoom(long id, String title, Liszt<Mail> mails, Liszt<User> chatters, User responsible, LocalDateTime timestamp) {
         super(id, title.isEmpty() || title == null ? "ChatRoom-"+id : title, timestamp);
         _mails = mails;
@@ -218,5 +238,14 @@ public class ChatRoom extends Model {
                 return mail;
 
         return null;
+    }
+
+    @Override
+    public String toString() {
+        return "ChatRoom(" +
+                    "id:" + _primaryId +
+                    ",title:" + _title +
+                    ",timestamp:" + _timestamp +
+                ")";
     }
 }

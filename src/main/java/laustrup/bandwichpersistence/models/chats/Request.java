@@ -1,20 +1,20 @@
 package laustrup.bandwichpersistence.models.chats;
 
+import laustrup.bandwichpersistence.models.dtos.chats.RequestDTO;
 import laustrup.bandwichpersistence.models.events.Event;
 import laustrup.bandwichpersistence.models.Model;
 import laustrup.bandwichpersistence.models.users.User;
+import laustrup.bandwichpersistence.services.DTOService;
 import laustrup.bandwichpersistence.utilities.Plato;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 import java.time.LocalDateTime;
 
 /**
  * Determines if a User have approved to be a part of the Event.
  */
-@ToString
 public class Request extends Model {
 
     /**
@@ -41,6 +41,15 @@ public class Request extends Model {
     @Getter @Setter
     private String _message;
 
+    public Request(RequestDTO request) {
+        super(request.getPrimaryId(), request.getEvent().getPrimaryId(),
+                "Request of " + request.getUser().getUsername() + " to " + request.getEvent().getTitle(),
+                request.getTimestamp());
+        _user = DTOService.get_instance().convertFromDTO(request.getUser());
+        _event = new Event(request.getEvent());
+        _approved = new Plato(request.getApproved());
+        _message = request.getMessage();
+    }
     public Request(User user, Event event, Plato approved, String message, LocalDateTime timestamp) {
         super(user.get_primaryId(), event.get_primaryId(), "Request of " + user.get_username() + " to " + event.get_title(),timestamp);
         _user = user;
@@ -82,5 +91,15 @@ public class Request extends Model {
         if (_assembling)
             _event = event;
         return _event;
+    }
+
+    @Override
+    public String toString() {
+        return "Request(" +
+                    "primaryId:" + _primaryId +
+                    ",secondaryId:" + _secondaryId +
+                    ",approved:" + _approved.get_argument() +
+                    ",timestamp:" + _timestamp +
+                ")";
     }
 }

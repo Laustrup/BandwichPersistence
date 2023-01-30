@@ -19,6 +19,7 @@ class LisztTeszt extends JTest {
     public void constructorTest(boolean isEmptyDataTemplate) {
         // ACT
         if (isEmptyDataTemplate) {
+            begin();
             _liszt = new Liszt<>();
             calculatePerformance();
 
@@ -105,6 +106,7 @@ class LisztTeszt extends JTest {
         assertTrue(_liszt.isEmpty());
     }
 
+    /*
     @Test
     public void canReplaceByIndex() {
         do {
@@ -140,6 +142,7 @@ class LisztTeszt extends JTest {
         } while (true);
     }
 
+
     @Test
     public void canReplaceByKey() {
         do {
@@ -172,5 +175,24 @@ class LisztTeszt extends JTest {
                 Printer.get_instance().print("Liszt can't find the object to replace...", e);
             }
         } while (true);
+    }
+
+     */
+
+    @Test
+    void canSet() {
+        //ARRANGE
+        Band[] bands = _items.get_bands();
+        _liszt = new Liszt<>(bands);
+        bands[4].set_runner("This is a new runner");
+
+        //ACT
+        begin();
+        _liszt.set(3,bands[4]);
+        calculatePerformance();
+
+        //ASSERT
+        assertEquals(((Band) _liszt.get(3)).get_runner(),bands[4].get_runner());
+        assertEquals(((Band) _liszt.get(bands[4].toString())).get_runner(),bands[4].get_runner());
     }
 }

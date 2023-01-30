@@ -1,7 +1,9 @@
 package laustrup.bandwichpersistence.models;
 
+import laustrup.bandwichpersistence.models.dtos.RatingDTO;
 import laustrup.bandwichpersistence.models.users.User;
 
+import laustrup.bandwichpersistence.services.DTOService;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -41,6 +43,16 @@ public class Rating extends Model {
     @Getter @Setter
     private String _comment;
 
+    public Rating(RatingDTO rating) throws InputMismatchException {
+        super(rating.getAppointed().getPrimaryId(), rating.getJudge().getPrimaryId(),
+                rating.getAppointed().getUsername()+"-"+rating.getJudge().getUsername(), rating.getTimestamp());
+        _value = set_value(rating.getValue());
+        _appointed = DTOService.get_instance().convertFromDTO(rating.getAppointed());
+        _judge = DTOService.get_instance().convertFromDTO(rating.getJudge());
+    }
+    public Rating(int value) {
+        _value = value;
+    }
     public Rating(int value, User appointed, User judge, LocalDateTime timestamp) throws InputMismatchException {
         super(appointed.get_primaryId(), judge.get_primaryId(), appointed.get_username()+"-"+judge.get_username(), timestamp);
         _value = set_value(value);
@@ -67,9 +79,8 @@ public class Rating extends Model {
      * @throws InputMismatchException Will be thrown if the value is not between 0 and 5.
      */
     public int set_value(int value) throws InputMismatchException {
-        if (0 < value && value <= 5 ) {
+        if (0 < value && value <= 5 )
             _value = value;
-        }
         else
             throw new InputMismatchException();
 

@@ -27,9 +27,9 @@ public class ControllerService<E> {
      * @param elements The E elements that is either null or not and should be returned.
      * @return The created ResponseEntity of E elements.
      */
-    protected ResponseEntity<Response<Liszt<E>>> entityContent(Liszt<E> elements) {
+    protected ResponseEntity<Response<E[]>> entityContent(Liszt<E> elements) {
         if (elements != null)
-            return new ResponseEntity<>(new Response<>(elements), HttpStatus.OK);
+            return new ResponseEntity<>(new Response<>((E[]) elements.toArray()), HttpStatus.OK);
         else
             return new ResponseEntity<>(new Response<>(null, Response.StatusType.NO_CONTENT),
                 HttpStatus.NO_CONTENT);
@@ -61,15 +61,15 @@ public class ControllerService<E> {
                 HttpStatus.NO_CONTENT);
     }
 
-    protected ResponseEntity<Response<Plato>> platoContent(Plato plato) {
+    protected ResponseEntity<Response<Plato.Argument>> platoContent(Plato plato) {
         if (plato.get_message()!=null) {
             if (plato.get_message().isEmpty())
-                return new ResponseEntity<>(new Response<>(plato, Response.StatusType.UNKNOWN),
+                return new ResponseEntity<>(new Response<>(plato.get_argument(), Response.StatusType.UNKNOWN),
                         HttpStatus.NOT_ACCEPTABLE);
             else
-                return new ResponseEntity<>(new Response<>(plato, Response.StatusType.NOT_ACCEPTABLE),
+                return new ResponseEntity<>(new Response<>(plato.get_argument(), Response.StatusType.NOT_ACCEPTABLE),
                         HttpStatus.CONFLICT);
         }
-        return new ResponseEntity<>(new Response<>(plato),HttpStatus.OK);
+        return new ResponseEntity<>(new Response<>(plato.get_argument()),HttpStatus.OK);
     }
 }

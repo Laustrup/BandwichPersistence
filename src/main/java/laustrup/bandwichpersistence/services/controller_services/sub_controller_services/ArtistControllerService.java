@@ -1,14 +1,16 @@
 package laustrup.bandwichpersistence.services.controller_services.sub_controller_services;
 
 import laustrup.bandwichpersistence.models.Response;
+import laustrup.bandwichpersistence.models.dtos.users.sub_users.bands.ArtistDTO;
 import laustrup.bandwichpersistence.models.users.Login;
 import laustrup.bandwichpersistence.models.users.sub_users.bands.Artist;
 import laustrup.bandwichpersistence.services.controller_services.ControllerService;
 import laustrup.bandwichpersistence.services.persistence_services.entity_services.sub_entity_services.ArtistPersistenceService;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-public class ArtistControllerService extends ControllerService<Artist> {
+public class ArtistControllerService extends ControllerService<ArtistDTO> {
 
     /**
      * Singleton instance of the Service.
@@ -33,11 +35,11 @@ public class ArtistControllerService extends ControllerService<Artist> {
      * @param password The password assigned for the Artist.
      * @return A ResponseEntity with the Response of Artist and the HttpStatus.
      */
-    public ResponseEntity<Response<Artist>> create(Artist artist, String password) {
+    public ResponseEntity<Response<ArtistDTO>> create(Artist artist, String password) {
         if (new Login(artist.get_username(), password).passwordIsValid())
-            return entityContent(ArtistPersistenceService.get_instance().create(artist, password));
+            return entityContent(new ArtistDTO(ArtistPersistenceService.get_instance().create(artist, password)));
         else
-            return new ResponseEntity<>(new Response<>(artist, Response.StatusType.INVALID_PASSWORD_FORMAT),
-                    HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity<>(new Response<>(new ArtistDTO(artist),
+                    Response.StatusType.INVALID_PASSWORD_FORMAT), HttpStatus.NOT_ACCEPTABLE);
     }
 }

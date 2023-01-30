@@ -1,8 +1,11 @@
 package laustrup.bandwichpersistence.models.albums;
 
 import laustrup.bandwichpersistence.models.Model;
+import laustrup.bandwichpersistence.models.dtos.albums.AlbumItemDTO;
+import laustrup.bandwichpersistence.models.dtos.users.UserDTO;
 import laustrup.bandwichpersistence.models.events.Event;
 import laustrup.bandwichpersistence.models.users.User;
+import laustrup.bandwichpersistence.services.DTOService;
 import laustrup.bandwichpersistence.utilities.Liszt;
 
 import lombok.Getter;
@@ -37,6 +40,18 @@ public class AlbumItem extends Model {
     @Getter
     private Kind _kind;
 
+    public AlbumItem(AlbumItemDTO albumItem) {
+        super(albumItem.get_title(), albumItem.get_timestamp());
+        _endpoint = albumItem.getEndpoint();
+        _kind = Kind.valueOf(albumItem.getKind().toString());
+        _tags = new Liszt<>();
+        convert(albumItem.getTags());
+    }
+    private Liszt<User> convert(UserDTO[] tags) {
+        for (UserDTO tag : tags)
+            _tags.add(DTOService.get_instance().convertFromDTO(tag));
+        return _tags;
+    }
     public AlbumItem(String title, String endpoint, Kind kind, Liszt<User> tags, LocalDateTime timestamp) {
         super(title, timestamp);
         _endpoint = endpoint;
@@ -82,5 +97,13 @@ public class AlbumItem extends Model {
     /**
      * An enum that will describe the type of Album.
      */
-    public enum Kind { IMAGE,MUSIC; }
+    public enum Kind { IMAGE,MUSIC }
+
+    @Override
+    public String toString() {
+        return "AlbumItem(" +
+                    "id:" + _primaryId +
+                    ",endpoint:" + _endpoint +
+                ")";
+    }
 }

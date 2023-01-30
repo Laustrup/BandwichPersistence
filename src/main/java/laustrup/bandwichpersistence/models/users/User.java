@@ -1,5 +1,11 @@
 package laustrup.bandwichpersistence.models.users;
 
+import laustrup.bandwichpersistence.models.dtos.RatingDTO;
+import laustrup.bandwichpersistence.models.dtos.albums.AlbumDTO;
+import laustrup.bandwichpersistence.models.dtos.chats.ChatRoomDTO;
+import laustrup.bandwichpersistence.models.dtos.chats.messages.BulletinDTO;
+import laustrup.bandwichpersistence.models.dtos.events.EventDTO;
+import laustrup.bandwichpersistence.models.dtos.users.UserDTO;
 import laustrup.bandwichpersistence.models.events.Event;
 import laustrup.bandwichpersistence.models.Model;
 import laustrup.bandwichpersistence.models.Rating;
@@ -12,9 +18,7 @@ import laustrup.bandwichpersistence.services.TimeService;
 import laustrup.bandwichpersistence.utilities.Liszt;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,7 +28,6 @@ import java.util.List;
  * It extends from Model class.
  * Can calculate full name from first- and last name.
  */
-@NoArgsConstructor @ToString
 public abstract class User extends Model {
 
     /**
@@ -113,6 +116,80 @@ public abstract class User extends Model {
     @Getter
     protected Authority _authority;
 
+    public User(long id, String username, String firstName, String lastName,
+                String description, ContactInfo contactInfo, AlbumDTO[] albums,
+                RatingDTO[] ratings, EventDTO[] events, ChatRoomDTO[] chatRooms,
+                Subscription subscription, BulletinDTO[] bulletins, Authority authority, LocalDateTime timestamp) {
+        this(id, username, description, contactInfo, albums, ratings, events, chatRooms, subscription, bulletins, authority, timestamp);
+        _firstName = firstName;
+        _lastName = lastName;
+        get_fullName();
+    }
+    public User(long id, String username, String description, ContactInfo contactInfo,
+    AlbumDTO[] albums, RatingDTO[] ratings, EventDTO[] events, ChatRoomDTO[] chatRooms,
+    Subscription subscription, BulletinDTO[] bulletins, Authority authority, LocalDateTime timestamp) {
+        super(id,username + "-" + id, timestamp);
+        _username = username;
+        _contactInfo = contactInfo;
+        _description = description;
+
+        _albums = new Liszt<>();
+        for (AlbumDTO album : albums)
+        _albums.add(new Album(album));
+
+        _ratings = new Liszt<>();
+        for (RatingDTO rating : ratings)
+        _ratings.add(new Rating(rating));
+
+        _events = new Liszt<>();
+        for (EventDTO event : events)
+        _events.add(new Event(event));
+
+        _chatRooms = new Liszt<>();
+        for (ChatRoomDTO chatRoom : chatRooms)
+        _chatRooms.add(new ChatRoom(chatRoom));
+
+        _subscription = subscription;
+
+        _bulletins = new Liszt<>();
+        for (BulletinDTO bulletin : bulletins)
+        _bulletins.add(new Bulletin(bulletin));
+
+        _authority = authority;
+    }
+    public User(UserDTO user) {
+        super(user.getPrimaryId(),user.getUsername() + "-" + user.getPrimaryId(),user.getTimestamp());
+        _username = user.getUsername();
+        _firstName = user.getFirstName();
+        _lastName = user.getLastName();
+        get_fullName();
+        _contactInfo = new ContactInfo(user.getContactInfo());
+        _description = user.getDescription();
+
+        _albums = new Liszt<>();
+        for (AlbumDTO album : user.getAlbums())
+            _albums.add(new Album(album));
+
+        _ratings = new Liszt<>();
+        for (RatingDTO rating : user.getRatings())
+            _ratings.add(new Rating(rating));
+
+        _events = new Liszt<>();
+        for (EventDTO event : user.getEvents())
+            _events.add(new Event(event));
+
+        _chatRooms = new Liszt<>();
+        for (ChatRoomDTO chatRoom : user.getChatRooms())
+            _chatRooms.add(new ChatRoom(chatRoom));
+
+        _subscription = new Subscription(user.getSubscription());
+
+        _bulletins = new Liszt<>();
+        for (BulletinDTO bulletin : user.getBulletins())
+            _bulletins.add(new Bulletin(bulletin));
+
+        _authority = Authority.valueOf(user.getAuthority().toString());
+    }
     public User(long id) {
         super(id);
     }

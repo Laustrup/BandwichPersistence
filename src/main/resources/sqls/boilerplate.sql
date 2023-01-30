@@ -54,6 +54,7 @@ CREATE TABLE users(
     id BIGINT(20) NOT NULL AUTO_INCREMENT,
     username VARCHAR(30) NOT NULL,
     `password` VARCHAR(30) NOT NULL,
+    email VARCHAR(30),
     first_name VARCHAR(20),
     last_name VARCHAR(40),
     `description` VARCHAR(500),
@@ -62,9 +63,12 @@ CREATE TABLE users(
         'ARTIST',
         'VENUE',
         'PARTICIPANT') NOT NULL,
-    
+
     PRIMARY KEY(id)
 );
+
+ALTER TABLE users ADD UNIQUE unique_username(username,`password`);
+ALTER TABLE users ADD UNIQUE unique_email(email,`password`);
 
 CREATE TABLE band_members(
     artist_id BIGINT(20) NOT NULL,
@@ -296,21 +300,24 @@ CREATE TABLE albums(
     title VARCHAR(100),
 
     author_id BIGINT(20) NOT NULL,
+    event_id BIGINT(20),
 
     `timestamp` DATETIME NOT NULL,
 
     PRIMARY KEY(id),
-    FOREIGN KEY(author_id) REFERENCES users(id)
+    FOREIGN KEY(author_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY(author_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE album_items(
     title VARCHAR(100),
     endpoint VARCHAR(100) NOT NULL,
-    kind ENUM('IMAGE',
-        'MUSIC') NOT NULL,
+    kind ENUM('IMAGE', 'MUSIC') NOT NULL,
 
     album_id BIGINT(20) NOT NULL,
     event_id BIGINT(20),
+
+    `timestamp` DATETIME NOT NULL,
 
     PRIMARY KEY(endpoint),
     FOREIGN KEY(album_id) REFERENCES albums(id) ON DELETE CASCADE,
@@ -333,15 +340,15 @@ CREATE TABLE subscriptions(
         'DISACTIVATED',
         'CLOSED') NOT NULL,
     subscription_type ENUM('FREEMIUM',
-        'PREEMIUM_BAND',
-        'PREEMIUM_ARTIST') NOT NULL,
+        'PREMIUM_BAND',
+        'PREMIUM_ARTIST') NOT NULL,
     /* Offer */
     offer_type ENUM('FREE_TRIAL',
-        'SALE') NOT NULL,
+        'SALE'),
     offer_expires DATETIME,
     offer_effect DOUBLE,
 
-    card_id BIGINT(20) NOT NULL,
+    card_id BIGINT(20),
     PRIMARY KEY (user_id),
     FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY(card_id) REFERENCES cards(id)
@@ -349,7 +356,6 @@ CREATE TABLE subscriptions(
 
 CREATE TABLE contact_informations(
     user_id BIGINT(20) NOT NULL,
-    email VARCHAR(30),
     /* Phone */
     first_digits INT(3),
     phone_number INT(10),

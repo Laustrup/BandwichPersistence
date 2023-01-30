@@ -31,5 +31,8 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Sensitive Data ###
 /src/main/java/laustrup/bandwichpersistence/miscs/Crate.java
 /src/main/resources/sqls/default_values.sql
+/src/main/resources/application.properties

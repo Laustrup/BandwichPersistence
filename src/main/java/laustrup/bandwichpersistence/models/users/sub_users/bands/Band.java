@@ -1,5 +1,7 @@
 package laustrup.bandwichpersistence.models.users.sub_users.bands;
 
+import laustrup.bandwichpersistence.models.dtos.users.sub_users.bands.ArtistDTO;
+import laustrup.bandwichpersistence.models.dtos.users.sub_users.bands.BandDTO;
 import laustrup.bandwichpersistence.models.events.Event;
 import laustrup.bandwichpersistence.models.Rating;
 import laustrup.bandwichpersistence.models.albums.Album;
@@ -14,7 +16,6 @@ import laustrup.bandwichpersistence.models.users.subscriptions.Subscription;
 import laustrup.bandwichpersistence.utilities.Liszt;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
@@ -23,7 +24,6 @@ import java.util.InputMismatchException;
 /**
  * Extends performer and contains Artists as members
  */
-@NoArgsConstructor
 public class Band extends Performer {
 
     /**
@@ -38,6 +38,18 @@ public class Band extends Performer {
     @Getter @Setter
     private String _runner;
 
+    public Band(BandDTO band) {
+        super(band.getPrimaryId(), band.getUsername(), band.getDescription(), new ContactInfo(band.getContactInfo()),
+                Authority.BAND, band.getAlbums(), band.getRatings(), band.getEvents(), band.getGigs(), band.getChatRooms(),
+                new Subscription(band.getSubscription()), band.getBulletins(), band.getFans(), band.getIdols(), band.getTimestamp());
+        _username = band.getUsername();
+
+        _members = new Liszt<>();
+        for (ArtistDTO member : band.getMembers())
+            _members.add(new Artist(member));
+
+        _runner = band.getRunner();
+    }
     public Band(long id) {
         super(id);
     }
@@ -45,15 +57,12 @@ public class Band extends Performer {
     public Band(long id, String username, String description, ContactInfo contactInfo, Liszt<Album> albums,
                 Liszt<Rating> ratings, Liszt<Event> events, Liszt<Gig> gigs, Liszt<ChatRoom> chatRooms,
                 Subscription subscription, Liszt<Bulletin> bulletins, Liszt<Artist> members,
-                String runner, Liszt<User> fans, Liszt<User> idols, LocalDateTime timestamp)
-            throws InputMismatchException {
+                String runner, Liszt<User> fans, Liszt<User> idols, LocalDateTime timestamp) {
         super(id, username, description, contactInfo, Authority.BAND, albums, ratings, events, gigs, chatRooms,
                 subscription, bulletins, fans, idols, timestamp);
         _username = username;
 
         _members = members;
-        if (_members.isEmpty())
-            throw new InputMismatchException();
 
         _runner = runner;
         _assembling = true;
@@ -125,11 +134,12 @@ public class Band extends Performer {
 
     @Override
     public String toString() {
-        return "Band(id="+_primaryId+
-                ",username="+_username+
-                ",description="+_description+
-                ",timestamp="+_timestamp+
-                ",runner="+_runner+
+        return "Band(" +
+                    "id=" + _primaryId +
+                    ",username=" + _username +
+                    ",description=" + _description +
+                    ",timestamp=" + _timestamp +
+                    ",runner=" + _runner +
                 ")";
     }
 }

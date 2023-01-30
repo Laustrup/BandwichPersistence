@@ -31,7 +31,7 @@ public class DbGate {
      * This is the only connection to the database, that is to be used.
      */
     @Getter
-    private static Connection _connection;
+    private Connection _connection;
 
     private DbGate() {}
 
@@ -40,14 +40,25 @@ public class DbGate {
      * @return True if the connection could open, otherwise false.
      */
     public boolean open() {
-        if (isClosed().get_truth()) {
-            Crate crate = Crate.get_instance();
-            try {
-                _connection = DriverManager.getConnection(crate.get_dbPath(), crate.get_dbUser(), crate.get_dbPassword());
-                return isOpen().get_truth();
-            } catch (SQLException e) {
-                Printer.get_instance().print("Couldn't open connection...",e);
-            }
+        if (_connection == null)
+            return createConnection();
+        else if (isClosed().get_truth())
+            return createConnection();
+
+        return false;
+    }
+
+    /**
+     * Creates a connection from DriverManager.
+     * @return True if the connection is open and haven't caught any exceptions.
+     */
+    private boolean createConnection() {
+        Crate crate = Crate.get_instance();
+        try {
+            _connection = DriverManager.getConnection(crate.get_dbPath(), crate.get_dbUser(), crate.get_dbPassword());
+            return isOpen().get_truth();
+        } catch (SQLException e) {
+            Printer.get_instance().print("Couldn't open connection...",e);
         }
         return false;
     }
@@ -92,5 +103,13 @@ public class DbGate {
             Printer.get_instance().print("Trouble determine if the connection is closed...",e);
         }
         return new Plato();
+    }
+
+    /**
+     * Determines whether the connection is null or not.
+     * @return _connection == null;
+     */
+    public boolean connectionIsNull() {
+        return _connection == null;
     }
 }
