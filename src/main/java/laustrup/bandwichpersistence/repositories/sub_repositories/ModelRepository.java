@@ -274,12 +274,14 @@ public class ModelRepository extends Repository {
         try {
             ResultSet set = create("INSERT INTO chat_rooms(" +
                         (idExists ? "id," : "") +
+                        "is_local," +
                         "title," +
                         "responsible_id," +
                         "`timestamp`" +
                     ") " +
                     "VALUES(" +
-                        (idExists ? chatRoom.get_primaryId()+"," : "") + "'" +
+                        (idExists ? chatRoom.get_primaryId()+"," : "") +
+                        chatRoom.is_local() + ",'" +
                         chatRoom.get_title() + "'," +
                         chatRoom.get_responsible().get_primaryId() + "," +
                         (idExists ? "'"+chatRoom.get_timestamp()+"'" : "NOW()") +
@@ -295,7 +297,8 @@ public class ModelRepository extends Repository {
 
             if (chatRoom.get_chatters().size() > 0)
                 if (insertChattersOf(new ChatRoom(
-                        id,chatRoom.get_title(),chatRoom.get_mails(),
+                        id, chatRoom.is_local(),
+                        chatRoom.get_title(),chatRoom.get_mails(),
                         chatRoom.get_chatters(),chatRoom.get_responsible(),
                         chatRoom.get_timestamp())
                 )) return id;

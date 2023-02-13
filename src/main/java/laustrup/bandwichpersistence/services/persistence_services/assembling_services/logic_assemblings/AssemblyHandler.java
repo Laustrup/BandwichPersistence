@@ -183,7 +183,7 @@ public class AssemblyHandler {
             set.next();
 
         if (set.getLong(table+".id") > 0) {
-            ChatRoom chatRoom = new ChatRoom(set.getLong(table+".id"),
+            ChatRoom chatRoom = new ChatRoom(set.getLong(table+".id"), set.getBoolean("is_local"),
                     set.getString(table+".title") == null ? new String() : set.getString(table+".title"),
                     TimeService.get_instance().convertFromDatabase(set,table+".timestamp"));
 

@@ -132,6 +132,7 @@ public class UserAssembly extends Assembler {
     public ChatRoom assembleChatRoom(ResultSet set) throws SQLException {
         long id = set.getLong("chat_rooms.id");
         String title = set.getString("chat_rooms.title");
+        boolean isLocal = set.getBoolean("is_local");
         Liszt<Mail> mails = new Liszt<>();
         Liszt<User> chatters = new Liszt<>();
         User responsible = assemble(set.getLong("chat_rooms.responsible_id"),false);
@@ -146,6 +147,6 @@ public class UserAssembly extends Assembler {
 
         } while (set.next());
 
-        return new ChatRoom(id, title, mails, chatters, responsible, timestamp);
+        return new ChatRoom(id, isLocal, title, mails, chatters, responsible, timestamp);
     }
 }

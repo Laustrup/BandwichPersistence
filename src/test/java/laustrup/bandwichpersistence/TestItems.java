@@ -486,7 +486,7 @@ public class TestItems extends JTest {
                 members.add(user);
             }
 
-            _chatRooms[i] = new ChatRoom(id, "Chatroom "+id,
+            _chatRooms[i] = new ChatRoom(id, _random.nextBoolean(), "Chatroom "+id,
                     generateMails(members), members,
                     members.get(_random.nextInt(members.size())+1), LocalDateTime.now()
             );

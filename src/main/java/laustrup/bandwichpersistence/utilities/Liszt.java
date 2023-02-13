@@ -390,6 +390,7 @@ public class Liszt<E> implements List<E>, ILiszt<E> {
     }
 
     public E getLast() { return _data.length > 0 ? _data[size()-1] : null; }
+    public E getFirst() { return _data[0]; }
 
     @Override
     public String toString() {

@@ -22,11 +22,18 @@ public abstract class Model {
     /**
      * Another identification value in the database for a specific entity.
      * Must be unique with primary id.
-     * Is used for incidents, where there are an connection between two entities
+     * Is used for incidents, where there are a connection between two entities
      * and they are both being used as primary keys
      */
-    @Getter
     protected Long _secondaryId;
+
+    /**
+     * Gets the secondary id, if there isn't any, it will get the primary id.
+     * @return The gathered id.
+     */
+    public Long get_secondaryId() {
+        return _secondaryId == null || _secondaryId < 1 ? get_primaryId() : _secondaryId;
+    }
 
     /**
      * The name for an enitity or model.

@@ -23,6 +23,14 @@ import java.util.List;
 public class ChatRoom extends Model {
 
     /**
+     * Will determine if this ChatRoom is local,
+     * meaning there will not be any responsible,
+     * but will only contain band members as chatters.
+     */
+    @Getter
+    private boolean _local;
+
+    /**
      * All the Mails that has been sent will be stored here.
      */
     @Getter
@@ -54,6 +62,10 @@ public class ChatRoom extends Model {
     @Getter
     private boolean _answered;
 
+    /**
+     * Converts a Data Transport Object into this object.
+     * @param chatRoom The Data Transport Object that will be converted.
+     */
     public ChatRoom(ChatRoomDTO chatRoom) {
         _mails = new Liszt<>();
         convert(chatRoom.getMails());
@@ -63,41 +75,108 @@ public class ChatRoom extends Model {
 
         isTheChatRoomAnswered();
     }
+
+    /**
+     * Converts a Data Transport Object into Mails.
+     * @param mails The Data Transport Object that will be converted.
+     * @return The converted Mails.
+     */
     private Liszt<Mail> convert(MailDTO[] mails) {
         for (MailDTO mail : mails)
             _mails.add(new Mail(mail));
         return _mails;
     }
+
+    /**
+     * Converts a Data Transport Object into Chatters.
+     * @param chatters The Data Transport Object that will be converted.
+     * @return The converted Chatters.
+     */
     private Liszt<User> convert(UserDTO[] chatters) {
         for (UserDTO chatter : chatters)
             _chatters.add(DTOService.get_instance().convertFromDTO(chatter));
         return _chatters;
     }
-    public ChatRoom(long id, String title, Liszt<Mail> mails, Liszt<User> chatters, User responsible, LocalDateTime timestamp) {
-        super(id, title.isEmpty() || title == null ? "ChatRoom-"+id : title, timestamp);
-        _mails = mails;
+
+    /**
+     * Containing all attributes of this object.
+     * Purpose is for assembling.
+     * Will set assembling to true.
+     * Checks if the ChatRoom has been answered.
+     * @param id The primary id.
+     * @param isLocal Is this a Band ChatRoom without a responsible or not
+     * @param title The title of the ChatRoom, if it is null or empty, it will be the usernames of the chatters.
+     * @param mails The Mails with relations to this ChatRoom.
+     * @param chatters The chatters that are members of this ChatRoom.
+     * @param responsible The intended receiver of this ChatRoom.
+     * @param timestamp The time this ChatRoom was created.
+     */
+    public ChatRoom(long id, boolean isLocal, String title, Liszt<Mail> mails, Liszt<User> chatters,
+                    User responsible, LocalDateTime timestamp) {
+        super(id, title, timestamp);
         _chatters = chatters;
         _responsible = responsible;
+        _title = determineChatRoomTitle(_title);
+        _local = isLocal;
+        _mails = mails;
         _assembling = true;
 
         setChatRoomOfMails();
         isTheChatRoomAnswered();
     }
 
-    public ChatRoom(long id, String title, LocalDateTime timestamp) {
-        super(id, title.isEmpty() || title == null ? "ChatRoom-"+id : title, timestamp);
-        _mails = new Liszt<>();
+    /**
+     * A primitive constructor, with lesser values.
+     * Purpose is to use for assembling.
+     * Will set assembling to true.
+     * @param id The primary id.
+     * @param title The title of the ChatRoom, if it is null or empty, it will be the usernames of the chatters.
+     * @param timestamp The time this ChatRoom was created.
+     */
+    public ChatRoom(long id, boolean isLocal, String title, LocalDateTime timestamp) {
+        super(id, title, timestamp);
+        _local = isLocal;
         _chatters = new Liszt<>();
+        _title = determineChatRoomTitle(_title);
+
+        _mails = new Liszt<>();
         _assembling = true;
     }
 
-    public ChatRoom(String title, Liszt<User> chatters, User responsible) {
+    /**
+     * Will be used for creating a new ChatRoom, without an id.
+     * Checks if the ChatRoom has been answered.
+     * @param title The title of the ChatRoom, if it is null or empty, it will be the usernames of the chatters.
+     * @param chatters The chatters that are members of this ChatRoom.
+     * @param responsible The intended receiver of this ChatRoom.
+     */
+    public ChatRoom(boolean isLocal, String title, Liszt<User> chatters, User responsible) {
         super(title);
-        _mails = new Liszt<>();
+        _local = isLocal;
         _chatters = chatters;
         _responsible = responsible;
+        _title = determineChatRoomTitle(_title);
+        _mails = new Liszt<>();
 
         isTheChatRoomAnswered();
+    }
+
+    /**
+     * Will make the title of this ChatRoom be of custom title or chatters' usernames.
+     * @param title The custom title.
+     * @return The determined title.
+     */
+    private String determineChatRoomTitle(String title) {
+        if (title.isEmpty() || title == null) {
+            StringBuilder usernames = new StringBuilder();
+
+            for (int i = 1; i <= _chatters.size(); i++)
+                usernames.append(_chatters.get(i).get_username()).append(i > _chatters.size() ? ", " : "");
+
+            return usernames.toString();
+        }
+        else
+            return title;
     }
 
     /**
