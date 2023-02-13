@@ -46,7 +46,9 @@ public class BandAssembly extends UserAssembler {
 
         if (set != null) {
             while (set.next()) {
-                bands.add(assemble(set, isTemplate));
+                Band band = assemble(set, isTemplate);
+                if (!bands.contains(band.toString()))
+                    bands.add(band);
             }
         }
 
@@ -89,7 +91,6 @@ public class BandAssembly extends UserAssembler {
                     memberIds.add(set.getLong("band_members.artist_id"));
             } while (set.next());
         }
-
 
         try {
             Band band = new Band(_id, _username, _description, _contactInfo, _albums, _ratings, _events, gigs, _chatRooms,

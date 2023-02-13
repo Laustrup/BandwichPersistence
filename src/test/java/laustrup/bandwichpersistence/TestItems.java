@@ -23,6 +23,7 @@ import laustrup.bandwichpersistence.models.users.subscriptions.Subscription;
 import laustrup.bandwichpersistence.models.users.subscriptions.SubscriptionOffer;
 import laustrup.bandwichpersistence.models.users.sub_users.venues.Venue;
 import laustrup.bandwichpersistence.services.TimeService;
+import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembly;
 import laustrup.bandwichpersistence.utilities.Liszt;
 import laustrup.bandwichpersistence.utilities.Plato;
 import laustrup.bandwichpersistence.utilities.Printer;
@@ -47,6 +48,35 @@ public class TestItems extends JTest {
      * Will be used to create values for attributes.
      */
     private Random _random = new Random();
+
+    /**
+     * An Artist gathered from the database of default values with all its values assigned to it.
+     */
+    @Getter
+    private Artist _carlos = (Artist) Assembly.get_instance().getUser(1),
+            _bjarke = (Artist) Assembly.get_instance().getUser(2),
+            _tir = (Artist) Assembly.get_instance().getUser(3),
+            _laust = (Artist) Assembly.get_instance().getUser(4);
+    /**
+     * A Band gathered from the database of default values with all its values assigned to it.
+     */
+    @Getter
+    private Band _melanges = (Band) Assembly.get_instance().getUser(5);
+
+    /**
+     * A Venue gathered from the database of default values with all its values assigned to it.
+     */
+    @Getter
+    private Venue _metronomen = (Venue) Assembly.get_instance().getUser(6),
+            _roskilde = (Venue) Assembly.get_instance().getUser(7);
+
+    /**
+     * A Participant gathered from the database of default values with all its values assigned to it.
+     */
+    @Getter
+    private Participant _rockGuy = (Participant) Assembly.get_instance().getUser(8),
+            _beautiQueen = (Participant) Assembly.get_instance().getUser(9),
+            _artsy = (Participant) Assembly.get_instance().getUser(10);
 
     /**
      * Length determine of array collection.
@@ -136,28 +166,6 @@ public class TestItems extends JTest {
 
         // Events
         setupEvents();
-    }
-
-    @Test
-    public void itemTest() {
-        for (int i = 0; i < 1; i++) {
-            try {
-                // ARRANGE
-                begin();
-
-                // ACT
-                resetItems();
-                calculatePerformance();
-
-                // ASSERT
-                assertTrue(true);
-            } catch (Exception e) {
-                Printer.get_instance().print("Test items caught an Exception...", e);
-
-                // ASSERT
-                assertTrue(false);
-            }
-        }
     }
 
     private void setupCountries() {
@@ -517,5 +525,27 @@ public class TestItems extends JTest {
         for (int i = 0; i < amount; i++) ratings.add(_ratings[_random.nextInt(_ratings.length)]);
 
         return ratings;
+    }
+
+    @Test
+    public void itemTest() {
+        for (int i = 0; i < 1; i++) {
+            try {
+                // ARRANGE
+                begin();
+
+                // ACT
+                resetItems();
+                calculatePerformance();
+
+                // ASSERT
+                assertTrue(true);
+            } catch (Exception e) {
+                Printer.get_instance().print("Test items caught an Exception...", e);
+
+                // ASSERT
+                fail();
+            }
+        }
     }
 }

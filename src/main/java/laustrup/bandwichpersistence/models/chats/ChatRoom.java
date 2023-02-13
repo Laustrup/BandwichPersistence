@@ -167,7 +167,7 @@ public class ChatRoom extends Model {
      * @return The determined title.
      */
     private String determineChatRoomTitle(String title) {
-        if (title.isEmpty() || title == null) {
+        if (title == null || title.isEmpty()) {
             StringBuilder usernames = new StringBuilder();
 
             for (int i = 1; i <= _chatters.size(); i++)

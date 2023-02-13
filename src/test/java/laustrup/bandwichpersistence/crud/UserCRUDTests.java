@@ -190,10 +190,10 @@ class UserCRUDTests extends JTest {
                 prevContent = "This is test content",
                 postContent = "Changed content";
 
-        User chatter = Assembly.get_instance().getUser(1),
-            responsible = Assembly.get_instance().getUser(2);
-        ChatRoom expectedChatRoom = Assembly.get_instance().finish(Assembly.get_instance().getChatRoomUnassembled(
-                chatter.get_chatRooms().getFirst().get_primaryId()));
+        User chatter = _items.get_artsy(),
+            responsible = _items.get_carlos();
+        ChatRoom expectedChatRoom = new ChatRoom(false, null,
+                new Liszt<>(new User[]{chatter,responsible}), responsible);
         Mail expectedMail = new Mail(expectedChatRoom,chatter);
 
         //ACT
