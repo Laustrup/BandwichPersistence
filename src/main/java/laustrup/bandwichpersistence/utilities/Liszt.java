@@ -158,6 +158,22 @@ public class Liszt<E> implements List<E>, ILiszt<E> {
 
         return true;
     }
+
+    @Override
+    public E[] addUnique(E element) {
+        if (!contains(element.toString()))
+            add(element);
+        return _data;
+    }
+
+    @Override
+    public E[] addUnique(E[] elements) {
+        for (E element : elements)
+            if (!contains(element.toString()))
+                add(element);
+        return _data;
+    }
+
     private void handleAdd(E[] elements) {
         elements = filterElements(elements);
         E[] storage = (E[]) new Object[_data.length + elements.length];;

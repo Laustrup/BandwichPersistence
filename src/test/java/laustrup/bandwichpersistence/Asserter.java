@@ -200,7 +200,7 @@ public class Asserter {
      * @param expectations The ChatRooms that are arranged and defined.
      * @param actuals The ChatRooms that are the result of an action.
      */
-    protected void assertChatRooms(Liszt<ChatRoom> expectations, Liszt<ChatRoom> actuals) {
+    public void assertChatRooms(Liszt<ChatRoom> expectations, Liszt<ChatRoom> actuals) {
         if (expectations != null && actuals != null) {
             if (expectations.size() == actuals.size()) {
                 for (int i = 1; i <= expectations.size(); i++) {
@@ -244,7 +244,7 @@ public class Asserter {
      * @param expected The Subscription that is arranged and defined.
      * @param actual The Subscription that is the result of an action.
      */
-    private void asserting(Subscription expected, Subscription actual) {
+    public void asserting(Subscription expected, Subscription actual) {
         if (expected != null && actual != null) {
             assertEquals(expected.get_user().toString(),actual.get_user().toString());
             assertEquals(expected.get_type(),actual.get_type());
@@ -267,7 +267,7 @@ public class Asserter {
      * @param expectations The Requests that are arranged and defined.
      * @param actuals The Requests that are the result of an action.
      */
-    private void assertRequests(Liszt<Request> expectations, Liszt<Request> actuals) {
+    public void assertRequests(Liszt<Request> expectations, Liszt<Request> actuals) {
         if (expectations != null && actuals != null) {
             if (expectations.size() == actuals.size()) {
                 for (int i = 1; i <= expectations.size(); i++) {
@@ -422,6 +422,20 @@ public class Asserter {
      * @param actual The Gig that is the result of an action.
      */
     protected void asserting(Gig expected, Gig actual) {
+        asserting(expected.get_event(),actual.get_event());
+        asserting(expected.get_act(),actual.get_act());
+        assertEquals(expected.get_start(),actual.get_start());
+        assertEquals(expected.get_end(),actual.get_end());
+    }
 
+    /**
+     * Asserts two acts to check they are the same.
+     * @param expectations The acts that is arranged and defined.
+     * @param actuals The acts that is the result of an action.
+     */
+    protected void asserting(Performer[] expectations, Performer[] actuals) {
+        if (expectations != null && actuals != null && expectations.length == actuals.length)
+            for (int i = 0; i < expectations.length; i++)
+                assertPerformers(expectations[i], actuals[i]);
     }
 }

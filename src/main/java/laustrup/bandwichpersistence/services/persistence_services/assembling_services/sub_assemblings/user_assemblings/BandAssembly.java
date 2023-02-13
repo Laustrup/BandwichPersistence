@@ -44,13 +44,9 @@ public class BandAssembly extends UserAssembler {
     public Liszt<Band> assembles(ResultSet set, boolean isTemplate) throws SQLException {
         Liszt<Band> bands = new Liszt<>();
 
-        if (set != null) {
-            while (set.next()) {
-                Band band = assemble(set, isTemplate);
-                if (!bands.contains(band.toString()))
-                    bands.add(band);
-            }
-        }
+        if (set != null)
+            while (set.next())
+                bands.addUnique(assemble(set, isTemplate));
 
         return bands;
     }

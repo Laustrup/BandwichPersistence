@@ -171,7 +171,7 @@ public class ChatRoom extends Model {
             StringBuilder usernames = new StringBuilder();
 
             for (int i = 1; i <= _chatters.size(); i++)
-                usernames.append(_chatters.get(i).get_username()).append(i > _chatters.size() ? ", " : "");
+                usernames.append(_chatters.get(i).get_username()).append(i < _chatters.size() ? ", " : "");
 
             return usernames.toString();
         }
