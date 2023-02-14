@@ -193,7 +193,7 @@ class UserCRUDTests extends JTest {
         User chatter = _items.get_artsy(),
             responsible = _items.get_carlos();
         ChatRoom expectedChatRoom = new ChatRoom(false, null,
-                new Liszt<>(new User[]{chatter,responsible}), responsible);
+                new Liszt<>(new User[]{responsible,chatter}), responsible);
         Mail expectedMail = new Mail(expectedChatRoom,chatter);
 
         //ACT

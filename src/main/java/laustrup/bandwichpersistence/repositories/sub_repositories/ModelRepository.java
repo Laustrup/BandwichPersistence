@@ -107,19 +107,19 @@ public class ModelRepository extends Repository {
                 ") " +
                 "VALUES(" +
                     (idExists ? bulletin.get_primaryId()+"," : "") +
-                    bulletin.get_author().get_primaryId() + ",'" +
-                    bulletin.get_content() + "'," +
-                    bulletin.is_sent() + ",'" +
-                    bulletin.get_edited().get_argument() + "'," +
+                    bulletin.get_author().get_primaryId() + "," +
+                    varCharColumn(bulletin.get_content()) + "," +
+                    bulletin.is_sent() + "," +
+                    platoColumn(bulletin.get_edited()) + "," +
                     bulletin.is_public() + "," +
                     bulletin.get_receiver().get_primaryId() + "," +
                 "NOW()) " +
                 "ON DUPLICATE KEY UPDATE " +
-                    "content = '" + bulletin.get_content() + "'," +
+                    "content = " + varCharColumn(bulletin.get_content()) + "," +
                     "is_sent = " + bulletin.is_sent() + "," +
-                    "is_edited = '" + bulletin.get_edited().get_argument() + "'," +
+                    "is_edited = " + platoColumn(bulletin.get_edited()) + "," +
                     "is_public = " + bulletin.is_public() +
-                ";", false);
+                ";");
     }
 
     /**
@@ -154,29 +154,29 @@ public class ModelRepository extends Repository {
                         "country_indexes," +
                     ") " +
                     "VALUES (" +
-                        contactInfo.get_primaryId() + ",'" +
+                        contactInfo.get_primaryId() + "," +
                         contactInfo.get_country().get_firstPhoneNumberDigits() + "," +
                         contactInfo.get_phone().get_numbers() + "," +
-                        contactInfo.get_phone().is_mobile() + ",'" +
-                        contactInfo.get_address().get_street() + "','" +
-                        contactInfo.get_address().get_floor() + "','" +
-                        contactInfo.get_address().get_postal() + "','" +
-                        contactInfo.get_address().get_city() + "','" +
-                        contactInfo.get_country().get_title() + "','" +
-                        contactInfo.get_country().get_indexes() +
-                    "') " +
+                        contactInfo.get_phone().is_mobile() + "," +
+                        varCharColumn(contactInfo.get_address().get_street()) + "," +
+                        varCharColumn(contactInfo.get_address().get_floor()) + "," +
+                        varCharColumn(contactInfo.get_address().get_postal()) + "," +
+                        varCharColumn(contactInfo.get_address().get_city()) + "," +
+                        varCharColumn(contactInfo.get_country().get_title()) + "," +
+                        varCharColumn(contactInfo.get_country().get_indexes().toString()) +
+                    ") " +
                     "ON DUPLICATE KEY UPDATE " +
-                        "email = '" + contactInfo.get_email() + "'," +
+                        "email = " + varCharColumn(contactInfo.get_email()) + "," +
                         "first_digits = " + contactInfo.get_country().get_firstPhoneNumberDigits() + "," +
                         "phone_number = " + contactInfo.get_phone().get_numbers() + "," +
                         "phone_is_mobile = " + contactInfo.get_phone().is_mobile() + "," +
-                        "street = '" + contactInfo.get_address().get_street() + "'," +
-                        "floor = '" + contactInfo.get_address().get_floor() + "'," +
-                        "postal = '" + contactInfo.get_address().get_postal() + "'," +
-                        "city = '" + contactInfo.get_address().get_city() + "'," +
-                        "country_title = '" + contactInfo.get_country().get_title() + "'," +
-                        "country_indexes = '" + contactInfo.get_country().get_indexes() +
-                    ";", false);
+                        "street = " + varCharColumn(contactInfo.get_address().get_street()) + "," +
+                        "floor = " + varCharColumn(contactInfo.get_address().get_floor()) + "," +
+                        "postal = " + varCharColumn(contactInfo.get_address().get_postal()) + "," +
+                        "city = " + varCharColumn(contactInfo.get_address().get_city()) + "," +
+                        "country_title = " + varCharColumn(contactInfo.get_country().get_title()) + "," +
+                        "country_indexes = " + varCharColumn(contactInfo.get_country().get_indexes().toString()) +
+                    ";");
         return false;
     }
 
@@ -200,22 +200,22 @@ public class ModelRepository extends Repository {
                         "card_id" +
                     ") " +
                     "VALUES (" +
-                        subscription.get_user().get_primaryId() + ",'" +
-                        subscription.get_situation() + "','" +
-                        subscription.get_type() + "','" +
-                        subscription.get_offer().get_type() + "','" +
-                        subscription.get_offer().get_expires() + "'," +
+                        subscription.get_user().get_primaryId() + "," +
+                        varCharColumn(subscription.get_status().toString()) + "," +
+                        varCharColumn(subscription.get_type().toString()) + "," +
+                        varCharColumn(subscription.get_offer().get_type().toString()) + "," +
+                        dateTimeColumn(subscription.get_offer().get_expires()) + "," +
                         subscription.get_offer().get_effect() + "," +
                         subscription.get_cardId() +
                     ") " +
                     "ON DUPLICATE KEY UPDATE " +
-                        "`status` = '" + subscription.get_situation() + "'," +
-                        "subscription_type = '" + subscription.get_type() + "'," +
-                        "offer_type = '" + subscription.get_offer().get_type() + "'," +
-                        "offer_expires = '" + subscription.get_offer().get_expires() + "'," +
+                        "`status` = " + varCharColumn(subscription.get_status().toString()) + "," +
+                        "subscription_type = " + varCharColumn(subscription.get_type().toString()) + "," +
+                        "offer_type = " + varCharColumn(subscription.get_offer().get_type().toString()) + "," +
+                        "offer_expires = " + dateTimeColumn(subscription.get_offer().get_expires()) + "," +
                         "offer_effect = " + subscription.get_offer().get_effect() + "," +
                         "card_id = " + subscription.get_cardId() +
-                    ";", false);
+                    ";");
         return false;
     }
 
@@ -240,18 +240,18 @@ public class ModelRepository extends Repository {
                         "`timestamp`) " +
                     "VALUES (" +
                         (mail.get_primaryId() > 0 ? mail.get_primaryId() + "," : "") +
-                        mail.get_author().get_primaryId() + ",'" +
-                        mail.get_content() + "'," +
-                        mail.is_sent() + ",'" +
-                        mail.get_edited().get_argument() + "'," +
+                        mail.get_author().get_primaryId() + "," +
+                        varCharColumn(mail.get_content()) + "," +
+                        mail.is_sent() + "," +
+                        platoColumn(mail.get_edited()) + "," +
                         mail.is_public() + "," +
                         mail.get_chatRoom().get_primaryId() + "," +
-                        (mail.get_primaryId() > 0 ? "'"+mail.get_timestamp()+"'" : "NOW()") +
+                        (mail.get_primaryId() > 0 ? varCharColumn(mail.get_timestamp().toString()) : "NOW()") +
                     ") " +
                     "ON DUPLICATE KEY UPDATE " +
-                        "content = '" + mail.get_content() + "'," +
+                        "content = " + varCharColumn(mail.get_content()) + "," +
                         "is_sent = " + mail.is_sent() + "," +
-                        "is_edited = '" + mail.get_edited().get_argument() + "'," +
+                        "is_edited = " + platoColumn(mail.get_edited()) + "," +
                         "is_public = " + mail.is_public() +
                     ";").getGeneratedKeys();
         } catch (SQLException e) {
@@ -281,13 +281,13 @@ public class ModelRepository extends Repository {
                     ") " +
                     "VALUES(" +
                         (idExists ? chatRoom.get_primaryId()+"," : "") +
-                        chatRoom.is_local() + ",'" +
-                        chatRoom.get_title() + "'," +
+                        chatRoom.is_local() + "," +
+                        varCharColumn(chatRoom.get_title()) + "," +
                         chatRoom.get_responsible().get_primaryId() + "," +
-                        (idExists ? "'"+chatRoom.get_timestamp()+"'" : "NOW()") +
+                        (idExists ? timestampColumn(chatRoom.get_timestamp()) : "NOW()") +
                     ") " +
                     "ON DUPLICATE KEY UPDATE " +
-                        "title = '" + chatRoom.get_title() + "'" +
+                        "title = " + varCharColumn(chatRoom.get_title()) +
                     ";").getGeneratedKeys();
 
             if (set.isBeforeFirst())
@@ -316,6 +316,7 @@ public class ModelRepository extends Repository {
      * @param chatRoom The ChatRoom that contains the chatters to insert.
      * @return True if it is a success.
      */
+    @SuppressWarnings("All")
     public boolean insertChattersOf(ChatRoom chatRoom) {
         String sql = new String();
 
@@ -329,7 +330,7 @@ public class ModelRepository extends Repository {
                         chatter.get_primaryId() +
                     "); ";
 
-        return edit(sql,false);
+        return edit(sql);
     }
 
     /**
@@ -354,7 +355,7 @@ public class ModelRepository extends Repository {
                 "NOW()) " +
                 "ON DUPLICATE KEY UPDATE " +
                     "`value` = " + rating.get_value() +
-                ";", false);
+                ";");
     }
 
     /**
@@ -376,17 +377,17 @@ public class ModelRepository extends Repository {
                         "`timestamp`" +
                     ") " +
                     "VALUES(" +
-                        (idExists ? album.get_primaryId()+",'" : "'") +
-                        album.get_title() + "'," +
+                        (idExists ? album.get_primaryId()+"," : "") +
+                        varCharColumn(album.get_title()) + "," +
                         album.get_author().get_primaryId() + "," +
                     "NOW()) " +
                     "ON DUPLICATE KEY UPDATE " +
-                        "title = '" + album.get_title() + "' " +
+                        "title = " + varCharColumn(album.get_title()) +
                     "; ").getGeneratedKeys();
             set.next();
             long id = set.getLong(1);
 
-            edit(upsertAlbumItemsSql(album),false);
+            edit(upsertAlbumItemsSql(album));
 
             return id;
         } catch (SQLException e) {
@@ -402,8 +403,9 @@ public class ModelRepository extends Repository {
      * @param album The Album that has the items.
      * @return The generated SQL string.
      */
+    @SuppressWarnings("All")
     private String upsertAlbumItemsSql(Album album) {
-        String sql = "";
+        String sql = new String();
         for (AlbumItem item : album.get_items())
             sql += "INSERT IGNORE INTO album_items(" +
                         "title," +
@@ -412,10 +414,10 @@ public class ModelRepository extends Repository {
                         "album_id," +
                         (item.get_event() != null ? "event_id," : "") +
                         "timestamp" +
-                    ") VALUES('" +
-                        item.get_title() + "','" +
-                        item.get_endpoint() + "','" +
-                        item.get_kind() + "'," +
+                    ") VALUES(" +
+                        varCharColumn(item.get_title()) + "," +
+                        varCharColumn(item.get_endpoint()) + "," +
+                        varCharColumn(item.get_kind().toString()) + "," +
                         album.get_primaryId() + "," +
                         (item.get_event() != null ? item.get_event().get_primaryId() + "," : "") +
                     "NOW()); " +
@@ -430,6 +432,7 @@ public class ModelRepository extends Repository {
      * @param item The items that has the tags.
      * @return The generated SQL string.
      */
+    @SuppressWarnings("All")
     private String upsertTags(AlbumItem item) {
         String sql = "";
         for (User tag : item.get_tags())
@@ -438,8 +441,8 @@ public class ModelRepository extends Repository {
                     "item_endpoint" +
                     ") " +
                     "VALUES(" +
-                        tag.get_primaryId() + ",'" +
-                        item.get_endpoint() + "'" +
+                        tag.get_primaryId() + "," +
+                        varCharColumn(item.get_endpoint()) + "" +
                     "); ";
         return sql;
     }

@@ -40,24 +40,7 @@ public class ParticipantRepository extends Repository {
      */
     public ResultSet create(Participant participant, String password) {
         try {
-            return create("INSERT INTO users(" +
-                        "username," +
-                        "email," +
-                        "`password`," +
-                        "first_name," +
-                        "last_name," +
-                        "`description`," +
-                        "`timestamp`," +
-                        "kind" +
-                    ") " +
-                    "VALUES ('" +
-                        participant.get_username() + "','" +
-                        participant.get_contactInfo().get_email() + "','" +
-                        password + "','" +
-                        participant.get_firstName() + "','" +
-                        participant.get_lastName() + "','" +
-                        participant.get_description() + "'," +
-                    "NOW(),'PARTICIPANT');").getGeneratedKeys();
+            return create(UserRepository.get_instance().insertUserSQL(participant,password)).getGeneratedKeys();
         } catch (SQLException e) {
             Printer.get_instance().print("Couldn't get generated keys of Participant...",e);
         }

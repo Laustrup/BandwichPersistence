@@ -185,7 +185,7 @@ public class UserRepository extends Repository {
                     user.get_contactInfo().get_address().get_city() + "','" +
                     user.get_contactInfo().get_country().get_title() + "','" +
                     user.get_contactInfo().get_country().get_indexes() + "'" +
-                ");", false);
+                ");");
     }
 
     /**
@@ -217,7 +217,7 @@ public class UserRepository extends Repository {
                     determineClass(fan) + "'," +
                     idol.get_primaryId() + ",'" +
                     determineClass(idol) + "'" +
-                ");", false);
+                ");");
     }
 
     /**
@@ -267,8 +267,8 @@ public class UserRepository extends Repository {
                                 || user.getClass() == Band.class
                                 || user.getClass() == Venue.class ? updateGearSQL(user) : "") +
                         (user.getClass() == Venue.class ? updateVenueSQL((Venue) user) : "") +
-                        (user.get_contactInfo() != null ? updateContactInfoSQL(user) : ""),
-                false);
+                        (user.get_contactInfo() != null ? updateContactInfoSQL(user) : "")
+        );
     }
 
     /**
@@ -399,6 +399,26 @@ public class UserRepository extends Repository {
                     "offer_expires = '" + subscription.get_offer().get_expires() + "', " +
                     "offer_effect = " + subscription.get_offer().get_effect() + ", " +
                     "card_id = " + subscription.get_cardId() +
-                "; ", false);
+                "; ");
+    }
+
+    public String insertUserSQL(User user, String password) {
+        return "INSERT INTO users(" +
+                    "username," +
+                    "email," +
+                    "`password`," +
+                    "first_name,last_name," +
+                    "`description`," +
+                    "kind," +
+                    "`timestamp`)" +
+                "VALUES (" +
+                    varCharColumn(user.get_username()) + "," +
+                    varCharColumn(user.get_contactInfo().get_email()) + "," +
+                    varCharColumn(password) + "," +
+                    varCharColumn(user.get_firstName()) +"," +
+                    varCharColumn(user.get_lastName()) +"," +
+                    varCharColumn(user.get_description()) +"," +
+                    varCharColumn(user.get_authority().toString()) +
+                ",NOW());";
     }
 }

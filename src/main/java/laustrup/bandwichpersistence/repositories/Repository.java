@@ -4,13 +4,14 @@ import laustrup.bandwichpersistence.utilities.Plato;
 import laustrup.bandwichpersistence.utilities.Printer;
 
 import java.sql.*;
+import java.time.LocalDateTime;
 
 /**
  * An abstract class that takes SQLs and performs them through JDBC methods.
  * Are also including a private class for handling database connections.
  * The database connection that is being handled is a connection specifically for this class.
  */
-public abstract class Repository {
+public abstract class Repository extends DbTranslator {
 
     /**
      * The connector that is used to handle the database connection of this Repository.
@@ -43,19 +44,15 @@ public abstract class Repository {
      * Uses the executeUpdate() of PreparedStatement to execute a specified SQL statement.
      * Can automatically close connection.
      * @param sql The specified SQL statement, that specifies the action intended for the database.
-     * @param doClose If true the connection will be closed after action.
      * @return The boolean answer of the database success.
      */
-    protected boolean edit(String sql, boolean doClose) {
+    protected boolean edit(String sql) {
         handleConnection();
-            try {
-                PreparedStatement statement = connection().prepareStatement(sql);
-                boolean success = statement.executeUpdate() > 0;
-
-                if (doClose)
-                    closeConnection();
-                return success;
-            } catch (SQLException e) { Printer.get_instance().print("Couldn't execute update...\n\n" + sql ,e); }
+        try {
+            return connection().prepareStatement(sql).executeUpdate() > 0;
+        } catch (SQLException e) {
+            Printer.get_instance().print("Couldn't execute update...\n\n" + sql ,e);
+        }
         return false;
     }
 
@@ -83,12 +80,17 @@ public abstract class Repository {
      * @return The open connection.
      */
     public Connection handleConnection() {
-        if (DbGate.get_instance().connectionIsNull())
-            return _connector.createConnection();
-        else if (DbGate.get_instance().isClosed().get_truth())
-            return _connector.createConnection();
-        else if (!DbGate.get_instance().isClosed().get_truth())
-            return DbGate.get_instance().get_connection();
+        try {
+            if (DbGate.get_instance().connectionIsNull())
+                return _connector.createConnection();
+            else if (DbGate.get_instance().isClosed().get_truth())
+                return _connector.createConnection();
+            else if (!DbGate.get_instance().isClosed().get_truth())
+                return DbGate.get_instance().get_connection();
+        }
+        catch (Exception e) {
+            Printer.get_instance().print("Couldn't handle connection",e);
+        }
         return null;
     }
 
@@ -162,7 +164,7 @@ public abstract class Repository {
      * @return True if connection is closed if intended and the rows doesn't exist.
      */
     protected boolean delete(long id, String table, String column, boolean closeConnection) {
-        if (edit("DELETE FROM " + table + " WHERE " + column + " = " + id + ";",false)) {
+        if (edit("DELETE FROM " + table + " WHERE " + column + " = " + id + ";")) {
             boolean doesExists = exists(id, table, column);
             return !doesExists && (closeConnection ? closeConnection().get_truth() : true);
         }
@@ -185,11 +187,22 @@ public abstract class Repository {
                              boolean closeConnection) {
         if (edit("DELETE FROM " + table +
                 " WHERE " + primaryColumn + " = " + primaryId + " AND " +
-                secondaryColumn + " = " + secondaryId + ";",false)) {
+                secondaryColumn + " = " + secondaryId + ";")) {
             boolean doesExists = exists(table, primaryId, primaryColumn, secondaryId, secondaryColumn);
             return !doesExists && (closeConnection ? closeConnection().get_truth() : true);
         }
         return (closeConnection ? closeConnection().get_truth() : true);
+    }
+
+    /**
+     * Will use the argument value of plato.
+     * Purpose is to indicate that this is a Plato object.
+     * Will also surround the argument with ''.
+     * @param plato The Plato that will be inserted into the column.
+     * @return The generated value to be set in the column.
+     */
+    protected String platoColumn(Plato plato) {
+        return "'" + plato.get_argument().toString() + "'";
     }
 
     /**

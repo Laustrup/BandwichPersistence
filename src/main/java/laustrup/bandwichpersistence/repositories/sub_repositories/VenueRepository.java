@@ -41,24 +41,7 @@ public class VenueRepository extends Repository {
      */
     public Long create(Venue venue, String password) {
         try {
-            ResultSet set =
-                    create("INSERT INTO users(" +
-                        "username," +
-                        "`password`," +
-                        "first_name," +
-                        "last_name," +
-                        "`description`," +
-                        "`timestamp`," +
-                        "kind" +
-                    ") " +
-                    "VALUES ('" +
-                        venue.get_username() + "','" +
-                        password + "','" +
-                        venue.get_firstName() + "','" +
-                        venue.get_lastName() + "','" +
-                        venue.get_description() + "','" +
-                        venue.get_timestamp() + "'," +
-                    "'VENUE');").getGeneratedKeys();
+            ResultSet set = create(UserRepository.get_instance().insertUserSQL(venue,password)).getGeneratedKeys();
 
             if (set.isBeforeFirst())
                 set.next();
@@ -72,16 +55,16 @@ public class VenueRepository extends Repository {
                     ") " +
                     "VALUES(" +
                         id + "," +
-                        venue.get_size() + ",'" +
-                        venue.get_location() +
-                    "'); " +
+                        venue.get_size() + "," +
+                        varCharColumn(venue.get_location()) +
+                    "); " +
                     "INSERTS INTO gear(" +
                         "user_id," +
                         "`description`" +
                     ") VALUES (" +
-                        id + ",'" +
-                        venue.get_gearDescription() +
-                    "');");
+                        id + "," +
+                        varCharColumn(venue.get_gearDescription()) +
+                    ");");
 
             return id;
         } catch (SQLException e) {

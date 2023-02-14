@@ -40,22 +40,7 @@ public class ArtistRepository extends Repository {
      */
     public long create(Artist artist, String password) {
         try {
-            ResultSet set = create("INSERT INTO users(" +
-                        "username," +
-                        "email," +
-                        "`password`," +
-                        "first_name,last_name," +
-                        "`description`," +
-                        "`timestamp`," +
-                        "kind) " +
-                    "VALUES ('" +
-                        artist.get_username() + "','" +
-                        artist.get_contactInfo().get_email() + "','" +
-                        password + "','" +
-                        artist.get_firstName() +"','" +
-                        artist.get_lastName() +"','" +
-                        artist.get_description() +"'," +
-                    "NOW(),'ARTIST');").getGeneratedKeys();
+            ResultSet set = create(UserRepository.get_instance().insertUserSQL(artist, password)).getGeneratedKeys();
 
             if (set.isBeforeFirst())
                 set.next();
@@ -65,9 +50,9 @@ public class ArtistRepository extends Repository {
                         "user_id," +
                         "description) " +
                     "VALUES (" +
-                        id + ",'" +
-                        artist.get_runner() +
-                    "');",false);
+                        id + "," +
+                        varCharColumn(artist.get_runner()) +
+                    ");");
 
             UserRepository.get_instance().createSubscriptionAndContactInfo(new Artist(id, artist.get_username(), artist.get_firstName(), artist.get_lastName(),
                     artist.get_description(), artist.get_contactInfo(), artist.get_albums(), artist.get_ratings(), artist.get_events(),

@@ -100,10 +100,11 @@ public class EventRepository extends Repository {
      * @return The collected JDBC ResultSet.
      */
     public ResultSet search(String query) {
-        query = query.replaceAll("%","");
-        return get("WHERE `events`.title LIKE '%" + query + "%' OR " +
-                "`events`.description LIKE '%" + query + "%' OR " +
-                "`events`.location LIKE '%" + query + "%'");
+        return get(whereSearchStatement(new String[]{
+                "`events`.title",
+                "`events`.description",
+                "`events`.location"},query)
+        );
     }
 
     /**
@@ -150,17 +151,17 @@ public class EventRepository extends Repository {
                         "venue_id," +
                         "`timestamp`" +
                     ") " +
-                    "VALUES ('" +
-                        event.get_title() +"','" +
-                        event.get_openDoors() + "','" +
-                        event.get_description() + "','" +
-                        event.get_voluntary().get_argument() + "','" +
-                        event.get_public().get_argument() + "','" +
-                        event.get_cancelled().get_argument() + "','" +
-                        event.get_soldOut().get_argument() + "','" +
-                        event.get_location() + "'," +
-                        event.get_price() + ",'" +
-                        event.get_ticketsURL() + "'," +
+                    "VALUES (" +
+                        varCharColumn(event.get_title()) +"," +
+                        dateTimeColumn(event.get_openDoors()) + "," +
+                        varCharColumn(event.get_description()) + "," +
+                        platoColumn(event.get_voluntary()) + "," +
+                        platoColumn(event.get_public()) + "," +
+                        platoColumn(event.get_cancelled()) + "," +
+                        platoColumn(event.get_soldOut()) + "," +
+                        varCharColumn(event.get_location()) + "," +
+                        event.get_price() + "," +
+                        varCharColumn(event.get_ticketsURL()) + "," +
                         event.get_venue().get_primaryId() + "," +
                     "NOW());").getGeneratedKeys();
         } catch (SQLException e) {
@@ -187,16 +188,16 @@ public class EventRepository extends Repository {
      */
     public boolean update(Event event) {
         String sql = "UPDATE `events` " +
-                    "title = '" + event.get_title() + "', " +
-                    "open_doors = '" + event.get_openDoors() + "', " +
-                    "`description` = '" + event.get_description() + "', " +
-                    "is_voluntary = '" + event.get_voluntary() + "', " +
-                    "is_public = '" + event.get_public() + "', " +
-                    "is_cancelled = '" + event.get_cancelled() + "', " +
-                    "is_sold_out = '" + event.get_soldOut() + "', " +
-                    "location = '" + event.get_location() + "', " +
+                    "title = " + varCharColumn(event.get_title()) + ", " +
+                    "open_doors = " + dateTimeColumn(event.get_openDoors()) + ", " +
+                    "`description` = " + varCharColumn(event.get_description()) + ", " +
+                    "is_voluntary = " + platoColumn(event.get_voluntary()) + ", " +
+                    "is_public = " + platoColumn(event.get_public()) + ", " +
+                    "is_cancelled = " + platoColumn(event.get_cancelled()) + ", " +
+                    "is_sold_out = " + platoColumn(event.get_soldOut()) + ", " +
+                    "location = " + varCharColumn(event.get_location()) + ", " +
                     "price = " + event.get_price() + ", " +
-                    "tickets_url = '" + event.get_ticketsURL() + "', " +
+                    "tickets_url = " + varCharColumn(event.get_ticketsURL()) + ", " +
                     "venue_id = " + event.get_venue().get_primaryId() + " " +
                 "WHERE id = " + event.get_primaryId() + "; ";
 
@@ -211,13 +212,13 @@ public class EventRepository extends Repository {
                     ") " +
                     "VALUES(" +
                         (idExists ? gig.get_primaryId()+"," : "") +
-                        gig.get_event().get_primaryId() + ",'" +
-                        gig.get_start() + "','" +
-                        gig.get_end() + "'," +
+                        gig.get_event().get_primaryId() + "," +
+                        dateTimeColumn(gig.get_start()) + "," +
+                        dateTimeColumn(gig.get_end()) + "," +
                     "NOW()) " +
                     "ON DUPLICATE KEY UPDATE " +
-                        "`start` = '" + gig.get_start() + "', " +
-                        "`end` = '" + gig.get_end() + "'" +
+                        "`start` = " + dateTimeColumn(gig.get_start()) + ", " +
+                        "`end` = " + dateTimeColumn(gig.get_end()) + "" +
                     "; ";
 
             //TODO Add timestamp to database table of acts
@@ -232,7 +233,7 @@ public class EventRepository extends Repository {
                         "); ";
         }
 
-        return edit(sql + upsertRequestSQL(event.get_requests()), false);
+        return edit(sql + upsertRequestSQL(event.get_requests()));
     }
 
     /**
@@ -254,14 +255,14 @@ public class EventRepository extends Repository {
                     ") " +
                     "VALUES(" +
                         request.get_user().get_primaryId() + "," +
-                        request.get_event().get_primaryId() + ",'" +
-                        request.get_approved().get_argument() + "','" +
-                        request.get_message() + "'," +
+                        request.get_event().get_primaryId() + "," +
+                        platoColumn(request.get_approved()) + "," +
+                        varCharColumn(request.get_message()) + "," +
                     "NOW()); " +
                     "ON DUPLICATE KEY UPDATE " +
-                        "is_approved = '" + request.get_approved().get_argument() + "' " +
-                        "message = '" + request.get_message() + "' " +
-                    "; ";
+                        "is_approved = " + platoColumn(request.get_approved()) + " " +
+                        "message = " + varCharColumn(request.get_message()) +
+                    ";";
         return sql;
     }
 
@@ -294,12 +295,12 @@ public class EventRepository extends Repository {
                     ") " +
                     "VALUES(" +
                         participation.get_event().get_primaryId() + "," +
-                        participation.get_participant() + ",'" +
-                        participation.get_type() + "'" +
+                        participation.get_participant() + "," +
+                        varCharColumn(participation.get_type().toString()) +
                     "NOW()) " +
                     "ON DUPLICATE KEY UPDATE " +
-                        "`type` = '" + participation.get_type() +
-                    "'; ";
-        return (!sql.isEmpty() ? edit(sql,false) : false);
+                        "`type` = " + varCharColumn(participation.get_type().toString()) +
+                    "; ";
+        return (!sql.isEmpty() ? edit(sql) : false);
     }
 }
