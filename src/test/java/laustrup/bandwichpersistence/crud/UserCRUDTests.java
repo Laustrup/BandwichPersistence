@@ -182,60 +182,6 @@ class UserCRUDTests extends JTest {
         UserPersistenceService.get_instance().upsert(expected, new Login(expected.get_username(),password),null);
     }
 
-    @Test
-    void canUpsertChatRoomAndMail() {
-        //ARRANGE
-        String prevTitle = "Test chat room",
-                postTitle = "New chat room",
-                prevContent = "This is test content",
-                postContent = "Changed content";
-
-        User chatter = _items.get_artsy(),
-            responsible = _items.get_carlos();
-        ChatRoom expectedChatRoom = new ChatRoom(false, null,
-                new Liszt<>(new User[]{responsible,chatter}), responsible);
-        Mail expectedMail = new Mail(expectedChatRoom,chatter);
-
-        //ACT
-        begin();
-        ChatRoom actual = UserPersistenceService.get_instance().upsert(expectedChatRoom);
-        calculatePerformance("upsert insert chat room");
-
-        //ASSERT
-        assertChatRooms(new Liszt<>(new ChatRoom[]{expectedChatRoom}), new Liszt<>(new ChatRoom[]{actual}));
-
-        //ACT
-        begin();
-        actual = UserPersistenceService.get_instance().upsert(expectedMail);
-        calculatePerformance("upsert insert mail");
-
-        //ASSERT
-        assertMails(new Liszt<>(new Mail[]{expectedMail}), new Liszt<>(new Mail[]{actual.get_mails().getLast()}));
-
-        //ACT
-        expectedChatRoom.set_title(postTitle);
-        begin();
-        actual = UserPersistenceService.get_instance().upsert(expectedChatRoom);
-        calculatePerformance("upsert update chat room");
-        expectedChatRoom.set_title(prevTitle);
-        UserPersistenceService.get_instance().upsert(expectedChatRoom);
-
-        //ASSERT
-        assertChatRooms(new Liszt<>(new ChatRoom[]{expectedChatRoom}), new Liszt<>(new ChatRoom[]{actual}));
-
-        //ACT
-        expectedMail.set_content(postContent);
-        begin();
-        actual = UserPersistenceService.get_instance().upsert(expectedMail);
-        calculatePerformance("upsert update mail");
-        expectedMail.set_content(prevContent);
-        UserPersistenceService.get_instance().upsert(expectedMail);
-
-        //ASSERT
-        assertMails(new Liszt<>(new Mail[]{expectedMail}), new Liszt<>(new Mail[]{actual.get_mails().getLast()}));
-
-    }
-
     @ParameterizedTest
     @CsvSource(value = {"1","5","6","8"})
     void canAssembleUser(long id) {

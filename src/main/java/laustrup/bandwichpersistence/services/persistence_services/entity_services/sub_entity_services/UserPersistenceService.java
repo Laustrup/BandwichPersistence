@@ -53,10 +53,9 @@ public class UserPersistenceService {
             try {
                 if (set.isBeforeFirst())
                     set.next();
-                return Assembly.get_instance().finish(
-                        Assembly.get_instance().getChatRoomUnassembled(
-                                set.getLong("mails.chat_room_id"))
-                );
+                return mail.get_chatRoom().get_primaryId() > 0 ? Assembly.get_instance().finish(
+                        Assembly.get_instance().getChatRoomUnassembled(mail.get_chatRoom().get_primaryId())) :
+                        Assembly.get_instance().getUser(mail.get_author().get_primaryId()).get_chatRooms().getLast();
             } catch (SQLException e) {
                 Printer.get_instance().print("Couldn't get ChatRoom of upserted Mail...",e);
             }

@@ -228,8 +228,8 @@ public class Asserter {
                 Mail expected = expectations.get(i),
                         actual = actuals.get(i);
                 assertEquals(expected.get_primaryId(),actual.get_primaryId());
-                assertEquals(expected.get_chatRoom().toString(),actual.toString());
-                assertEquals(expected.get_author().toString(),actual.toString());
+                assertEquals(expected.get_chatRoom().toString(),actual.get_chatRoom().toString());
+                assertEquals(expected.get_author().toString(),actual.get_author().toString());
                 assertEquals(expected.get_content(),actual.get_content());
                 assertEquals(expected.is_sent(),actual.is_sent());
                 assertEquals(expected.get_edited().toString(),actual.get_edited().toString());
