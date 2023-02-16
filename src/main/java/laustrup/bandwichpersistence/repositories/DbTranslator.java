@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 /**
  * Is used for having methods, that will handle some Java and SQL issues.
  */
-public class DbTranslator {
+public abstract class DbTranslator {
 
     /**
      * Will set the value as a VARCHAR, surrounded with '', but in case it is null,

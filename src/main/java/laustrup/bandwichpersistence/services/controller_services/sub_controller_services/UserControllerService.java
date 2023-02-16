@@ -12,6 +12,7 @@ import laustrup.bandwichpersistence.models.users.subscriptions.Card;
 import laustrup.bandwichpersistence.services.DTOService;
 import laustrup.bandwichpersistence.services.controller_services.ControllerService;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembly;
+import laustrup.bandwichpersistence.services.persistence_services.entity_services.sub_entity_services.ChatPersistenceService;
 import laustrup.bandwichpersistence.services.persistence_services.entity_services.sub_entity_services.UserPersistenceService;
 import laustrup.bandwichpersistence.utilities.Liszt;
 
@@ -111,7 +112,7 @@ public class UserControllerService extends ControllerService<UserDTO> {
      * @return The created ResponseEntity of a Response with the current state of Receiver.
      */
     public ResponseEntity<Response<UserDTO>> upsert(Bulletin bulletin) {
-        return entityContent(DTOService.get_instance().convertToDTO(UserPersistenceService.get_instance().upsert(bulletin)));
+        return entityContent(DTOService.get_instance().convertToDTO(ChatPersistenceService.get_instance().upsert(bulletin)));
     }
 
     /**

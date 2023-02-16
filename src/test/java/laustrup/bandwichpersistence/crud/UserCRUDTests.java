@@ -39,31 +39,6 @@ class UserCRUDTests extends JTest {
     }
 
     @Test
-    void canUpsertBulletin() {
-        //ARRANGE
-        Bulletin expected = _items.generateBulletins(Assembly.get_instance().getEvent(1))[0];
-
-        //ACT
-        begin();
-        User user = UserPersistenceService.get_instance().upsert(expected);
-        calculatePerformance("upsert insert bulletin");
-
-        //ASSERT
-        assertBulletins(new Liszt<>(new Bulletin[]{expected}), new Liszt<>(new Bulletin[]{user.get_bulletins().getLast()}));
-
-        //ARRANGE
-        expected.set_content("This is new content");
-
-        //ACT
-        begin();
-        user = UserPersistenceService.get_instance().upsert(expected);
-        calculatePerformance("upsert update bulletin");
-
-        //ASSERT
-        assertBulletins(new Liszt<>(new Bulletin[]{expected}), new Liszt<>(new Bulletin[]{user.get_bulletins().getLast()}));
-    }
-
-    @Test
     void canUpsertRating() {
         //ARRANGE
         Rating expected = new Rating(

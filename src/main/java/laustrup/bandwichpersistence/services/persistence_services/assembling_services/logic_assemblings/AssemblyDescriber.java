@@ -9,6 +9,7 @@ import laustrup.bandwichpersistence.models.events.Participation;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.sub_users.Performer;
 import laustrup.bandwichpersistence.models.users.sub_users.participants.Participant;
+import laustrup.bandwichpersistence.repositories.sub_repositories.ChatRepository;
 import laustrup.bandwichpersistence.repositories.sub_repositories.EventRepository;
 import laustrup.bandwichpersistence.repositories.sub_repositories.ModelRepository;
 import laustrup.bandwichpersistence.repositories.sub_repositories.UserRepository;
@@ -70,7 +71,7 @@ public class AssemblyDescriber {
             _ids.add(chatRoom.get_primaryId());
 
         chatRooms = new Liszt<>();
-        ResultSet set = ModelRepository.get_instance().chatRooms(_ids);
+        ResultSet set = ChatRepository.get_instance().chatRooms(_ids);
 
         if (set != null) {
             for (long id : _ids) {

@@ -42,43 +42,6 @@ public class UserPersistenceService {
     private UserPersistenceService() {}
 
     /**
-     * Will upsert a Mail.
-     * Closes database connection and sets Mail into assembled.
-     * @param mail The Mail that will be upserted.
-     * @return The ChatRoom of the Mail from the database.
-     */
-    public ChatRoom upsert(Mail mail) {
-        ResultSet set = ModelRepository.get_instance().upsert(mail);
-        if (set != null) {
-            try {
-                if (set.isBeforeFirst())
-                    set.next();
-                return mail.get_chatRoom().get_primaryId() > 0 ? Assembly.get_instance().finish(
-                        Assembly.get_instance().getChatRoomUnassembled(mail.get_chatRoom().get_primaryId())) :
-                        Assembly.get_instance().getUser(mail.get_author().get_primaryId()).get_chatRooms().getLast();
-            } catch (SQLException e) {
-                Printer.get_instance().print("Couldn't get ChatRoom of upserted Mail...",e);
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Will upsert a ChatRoom and inserts its chatters if they exist.
-     * Closes database connection and sets ChatRoom into assembled.
-     * @param chatRoom The ChatRoom that will be upserted.
-     * @return The ChatRoom from the database.
-     */
-    public ChatRoom upsert(ChatRoom chatRoom) {
-        Long id = ModelRepository.get_instance().upsert(chatRoom);
-        if (id!=null)
-            return Assembly.get_instance().finish(
-                    Assembly.get_instance().getChatRoomUnassembled(id)
-            );
-        return null;
-    }
-
-    /**
      * Will delete a User and connections from repository will be closed.
      * @param user The User that will be deleted.
      * @return A Plato with true truth if success, otherwise false with a message.
@@ -89,19 +52,6 @@ public class UserPersistenceService {
         Plato status = new Plato(false);
         status.set_message("Couldn't delete " + user.get_title() + "...");
         return status;
-    }
-
-    /**
-     * Will upsert a Bulletin of a User.
-     * Closes database connection and sets User into assembled.
-     * @param bulletin The Bulletin that will be upserted.
-     * @return The Receiver from the database.
-     */
-    public User upsert(Bulletin bulletin) {
-        if (ModelRepository.get_instance().upsert(bulletin, true))
-            return Assembly.get_instance().getUser(bulletin.get_receiver().get_primaryId());
-        ModelRepository.get_instance().closeConnection();
-        return (User) bulletin.get_receiver();
     }
 
     /**

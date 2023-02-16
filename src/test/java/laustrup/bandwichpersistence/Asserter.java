@@ -438,4 +438,13 @@ public class Asserter {
             for (int i = 0; i < expectations.length; i++)
                 assertPerformers(expectations[i], actuals[i]);
     }
+
+    /**
+     * Is used to determine whether a statement is true.
+     * Uses the assertTrue method.
+     * @param isTrue A statement or value that must be true.
+     */
+    protected void asserting(boolean isTrue) {
+        assertTrue(isTrue);
+    }
 }

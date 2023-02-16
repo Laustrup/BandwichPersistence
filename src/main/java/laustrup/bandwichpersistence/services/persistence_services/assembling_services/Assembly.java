@@ -7,6 +7,7 @@ import laustrup.bandwichpersistence.models.users.Login;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.repositories.sub_repositories.ArtistRepository;
 import laustrup.bandwichpersistence.repositories.DbGate;
+import laustrup.bandwichpersistence.repositories.sub_repositories.ChatRepository;
 import laustrup.bandwichpersistence.repositories.sub_repositories.ModelRepository;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.sub_assemblings.EventAssembly;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.sub_assemblings.user_assemblings.UserAssembly;
@@ -103,7 +104,7 @@ public class Assembly extends Assembler {
     public ChatRoom getChatRoomUnassembled(long id) {
         try {
             return _describer.describeChatRooms(_handler.handleChatRooms(
-                    ModelRepository.get_instance().chatRooms(new Liszt<>(new Long[]{id})),
+                    ChatRepository.get_instance().chatRooms(new Liszt<>(new Long[]{id})),
                     new Liszt<>())
             ).get(1);
         } catch (SQLException e) {

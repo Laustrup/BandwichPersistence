@@ -4,6 +4,7 @@ import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
 import laustrup.bandwichpersistence.models.events.Event;
 import laustrup.bandwichpersistence.models.events.Participation;
 import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
+import laustrup.bandwichpersistence.repositories.sub_repositories.ChatRepository;
 import laustrup.bandwichpersistence.repositories.sub_repositories.EventRepository;
 import laustrup.bandwichpersistence.repositories.sub_repositories.ModelRepository;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembly;
@@ -131,7 +132,7 @@ public class EventPersistenceService extends EntityService<Event> {
      * @return The Event from the database.
      */
     public Event upsert(Bulletin bulletin) {
-        if (ModelRepository.get_instance().upsert(bulletin, false))
+        if (ChatRepository.get_instance().upsert(bulletin, false))
             return Assembly.get_instance().getEvent(bulletin.get_receiver().get_primaryId());
         ModelRepository.get_instance().closeConnection();
         return (Event) bulletin.get_receiver();

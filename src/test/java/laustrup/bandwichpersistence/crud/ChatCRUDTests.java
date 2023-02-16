@@ -2,9 +2,11 @@ package laustrup.bandwichpersistence.crud;
 
 import laustrup.bandwichpersistence.JTest;
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
+import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
 import laustrup.bandwichpersistence.models.chats.messages.Mail;
 import laustrup.bandwichpersistence.models.users.User;
-import laustrup.bandwichpersistence.services.persistence_services.entity_services.sub_entity_services.UserPersistenceService;
+import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembly;
+import laustrup.bandwichpersistence.services.persistence_services.entity_services.sub_entity_services.ChatPersistenceService;
 import laustrup.bandwichpersistence.utilities.Liszt;
 
 import org.junit.jupiter.api.Test;
@@ -12,7 +14,7 @@ import org.junit.jupiter.api.Test;
 public class ChatCRUDTests extends JTest {
 
     @Test
-    void canUpsertChatRoomAndMail() {
+    void canCRUDChatRoomAndMail() {
         //ARRANGE
         String prevTitle,
                 postTitle = "New chat room",
@@ -81,6 +83,9 @@ public class ChatCRUDTests extends JTest {
         //RE ARRANGE
         expectedMail.set_content(prevContent);
         actualChatRoom = canUpdate(expectedMail);
+
+        //ACT ASSERT
+        asserting(canDelete(expectedChatRoom));
     }
 
     /**
@@ -90,7 +95,7 @@ public class ChatCRUDTests extends JTest {
      */
     private ChatRoom canInsert(ChatRoom expected) {
         begin();
-        ChatRoom actual = UserPersistenceService.get_instance().upsert(expected);
+        ChatRoom actual = ChatPersistenceService.get_instance().upsert(expected);
         calculatePerformance("inserting chat room");
         return actual;
     }
@@ -102,7 +107,7 @@ public class ChatCRUDTests extends JTest {
      */
     private ChatRoom canInsert(Mail expected) {
         begin();
-        ChatRoom chatRoom = UserPersistenceService.get_instance().upsert(expected);
+        ChatRoom chatRoom = ChatPersistenceService.get_instance().upsert(expected);
         calculatePerformance("insert mail");
         return chatRoom;
     }
@@ -114,7 +119,7 @@ public class ChatCRUDTests extends JTest {
      */
     private ChatRoom canUpdate(ChatRoom expected) {
         begin();
-        ChatRoom actual = UserPersistenceService.get_instance().upsert(expected);
+        ChatRoom actual = ChatPersistenceService.get_instance().upsert(expected);
         calculatePerformance("update chat room");
         return actual;
     }
@@ -126,8 +131,45 @@ public class ChatCRUDTests extends JTest {
      */
     private ChatRoom canUpdate(Mail expected) {
         begin();
-        ChatRoom actual = UserPersistenceService.get_instance().upsert(expected);
+        ChatRoom actual = ChatPersistenceService.get_instance().upsert(expected);
         calculatePerformance("upsert update mail");
         return actual;
+    }
+
+    /**
+     * Acts the delete of ChatRoom for the delete purpose.
+     * @param chatRoom The ChatRoom that will be used for the delete method.
+     * @return The result of the act, where the Plato argument is as a boolean truth.
+     */
+    private boolean canDelete(ChatRoom chatRoom) {
+        begin();
+        boolean result = ChatPersistenceService.get_instance().delete(chatRoom.get_primaryId()).get_truth();
+        calculatePerformance("Deleting " + chatRoom.get_title());
+        return result;
+    }
+
+    @Test
+    void canUpsertBulletin() {
+        //ARRANGE
+        Bulletin expected = _items.generateBulletins(Assembly.get_instance().getEvent(1))[0];
+
+        //ACT
+        begin();
+        User user = ChatPersistenceService.get_instance().upsert(expected);
+        calculatePerformance("upsert insert bulletin");
+
+        //ASSERT
+        assertBulletins(new Liszt<>(new Bulletin[]{expected}), new Liszt<>(new Bulletin[]{user.get_bulletins().getLast()}));
+
+        //ARRANGE
+        expected.set_content("This is new content");
+
+        //ACT
+        begin();
+        user = ChatPersistenceService.get_instance().upsert(expected);
+        calculatePerformance("upsert update bulletin");
+
+        //ASSERT
+        assertBulletins(new Liszt<>(new Bulletin[]{expected}), new Liszt<>(new Bulletin[]{user.get_bulletins().getLast()}));
     }
 }

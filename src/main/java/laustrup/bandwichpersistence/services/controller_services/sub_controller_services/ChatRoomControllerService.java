@@ -5,8 +5,10 @@ import laustrup.bandwichpersistence.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.models.chats.messages.Mail;
 import laustrup.bandwichpersistence.models.dtos.chats.ChatRoomDTO;
 import laustrup.bandwichpersistence.services.controller_services.ControllerService;
+import laustrup.bandwichpersistence.services.persistence_services.entity_services.sub_entity_services.ChatPersistenceService;
 import laustrup.bandwichpersistence.services.persistence_services.entity_services.sub_entity_services.UserPersistenceService;
 
+import laustrup.bandwichpersistence.utilities.Plato;
 import org.springframework.http.ResponseEntity;
 
 public class ChatRoomControllerService extends ControllerService<ChatRoomDTO> {
@@ -35,7 +37,7 @@ public class ChatRoomControllerService extends ControllerService<ChatRoomDTO> {
      * @return A ResponseEntity with the Response of the ChatRoom of the Mail and the HttpStatus.
      */
     public ResponseEntity<Response<ChatRoomDTO>> upsert(Mail mail) {
-        return entityContent(new ChatRoomDTO(UserPersistenceService.get_instance().upsert(mail)));
+        return entityContent(new ChatRoomDTO(ChatPersistenceService.get_instance().upsert(mail)));
     }
 
     /**
@@ -46,6 +48,16 @@ public class ChatRoomControllerService extends ControllerService<ChatRoomDTO> {
      * @return A ResponseEntity with the Response of the ChatRoom and the HttpStatus.
      */
     public ResponseEntity<Response<ChatRoomDTO>> upsert(ChatRoom chatRoom) {
-        return entityContent(new ChatRoomDTO(UserPersistenceService.get_instance().upsert(chatRoom)));
+        return entityContent(new ChatRoomDTO(ChatPersistenceService.get_instance().upsert(chatRoom)));
+    }
+
+    /**
+     * Will use the ChatPersistenceService to delete the ChatRoom with its Mails that
+     * matches the id in the database.
+     * @param id The id of the ChatRoom that will be deleted.
+     * @return The Plato argument of the result in a Response of a ResponseEntity.
+     */
+    public ResponseEntity<Response<Plato.Argument>> delete(long id) {
+        return platoContent(ChatPersistenceService.get_instance().delete(id));
     }
 }
