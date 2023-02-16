@@ -75,9 +75,17 @@ public class ChatPersistenceService {
      * @param id The id Of the ChatRoom that will be deleted.
      * @return The Plato response of the result.
      */
-    public Plato delete(long id) {
-        return ChatRepository.get_instance().delete(id);
+    public Plato deleteChatRoom(long id) {
+        return ChatRepository.get_instance().deleteChatRoom(id);
     }
+
+    /**
+     * Uses the ChatRepository to delete the Bulletin
+     * with the ids that matches in the database.
+     * @param id The id Of the Bulletin that will be deleted.
+     * @return The Plato response of the result.
+     */
+    public Plato deleteBulletin(long id) {return ChatRepository.get_instance().deleteBulletin(id);}
 
     /**
      * Will upsert a Bulletin of a User.
@@ -86,7 +94,7 @@ public class ChatPersistenceService {
      * @return The Receiver from the database.
      */
     public User upsert(Bulletin bulletin) {
-        if (ChatRepository.get_instance().upsert(bulletin, true))
+        if (ChatRepository.get_instance().upsert(bulletin))
             return Assembly.get_instance().getUser(bulletin.get_receiver().get_primaryId());
         ModelRepository.get_instance().closeConnection();
         return (User) bulletin.get_receiver();

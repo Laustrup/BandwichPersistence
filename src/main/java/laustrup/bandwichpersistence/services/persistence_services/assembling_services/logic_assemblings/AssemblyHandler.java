@@ -194,8 +194,8 @@ public class AssemblyHandler {
         return chatRooms;
     }
 
-    public Liszt<Bulletin> handleBulletins(ResultSet set, Liszt<Bulletin> bulletins, boolean forEvents) throws SQLException {
-        String table = forEvents ? "event_bulletins" : "user_bulletins";
+    public Liszt<Bulletin> handleBulletins(ResultSet set, Liszt<Bulletin> bulletins) throws SQLException {
+        String table = "bulletins";
 
         if (set.getLong(table+".id") > 0) {
             Bulletin bulletin = new Bulletin(set.getLong(table+".id"),

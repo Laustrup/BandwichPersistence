@@ -76,7 +76,7 @@ public class BandAssembly extends UserAssembler {
                 gigs = _handler.handleGigs(set, gigs);
                 _events = _handler.handleEvents(set, _events);
                 _chatRooms = _handler.handleChatRooms(set, _chatRooms);
-                _bulletins = _handler.handleBulletins(set, _bulletins, false);
+                _bulletins = _handler.handleBulletins(set, _bulletins);
 
                 if (set.getLong("followings.idol_id") == _id)
                     fans = _handler.handleFans(set, fans);

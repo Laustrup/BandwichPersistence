@@ -149,7 +149,7 @@ public class EventAssembly extends Assembler {
                                 ? new Artist(set.getLong("requests.user_id"))
                                 : new Venue(set.getLong("requests.user_id")));
                 participations = _handler.handleParticipations(set, participations);
-                bulletins = _handler.handleBulletins(set, bulletins, true);
+                bulletins = _handler.handleBulletins(set, bulletins);
                 albums = _handler.handleAlbums(set, albums);
             } while (set.next());
 

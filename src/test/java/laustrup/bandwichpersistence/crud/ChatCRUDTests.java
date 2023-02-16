@@ -143,7 +143,7 @@ public class ChatCRUDTests extends JTest {
      */
     private boolean canDelete(ChatRoom chatRoom) {
         begin();
-        boolean result = ChatPersistenceService.get_instance().delete(chatRoom.get_primaryId()).get_truth();
+        boolean result = ChatPersistenceService.get_instance().deleteChatRoom(chatRoom.get_primaryId()).get_truth();
         calculatePerformance("Deleting " + chatRoom.get_title());
         return result;
     }

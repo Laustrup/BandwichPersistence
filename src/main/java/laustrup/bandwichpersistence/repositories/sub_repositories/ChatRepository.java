@@ -63,18 +63,17 @@ public class ChatRepository extends Repository {
         StringBuilder where = new StringBuilder("WHERE ");
 
         for (int i = 1; i <= ids.size(); i++) {
-            where.append("user_bulletins.id = ").append(ids.get(i));
+            where.append("bulletins.id = ").append(ids.get(i));
             if (i < ids.size())
                 where.append(" OR ");
         }
 
-        String table = (isUser ? "user_bulletins " : "event_bulletins ");
+        String table = (isUser ? "bulletins " : "bulletins ");
         return read("SELECT * FROM " + table +
                 "INNER JOIN users ON " + table +".author_id = users.id OR " + table + ".receiver_id = users.id " +
                 where + ";");
     }
 
-    //TODO Make bulletin tables the same.
     /**
      * Upserts Bulletin depending on the id.
      * This means it will insert the values of the Bulletin if they don't exist,
@@ -83,32 +82,32 @@ public class ChatRepository extends Repository {
      * @param bulletin The Bulletin that will have influence on the database table.
      * @return True if any rows have been affected.
      */
-    public boolean upsert(Bulletin bulletin, boolean ofUser) {
+    public boolean upsert(Bulletin bulletin) {
         boolean idExists = bulletin.get_primaryId() > 0;
-        return edit("INSERT INTO " + (ofUser ? "user_bulletins" : "event_bulletins") + "(" +
-                (idExists ? "id," : "") +
-                "author_id," +
-                "content," +
-                "is_sent," +
-                "is_edited," +
-                "is_public," +
-                "receiver_id," +
-                "`timestamp`" +
+        return edit("INSERT INTO bulletins(" +
+                    (idExists ? "id," : "") +
+                    "author_id," +
+                    "content," +
+                    "is_sent," +
+                    "is_edited," +
+                    "is_public," +
+                    "receiver_id," +
+                    "`timestamp`" +
                 ") " +
                 "VALUES(" +
-                (idExists ? bulletin.get_primaryId()+"," : "") +
-                bulletin.get_author().get_primaryId() + "," +
-                varCharColumn(bulletin.get_content()) + "," +
-                bulletin.is_sent() + "," +
-                platoColumn(bulletin.get_edited()) + "," +
-                bulletin.is_public() + "," +
-                bulletin.get_receiver().get_primaryId() + "," +
-                "NOW()) " +
+                    (idExists ? bulletin.get_primaryId()+"," : "") +
+                    bulletin.get_author().get_primaryId() + "," +
+                    varCharColumn(bulletin.get_content()) + "," +
+                    bulletin.is_sent() + "," +
+                    platoColumn(bulletin.get_edited()) + "," +
+                    bulletin.is_public() + "," +
+                    bulletin.get_receiver().get_primaryId() + "," +
+                    "NOW()) " +
                 "ON DUPLICATE KEY UPDATE " +
-                "content = " + varCharColumn(bulletin.get_content()) + "," +
-                "is_sent = " + bulletin.is_sent() + "," +
-                "is_edited = " + platoColumn(bulletin.get_edited()) + "," +
-                "is_public = " + bulletin.is_public() +
+                    "content = " + varCharColumn(bulletin.get_content()) + "," +
+                    "is_sent = " + bulletin.is_sent() + "," +
+                    "is_edited = " + platoColumn(bulletin.get_edited()) + "," +
+                    "is_public = " + bulletin.is_public() +
                 ";");
     }
 
@@ -229,10 +228,21 @@ public class ChatRepository extends Repository {
     /**
      * Will delete ChatRooms, where the id matches.
      * Will also delete the Mails in the ChatRoom.
+     * Closes connection.
      * @param id The id of the ChatRoom that will be deleted.
      * @return A Plato object with the boolean result of the act.
      */
-    public Plato delete(long id) {
+    public Plato deleteChatRoom(long id) {
         return new Plato(delete(id, "chat_rooms", "id", true));
+    }
+
+    /**
+     * Will delete Bulletins, where the id matches.
+     * Closes connection.
+     * @param id The id of the Bulletin that will be deleted.
+     * @return A Plato object with the boolean result of the act.
+     */
+    public Plato deleteBulletin(long id) {
+        return new Plato(delete(id, "bulletins","id",true));
     }
 }

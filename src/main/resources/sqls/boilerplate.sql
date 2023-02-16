@@ -17,8 +17,7 @@ DROP TABLE IF EXISTS album_items;
 DROP TABLE IF EXISTS albums;
 DROP TABLE IF EXISTS ratings;
 DROP TABLE IF EXISTS requests;
-DROP TABLE IF EXISTS event_bulletins;
-DROP TABLE IF EXISTS user_bulletins;
+DROP TABLE IF EXISTS bulletins;
 DROP TABLE IF EXISTS mails;
 DROP TABLE IF EXISTS chatters;
 DROP TABLE IF EXISTS chat_rooms;
@@ -231,7 +230,7 @@ CREATE TABLE mails(
     FOREIGN KEY(chat_room_id) REFERENCES chat_rooms(id) ON DELETE CASCADE
 );
 
-CREATE TABLE user_bulletins(
+CREATE TABLE bulletins(
     id BIGINT(20) NOT NULL AUTO_INCREMENT,
     author_id BIGINT(20) NOT NULL,
     content VARCHAR(1000),
@@ -242,31 +241,14 @@ CREATE TABLE user_bulletins(
         'UNDEFINED'
         ),
     is_public BOOL NOT NULL,
-    receiver_id BIGINT(20) NOT NULL,
+    user_id BIGINT(20),
+    event_id BIGINT(20),
     `timestamp` DATETIME NOT NULL,
 
     PRIMARY KEY(id),
     FOREIGN KEY(author_id) REFERENCES users(id),
-    FOREIGN KEY(receiver_id) REFERENCES users(id) ON DELETE CASCADE
-);
-
-CREATE TABLE event_bulletins(
-    id BIGINT(20) NOT NULL AUTO_INCREMENT,
-    author_id BIGINT(20) NOT NULL,
-    content VARCHAR(1000),
-    is_sent BOOL NOT NULL,
-    is_edited ENUM(
-        'FALSE',
-        'TRUE',
-        'UNDEFINED'
-        ),
-    is_public BOOL NOT NULL,
-    receiver_id BIGINT(20) NOT NULL,
-    `timestamp` DATETIME NOT NULL,
-
-    PRIMARY KEY(id),
-    FOREIGN KEY(author_id) REFERENCES users(id),
-    FOREIGN KEY(receiver_id) REFERENCES `events`(id) ON DELETE CASCADE
+    FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY(event_id) REFERENCES events(id) ON DELETE CASCADE
 );
 
 CREATE TABLE requests(
