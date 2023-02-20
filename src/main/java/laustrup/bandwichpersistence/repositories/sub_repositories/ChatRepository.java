@@ -3,6 +3,7 @@ package laustrup.bandwichpersistence.repositories.sub_repositories;
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
 import laustrup.bandwichpersistence.models.chats.messages.Mail;
+import laustrup.bandwichpersistence.models.events.Event;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.repositories.Repository;
 import laustrup.bandwichpersistence.utilities.Liszt;
@@ -68,10 +69,10 @@ public class ChatRepository extends Repository {
                 where.append(" OR ");
         }
 
-        String table = (isUser ? "bulletins " : "bulletins ");
+        String table = "bulletins";
         return read("SELECT * FROM " + table +
-                "INNER JOIN users ON " + table +".author_id = users.id OR " + table + ".receiver_id = users.id " +
-                where + ";");
+                " INNER JOIN users ON " + table +".author_id = users.id OR " + table + (isUser ? ".user_id" : ".event_id")
+                + " = users.id " + where + ";");
     }
 
     /**
@@ -91,7 +92,7 @@ public class ChatRepository extends Repository {
                     "is_sent," +
                     "is_edited," +
                     "is_public," +
-                    "receiver_id," +
+                    (bulletin.get_receiver().getClass() == Event.class ? "event_id," : "user_id,") +
                     "`timestamp`" +
                 ") " +
                 "VALUES(" +

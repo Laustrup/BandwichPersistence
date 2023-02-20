@@ -271,6 +271,7 @@ CREATE TABLE ratings(
     appointed_id BIGINT(20) NOT NULL,
     judge_id BIGINT(20) NOT NULL,
     `value` INT(1) NOT NULL,
+    `comment` VARCHAR(500) NOT NULL,
     `timestamp` DATETIME NOT NULL,
 
     PRIMARY KEY(appointed_id, judge_id),

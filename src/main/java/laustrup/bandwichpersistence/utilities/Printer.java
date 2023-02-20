@@ -10,9 +10,15 @@ import java.util.Collection;
 public class Printer implements IPrinter {
 
     /**
+     * The border content, used to determine the border.
+     */
+    private final String _border = "-----------------------------------------------------------------------------------" +
+            "-------------------------------------------------------";
+    /**
      * Is used to be reused as a border for beginning and ending of a print.
      */
-    private final String _border = "\n\n-----------------------------------------------------------------------------------------\n\n";
+    private final String _startBorder = "\n++ " + _border + "\n\n",
+        _endBorder = "\n\n++ " + _border + "\n";
 
     /**
      * Singleton instance of the Printer.
@@ -27,9 +33,9 @@ public class Printer implements IPrinter {
     }
 
     @Override
-    public void print(String content) { System.out.println(_border + content + _border); }
+    public void print(String content) { System.out.println(_startBorder + content + _endBorder); }
     @Override
-    public void print(String content, Exception ex) { System.err.println(_border + content + "\n\n" + ex + _border); }
+    public void print(String content, Exception ex) { System.err.println(_startBorder + content + "\n\n" + ex + _endBorder); }
 
     @Override
     public void print(Object[] array) {

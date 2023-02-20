@@ -44,11 +44,11 @@ public class Rating extends Model {
     private String _comment;
 
     public Rating(RatingDTO rating) throws InputMismatchException {
-        super(rating.getAppointed().getPrimaryId(), rating.getJudge().getPrimaryId(),
-                rating.getAppointed().getUsername()+"-"+rating.getJudge().getUsername(), rating.getTimestamp());
-        _value = set_value(rating.getValue());
-        _appointed = DTOService.get_instance().convertFromDTO(rating.getAppointed());
-        _judge = DTOService.get_instance().convertFromDTO(rating.getJudge());
+        super(rating.get_appointed().getPrimaryId(), rating.get_judge().getPrimaryId(),
+                rating.get_appointed().getUsername()+"-"+rating.get_judge().getUsername(), rating.getTimestamp());
+        _value = set_value(rating.get_value());
+        _appointed = DTOService.get_instance().convertFromDTO(rating.get_appointed());
+        _judge = DTOService.get_instance().convertFromDTO(rating.get_judge());
     }
     public Rating(int value) {
         _value = value;
@@ -62,6 +62,12 @@ public class Rating extends Model {
 
     public Rating(int value, long appointedId, long judgeId, LocalDateTime timestamp) throws InputMismatchException {
         super(appointedId, judgeId, appointedId+"-"+judgeId, timestamp);
+        _value = set_value(value);
+    }
+
+    public Rating(int value, long appointedId, long judgeId, String comment, LocalDateTime timestamp) throws InputMismatchException {
+        super(appointedId, judgeId, appointedId+"-"+judgeId, timestamp);
+        _comment = comment;
         _value = set_value(value);
     }
 

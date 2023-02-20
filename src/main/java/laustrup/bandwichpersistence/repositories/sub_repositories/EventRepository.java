@@ -120,13 +120,13 @@ public class EventRepository extends Repository {
                 "LEFT JOIN acts ON gigs.id = acts.gig_id " +
                 "LEFT JOIN requests ON `events`.id = requests.event_id " +
                 "LEFT JOIN participations ON `events`.id = participations.event_id " +
-                "LEFT JOIN event_bulletins ON `events`.id = event_bulletins.receiver_id " +
+                "LEFT JOIN bulletins ON `events`.id = bulletins.event_id " +
                 "LEFT JOIN albums ON `events`.id = albums.event_id " +
                 "LEFT JOIN album_items ON albums.id = album_items.album_id " +
                 "LEFT JOIN users ON `events`.venue_id = users.id " +
                     "OR acts.user_id = users.id " +
                         "OR requests.user_id = users.id OR participations.participant_id = users.id " +
-                            "OR event_bulletins.author_id = users.id " +
+                            "OR bulletins.author_id = users.id " +
                 where + ";");
     }
 

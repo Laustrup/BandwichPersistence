@@ -3,14 +3,10 @@ package laustrup.bandwichpersistence.repositories.sub_repositories;
 import laustrup.bandwichpersistence.models.Rating;
 import laustrup.bandwichpersistence.models.albums.Album;
 import laustrup.bandwichpersistence.models.albums.AlbumItem;
-import laustrup.bandwichpersistence.models.chats.ChatRoom;
-import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
-import laustrup.bandwichpersistence.models.chats.messages.Mail;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
 import laustrup.bandwichpersistence.models.users.subscriptions.Subscription;
 import laustrup.bandwichpersistence.repositories.Repository;
-import laustrup.bandwichpersistence.utilities.Liszt;
 import laustrup.bandwichpersistence.utilities.Printer;
 
 import java.sql.ResultSet;
@@ -151,15 +147,18 @@ public class ModelRepository extends Repository {
                     "appointed_id," +
                     "judge_id," +
                     "`value`," +
+                    "`comment`," +
                     "`timestamp`" +
                 ") " +
                 "VALUES(" +
                     rating.get_appointed().get_primaryId() + "," +
                     rating.get_judge().get_primaryId() + "," +
                     rating.get_value() + "," +
-                "NOW()) " +
+                    varCharColumn(rating.get_comment()) + "," +
+                    "NOW()) " +
                 "ON DUPLICATE KEY UPDATE " +
                     "`value` = " + rating.get_value() +
+                    "`comment` = " + varCharColumn(rating.get_comment()) +
                 ";");
     }
 

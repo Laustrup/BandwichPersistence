@@ -95,6 +95,7 @@ public class AssemblyHandler {
             Rating rating = new Rating(set.getInt(table+".value"),
                     set.getLong(table+".appointed_id"),
                     set.getLong(table+".judge_id"),
+                    set.getString(table+".comment"),
                     TimeService.get_instance().convertFromDatabase(set,table+".timestamp"));
 
             if (!ratings.contains(rating.toString()))

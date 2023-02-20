@@ -96,7 +96,7 @@ public class ChatCRUDTests extends JTest {
     private ChatRoom canInsert(ChatRoom expected) {
         begin();
         ChatRoom actual = ChatPersistenceService.get_instance().upsert(expected);
-        calculatePerformance("inserting chat room");
+        calculatePerformance("inserting " + expected.get_title());
         return actual;
     }
 
@@ -108,7 +108,7 @@ public class ChatCRUDTests extends JTest {
     private ChatRoom canInsert(Mail expected) {
         begin();
         ChatRoom chatRoom = ChatPersistenceService.get_instance().upsert(expected);
-        calculatePerformance("insert mail");
+        calculatePerformance("inserting " + expected.get_title());
         return chatRoom;
     }
 
@@ -120,7 +120,7 @@ public class ChatCRUDTests extends JTest {
     private ChatRoom canUpdate(ChatRoom expected) {
         begin();
         ChatRoom actual = ChatPersistenceService.get_instance().upsert(expected);
-        calculatePerformance("update chat room");
+        calculatePerformance("updating " + expected.get_title());
         return actual;
     }
 
@@ -132,7 +132,7 @@ public class ChatCRUDTests extends JTest {
     private ChatRoom canUpdate(Mail expected) {
         begin();
         ChatRoom actual = ChatPersistenceService.get_instance().upsert(expected);
-        calculatePerformance("upsert update mail");
+        calculatePerformance("updating " + expected.get_title());
         return actual;
     }
 
@@ -143,33 +143,69 @@ public class ChatCRUDTests extends JTest {
      */
     private boolean canDelete(ChatRoom chatRoom) {
         begin();
-        boolean result = ChatPersistenceService.get_instance().deleteChatRoom(chatRoom.get_primaryId()).get_truth();
+        boolean act = ChatPersistenceService.get_instance().deleteChatRoom(chatRoom.get_primaryId()).get_truth();
         calculatePerformance("Deleting " + chatRoom.get_title());
-        return result;
+        return act;
     }
 
     @Test
-    void canUpsertBulletin() {
+    void canCrudBulletin() {
         //ARRANGE
         Bulletin expected = _items.generateBulletins(Assembly.get_instance().getEvent(1))[0];
 
         //ACT
-        begin();
-        User user = ChatPersistenceService.get_instance().upsert(expected);
-        calculatePerformance("upsert insert bulletin");
+        User user = canInsert(expected);
+        Bulletin actual = user.get_bulletins().getLast();
 
         //ASSERT
-        assertBulletins(new Liszt<>(new Bulletin[]{expected}), new Liszt<>(new Bulletin[]{user.get_bulletins().getLast()}));
+        assertBulletins(new Liszt<>(new Bulletin[]{expected}), new Liszt<>(new Bulletin[]{actual}));
 
-        //ARRANGE
+        //PRE ARRANGE
         expected.set_content("This is new content");
 
         //ACT
-        begin();
-        user = ChatPersistenceService.get_instance().upsert(expected);
-        calculatePerformance("upsert update bulletin");
+        actual = canUpdate(expected).get_bulletins().getLast();
 
         //ASSERT
-        assertBulletins(new Liszt<>(new Bulletin[]{expected}), new Liszt<>(new Bulletin[]{user.get_bulletins().getLast()}));
+        assertBulletins(new Liszt<>(new Bulletin[]{expected}), new Liszt<>(new Bulletin[]{actual}));
+
+        //ACT ASSERT
+        asserting(canDelete(expected));
+    }
+
+    /**
+     * Acts the upsert of Bulletin for the insert purpose.
+     * @param expected The Bulletin that will be used for the upsert method.
+     * @return The User that will receive the Bulletin.
+     */
+    private User canInsert(Bulletin expected) {
+        begin();
+        User user = ChatPersistenceService.get_instance().upsert(expected);
+        calculatePerformance("inserting " + expected.get_title());
+        return user;
+    }
+
+    /**
+     * Acts the upsert of Bulletin for the update purpose.
+     * @param bulletin The Bulletin that will be used for the upsert method.
+     * @return The User that will receive the Bulletin.
+     */
+    private User canUpdate(Bulletin bulletin) {
+        begin();
+        User user = ChatPersistenceService.get_instance().upsert(bulletin);
+        calculatePerformance("updating " + bulletin.get_title());
+        return user;
+    }
+
+    /**
+     * Acts the delete of Bulletin for the delete purpose.
+     * @param bulletin The Bulletin that will be used for the delete method.
+     * @return The result of the act, where the Plato argument is as a boolean truth.
+     */
+    private boolean canDelete(Bulletin bulletin) {
+        begin();
+        boolean act = ChatPersistenceService.get_instance().deleteBulletin(bulletin.get_primaryId()).get_truth();
+        calculatePerformance("deleting " + bulletin.get_title());
+        return act;
     }
 }

@@ -37,7 +37,6 @@ public abstract class Repository extends DbTranslator {
         return null;
     }
 
-    //TODO Remove doClose parameter and references.
     /**
      * Opens the connection, if it isn't already open.
      * Are used for making changes such as Update and Delete to the database.

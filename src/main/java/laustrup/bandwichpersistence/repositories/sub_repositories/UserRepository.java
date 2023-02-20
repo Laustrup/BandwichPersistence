@@ -127,7 +127,7 @@ public class UserRepository extends Repository {
                 "LEFT JOIN followings ON followings.fan_id = users.id OR followings.idol_id = users.id " +
                 "LEFT JOIN chatters ON chatters.user_id = users.id " +
                 "LEFT JOIN chat_rooms ON chatters.chat_room_id = chat_rooms.id " +
-                "LEFT JOIN user_bulletins ON users.id = user_bulletins.receiver_id " +
+                "LEFT JOIN bulletins ON users.id = bulletins.user_id " +
                 "LEFT JOIN requests ON users.id = requests.user_id " +
                 "LEFT JOIN ratings ON users.id = ratings.appointed_id " +
                 "LEFT JOIN albums ON users.id = albums.author_id " +
