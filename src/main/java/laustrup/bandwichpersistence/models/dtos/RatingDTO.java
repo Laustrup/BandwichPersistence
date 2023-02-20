@@ -19,31 +19,31 @@ public class RatingDTO extends ModelDTO {
      * The id of the user, that has received this rating.
      * Is used for when inserting the rating to the user.
      */
-    private UserDTO _appointed;
+    private UserDTO appointed;
 
     /**
      * The id of the user, that has given this rating.
      * Is used for when inserting the rating to the user.
      */
-    private UserDTO _judge;
+    private UserDTO judge;
 
     /**
      * The value of the rating that is appointed.
      * Must be between 0 and 5.
      */
-    private int _value;
+    private int value;
 
     /**
      * Is not meant to be necessary, but can be added by the judge.
      */
-    private String _comment;
+    private String comment;
 
     public RatingDTO(Rating rating) {
         super(rating.get_appointed().get_primaryId(), rating.get_judge().get_primaryId(),
                 rating.get_appointed().get_username()+"-"+rating.get_judge().get_username(), rating.get_timestamp());
-        _value = rating.get_value();
-        _comment = rating.get_comment();
-        _appointed = DTOService.get_instance().convertToDTO(rating.get_appointed());
-        _judge = DTOService.get_instance().convertToDTO(rating.get_judge());
+        value = rating.get_value();
+        comment = rating.get_comment();
+        appointed = DTOService.get_instance().convertToDTO(rating.get_appointed());
+        judge = DTOService.get_instance().convertToDTO(rating.get_judge());
     }
 }
