@@ -3,7 +3,9 @@ package laustrup.bandwichpersistence.utilities;
 import lombok.Data;
 import lombok.Getter;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.io.*;
 
 /**
  * This class will handle printing of statements.
@@ -36,7 +38,7 @@ public class Printer implements IPrinter {
      * Will indicate how a row of the content will start.
      */
     @SuppressWarnings("all")
-    private final String _startRow = "\n | ";
+    private final String _startRow = cyan("\n | ");
 
     /**
      * The border used for separating the print in the console.
@@ -73,7 +75,19 @@ public class Printer implements IPrinter {
     @Override
     public void print(String content) { handlePrint(content); }
     @Override
-    public void print(String content, Exception ex) { handlePrint(content + "\n\n" + ex.getMessage()); }
+    public void print(String content, Exception ex) {
+        handlePrint((content != null && !content.isEmpty() ? content + "\n\n-- EXCEPTION\n\n" : "-- EXCEPTION\n\n") + manage(ex));
+    }
+
+    /**
+     * Will manage how an exception will be displayed in the console.
+     * @param exception The exception that will be managed before displayed.
+     * @return The managed exception, as a String representation.
+     */
+    private String manage(Exception exception) {
+        return exception.toString();
+    }
+
     @Override
     public void print(Object[] array) { handlePrint(toString(array)); }
 
@@ -93,8 +107,35 @@ public class Printer implements IPrinter {
      * @return The print param for saving to be latest.
      */
     private String systemOut(String print) {
-        System.out.println(_startBorder + print + _endBorder);
+        System.out.println(cyan(_startBorder) + print + cyan(_endBorder));
         return print;
+    }
+
+    /**
+     * Will make some specific text the colour cyan for console.
+     * @param text The text that should be in cyan.
+     * @return The text with some escape sequences for the console.
+     */
+    private String cyan(String text) {
+        return "\033[0;96m" + text + "\033[0m";
+    }
+
+    /**
+     * Will make some specific text the colour yellow for console.
+     * @param text The text that should be in yellow.
+     * @return The text with some escape sequences for the console.
+     */
+    private String yellow(String text) {
+        return "\033[0;93m" + text + "\033[0m";
+    }
+
+    /**
+     * Will make some specific text the colour red for console.
+     * @param text The text that should be in red.
+     * @return The text with some escape sequences for the console.
+     */
+    private String red(String text) {
+        return "\033[0;91m" + text + "\033[0m";
     }
 
     @Override
@@ -124,19 +165,23 @@ public class Printer implements IPrinter {
      */
     private String generateContent(String element) {
         if (element == null || element.isEmpty()) {
-            String generated = _startRow + _emptyIndicator;
+            String generated = _startRow + yellow(_emptyIndicator);
             _content = new StringBuilder();
             return generated;
         }
 
+        boolean isException = false;
         StringBuilder generated = new StringBuilder();
         _content = new StringBuilder();
 
         for (int i = 0; i < element.length(); i++) {
+            if (generated.toString().contains("-- EXCEPTION"))
+                isException = true;
             if (i % _length == 0 || element.charAt(i) == '\n')
                 generated.append(_startRow);
             if (element.charAt(i) != '\n')
-                generated.append(element.charAt(i));
+                generated.append(isException ? red(String.valueOf(element.charAt(i)))
+                        : yellow(String.valueOf(element.charAt(i))));
             _content.append(element.charAt(i));
         }
 

@@ -5,11 +5,11 @@ import laustrup.bandwichpersistence.Tester;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-import java.util.InputMismatchException;
+import java.util.Arrays;
 
 public class PrinterTests extends Tester {
 
-    private static Printer _printer = Printer.get_instance();
+    private static final Printer _printer = Printer.get_instance();
 
     /**
      * Defines a content input that will be used in parametrized tests.
@@ -20,7 +20,7 @@ public class PrinterTests extends Tester {
     /**
      * Defines an exception inputs that will be used in parametrized tests.
      */
-    private final String _inputMismatch = "InputMismatch";
+    private final String _numberFormatException = "NumberFormatException";
 
     @ParameterizedTest
     @CsvSource(value = {_null, _empty, _single, _multiple, _borderCheck})
@@ -40,15 +40,17 @@ public class PrinterTests extends Tester {
 
     @ParameterizedTest
     @CsvSource(value = {
-            _null+_divider+_inputMismatch,
-            _empty+_divider+_inputMismatch,
-            _single+_divider+_inputMismatch,
-            _multiple+_divider+_inputMismatch,
-            _borderCheck+_divider+_inputMismatch}, delimiter = _delimiter)
+            _null+_divider+ _numberFormatException,
+            _empty+_divider+ _numberFormatException,
+            _single+_divider+ _numberFormatException,
+            _multiple+_divider+ _numberFormatException,
+            _borderCheck+_divider+ _numberFormatException}, delimiter = _delimiter)
     void canPrint(String content, String exception) {
         //ARRANGE
         content = arrange(content);
         Exception determined = determine(exception);
+        String expected = (content != null && !content.isEmpty() ? content + "\n\n-- EXCEPTION\n\n" : "-- EXCEPTION\n\n")
+                + determined.toString();
 
         //ACT
         begin();
@@ -57,7 +59,7 @@ public class PrinterTests extends Tester {
         calculatePerformance();
 
         //ASSERT
-        asserting(content, actual);
+        asserting(expected, actual);
     }
 
     /**
@@ -71,7 +73,7 @@ public class PrinterTests extends Tester {
             case _null -> { return null; }
             case _empty -> { return ""; }
             case _multiple -> { return _multiple + "\n" + _multiple + "\n" + _multiple; }
-            case _borderCheck -> { return "bordercheck".repeat(100); }
+            case _borderCheck -> { return "bordercheck ".repeat(100); }
             default -> { return content; }
         }
     }
@@ -83,7 +85,15 @@ public class PrinterTests extends Tester {
      */
     private Exception determine(String exception) {
         switch (exception) {
-            case _inputMismatch -> { return new InputMismatchException(); }
+            case _numberFormatException -> {
+                try {
+                    int integer = Integer.parseInt("a");
+                    return null;
+                }
+                catch (Exception e) {
+                    return e;
+                }
+            }
             default -> { return new IllegalStateException("Unexpected value: " + exception); }
         }
     }
