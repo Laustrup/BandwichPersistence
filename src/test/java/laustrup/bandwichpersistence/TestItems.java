@@ -42,7 +42,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * Contains different attributes that imitates models.
  * Primary intended to be used for tests, involving models.
  */
-public class TestItems extends JTest {
+public class TestItems extends Tester {
 
     /**
      * Will be used to create values for attributes.

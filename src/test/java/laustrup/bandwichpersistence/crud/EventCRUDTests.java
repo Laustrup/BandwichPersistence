@@ -1,6 +1,6 @@
 package laustrup.bandwichpersistence.crud;
 
-import laustrup.bandwichpersistence.JTest;
+import laustrup.bandwichpersistence.Tester;
 import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
 import laustrup.bandwichpersistence.models.events.Event;
 import laustrup.bandwichpersistence.models.events.Participation;
@@ -15,7 +15,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class EventCRUDTests extends JTest {
+public class EventCRUDTests extends Tester {
 
     @Test
     void canCRUDEvent() {

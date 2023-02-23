@@ -1,11 +1,8 @@
 package laustrup.bandwichpersistence.crud;
 
-import laustrup.bandwichpersistence.JTest;
+import laustrup.bandwichpersistence.Tester;
 import laustrup.bandwichpersistence.models.Rating;
 import laustrup.bandwichpersistence.models.albums.Album;
-import laustrup.bandwichpersistence.models.chats.ChatRoom;
-import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
-import laustrup.bandwichpersistence.models.chats.messages.Mail;
 import laustrup.bandwichpersistence.models.users.Login;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.sub_users.bands.Artist;
@@ -26,7 +23,7 @@ import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class UserCRUDTests extends JTest {
+class UserCRUDTests extends Tester {
 
     @Test
     void canReadAllUsers() {

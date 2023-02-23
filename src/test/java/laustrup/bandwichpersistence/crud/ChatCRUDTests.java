@@ -1,6 +1,6 @@
 package laustrup.bandwichpersistence.crud;
 
-import laustrup.bandwichpersistence.JTest;
+import laustrup.bandwichpersistence.Tester;
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
 import laustrup.bandwichpersistence.models.chats.messages.Mail;
@@ -11,7 +11,7 @@ import laustrup.bandwichpersistence.utilities.Liszt;
 
 import org.junit.jupiter.api.Test;
 
-public class ChatCRUDTests extends JTest {
+public class ChatCRUDTests extends Tester {
 
     @Test
     void canCRUDChatRoomAndMail() {

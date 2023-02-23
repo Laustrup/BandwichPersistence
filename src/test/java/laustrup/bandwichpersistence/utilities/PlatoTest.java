@@ -1,13 +1,13 @@
 package laustrup.bandwichpersistence.utilities;
 
-import laustrup.bandwichpersistence.JTest;
+import laustrup.bandwichpersistence.Tester;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class PlatoTest extends JTest {
+class PlatoTest extends Tester {
 
     private Plato _plato;
 

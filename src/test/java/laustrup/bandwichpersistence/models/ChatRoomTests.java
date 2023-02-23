@@ -1,6 +1,6 @@
 package laustrup.bandwichpersistence.models;
 
-import laustrup.bandwichpersistence.JTest;
+import laustrup.bandwichpersistence.Tester;
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
 
 import laustrup.bandwichpersistence.models.users.User;
@@ -11,7 +11,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ChatRoomTests extends JTest {
+public class ChatRoomTests extends Tester {
 
     @ParameterizedTest
     @CsvSource(value = {"null","empty"})

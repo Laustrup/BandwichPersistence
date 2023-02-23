@@ -1,6 +1,6 @@
 package laustrup.bandwichpersistence.crud;
 
-import laustrup.bandwichpersistence.JTest;
+import laustrup.bandwichpersistence.Tester;
 import laustrup.bandwichpersistence.models.Search;
 import laustrup.bandwichpersistence.services.RandomCreatorService;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembly;
@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class SearchTests extends JTest {
+public class SearchTests extends Tester {
 
     @Test
     void canSearch() {

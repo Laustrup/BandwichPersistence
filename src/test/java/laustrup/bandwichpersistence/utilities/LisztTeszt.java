@@ -1,6 +1,6 @@
 package laustrup.bandwichpersistence.utilities;
 
-import laustrup.bandwichpersistence.JTest;
+import laustrup.bandwichpersistence.Tester;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.sub_users.bands.Band;
 
@@ -10,7 +10,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class LisztTeszt extends JTest {
+class LisztTeszt extends Tester {
 
     private Liszt<Object> _liszt;
 

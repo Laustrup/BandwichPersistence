@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 /**
  * Adds a few functions to test methods to reuse.
  */
-public abstract class JTest extends Asserter {
+public abstract class Tester extends Asserter {
 
     /**
      * Will be the start of the ACT in tests
@@ -38,6 +38,16 @@ public abstract class JTest extends Asserter {
      * This Random is the java Random utility, that can be reused throughout tests.
      */
     protected Random _random = new Random();
+
+    /**
+     * Defines a character that is used to separate CSVSources
+     */
+    protected final char _delimiter = '|';
+
+    /**
+     * Will divide Strings in CSVSources.
+     */
+    protected final String _divider = "|";
 
     /**
      * Will automatically begin the time of start.
@@ -65,9 +75,13 @@ public abstract class JTest extends Asserter {
      */
     protected long calculatePerformance() {
         long performance = Duration.between(_start, LocalDateTime.now()).toMillis();
+        long seconds = (performance / 1000),
+            minutes = seconds/60;
 
-        Printer.get_instance().print("The performance of current test is " + performance +
-                " in milliseconds, " + (performance / 1000) + " in seconds and " + ((performance / 1000)/60)  + " in minutes");
+        Printer.get_instance().print("The performance of current test" + (seconds>0 ? seconds + ":\n\n" : " is ")
+                + performance + " in milliseconds."
+                + (seconds>0 ? seconds + "\n in seconds\n" : "")
+                + (minutes>0 ? minutes + " in minutes" : ""));
 
         return performance;
     }

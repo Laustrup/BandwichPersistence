@@ -447,4 +447,13 @@ public class Asserter {
     protected void asserting(boolean isTrue) {
         assertTrue(isTrue);
     }
+
+    /**
+     * A simple comparing assertEqual of two Strings.
+     * @param expected The String that is arranged and defined.
+     * @param actual The String that is the result of an action
+     */
+    protected void asserting(String expected, String actual) {
+        assertEquals(expected,actual);
+    }
 }

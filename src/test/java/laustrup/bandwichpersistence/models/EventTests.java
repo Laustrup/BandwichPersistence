@@ -1,6 +1,6 @@
 package laustrup.bandwichpersistence.models;
 
-import laustrup.bandwichpersistence.JTest;
+import laustrup.bandwichpersistence.Tester;
 
 import laustrup.bandwichpersistence.models.chats.Request;
 import laustrup.bandwichpersistence.models.events.Event;
@@ -21,7 +21,7 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class EventTests extends JTest {
+public class EventTests extends Tester {
 
     private Event _event;
 
