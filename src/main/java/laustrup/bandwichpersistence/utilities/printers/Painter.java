@@ -31,6 +31,18 @@ public class Painter {
     private static final String RESET = colourCode(0);
 
     /**
+     * Determines the colours available.
+     */
+    protected enum Colour {
+        BLACK,RED,GREEN,YELLOW,BLUE,PURPLE,CYAN,WHITE
+    }
+
+    /**
+     * This determines which colour have been used for previous colouring.
+     */
+    protected Colour _previousColour;
+
+    /**
      * Describes the escape-sequences of colours
      * to the text of consoles as regular type.
      */
@@ -164,12 +176,39 @@ public class Painter {
     }
 
     /**
+     * Will generate a text into a colour with a switch case of the Colour enum.
+     * @param text The text that will have its colour changed for the console.
+     * @param colour An enum with the values of the different colours available.
+     * @return The generated text with its colour. If default text, it will be white.
+     */
+    protected String colorize(String text, Colour colour) {
+        switch (colour) {
+            case CYAN -> { return cyan(text); }
+            case YELLOW -> { return yellow(text); }
+            case GREEN -> { return green(text); }
+            case RED -> { return red(text); }
+            default -> { return white(text); }
+        }
+    }
+
+    /**
      * Will make some specific text the colour cyan for console.
      * @param text The text that should be in cyan.
      * @return The text with some escape sequences for the console.
      */
     protected String cyan(String text) {
+        _previousColour = Colour.CYAN;
         return colorize(text, HighIntensity.CYAN._colour);
+    }
+
+    /**
+     * Will make some specific text the colour green for console.
+     * @param text The text that should be in green.
+     * @return The text with some escape sequences for the console.
+     */
+    protected String green(String text) {
+        _previousColour = Colour.GREEN;
+        return colorize(text, HighIntensity.GREEN._colour);
     }
 
     /**
@@ -178,6 +217,7 @@ public class Painter {
      * @return The text with some escape sequences for the console.
      */
     protected String yellow(String text) {
+        _previousColour = Colour.YELLOW;
         return colorize(text, HighIntensity.YELLOW._colour);
     }
 
@@ -187,6 +227,17 @@ public class Painter {
      * @return The text with some escape sequences for the console.
      */
     protected String red(String text) {
+        _previousColour = Colour.RED;
         return colorize(text, HighIntensity.RED._colour);
+    }
+
+    /**
+     * Will make some specific text the colour white for console.
+     * @param text The text that should be in white.
+     * @return The text with some escape sequences for the console.
+     */
+    protected String white(String text) {
+        _previousColour = Colour.WHITE;
+        return colorize(text, HighIntensity.WHITE._colour);
     }
 }

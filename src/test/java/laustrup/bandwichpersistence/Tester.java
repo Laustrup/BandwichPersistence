@@ -78,10 +78,11 @@ public abstract class Tester extends Asserter {
         long seconds = (performance / 1000),
             minutes = seconds/60;
 
-        Printer.get_instance().print("The performance of current test" + (seconds>0 ? seconds + ":\n\n" : " is ")
+        Printer.get_instance().print(performance <= 0 ? "The performance took less than a millisecond!" :
+                ("The performance of current test" + (seconds>0 ? seconds + ":\n\n" : " is ")
                 + performance + " in milliseconds."
                 + (seconds>0 ? seconds + "\n in seconds\n" : "")
-                + (minutes>0 ? minutes + " in minutes" : ""));
+                + (minutes>0 ? minutes + " in minutes" : "")));
 
         return performance;
     }

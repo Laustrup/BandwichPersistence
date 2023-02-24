@@ -32,7 +32,7 @@ public class Printer extends Painter implements IPrinter {
     /**
      * Will determined the allowed length of a print.
      */
-    private final int _length = 145;
+    private final int _length = 143;
 
     /**
      * Will indicate how a row of the content will start.
@@ -44,6 +44,7 @@ public class Printer extends Painter implements IPrinter {
      * The border used for separating the print in the console.
      */
     private final String _border = generateBorder();
+
     /**
      * Will describe the border from the given length.
      * @return The described border.
@@ -53,8 +54,8 @@ public class Printer extends Painter implements IPrinter {
     /**
      * Is used to be reused as a border for beginning and ending of a print.
      */
-    private final String _startBorder = "\n++ " + _border + "\n +",
-        _endBorder = "\n +\n++ " + _border + "\n";
+    private final String _startBorder = "\n-+ " + _border + " +\n $",
+        _endBorder = "\n $\n-+ " + _border + " +\n";
 
     /**
      * Singleton instance of the Printer.
@@ -138,27 +139,63 @@ public class Printer extends Painter implements IPrinter {
      */
     private String generateContent(String element) {
         if (element == null || element.isEmpty()) {
-            String generated = _startRow + yellow(_emptyIndicator);
+            String generated = _startRow + green(_emptyIndicator);
             _content = new StringBuilder();
             return generated;
         }
 
-        boolean isException = false;
         StringBuilder generated = new StringBuilder();
         _content = new StringBuilder();
 
         for (int i = 0; i < element.length(); i++) {
-            if (generated.toString().contains("-- EXCEPTION"))
-                isException = true;
-            if (i % _length == 0 || element.charAt(i) == '\n')
-                generated.append(_startRow);
-            if (element.charAt(i) != '\n')
-                generated.append(isException ? red(String.valueOf(element.charAt(i)))
-                        : yellow(String.valueOf(element.charAt(i))));
+            generated = generate(generated,element,i);
             _content.append(element.charAt(i));
         }
 
         return generated.toString();
+    }
+
+    /**
+     * Will generate the text that will be printed on the console from the original text.
+     * @param generated The generated text, that will be updated.
+     * @param original The text, that the generated text will be generated from.
+     * @param index The current index.
+     * @return The updated generated text.
+     */
+    private StringBuilder generate(StringBuilder generated, String original, int index) {
+        Colour colour = setColour(original, index);
+
+        if (index % _length == 0 || original.charAt(index) == '\n')
+            generated.append(_startRow);
+        if (original.charAt(index) != '\n')
+            generated.append(colorize(String.valueOf(original.charAt(index)),colour));
+
+        return generated;
+    }
+
+    /**
+     * Will set the colour depending on the current characters of the text.
+     * @param text The original text that is being processed.
+     * @param index The current index of the text.
+     * @return The colour that has been set.
+     */
+    private Colour setColour(String text, int index) {
+        Colour colour;
+        text = _startRow + text;
+        index += _startRow.length();
+        boolean yellowIndexLengthIsAllowed = index > 4 && index <= text.length()-2,
+            beforeIsAStartBorder = index == _startRow.length() || (text.charAt(index-1) == '\n'),
+            headlineIdentifier = String.valueOf(text.charAt(index)).equals("-") && String.valueOf(text.charAt(index+1)).equals("-"),
+            isStillHeadline = _previousColour == Colour.YELLOW && !beforeIsAStartBorder;
+
+        if (yellowIndexLengthIsAllowed && ((beforeIsAStartBorder && headlineIdentifier) || isStillHeadline))
+            colour = Colour.YELLOW;
+        else if (_content.toString().contains("-- EXCEPTION"))
+            colour = Colour.RED;
+        else
+            colour = Colour.GREEN;
+
+        return colour;
     }
 
     @Override
