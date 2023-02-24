@@ -17,7 +17,7 @@ import laustrup.bandwichpersistence.models.users.sub_users.venues.Venue;
 import laustrup.bandwichpersistence.services.DTOService;
 import laustrup.bandwichpersistence.utilities.Liszt;
 import laustrup.bandwichpersistence.utilities.Plato;
-import laustrup.bandwichpersistence.utilities.Printer;
+import laustrup.bandwichpersistence.utilities.printers.Printer;
 
 import lombok.*;
 

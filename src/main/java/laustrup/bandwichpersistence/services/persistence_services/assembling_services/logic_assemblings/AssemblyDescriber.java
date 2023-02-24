@@ -11,13 +11,12 @@ import laustrup.bandwichpersistence.models.users.sub_users.Performer;
 import laustrup.bandwichpersistence.models.users.sub_users.participants.Participant;
 import laustrup.bandwichpersistence.repositories.sub_repositories.ChatRepository;
 import laustrup.bandwichpersistence.repositories.sub_repositories.EventRepository;
-import laustrup.bandwichpersistence.repositories.sub_repositories.ModelRepository;
 import laustrup.bandwichpersistence.repositories.sub_repositories.UserRepository;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembly;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.sub_assemblings.EventAssembly;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.sub_assemblings.user_assemblings.UserAssembly;
 import laustrup.bandwichpersistence.utilities.Liszt;
-import laustrup.bandwichpersistence.utilities.Printer;
+import laustrup.bandwichpersistence.utilities.printers.Printer;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

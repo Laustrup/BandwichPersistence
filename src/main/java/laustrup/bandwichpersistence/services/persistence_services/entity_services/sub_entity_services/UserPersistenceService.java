@@ -2,9 +2,6 @@ package laustrup.bandwichpersistence.services.persistence_services.entity_servic
 
 import laustrup.bandwichpersistence.models.Rating;
 import laustrup.bandwichpersistence.models.albums.Album;
-import laustrup.bandwichpersistence.models.chats.ChatRoom;
-import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
-import laustrup.bandwichpersistence.models.chats.messages.Mail;
 import laustrup.bandwichpersistence.models.users.Login;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.subscriptions.Card;
@@ -14,7 +11,7 @@ import laustrup.bandwichpersistence.repositories.sub_repositories.ModelRepositor
 import laustrup.bandwichpersistence.repositories.sub_repositories.UserRepository;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembly;
 import laustrup.bandwichpersistence.utilities.Plato;
-import laustrup.bandwichpersistence.utilities.Printer;
+import laustrup.bandwichpersistence.utilities.printers.Printer;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

@@ -2,7 +2,7 @@ package laustrup.bandwichpersistence.repositories;
 
 import laustrup.bandwichpersistence.miscs.Crate;
 import laustrup.bandwichpersistence.utilities.Plato;
-import laustrup.bandwichpersistence.utilities.Printer;
+import laustrup.bandwichpersistence.utilities.printers.Printer;
 
 import lombok.Getter;
 

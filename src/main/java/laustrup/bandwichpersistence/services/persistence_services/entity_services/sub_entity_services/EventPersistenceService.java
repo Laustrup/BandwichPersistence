@@ -11,7 +11,7 @@ import laustrup.bandwichpersistence.services.persistence_services.assembling_ser
 import laustrup.bandwichpersistence.services.persistence_services.entity_services.EntityService;
 import laustrup.bandwichpersistence.utilities.Liszt;
 import laustrup.bandwichpersistence.utilities.Plato;
-import laustrup.bandwichpersistence.utilities.Printer;
+import laustrup.bandwichpersistence.utilities.printers.Printer;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

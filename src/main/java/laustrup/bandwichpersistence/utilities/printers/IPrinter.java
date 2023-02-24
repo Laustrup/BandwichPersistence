@@ -1,4 +1,4 @@
-package laustrup.bandwichpersistence.utilities;
+package laustrup.bandwichpersistence.utilities.printers;
 
 
 import java.util.Collection;

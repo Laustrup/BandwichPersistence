@@ -26,7 +26,7 @@ import laustrup.bandwichpersistence.services.TimeService;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembly;
 import laustrup.bandwichpersistence.utilities.Liszt;
 import laustrup.bandwichpersistence.utilities.Plato;
-import laustrup.bandwichpersistence.utilities.Printer;
+import laustrup.bandwichpersistence.utilities.printers.Printer;
 
 import lombok.Getter;
 import org.junit.jupiter.api.Test;

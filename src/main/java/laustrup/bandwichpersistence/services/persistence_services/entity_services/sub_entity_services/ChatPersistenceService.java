@@ -8,7 +8,7 @@ import laustrup.bandwichpersistence.repositories.sub_repositories.ChatRepository
 import laustrup.bandwichpersistence.repositories.sub_repositories.ModelRepository;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembly;
 import laustrup.bandwichpersistence.utilities.Plato;
-import laustrup.bandwichpersistence.utilities.Printer;
+import laustrup.bandwichpersistence.utilities.printers.Printer;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

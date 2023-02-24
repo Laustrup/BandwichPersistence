@@ -8,12 +8,11 @@ import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.repositories.sub_repositories.ArtistRepository;
 import laustrup.bandwichpersistence.repositories.DbGate;
 import laustrup.bandwichpersistence.repositories.sub_repositories.ChatRepository;
-import laustrup.bandwichpersistence.repositories.sub_repositories.ModelRepository;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.sub_assemblings.EventAssembly;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.sub_assemblings.user_assemblings.UserAssembly;
 import laustrup.bandwichpersistence.utilities.Liszt;
 import laustrup.bandwichpersistence.utilities.Plato;
-import laustrup.bandwichpersistence.utilities.Printer;
+import laustrup.bandwichpersistence.utilities.printers.Printer;
 
 import java.sql.SQLException;
 

@@ -1,16 +1,16 @@
-package laustrup.bandwichpersistence.utilities;
+package laustrup.bandwichpersistence.utilities.printers;
+
+import laustrup.bandwichpersistence.utilities.Liszt;
 
 import lombok.Data;
 import lombok.Getter;
 
-import java.util.Arrays;
 import java.util.Collection;
-import java.io.*;
 
 /**
  * This class will handle printing of statements.
  */
-public class Printer implements IPrinter {
+public class Printer extends Painter implements IPrinter {
 
     /**
      * Contains the last content that was printed.
@@ -109,33 +109,6 @@ public class Printer implements IPrinter {
     private String systemOut(String print) {
         System.out.println(cyan(_startBorder) + print + cyan(_endBorder));
         return print;
-    }
-
-    /**
-     * Will make some specific text the colour cyan for console.
-     * @param text The text that should be in cyan.
-     * @return The text with some escape sequences for the console.
-     */
-    private String cyan(String text) {
-        return "\033[0;96m" + text + "\033[0m";
-    }
-
-    /**
-     * Will make some specific text the colour yellow for console.
-     * @param text The text that should be in yellow.
-     * @return The text with some escape sequences for the console.
-     */
-    private String yellow(String text) {
-        return "\033[0;93m" + text + "\033[0m";
-    }
-
-    /**
-     * Will make some specific text the colour red for console.
-     * @param text The text that should be in red.
-     * @return The text with some escape sequences for the console.
-     */
-    private String red(String text) {
-        return "\033[0;91m" + text + "\033[0m";
     }
 
     @Override

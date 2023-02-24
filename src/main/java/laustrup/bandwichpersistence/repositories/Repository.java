@@ -1,10 +1,9 @@
 package laustrup.bandwichpersistence.repositories;
 
 import laustrup.bandwichpersistence.utilities.Plato;
-import laustrup.bandwichpersistence.utilities.Printer;
+import laustrup.bandwichpersistence.utilities.printers.Printer;
 
 import java.sql.*;
-import java.time.LocalDateTime;
 
 /**
  * An abstract class that takes SQLs and performs them through JDBC methods.

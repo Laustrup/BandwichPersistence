@@ -1,6 +1,6 @@
     package laustrup.bandwichpersistence.models;
 
-    import laustrup.bandwichpersistence.utilities.Printer;
+    import laustrup.bandwichpersistence.utilities.printers.Printer;
 
     import lombok.*;
 

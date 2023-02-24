@@ -1,7 +1,7 @@
 package laustrup.bandwichpersistence.models.users.subscriptions;
 
 import laustrup.bandwichpersistence.models.dtos.users.subscriptions.SubscriptionOfferDTO;
-import laustrup.bandwichpersistence.utilities.Printer;
+import laustrup.bandwichpersistence.utilities.printers.Printer;
 import lombok.Getter;
 import lombok.ToString;
 

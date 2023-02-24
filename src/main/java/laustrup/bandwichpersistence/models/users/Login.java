@@ -1,7 +1,7 @@
 package laustrup.bandwichpersistence.models.users;
 
 import laustrup.bandwichpersistence.models.dtos.users.LoginDTO;
-import laustrup.bandwichpersistence.utilities.Printer;
+import laustrup.bandwichpersistence.utilities.printers.Printer;
 
 import lombok.Getter;
 import lombok.ToString;

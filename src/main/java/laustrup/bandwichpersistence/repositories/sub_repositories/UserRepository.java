@@ -11,7 +11,7 @@ import laustrup.bandwichpersistence.models.users.subscriptions.Subscription;
 import laustrup.bandwichpersistence.models.users.sub_users.venues.Venue;
 import laustrup.bandwichpersistence.repositories.Repository;
 import laustrup.bandwichpersistence.utilities.Liszt;
-import laustrup.bandwichpersistence.utilities.Printer;
+import laustrup.bandwichpersistence.utilities.printers.Printer;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
