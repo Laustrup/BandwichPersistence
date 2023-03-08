@@ -4,6 +4,7 @@ import laustrup.bandwichpersistence.utilities.Liszt;
 
 import lombok.Data;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Collection;
 
@@ -11,6 +12,12 @@ import java.util.Collection;
  * This class will handle printing of statements.
  */
 public class Printer extends Painter implements IPrinter {
+
+    /**
+     * The specified PrinterMode for this Printer, that will behave depending on the choosen enum.
+     */
+    @Getter @Setter
+    private PrinterMode _mode;
 
     /**
      * Contains the last content that was printed.
@@ -32,6 +39,7 @@ public class Printer extends Painter implements IPrinter {
     /**
      * Will determined the allowed length of a print.
      */
+    @Getter @Setter
     private final int _length = 143;
 
     /**
@@ -49,7 +57,7 @@ public class Printer extends Painter implements IPrinter {
      * Will describe the border from the given length.
      * @return The described border.
      */
-    private String generateBorder() { return "-".repeat(_length); }
+    private String generateBorder() { return "-".repeat(2); }
 
     /**
      * Is used to be reused as a border for beginning and ending of a print.
@@ -72,6 +80,8 @@ public class Printer extends Painter implements IPrinter {
         }
         return _instance;
     }
+
+    private Printer() {}
 
     @Override
     public void print(String content) { handlePrint(content); }

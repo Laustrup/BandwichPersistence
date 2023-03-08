@@ -1,5 +1,8 @@
 package laustrup.bandwichpersistence;
 
+import laustrup.bandwichpersistence.console_ui.Greeter;
+import laustrup.bandwichpersistence.utilities.printers.Printer;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -14,7 +17,14 @@ public class BandwichPersistenceApplication extends SpringBootServletInitializer
     }
 
     public static void main(String[] args) {
-        SpringApplication.run(BandwichPersistenceApplication.class, args);
-    }
+        Greeter.startUp();
 
+        try {
+            SpringApplication.run(BandwichPersistenceApplication.class, args);
+            Greeter.running();
+        } catch (Exception e) {
+            Printer.get_instance().print("An uncaught exception occurred, therefor the application will restart...",e);
+            main(new String[]{});
+        }
+    }
 }

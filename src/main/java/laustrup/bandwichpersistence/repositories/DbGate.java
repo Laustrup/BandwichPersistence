@@ -1,6 +1,5 @@
 package laustrup.bandwichpersistence.repositories;
 
-import laustrup.bandwichpersistence.miscs.Crate;
 import laustrup.bandwichpersistence.utilities.Plato;
 import laustrup.bandwichpersistence.utilities.printers.Printer;
 
@@ -13,7 +12,7 @@ import java.sql.SQLException;
 public class DbGate {
 
     /**
-     * Singleton instance of the Repository.
+     * Singleton instance of the DbGate.
      */
     private static DbGate _instance = null;
 
@@ -53,9 +52,9 @@ public class DbGate {
      * @return True if the connection is open and haven't caught any exceptions.
      */
     private boolean createConnection() {
-        Crate crate = Crate.get_instance();
+        DbLibrary library = DbLibrary.get_instance();
         try {
-            _connection = DriverManager.getConnection(crate.get_dbPath(), crate.get_dbUser(), crate.get_dbPassword());
+            _connection = DriverManager.getConnection(library.get_path(), library.get_user(), library.get_password());
             return isOpen().get_truth();
         } catch (SQLException e) {
             Printer.get_instance().print("Couldn't open connection...",e);
