@@ -17,8 +17,8 @@ import laustrup.bandwichpersistence.models.users.sub_users.bands.Band;
 import laustrup.bandwichpersistence.models.users.sub_users.participants.Participant;
 import laustrup.bandwichpersistence.models.users.sub_users.venues.Venue;
 import laustrup.bandwichpersistence.models.users.subscriptions.Subscription;
-import laustrup.bandwichpersistence.utilities.Liszt;
-import laustrup.bandwichpersistence.utilities.printers.Printer;
+import laustrup.bandwichpersistence.utilities.collections.Liszt;
+import laustrup.bandwichpersistence.utilities.console.Printer;
 
 import static org.junit.jupiter.api.Assertions.*;
 

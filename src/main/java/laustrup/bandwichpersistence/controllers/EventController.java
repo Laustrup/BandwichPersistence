@@ -8,8 +8,8 @@ import laustrup.bandwichpersistence.models.dtos.events.ParticipationDTO;
 import laustrup.bandwichpersistence.models.events.Event;
 import laustrup.bandwichpersistence.models.events.Participation;
 import laustrup.bandwichpersistence.services.controller_services.sub_controller_services.EventControllerService;
-import laustrup.bandwichpersistence.utilities.Liszt;
-import laustrup.bandwichpersistence.utilities.Plato;
+import laustrup.bandwichpersistence.utilities.collections.Liszt;
+import laustrup.bandwichpersistence.utilities.parameters.Plato;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

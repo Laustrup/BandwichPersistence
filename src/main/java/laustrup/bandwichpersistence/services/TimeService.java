@@ -1,7 +1,7 @@
 package laustrup.bandwichpersistence.services;
 
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
-import laustrup.bandwichpersistence.utilities.Liszt;
+import laustrup.bandwichpersistence.utilities.collections.Liszt;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

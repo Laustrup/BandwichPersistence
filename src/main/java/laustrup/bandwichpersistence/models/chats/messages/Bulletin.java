@@ -4,7 +4,7 @@ import laustrup.bandwichpersistence.models.Model;
 import laustrup.bandwichpersistence.models.dtos.chats.messages.BulletinDTO;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.services.DTOService;
-import laustrup.bandwichpersistence.utilities.Plato;
+import laustrup.bandwichpersistence.utilities.parameters.Plato;
 
 import lombok.Getter;
 

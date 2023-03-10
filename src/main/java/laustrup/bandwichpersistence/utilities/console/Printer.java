@@ -1,33 +1,37 @@
-package laustrup.bandwichpersistence.utilities.printers;
+package laustrup.bandwichpersistence.utilities.console;
 
-import laustrup.bandwichpersistence.utilities.Liszt;
+import laustrup.bandwichpersistence.utilities.collections.Liszt;
 
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 
-/**
- * This class will handle printing of statements.
- */
+/** This class will handle printing of statements to the console. */
 public class Printer extends Painter implements IPrinter {
 
-    /**
-     * The specified PrinterMode for this Printer, that will behave depending on the choosen enum.
-     */
-    @Getter @Setter
-    private PrinterMode _mode;
+    /** The specified PrinterMode for this Printer, that will behave depending on the choosen enum. */
+    @Getter
+    private PrinterMode _mode = PrinterMode.NOIRE;
 
     /**
-     * Contains the last content that was printed.
+     * Configures the mode for the Printer.
+     * @param mode The mode that should be configured.
+     * @return The configured mode.
      */
+    public PrinterMode set_mode(PrinterMode mode) {
+        _mode = mode;
+        set_startRow();
+        return _mode;
+    }
+
+    /** Contains the last content that was printed. */
     @Getter
     private String _latest;
 
-    /**
-     * The content that is meant to be printed.
-     */
+    /** The content that is meant to be printed. */
     private StringBuilder _content;
 
     /**
@@ -46,7 +50,16 @@ public class Printer extends Painter implements IPrinter {
      * Will indicate how a row of the content will start.
      */
     @SuppressWarnings("all")
-    private final String _startRow = cyan("\n | ");
+    private String _startRow = set_startRow();
+
+    /**
+     * Sets the start of each row depending on the mode.
+     * @return The start of each row.
+     */
+    private String set_startRow() {
+        _startRow = _mode.equals(PrinterMode.HIGH_CONTRAST) ? cyan("\n | ") : "\n | ";
+        return _startRow;
+    }
 
     /**
      * The border used for separating the print in the console.
@@ -81,7 +94,9 @@ public class Printer extends Painter implements IPrinter {
         return _instance;
     }
 
-    private Printer() {}
+    private Printer() {
+        super(LocalDateTime.now().getYear(), 1, 1);
+    }
 
     @Override
     public void print(String content) { handlePrint(content); }
@@ -107,8 +122,16 @@ public class Printer extends Painter implements IPrinter {
      * @param content The content that is wished to be handled.
      */
     private void handlePrint(String content) {
-        systemOut(generateContent(content));
-        _latest = _content == null || _content.toString().isEmpty() ? _emptyIndicator : _content.toString();
+        switch (_mode) {
+            case DEFAULT -> {
+                System.out.println(content);
+                _latest = content;
+            }
+            default -> {
+                systemOut(generateContent(content));
+                _latest = _content == null || _content.toString().isEmpty() ? _emptyIndicator : _content.toString();
+            }
+        }
     }
 
     /**
@@ -149,7 +172,8 @@ public class Printer extends Painter implements IPrinter {
      */
     private String generateContent(String element) {
         if (element == null || element.isEmpty()) {
-            String generated = _startRow + green(_emptyIndicator);
+            String generated = _startRow +
+                    (_mode.equals(PrinterMode.HIGH_CONTRAST) ? green(_emptyIndicator) : _emptyIndicator);
             _content = new StringBuilder();
             return generated;
         }
@@ -173,7 +197,7 @@ public class Printer extends Painter implements IPrinter {
      * @return The updated generated text.
      */
     private StringBuilder generate(StringBuilder generated, String original, int index) {
-        Colour colour = setColour(original, index);
+        Colour colour = _mode.equals(PrinterMode.HIGH_CONTRAST) ? setColour(original, index) : null;
 
         if (index % _length == 0 || original.charAt(index) == '\n')
             generated.append(_startRow);

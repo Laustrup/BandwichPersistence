@@ -1,7 +1,7 @@
 package laustrup.bandwichpersistence;
 
 import laustrup.bandwichpersistence.services.RandomCreatorService;
-import laustrup.bandwichpersistence.utilities.printers.Printer;
+import laustrup.bandwichpersistence.utilities.console.Printer;
 import org.junit.jupiter.api.BeforeEach;
 
 import java.time.Duration;

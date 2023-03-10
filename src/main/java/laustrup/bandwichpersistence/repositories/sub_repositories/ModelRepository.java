@@ -7,7 +7,7 @@ import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
 import laustrup.bandwichpersistence.models.users.subscriptions.Subscription;
 import laustrup.bandwichpersistence.repositories.Repository;
-import laustrup.bandwichpersistence.utilities.printers.Printer;
+import laustrup.bandwichpersistence.utilities.console.Printer;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

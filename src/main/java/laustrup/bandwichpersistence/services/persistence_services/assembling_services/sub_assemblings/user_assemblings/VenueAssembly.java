@@ -2,7 +2,7 @@ package laustrup.bandwichpersistence.services.persistence_services.assembling_se
 
 import laustrup.bandwichpersistence.models.chats.Request;
 import laustrup.bandwichpersistence.models.users.sub_users.venues.Venue;
-import laustrup.bandwichpersistence.utilities.Liszt;
+import laustrup.bandwichpersistence.utilities.collections.Liszt;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

@@ -9,7 +9,7 @@ import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
 import laustrup.bandwichpersistence.models.users.subscriptions.Subscription;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembler;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.sub_assemblings.ModelAssembly;
-import laustrup.bandwichpersistence.utilities.Liszt;
+import laustrup.bandwichpersistence.utilities.collections.Liszt;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

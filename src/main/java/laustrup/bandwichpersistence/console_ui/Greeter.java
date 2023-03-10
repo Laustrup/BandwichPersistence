@@ -1,8 +1,8 @@
 package laustrup.bandwichpersistence.console_ui;
 
 import laustrup.bandwichpersistence.repositories.DbLibrary;
-import laustrup.bandwichpersistence.utilities.printers.Printer;
-import laustrup.bandwichpersistence.utilities.printers.PrinterMode;
+import laustrup.bandwichpersistence.utilities.console.Printer;
+import laustrup.bandwichpersistence.utilities.console.PrinterMode;
 
 import lombok.Data;
 
@@ -214,7 +214,7 @@ public class Greeter extends GreeterContents {
         if (_input.equalsIgnoreCase(Command.START._value))
             _quickStart = true;
         if (_input.equalsIgnoreCase(Command.CANCEL._value)) {
-            System.out.println("You have chosen to cancel the start of BandwichPersistence...");
+            System.out.println(_sectionSkip + "\tYou have chosen to cancel the start of BandwichPersistence...");
             System.exit(2);
         }
 

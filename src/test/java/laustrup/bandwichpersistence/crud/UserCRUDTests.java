@@ -13,7 +13,7 @@ import laustrup.bandwichpersistence.models.users.subscriptions.Subscription;
 import laustrup.bandwichpersistence.services.RandomCreatorService;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembly;
 import laustrup.bandwichpersistence.services.persistence_services.entity_services.sub_entity_services.*;
-import laustrup.bandwichpersistence.utilities.Liszt;
+import laustrup.bandwichpersistence.utilities.collections.Liszt;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

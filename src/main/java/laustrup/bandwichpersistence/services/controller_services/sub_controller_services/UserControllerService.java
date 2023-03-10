@@ -14,9 +14,9 @@ import laustrup.bandwichpersistence.services.controller_services.ControllerServi
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembly;
 import laustrup.bandwichpersistence.services.persistence_services.entity_services.sub_entity_services.ChatPersistenceService;
 import laustrup.bandwichpersistence.services.persistence_services.entity_services.sub_entity_services.UserPersistenceService;
-import laustrup.bandwichpersistence.utilities.Liszt;
+import laustrup.bandwichpersistence.utilities.collections.Liszt;
 
-import laustrup.bandwichpersistence.utilities.Plato;
+import laustrup.bandwichpersistence.utilities.parameters.Plato;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 

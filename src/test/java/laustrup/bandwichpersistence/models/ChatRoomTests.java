@@ -4,7 +4,7 @@ import laustrup.bandwichpersistence.Tester;
 import laustrup.bandwichpersistence.models.chats.ChatRoom;
 
 import laustrup.bandwichpersistence.models.users.User;
-import laustrup.bandwichpersistence.utilities.Liszt;
+import laustrup.bandwichpersistence.utilities.collections.Liszt;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;

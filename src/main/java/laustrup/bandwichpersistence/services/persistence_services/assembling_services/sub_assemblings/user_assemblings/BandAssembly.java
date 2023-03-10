@@ -4,8 +4,8 @@ import laustrup.bandwichpersistence.models.events.Gig;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.sub_users.bands.Band;
 import laustrup.bandwichpersistence.repositories.sub_repositories.UserRepository;
-import laustrup.bandwichpersistence.utilities.Liszt;
-import laustrup.bandwichpersistence.utilities.printers.Printer;
+import laustrup.bandwichpersistence.utilities.collections.Liszt;
+import laustrup.bandwichpersistence.utilities.console.Printer;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

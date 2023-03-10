@@ -4,7 +4,7 @@ import laustrup.bandwichpersistence.models.dtos.ModelDTO;
 import laustrup.bandwichpersistence.models.dtos.users.UserDTO;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.services.DTOService;
-import laustrup.bandwichpersistence.utilities.Plato;
+import laustrup.bandwichpersistence.utilities.parameters.Plato;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

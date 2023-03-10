@@ -6,7 +6,7 @@ import laustrup.bandwichpersistence.models.users.subscriptions.Subscription;
 import laustrup.bandwichpersistence.repositories.sub_repositories.ParticipantRepository;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembly;
 import laustrup.bandwichpersistence.services.persistence_services.entity_services.EntityService;
-import laustrup.bandwichpersistence.utilities.printers.Printer;
+import laustrup.bandwichpersistence.utilities.console.Printer;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

@@ -24,9 +24,9 @@ import laustrup.bandwichpersistence.models.users.subscriptions.SubscriptionOffer
 import laustrup.bandwichpersistence.models.users.sub_users.venues.Venue;
 import laustrup.bandwichpersistence.services.TimeService;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembly;
-import laustrup.bandwichpersistence.utilities.Liszt;
-import laustrup.bandwichpersistence.utilities.Plato;
-import laustrup.bandwichpersistence.utilities.printers.Printer;
+import laustrup.bandwichpersistence.utilities.collections.Liszt;
+import laustrup.bandwichpersistence.utilities.parameters.Plato;
+import laustrup.bandwichpersistence.utilities.console.Printer;
 
 import lombok.Getter;
 import org.junit.jupiter.api.Test;

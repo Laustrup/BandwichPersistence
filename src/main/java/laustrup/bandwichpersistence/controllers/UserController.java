@@ -16,7 +16,7 @@ import laustrup.bandwichpersistence.models.users.sub_users.participants.Particip
 import laustrup.bandwichpersistence.models.users.subscriptions.Card;
 import laustrup.bandwichpersistence.services.DTOService;
 import laustrup.bandwichpersistence.services.controller_services.sub_controller_services.UserControllerService;
-import laustrup.bandwichpersistence.utilities.Plato;
+import laustrup.bandwichpersistence.utilities.parameters.Plato;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

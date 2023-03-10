@@ -1,10 +1,21 @@
-package laustrup.bandwichpersistence.utilities.printers;
+package laustrup.bandwichpersistence.utilities.console;
+
+import laustrup.bandwichpersistence.utilities.Utility;
 
 /**
  * Paints String that will be used for the console into another colour
  * and/or with an underline and/or background.
  */
-public class Painter {
+public abstract class Painter extends Utility {
+
+    /** Is used to generate the version of the Utility.
+     * @param year The year of the Utility.
+     * @param version The middle index of version.
+     * @param update The update of the version.
+     */
+    protected Painter(int year, int version, int update) {
+        super(year, version, update);
+    }
 
     /**
      * Will generate a escape-sequence for a specific colour.
@@ -182,6 +193,8 @@ public class Painter {
      * @return The generated text with its colour. If default text, it will be white.
      */
     protected String colorize(String text, Colour colour) {
+        if (colour == null)
+            return text;
         switch (colour) {
             case CYAN -> { return cyan(text); }
             case YELLOW -> { return yellow(text); }

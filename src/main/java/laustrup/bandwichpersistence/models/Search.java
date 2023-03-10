@@ -5,7 +5,7 @@ import laustrup.bandwichpersistence.models.dtos.users.UserDTO;
 import laustrup.bandwichpersistence.models.events.Event;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.services.DTOService;
-import laustrup.bandwichpersistence.utilities.Liszt;
+import laustrup.bandwichpersistence.utilities.collections.Liszt;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -4,6 +4,7 @@ import laustrup.bandwichpersistence.Tester;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.sub_users.bands.Band;
 
+import laustrup.bandwichpersistence.utilities.collections.Liszt;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;

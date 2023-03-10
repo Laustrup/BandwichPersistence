@@ -1,4 +1,6 @@
-package laustrup.bandwichpersistence.utilities;
+package laustrup.bandwichpersistence.utilities.collections;
+
+import laustrup.bandwichpersistence.utilities.collections.Liszt;
 
 import java.util.Collection;
 import java.util.InputMismatchException;

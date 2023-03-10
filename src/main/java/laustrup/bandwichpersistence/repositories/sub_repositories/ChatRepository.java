@@ -6,9 +6,9 @@ import laustrup.bandwichpersistence.models.chats.messages.Mail;
 import laustrup.bandwichpersistence.models.events.Event;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.repositories.Repository;
-import laustrup.bandwichpersistence.utilities.Liszt;
-import laustrup.bandwichpersistence.utilities.Plato;
-import laustrup.bandwichpersistence.utilities.printers.Printer;
+import laustrup.bandwichpersistence.utilities.collections.Liszt;
+import laustrup.bandwichpersistence.utilities.parameters.Plato;
+import laustrup.bandwichpersistence.utilities.console.Printer;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

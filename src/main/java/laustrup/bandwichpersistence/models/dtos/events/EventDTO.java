@@ -8,7 +8,7 @@ import laustrup.bandwichpersistence.models.dtos.users.contact_infos.ContactInfoD
 import laustrup.bandwichpersistence.models.dtos.users.sub_users.venues.VenueDTO;
 import laustrup.bandwichpersistence.models.events.Event;
 import laustrup.bandwichpersistence.services.DTOService;
-import laustrup.bandwichpersistence.utilities.Plato;
+import laustrup.bandwichpersistence.utilities.parameters.Plato;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

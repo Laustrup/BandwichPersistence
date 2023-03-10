@@ -2,6 +2,7 @@ package laustrup.bandwichpersistence.utilities;
 
 import laustrup.bandwichpersistence.Tester;
 
+import laustrup.bandwichpersistence.utilities.parameters.Plato;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 

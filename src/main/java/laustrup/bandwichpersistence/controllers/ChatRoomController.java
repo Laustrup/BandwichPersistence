@@ -8,7 +8,7 @@ import laustrup.bandwichpersistence.models.dtos.chats.messages.BulletinDTO;
 import laustrup.bandwichpersistence.models.dtos.chats.messages.MailDTO;
 import laustrup.bandwichpersistence.services.controller_services.sub_controller_services.ChatRoomControllerService;
 
-import laustrup.bandwichpersistence.utilities.Plato;
+import laustrup.bandwichpersistence.utilities.parameters.Plato;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

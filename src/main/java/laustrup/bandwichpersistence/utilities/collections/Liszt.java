@@ -1,8 +1,10 @@
-package laustrup.bandwichpersistence.utilities;
+package laustrup.bandwichpersistence.utilities.collections;
 
-import laustrup.bandwichpersistence.utilities.printers.Printer;
+import laustrup.bandwichpersistence.utilities.Utility;
+import laustrup.bandwichpersistence.utilities.console.Printer;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 /**
@@ -13,7 +15,7 @@ import java.util.*;
  * means, that they will be saved doing add, costing lower performance.
  * @param <E> The type of element that are wished to be used in this class
  */
-public class Liszt<E> implements List<E>, ILiszt<E> {
+public class Liszt<E> extends Utility implements List<E>, ILiszt<E> {
 
     /**
      * Contains all the elements that are inside the Liszt.
@@ -26,6 +28,7 @@ public class Liszt<E> implements List<E>, ILiszt<E> {
 
     public Liszt() { this(false); }
     public Liszt(boolean isLinked) {
+        super(LocalDateTime.now().getYear(),1,1);
         _data = (E[]) new Object[0];
         _destinationKeys = new String[0];
 
@@ -34,6 +37,7 @@ public class Liszt<E> implements List<E>, ILiszt<E> {
     }
     public Liszt(E[] data) { this(data,false); }
     public Liszt(E[] data, boolean isLinked) {
+        super(LocalDateTime.now().getYear(),1,1);
         _destinationKeys = new String[0];
 
         if (isLinked) _map = new LinkedHashMap<>(); else _map = new HashMap<>();

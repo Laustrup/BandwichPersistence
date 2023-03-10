@@ -17,7 +17,7 @@ import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
 import laustrup.bandwichpersistence.models.users.subscriptions.Subscription;
 import laustrup.bandwichpersistence.models.users.subscriptions.SubscriptionOffer;
 import laustrup.bandwichpersistence.services.DTOService;
-import laustrup.bandwichpersistence.utilities.Liszt;
+import laustrup.bandwichpersistence.utilities.collections.Liszt;
 
 import lombok.Getter;
 

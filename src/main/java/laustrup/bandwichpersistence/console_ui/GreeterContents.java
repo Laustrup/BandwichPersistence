@@ -26,7 +26,7 @@ public class GreeterContents {
             "If you wish to skip the prompt section, simply type skip " +
             "and the application will use the default settings of the section and the next will start." + _newLine +
             "In case you want to quit running the application, simply type cancel and the application will cancel to run." + _sectionSkip +
-            "Type any key, when you are ready to begin.",
+            "Type any key to  begin.",
             _printerIntroduction = "-- Printer" + _sectionSkip +
                     "\tThe Printer is a class used for writing to the console, it can print in various ways and logs actions." + _sectionSkip +
                     "Please choose a mode for the printer.\n\n",
@@ -66,7 +66,7 @@ public class GreeterContents {
 
     /** Inputs that will have a command. */
     protected enum Command {
-        ANY_KEY("any key, when you are ready"),
+        ANY_KEY("any key"),
         START("start"),
         SKIP("skip"),
         CANCEL("cancel"),

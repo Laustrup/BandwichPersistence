@@ -1,9 +1,11 @@
-package laustrup.bandwichpersistence.utilities;
+package laustrup.bandwichpersistence.utilities.parameters;
 
+import laustrup.bandwichpersistence.utilities.Utility;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.time.LocalDateTime;
 import java.util.Random;
 
 /**
@@ -15,7 +17,7 @@ import java.util.Random;
  * Can also be null, since it's a class object.
  */
 @ToString
-public class Plato implements IPlato {
+public class Plato extends Utility implements IPlato {
 
     /**
      * Determines the value of the Plato class.
@@ -71,9 +73,16 @@ public class Plato implements IPlato {
      */
     public boolean get_truth() { return _truth && (_argument == Argument.TRUE || _argument == Argument.ABOVE_HALF); }
 
+    /** Sets the argument to undefined */
     public Plato() { this(Argument.UNDEFINED); }
-    public Plato(Argument argument) { set_argument(argument); }
-    public Plato(boolean isTrue) { set_argument(isTrue); }
+    public Plato(Argument argument) {
+        super(LocalDateTime.now().getYear(),1,1);
+        set_argument(argument);
+    }
+    public Plato(boolean isTrue) {
+        super(LocalDateTime.now().getYear(),1,1);
+        set_argument(isTrue);
+    }
 
     @Override
     public boolean randomize() { return randomize(1); }

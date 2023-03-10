@@ -7,7 +7,7 @@ import laustrup.bandwichpersistence.models.dtos.chats.ChatRoomDTO;
 import laustrup.bandwichpersistence.services.controller_services.ControllerService;
 import laustrup.bandwichpersistence.services.persistence_services.entity_services.sub_entity_services.ChatPersistenceService;
 
-import laustrup.bandwichpersistence.utilities.Plato;
+import laustrup.bandwichpersistence.utilities.parameters.Plato;
 import org.springframework.http.ResponseEntity;
 
 public class ChatRoomControllerService extends ControllerService<ChatRoomDTO> {

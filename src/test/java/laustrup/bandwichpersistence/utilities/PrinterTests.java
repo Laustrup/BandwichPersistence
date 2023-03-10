@@ -2,7 +2,7 @@ package laustrup.bandwichpersistence.utilities;
 
 import laustrup.bandwichpersistence.Tester;
 
-import laustrup.bandwichpersistence.utilities.printers.Printer;
+import laustrup.bandwichpersistence.utilities.console.Printer;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 

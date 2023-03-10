@@ -1,7 +1,7 @@
 package laustrup.bandwichpersistence;
 
 import laustrup.bandwichpersistence.console_ui.Greeter;
-import laustrup.bandwichpersistence.utilities.printers.Printer;
+import laustrup.bandwichpersistence.utilities.console.Printer;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
