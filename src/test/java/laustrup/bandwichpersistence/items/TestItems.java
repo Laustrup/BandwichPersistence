@@ -1,4 +1,4 @@
-package laustrup.bandwichpersistence;
+package laustrup.bandwichpersistence.items;
 
 import laustrup.bandwichpersistence.models.Model;
 import laustrup.bandwichpersistence.models.albums.AlbumItem;
@@ -24,36 +24,38 @@ import laustrup.bandwichpersistence.models.users.subscriptions.SubscriptionOffer
 import laustrup.bandwichpersistence.models.users.sub_users.venues.Venue;
 import laustrup.bandwichpersistence.services.TimeService;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembly;
+import laustrup.bandwichpersistence.tests.Tester;
 import laustrup.bandwichpersistence.utilities.collections.Liszt;
 import laustrup.bandwichpersistence.utilities.parameters.Plato;
 import laustrup.bandwichpersistence.utilities.console.Printer;
 
 import lombok.Getter;
-import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
+import java.util.function.Function;
 
+import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Contains different attributes that imitates models.
  * Primary intended to be used for tests, involving models.
  */
-public class TestItems extends Tester {
+public class TestItems extends Tester<Object, Object> {
 
     /**
      * Will be used to create values for attributes.
      */
-    private Random _random = new Random();
+    private final Random _random = new Random();
 
     /**
      * An Artist gathered from the database of default values with all its values assigned to it.
      */
     @Getter
-    private Artist _carlos = (Artist) Assembly.get_instance().getUser(1),
+    private final Artist _carlos = (Artist) Assembly.get_instance().getUser(1),
             _bjarke = (Artist) Assembly.get_instance().getUser(2),
             _tir = (Artist) Assembly.get_instance().getUser(3),
             _laust = (Artist) Assembly.get_instance().getUser(4);
@@ -61,20 +63,20 @@ public class TestItems extends Tester {
      * A Band gathered from the database of default values with all its values assigned to it.
      */
     @Getter
-    private Band _melanges = (Band) Assembly.get_instance().getUser(5);
+    private final Band _melanges = (Band) Assembly.get_instance().getUser(5);
 
     /**
      * A Venue gathered from the database of default values with all its values assigned to it.
      */
     @Getter
-    private Venue _metronomen = (Venue) Assembly.get_instance().getUser(6),
+    private final Venue _metronomen = (Venue) Assembly.get_instance().getUser(6),
             _roskilde = (Venue) Assembly.get_instance().getUser(7);
 
     /**
      * A Participant gathered from the database of default values with all its values assigned to it.
      */
     @Getter
-    private Participant _rockGuy = (Participant) Assembly.get_instance().getUser(8),
+    private final Participant _rockGuy = (Participant) Assembly.get_instance().getUser(8),
             _beautiQueen = (Participant) Assembly.get_instance().getUser(9),
             _artsy = (Participant) Assembly.get_instance().getUser(10);
 
@@ -529,23 +531,21 @@ public class TestItems extends Tester {
 
     @Test
     public void itemTest() {
-        for (int i = 0; i < 1; i++) {
+        test(t -> {
             try {
-                // ARRANGE
-                begin();
+                act(e -> {
+                    resetItems();
+                    return null;
+                });
 
-                // ACT
-                resetItems();
-                calculatePerformance();
-
-                // ASSERT
-                assertTrue(true);
+                success("Items are successfully reset!");
             } catch (Exception e) {
                 Printer.get_instance().print("Test items caught an Exception...", e);
 
-                // ASSERT
-                fail();
+                fail("Items could not be reset...", e);
             }
-        }
+
+            return true;
+        });
     }
 }

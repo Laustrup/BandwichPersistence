@@ -1,5 +1,7 @@
 package laustrup.bandwichpersistence.services;
 
+import org.w3c.dom.CharacterData;
+
 import java.util.Random;
 
 public class RandomCreatorService {
@@ -62,6 +64,10 @@ public class RandomCreatorService {
             return string;
     }
 
+    /**
+     * Will generate a String containing a random password with generateString() with special characters and length of 5.
+     * @return The generated password.
+     */
     public String generatePassword() {
         String password = new String();
 

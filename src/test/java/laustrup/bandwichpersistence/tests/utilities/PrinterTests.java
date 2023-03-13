@@ -1,12 +1,13 @@
-package laustrup.bandwichpersistence.utilities;
+package laustrup.bandwichpersistence.tests.utilities;
 
-import laustrup.bandwichpersistence.Tester;
+import laustrup.bandwichpersistence.tests.Tester;
 
 import laustrup.bandwichpersistence.utilities.console.Printer;
+
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-public class PrinterTests extends Tester {
+public class PrinterTests extends Tester<String, String> {
 
     private static final Printer _printer = Printer.get_instance();
 
@@ -24,17 +25,18 @@ public class PrinterTests extends Tester {
     @ParameterizedTest
     @CsvSource(value = {_null, _empty, _single, _multiple, _borderCheck})
     void canPrint(String content) {
-        //ARRANGE
-        content = arrange(content);
+        test(t -> {
+            String expected = arrange(content, this::arrange);
 
-        //ACT
-        begin();
-        _printer.print(content);
-        String actual = _printer.get_latest();
-        calculatePerformance();
+            String actual = act(expected, e -> {
+                _printer.print(e);
+                return _printer.get_latest();
+            });
 
-        //ASSERT
-        asserting(content == null || content.isEmpty() ? "Nothing to print..." : content, actual);
+            asserting(expected == null || expected.isEmpty() ? "Nothing to print..." : expected, actual);
+
+            return true;
+        });
     }
 
     @ParameterizedTest
@@ -45,20 +47,26 @@ public class PrinterTests extends Tester {
             _multiple+_divider+ _numberFormatException,
             _borderCheck+_divider+ _numberFormatException}, delimiter = _delimiter)
     void canPrint(String content, String exception) {
-        //ARRANGE
-        content = arrange(content);
-        Exception determined = determine(exception);
-        String expected = (content != null && !content.isEmpty() ? content + "\n\n-- EXCEPTION\n\n" : "-- EXCEPTION\n\n")
-                + determined.toString();
+        test(t -> {
+            String expected = arrange(content, e -> {
+                String arranged = arrange(e);
+                _exception = determine(exception);
+                if (_exception != null)
+                    return (!e.isEmpty() ? e + "\n\n-- EXCEPTION\n\n" : "-- EXCEPTION\n\n")
+                            + _exception.toString();
+                return arranged;
+            });
 
-        //ACT
-        begin();
-        _printer.print(content,determined);
-        String actual = _printer.get_latest();
-        calculatePerformance();
+            String actual = act(expected, e -> {
+                _printer.print(e,_exception);
+                return _printer.get_latest();
+            });
 
-        //ASSERT
-        asserting(expected, actual);
+            asserting(expected, actual);
+
+            return true;
+        });
+
     }
 
     /**
@@ -86,7 +94,7 @@ public class PrinterTests extends Tester {
         switch (exception) {
             case _numberFormatException -> {
                 try {
-                    int integer = Integer.parseInt("a");
+                    Integer.parseInt("a");
                     return null;
                 }
                 catch (Exception e) {

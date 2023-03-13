@@ -1,4 +1,4 @@
-package laustrup.bandwichpersistence;
+package laustrup.bandwichpersistence.items.aaa;
 
 import laustrup.bandwichpersistence.models.Rating;
 import laustrup.bandwichpersistence.models.albums.Album;
@@ -20,9 +20,48 @@ import laustrup.bandwichpersistence.models.users.subscriptions.Subscription;
 import laustrup.bandwichpersistence.utilities.collections.Liszt;
 import laustrup.bandwichpersistence.utilities.console.Printer;
 
+import javax.lang.model.element.UnknownElementException;
+
 import static org.junit.jupiter.api.Assertions.*;
 
-public class Asserter {
+public abstract class Asserter<T,R> extends Actor<T,R> {
+
+    /**
+     * Generates a message for cases, where an element such or should not be null.
+     * @param object The Object that should either be null or not.
+     * @return The generated message.
+     */
+    protected String isNullMessage(Object object) {
+        if (object == null)
+            return "An object is null, where it is not supposed to be...";
+        return object.toString() + " isn't null...";
+    }
+
+    /**
+     * Will generate a message of the assertion fail of two collections having different sizes.
+     * @param elements The two collections, must be of no more than two.
+     * @return The generated message.
+     */
+    protected String notSameSizeMessage(Object[][] elements) {
+        String description = new String();
+        if (elements.length == 0)
+            description = "Collections not specified";
+        else if (elements.length >= 2)
+            description = elements[0][0].getClass() + " of " + Printer.get_instance().toString(elements[0]) + " and " +
+                    Printer.get_instance().toString(elements[1]);
+        else
+            description = elements[0][0].getClass() + " of " + Printer.get_instance().toString(elements[0]);
+        return description + " are not the same size...";
+    }
+
+    /**
+     * Will generate a message of the assertion fail of an unknown switch case occurring at default case.
+     * @param element The element that results in the fail.
+     * @return The generated message.
+     */
+    protected String switchElementUnknown(Object element) {
+        return element.toString() + " type unknown of " + element.getClass();
+    }
 
     /**
      * Asserts two Users to check they are the same.
@@ -37,7 +76,7 @@ public class Asserter {
             case BAND -> assertBands((Band) expected,(Band) actual, true);
             case ARTIST -> assertArtists((Artist) expected,(Artist) actual, true);
             case VENUE -> assertVenues((Venue) expected,(Venue) actual, true);
-            default -> fail();
+            default -> fail(switchElementUnknown(authority), new UnknownElementException(null,authority));
         }
     }
 
@@ -49,10 +88,12 @@ public class Asserter {
     protected void assertParticipants(Participant expected, Participant actual, boolean assertNotNull) {
         if ((expected != null && actual != null) || assertNotNull) {
             assertUsers(expected, actual);
+            assert expected != null && actual != null;
             if (expected.get_idols().size() == actual.get_idols().size())
                 for (int i = 1; i <= expected.get_idols().size(); i++)
                     assertEquals(expected.get_idols().get(i).toString(),actual.get_idols().get(i).toString());
-            else fail();
+            else
+                fail(notSameSizeMessage(new Object[][]{expected.get_idols().get_data(),actual.get_idols().get_data()}));
         }
     }
 
@@ -64,10 +105,11 @@ public class Asserter {
     protected void assertBands(Band expected, Band actual, boolean assertNotNull) {
         if ((expected != null && actual != null) || assertNotNull) {
             assertPerformers(expected, actual);
+            assert expected != null && actual != null;
             if (expected.get_members().size() == actual.get_members().size())
                 for (int i = 1; i <= expected.get_members().size(); i++)
                     assertEquals(expected.get_members().get(i).toString(),actual.get_members().get(i).toString());
-            else fail();
+            else fail("Bands are not the same size");
             assertEquals(expected.get_runner(),actual.get_runner());
         }
     }
@@ -79,11 +121,14 @@ public class Asserter {
      */
     protected void assertArtists(Artist expected, Artist actual, boolean assertNotNull) {
         if ((expected != null && actual != null) || assertNotNull)
-        assertPerformers(expected,actual);
+            assertPerformers(expected,actual);
+        assert expected != null && actual != null;
         if (expected.get_bands().size() == actual.get_bands().size())
             for (int i = 1; i <= expected.get_bands().size(); i++)
                 assertEquals(expected.get_bands().get(i).toString(),actual.get_bands().get(i).toString());
-        else fail();
+        else
+            fail(notSameSizeMessage(new Object[][]{expected.get_bands().get_data(),actual.get_bands().get_data()}));
+
         assertEquals(expected.get_runner(),actual.get_runner());
         assertRequests(expected.get_requests(),actual.get_requests());
     }
@@ -98,11 +143,13 @@ public class Asserter {
         if (expected.get_fans().size() == actual.get_fans().size())
             for (int i = 1; i <= expected.get_fans().size(); i++)
                 assertEquals(expected.get_fans().get(i).toString(),actual.get_fans().get(i).toString());
-        else fail();
+        else
+            fail(notSameSizeMessage(new Object[][]{expected.get_fans().get_data(),actual.get_fans().get_data()}));
         if (expected.get_idols().size() == actual.get_idols().size())
             for (int i = 1; i <= expected.get_idols().size(); i++)
                 assertEquals(expected.get_idols().get(i).toString(),actual.get_idols().get(i).toString());
-        else fail();
+        else
+            fail(notSameSizeMessage(new Object[][]{expected.get_idols().get_data(),actual.get_idols().get_data()}));
     }
 
     /**
@@ -113,6 +160,7 @@ public class Asserter {
     protected void assertVenues(Venue expected, Venue actual, boolean assertNotNull) {
         if ((expected != null && actual != null) || assertNotNull) {
             assertUsers(expected, actual);
+            assert expected != null && actual != null;
             assertEquals(expected.get_location(),actual.get_location());
             assertEquals(expected.get_gearDescription(),actual.get_gearDescription());
             assertEquals(expected.get_size(),actual.get_size());
@@ -167,7 +215,7 @@ public class Asserter {
                             assertEquals(expected.get_items().get(j).get_kind(),actual.get_items().get(j).get_kind());
                         }
                 }
-            } else fail();
+            } else fail(notSameSizeMessage(new Object[][]{expectations.get_data(),actuals.get_data()}));
         }
     }
 
@@ -191,7 +239,7 @@ public class Asserter {
                             && (actual.get_value() <= 5 && actual.get_value() > 0));
                     assertEquals(expected.get_comment(),actual.get_comment());
                 }
-            } else fail();
+            } else fail(notSameSizeMessage(new Object[][]{expectations.get_data(),actuals.get_data()}));
         }
     }
 
@@ -213,7 +261,7 @@ public class Asserter {
                     assertEquals(expected.get_answeringTime(),actual.get_answeringTime());
                     assertEquals(expected.is_answered(),actual.is_answered());
                 }
-            } else fail();
+            } else fail(notSameSizeMessage(new Object[][]{expectations.get_data(),actuals.get_data()}));
         }
     }
 
@@ -236,7 +284,7 @@ public class Asserter {
                 assertEquals(expected.is_public(),actual.is_public());
                 assertEquals(expected.get_timestamp(),actual.get_timestamp());
             }
-        } else fail();
+        } else fail(notSameSizeMessage(new Object[][]{expectations.get_data(),actuals.get_data()}));
     }
 
     /**
@@ -278,7 +326,7 @@ public class Asserter {
                     assertEquals(expected.get_approved().get_truth(),actual.get_approved().get_truth());
                     assertEquals(expected.get_message(),actual.get_message());
                 }
-            } else fail();
+            } else fail(notSameSizeMessage(new Object[][]{expectations.get_data(),actuals.get_data()}));
         }
     }
     /**
@@ -312,9 +360,7 @@ public class Asserter {
                     assertEquals(expected.get_primaryId(),actual.get_primaryId());
                     assertUsers(expected.get_author(), actual.get_author());
                     if (expected.get_author() != null && actual.get_author() != null)
-                        if (expected.get_receiver().getClass() == User.class &&
-                            actual.get_receiver().getClass() == User.class)
-                            assertUsers((User) expected.get_receiver(),(User) actual.get_receiver());
+                        assertUsers((User) expected.get_receiver(),(User) actual.get_receiver());
                     else if (expected.get_receiver() != null && actual.get_receiver() != null)
                         if (expected.get_receiver().getClass() == Event.class &&
                             actual.get_receiver().getClass() == Event.class)
@@ -323,9 +369,8 @@ public class Asserter {
                     assertEquals(expected.is_sent(),actual.is_sent());
                     assertEquals(expected.get_edited().toString(),actual.get_edited().toString());
                     assertEquals(expected.is_public(),actual.is_public());
-                    //assertEquals(expected.get_timestamp(),actual.get_timestamp());
                 }
-            } else fail();
+            } else fail(notSameSizeMessage(new Object[][]{expectations.get_data(),actuals.get_data()}));
         }
     }
 
@@ -340,7 +385,7 @@ public class Asserter {
                 for (int i = 1; i <= expectations.size(); i++)
                     asserting(expectations.get(i),actuals.get(i));
             else
-                fail();
+                fail(notSameSizeMessage(new Object[][]{expectations.get_data(),actuals.get_data()}));
     }
 
     /**
@@ -386,7 +431,7 @@ public class Asserter {
                 for (int i = 1; i <= expectations.size(); i++)
                     asserting(expectations.get(i),actuals.get(i));
             else
-                fail();
+                fail(notSameSizeMessage(new Object[][]{expectations.get_data(),actuals.get_data()}));
         }
     }
 
@@ -410,7 +455,7 @@ public class Asserter {
                 for (int i = 1; i <= expectations.size(); i++)
                     asserting(expectations.get(i),actuals.get(i));
             else
-                fail();
+                fail(notSameSizeMessage(new Object[][]{expectations.get_data(),actuals.get_data()}));
         }
     }
 
@@ -449,11 +494,61 @@ public class Asserter {
     }
 
     /**
+     * A simple comparing assertEqual of two booleans.
+     * @param expected The boolean that is arranged and defined.
+     * @param actual The boolean that is the result of an action
+     */
+    protected void asserting(boolean expected, boolean actual) { assertEquals(expected,actual);}
+
+    /**
+     * A simple comparing assertEqual of two Objects.
+     * @param expected The Object that is arranged and defined.
+     * @param actual The Object that is the result of an action
+     */
+    protected void asserting(Object expected, Object actual) { assertEquals(expected,actual);}
+
+    /**
      * A simple comparing assertEqual of two Strings.
      * @param expected The String that is arranged and defined.
      * @param actual The String that is the result of an action
      */
     protected void asserting(String expected, String actual) {
         assertEquals(expected,actual);
+    }
+
+    /**
+     * Will assert the condition of whether this is null or not.
+     * @param object The Object that will be asserted.
+     */
+    protected void notNull(Object object) {
+        assertNotNull(object);
+    }
+
+    /**
+     * Will make the assertion fail.
+     * @param message The reason of the fail described.
+     */
+    protected void fail(String message) {
+        Printer.get_instance().print(message, new Exception());
+        fail(message);
+    }
+
+    /**
+     * Will make the assertion fail.
+     * @param message The reason of the fail described.
+     * @param exception The exception caused.
+     */
+    protected void fail(String message, Exception exception) {
+        Printer.get_instance().print(message, exception);
+        fail(message);
+    }
+
+    /**
+     * Will add the message to the print and assertion status will be a success.
+     * @param message A description of the assertion.
+     */
+    protected void success(String message) {
+        _print += "\n\n\t" + message + "\n";
+        assertTrue(true);
     }
 }

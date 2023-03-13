@@ -1,5 +1,6 @@
 package laustrup.bandwichpersistence.utilities.console;
 
+import laustrup.bandwichpersistence.repositories.DbLibrary;
 import laustrup.bandwichpersistence.utilities.collections.Liszt;
 
 import lombok.Data;
@@ -14,7 +15,7 @@ public class Printer extends Painter implements IPrinter {
 
     /** The specified PrinterMode for this Printer, that will behave depending on the choosen enum. */
     @Getter
-    private PrinterMode _mode = PrinterMode.NOIRE;
+    private PrinterMode _mode = DbLibrary.get_instance().is_testing() ? PrinterMode.HIGH_CONTRAST : PrinterMode.NOIRE;
 
     /**
      * Configures the mode for the Printer.
@@ -141,7 +142,8 @@ public class Printer extends Painter implements IPrinter {
      * @return The print param for saving to be latest.
      */
     private String systemOut(String print) {
-        System.out.println(cyan(_startBorder) + print + cyan(_endBorder));
+        System.out.println(_mode.equals(PrinterMode.HIGH_CONTRAST) ? cyan(_startBorder) + print + cyan(_endBorder)
+                : _startBorder + print + _endBorder);
         return print;
     }
 

@@ -6,6 +6,10 @@ import lombok.Getter;
 
 public class DbLibrary {
 
+    /** Determines if the current connection is to an in memory H2 db for testing purpose or the MySQL. */
+    @Getter
+    private final boolean _testing = true;
+
     /** Will allow a SQL statement to have multiple queries at once. */
     private String _allowMultipleQueries = Defaults.get_instance().get_sqlAllowMultipleQueries();
 
@@ -27,7 +31,9 @@ public class DbLibrary {
     /** Value for the DbGate with the purpose of creating a connection. */
     @Getter
     private String _path = setPath(),
-            _user = Defaults._instance.get_dbUser(), _password = Defaults.get_instance().get_dbPassword();
+        _user = _testing ? "sa" : Defaults._instance.get_dbUser(),
+        _password = _testing ? "" : Defaults.get_instance().get_dbPassword(),
+        _driverClassName = _testing ? "org.h2.Driver" : "com.mysql.cj.jdbc.Driver";
 
     /**
      * Will change the fields of crating a connection for the database,
@@ -85,7 +91,8 @@ public class DbLibrary {
      * @return The collected string.
      */
     private String setPath() {
-        _path = "jdbc:mysql://" + _location + ":" + _port + "/" + _schema + _allowMultipleQueries;
+        _path = "jdbc:mysql:" + (_testing ? "h2:mem:testdb"
+                : "//" + _location + ":" + _port + "/" + _schema + _allowMultipleQueries);
         return _path;
     }
 
