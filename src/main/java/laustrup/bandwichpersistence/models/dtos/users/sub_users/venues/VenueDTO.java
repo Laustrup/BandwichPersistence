@@ -50,7 +50,7 @@ public class VenueDTO extends UserDTO {
         size = venue.get_size();
         requests = new RequestDTO[venue.get_requests().size()];
         for (int i = 0; i < requests.length; i++)
-            requests[i] = new RequestDTO(venue.get_requests().get(i+1));
+            requests[i] = new RequestDTO(venue.get_requests().Get(i+1));
     }
 
     public VenueDTO(User user) {
@@ -66,7 +66,7 @@ public class VenueDTO extends UserDTO {
             size = ((Venue) user).get_size();
             requests = new RequestDTO[((Venue) user).get_requests().size()];
             for (int i = 0; i < requests.length; i++)
-                requests[i] = new RequestDTO(((Venue) user).get_requests().get(i+1));
+                requests[i] = new RequestDTO(((Venue) user).get_requests().Get(i+1));
         }
     }
 }

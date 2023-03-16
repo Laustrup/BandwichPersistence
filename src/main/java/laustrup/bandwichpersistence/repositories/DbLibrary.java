@@ -1,14 +1,17 @@
 package laustrup.bandwichpersistence.repositories;
 
 import laustrup.bandwichpersistence.Defaults;
+import laustrup.bandwichpersistence.Program;
 
+import laustrup.bandwichpersistence.repositories.h2.H2Config;
 import lombok.Getter;
 
-public class DbLibrary {
-
-    /** Determines if the current connection is to an in memory H2 db for testing purpose or the MySQL. */
-    @Getter
-    private final boolean _testing = true;
+/**
+ * Contains necessarily values for the database and are able to configure the values only at startup.
+ * Gathers some values from Defaults as standard values.
+ * Extends H2Config, that configures the embedded database used for testing purposes.
+ */
+public class DbLibrary extends H2Config {
 
     /** Will allow a SQL statement to have multiple queries at once. */
     private String _allowMultipleQueries = Defaults.get_instance().get_sqlAllowMultipleQueries();
@@ -30,10 +33,10 @@ public class DbLibrary {
 
     /** Value for the DbGate with the purpose of creating a connection. */
     @Getter
-    private String _path = setPath(),
-        _user = _testing ? "sa" : Defaults._instance.get_dbUser(),
-        _password = _testing ? "" : Defaults.get_instance().get_dbPassword(),
-        _driverClassName = _testing ? "org.h2.Driver" : "com.mysql.cj.jdbc.Driver";
+    private String _path = set_path(),
+        _user = Program.get_instance().get_state().equals(Program.State.TESTING) ? "sa" : Defaults.get_instance().get_dbUser(),
+        _password = Program.get_instance().get_state().equals(Program.State.TESTING) ? "" : Defaults.get_instance().get_dbPassword(),
+        _driverClassName = Program.get_instance().get_state().equals(Program.State.TESTING) ? "org.h2.Driver" : "com.mysql.cj.jdbc.Driver";
 
     /**
      * Will change the fields of crating a connection for the database,
@@ -68,16 +71,16 @@ public class DbLibrary {
             _password = changePassword ? password : _password;
         }
 
-        setPath();
+        set_path();
         _setupIsConfigured = true;
 
         if (allowConfiguration) {
             String fields = (changeLocation ? "Location\n" : "") +
-                    (changePort ? "Port\n" : "") +
-                    (changeSchema ? "Schema\n" : "") +
-                    (!allowMultipleQueries ? "Will not allow multiple queries\n" : "") +
-                    (changeUser ? "User\n" : "") +
-                    (changePassword ? "Password\n" : "");
+                (changePort ? "Port\n" : "") +
+                (changeSchema ? "Schema\n" : "") +
+                (!allowMultipleQueries ? "Will not allow multiple queries\n" : "") +
+                (changeUser ? "User\n" : "") +
+                (changePassword ? "Password\n" : "");
 
             return "\tFields that has been successfully changed are:\n\n" + fields + "\n";
         }
@@ -88,12 +91,18 @@ public class DbLibrary {
     /**
      * Collects a string of a path to the database from the necessarily fields needed,
      * therefore the path should be set after location, port, schema and allow multiple queries.
+     * Will generate or reset the reset_db.sql and it will be composed by the boilerplate.sql and default_values.sql.
      * @return The collected string.
      */
-    private String setPath() {
-        _path = "jdbc:mysql:" + (_testing ? "h2:mem:testdb"
-                : "//" + _location + ":" + _port + "/" + _schema + _allowMultipleQueries);
-        return _path;
+    public String set_path() {
+        if (Program.get_instance().get_state().equals(Program.State.TESTING))
+            h2InitScript();
+
+        return "jdbc:" +
+            (Program.get_instance().get_state().equals(Program.State.TESTING)
+                ? "h2:mem:TESTING" +
+                ";CACHE_SIZE=8192;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE;DB_CLOSE_DELAY=-1;" + h2Init()
+                    : "mysql://" + _location + ":" + _port + "/" + _schema + _allowMultipleQueries);
     }
 
     /**

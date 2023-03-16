@@ -65,7 +65,7 @@ public class EventTests extends Tester<Object, Object> {
 
                     Gig[] gigs = new Gig[_generatedGigs.size()];
                     for (int j = 0; j < gigs.length; j++)
-                        gigs[j] = _generatedGigs.get(j+1);
+                        gigs[j] = _generatedGigs.Get(j+1);
 
                     return gigs;
                 });
@@ -94,8 +94,8 @@ public class EventTests extends Tester<Object, Object> {
                 Gig[] gigsToRemove = new Gig[_event.get_gigs().size()-1];
                 Set<Gig> gigSet = new HashSet<>();
                 for (int j = 0; j < gigsToRemove.length; j++) {
-                    Gig gig = _event.get_gigs().get(_random.nextInt(_event.get_gigs().size())+1);
-                    while (gigSet.contains(gig)) gig = _event.get_gigs().get(_random.nextInt(_event.get_gigs().size())+1);
+                    Gig gig = _event.get_gigs().Get(_random.nextInt(_event.get_gigs().size())+1);
+                    while (gigSet.contains(gig)) gig = _event.get_gigs().Get(_random.nextInt(_event.get_gigs().size())+1);
                     gigSet.add(gig);
 
                     gigsToRemove[j] = gig;
@@ -115,8 +115,8 @@ public class EventTests extends Tester<Object, Object> {
     private long calculateEventLength() {
         Liszt<Gig> gigs = _event.get_gigs();
 
-        LocalDateTime start = _event.get_gigs().get(1).get_start();
-        LocalDateTime end = _event.get_gigs().get(1).get_end();
+        LocalDateTime start = _event.get_gigs().Get(1).get_start();
+        LocalDateTime end = _event.get_gigs().Get(1).get_end();
 
         for (Gig gig : gigs) {
             if (gig.get_start().isBefore(start)) start = gig.get_start();
@@ -158,8 +158,8 @@ public class EventTests extends Tester<Object, Object> {
 
                 do {
                     for (int i = 1; i <= _event.get_requests().size(); i++) {
-                        if (!_event.get_requests().get(i).get_approved().get_truth()) {
-                            request = _event.get_requests().get(i);
+                        if (!_event.get_requests().Get(i).get_approved().get_truth()) {
+                            request = _event.get_requests().Get(i);
                             _index = i;
                         }
                     }
@@ -175,8 +175,8 @@ public class EventTests extends Tester<Object, Object> {
             act(expected, e -> _event.acceptRequest((Request) e));
 
             expected.set_approved(new Plato(true));
-            asserting(_event.get_requests().get(_index).toString(), expected.toString());
-            asserting(_event.get_requests().get(_index).get_approved().get_truth());
+            asserting(_event.get_requests().Get(_index).toString(), expected.toString());
+            asserting(_event.get_requests().Get(_index).get_approved().get_truth());
 
             return true;
         });

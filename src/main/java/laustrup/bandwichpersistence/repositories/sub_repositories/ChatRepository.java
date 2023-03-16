@@ -44,7 +44,7 @@ public class ChatRepository extends Repository {
         StringBuilder where = new StringBuilder("WHERE ");
 
         for (int i = 1; i <= ids.size(); i++) {
-            where.append("chat_rooms.id = ").append(ids.get(i));
+            where.append("chat_rooms.id = ").append(ids.Get(i));
             if (i < ids.size())
                 where.append(" OR ");
         }
@@ -64,7 +64,7 @@ public class ChatRepository extends Repository {
         StringBuilder where = new StringBuilder("WHERE ");
 
         for (int i = 1; i <= ids.size(); i++) {
-            where.append("bulletins.id = ").append(ids.get(i));
+            where.append("bulletins.id = ").append(ids.Get(i));
             if (i < ids.size())
                 where.append(" OR ");
         }

@@ -35,10 +35,8 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
-import java.util.function.Function;
 
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Contains different attributes that imitates models.
@@ -133,7 +131,12 @@ public class TestItems extends Tester<Object, Object> {
     @Getter
     private ChatRoom[] _chatRooms;
 
-    public TestItems() { resetItems(); }
+    /**
+     * Will start with all items being reset.
+     */
+    public TestItems() {
+        resetItems();
+    }
 
     public void resetItems() {
         // Lengths of collections
@@ -498,7 +501,7 @@ public class TestItems extends Tester<Object, Object> {
 
             _chatRooms[i] = new ChatRoom(id, _random.nextBoolean(), "Chatroom "+id,
                     generateMails(members), members,
-                    members.get(_random.nextInt(members.size())+1), LocalDateTime.now()
+                    members.Get(_random.nextInt(members.size())+1), LocalDateTime.now()
             );
         }
     }
@@ -513,7 +516,7 @@ public class TestItems extends Tester<Object, Object> {
 
             for (int j = 0; j < contentAmount; j++) content += "Test ";
 
-            mails.add(new Mail(i+1, null, members.get(_random.nextInt(members.size())+1),
+            mails.add(new Mail(i+1, null, members.Get(_random.nextInt(members.size())+1),
                     content, _random.nextBoolean(), generatePlato(), _random.nextBoolean(), LocalDateTime.now()));
         }
 

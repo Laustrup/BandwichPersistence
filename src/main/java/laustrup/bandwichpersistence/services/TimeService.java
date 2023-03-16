@@ -46,7 +46,7 @@ public class TimeService {
 
         for (ChatRoom room : chatRooms) {
             if (room.is_answered()) answeringTimes.add(room.get_answeringTime());
-            else answeringTimes.add(Duration.between(room.get_mails().get(1).get_timestamp(),
+            else answeringTimes.add(Duration.between(room.get_mails().Get(1).get_timestamp(),
                     LocalDateTime.now()).toMinutes());
         }
 

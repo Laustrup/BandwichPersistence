@@ -66,8 +66,12 @@ CREATE TABLE users(
     PRIMARY KEY(id)
 );
 
-ALTER TABLE users ADD UNIQUE unique_username(username,`password`);
-ALTER TABLE users ADD UNIQUE unique_email(email,`password`);
+CREATE UNIQUE INDEX username_password ON users(username,`password`);
+CREATE UNIQUE INDEX email_password ON users(email,`password`);
+
+-- Previous Unique indexes
+-- ALTER TABLE users ADD UNIQUE username_password(username,`password`);
+-- ALTER TABLE users ADD UNIQUE email_password(email,`password`);
 
 CREATE TABLE band_members(
     artist_id BIGINT(20) NOT NULL,
@@ -144,7 +148,7 @@ CREATE TABLE gigs(
     `timestamp` DATETIME,
 
     PRIMARY KEY(id),
-    FOREIGN KEY(event_id) REFERENCES events(id) ON DELETE CASCADE
+    FOREIGN KEY(event_id) REFERENCES `events`(id) ON DELETE CASCADE
 );
 
 CREATE TABLE acts(
@@ -167,7 +171,7 @@ CREATE TABLE participations(
     `timestamp` DATETIME NOT NULL,
 
     PRIMARY KEY(event_id, participant_id),
-    FOREIGN KEY(event_id) REFERENCES events(id) ON DELETE CASCADE,
+    FOREIGN KEY(event_id) REFERENCES `events`(id) ON DELETE CASCADE,
     FOREIGN KEY(participant_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
@@ -248,7 +252,7 @@ CREATE TABLE bulletins(
     PRIMARY KEY(id),
     FOREIGN KEY(author_id) REFERENCES users(id),
     FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY(event_id) REFERENCES events(id) ON DELETE CASCADE
+    FOREIGN KEY(event_id) REFERENCES `events`(id) ON DELETE CASCADE
 );
 
 CREATE TABLE requests(
@@ -264,7 +268,7 @@ CREATE TABLE requests(
 
     PRIMARY KEY(user_id,event_id),
     FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY(event_id) REFERENCES events(id) ON DELETE CASCADE
+    FOREIGN KEY(event_id) REFERENCES `events`(id) ON DELETE CASCADE
 );
 
 CREATE TABLE ratings(

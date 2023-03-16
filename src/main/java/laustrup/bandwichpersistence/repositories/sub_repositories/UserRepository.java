@@ -85,7 +85,7 @@ public class UserRepository extends Repository {
         StringBuilder where = new StringBuilder("WHERE ");
 
         for (int i = 1; i <= ids.size(); i++) {
-            where.append("users.id = ").append(ids.get(i));
+            where.append("users.id = ").append(ids.Get(i));
             if (i < ids.size())
                 where.append(" OR ");
         }

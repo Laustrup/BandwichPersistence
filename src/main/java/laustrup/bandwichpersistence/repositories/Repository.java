@@ -1,5 +1,6 @@
 package laustrup.bandwichpersistence.repositories;
 
+import laustrup.bandwichpersistence.Program;
 import laustrup.bandwichpersistence.utilities.parameters.Plato;
 import laustrup.bandwichpersistence.utilities.console.Printer;
 
@@ -29,9 +30,9 @@ public abstract class Repository extends DbTranslator {
     protected ResultSet read(String sql) {
         handleConnection();
         try {
-            return connection().prepareStatement(sql).executeQuery();
+            return connection().prepareStatement(handleSQL(sql)).executeQuery();
         } catch (SQLException e) {
-            Printer.get_instance().print("Couldn't read sql statement...\n\n" + sql,e);
+            Printer.get_instance().print("-- Couldn't read sql statement...\n\n" + sql,e);
         }
         return null;
     }
@@ -47,7 +48,7 @@ public abstract class Repository extends DbTranslator {
     protected boolean edit(String sql) {
         handleConnection();
         try {
-            return connection().prepareStatement(sql).executeUpdate() > 0;
+            return connection().prepareStatement(handleSQL(sql)).executeUpdate() > 0;
         } catch (SQLException e) {
             Printer.get_instance().print("Couldn't execute update...\n\n" + sql ,e);
         }
@@ -63,14 +64,30 @@ public abstract class Repository extends DbTranslator {
      * @return The PreparedStatement that is executed with the GENERATED KEY.
      */
     protected PreparedStatement create(String sql) {
-            try {
-                PreparedStatement statement = handleConnection().prepareStatement(sql,
-                        PreparedStatement.RETURN_GENERATED_KEYS);
+        try {
+            PreparedStatement statement = handleConnection().prepareStatement(
+                    handleSQL(sql),
+                PreparedStatement.RETURN_GENERATED_KEYS
+            );
 
-                statement.executeUpdate();
-                return statement;
-            } catch (SQLException e) { Printer.get_instance().print("Couldn't execute create...\n\n" + sql,e); }
+            statement.executeUpdate();
+            return statement;
+        } catch (SQLException e) {
+            Printer.get_instance().print("Couldn't execute create...\n\n" + sql,e);
+        }
+
         return null;
+    }
+
+    /**
+     * In case the program is running in testing mode, it will try and translate the MySQL into H" syntax.
+     * @param sql The SQL query that will be executed.
+     * @return The fixed SQL.
+     */
+    private String handleSQL(String sql) {
+        return Program.get_state().equals(Program.State.TESTING)
+            ? DbLibrary.get_instance().translateMySQLIntoH2(sql)
+            : sql;
     }
 
     /**

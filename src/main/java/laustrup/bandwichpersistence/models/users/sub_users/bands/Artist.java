@@ -97,7 +97,7 @@ public class Artist extends Performer {
     public Artist set_requestUsers() {
         if (_assembling)
             for (int i = 1; i <= _requests.size(); i++)
-                _requests.get(i).set_user(this);
+                _requests.Get(i).set_user(this);
 
         return this;
     }

@@ -140,7 +140,7 @@ public class EventDTO extends ModelDTO {
         if (event.get_gigs() != null) {
             gigs = new GigDTO[event.get_gigs().size()];
             for (int i = 0; i < gigs.length; i++)
-                gigs[i] = new GigDTO(event.get_gigs().get(i+1));
+                gigs[i] = new GigDTO(event.get_gigs().Get(i+1));
         }
 
         openDoors = event.get_openDoors();
@@ -162,22 +162,22 @@ public class EventDTO extends ModelDTO {
         if (event.get_requests() != null) {
             requests = new RequestDTO[event.get_requests().size()];
             for (int i = 0; i < requests.length; i++)
-                requests[i] = new RequestDTO(event.get_requests().get(i+1));
+                requests[i] = new RequestDTO(event.get_requests().Get(i+1));
         }
         if (event.get_participations() != null) {
             participations = new ParticipationDTO[event.get_participations().size()];
             for (int i = 0; i < participations.length; i++)
-                participations[i] = new ParticipationDTO(event.get_participations().get(i+1));
+                participations[i] = new ParticipationDTO(event.get_participations().Get(i+1));
         }
         if (event.get_bulletins() != null) {
             bulletins = new BulletinDTO[event.get_bulletins().size()];
             for (int i = 0; i < bulletins.length; i++)
-                bulletins[i] = new BulletinDTO(event.get_bulletins().get(i+1));
+                bulletins[i] = new BulletinDTO(event.get_bulletins().Get(i+1));
         }
         if (event.get_albums() != null) {
             albums = new AlbumDTO[event.get_albums().size()];
             for (int i = 0; i < albums.length; i++)
-                albums[i] = new AlbumDTO(event.get_albums().get(i+1));
+                albums[i] = new AlbumDTO(event.get_albums().Get(i+1));
         }
     }
 }

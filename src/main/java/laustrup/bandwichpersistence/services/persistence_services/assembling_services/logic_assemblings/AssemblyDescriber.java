@@ -136,7 +136,7 @@ public class AssemblyDescriber {
             try {
                 if (set.isBeforeFirst())
                     set.next();
-                bulletins.get(i).set_author(UserAssembly.get_instance().assemble(set, false,true));
+                bulletins.Get(i).set_author(UserAssembly.get_instance().assemble(set, false,true));
             } catch (SQLException e) {
                 Printer.get_instance().print("Couldn't describe Bulletins...", e);
             }
@@ -165,9 +165,9 @@ public class AssemblyDescriber {
                     if (set.isBeforeFirst())
                         set.next();
                     if (!forUser)
-                        requests.get(i).set_event(EventAssembly.get_instance().assemble(set, false));
+                        requests.Get(i).set_event(EventAssembly.get_instance().assemble(set, false));
                     else
-                        requests.get(i).set_user(UserAssembly.get_instance().assemble(set, false, true));
+                        requests.Get(i).set_user(UserAssembly.get_instance().assemble(set, false, true));
                 } catch (SQLException e) {
                     Printer.get_instance().print("Couldn't describe Requests...", e);
                 }
@@ -189,8 +189,8 @@ public class AssemblyDescriber {
         Liszt<Gig> described = new Liszt<>();
 
         for (int i = 1; i <= gigs.size(); i++)
-            described.add(new Gig(gigs.get(i).get_primaryId(), events.get(i), acts.get(i), gigs.get(i).get_start(),
-                    gigs.get(i).get_end(), gigs.get(i).get_timestamp()));
+            described.add(new Gig(gigs.Get(i).get_primaryId(), events.Get(i), acts.Get(i), gigs.Get(i).get_start(),
+                    gigs.Get(i).get_end(), gigs.Get(i).get_timestamp()));
 
         return described;
     }
@@ -209,10 +209,10 @@ public class AssemblyDescriber {
 
         for (int i = 1; i <= gigs.size(); i++) {
             Performer[] performers = null;
-            for (int j = 0; j < gigs.get(i).get_act().length; j++) {
-                performers = new Performer[gigs.get(i).get_act().length];
+            for (int j = 0; j < gigs.Get(i).get_act().length; j++) {
+                performers = new Performer[gigs.Get(i).get_act().length];
                 for (User user : users) {
-                    if (user.get_primaryId() == gigs.get(i).get_act()[i-1].get_primaryId()) {
+                    if (user.get_primaryId() == gigs.Get(i).get_act()[i-1].get_primaryId()) {
                         performers[i-1] = (Performer) user;
                         break;
                     }
@@ -237,7 +237,7 @@ public class AssemblyDescriber {
 
             for (int i = 1; i <= participations.size(); i++) {
                 participations.set(i, new Participation(
-                            (Participant) Assembly.get_instance().getUser(participations.get(i).get_primaryId()),
+                            (Participant) Assembly.get_instance().getUser(participations.Get(i).get_primaryId()),
                             event, Participation.ParticipationType.valueOf(set.getString("participations.`type`")),
                             set.getTimestamp("participations.`timestamp`").toLocalDateTime()
                         )

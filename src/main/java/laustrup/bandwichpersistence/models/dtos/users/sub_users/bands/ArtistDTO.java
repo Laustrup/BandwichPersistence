@@ -37,11 +37,11 @@ public class ArtistDTO extends PerformerDTO {
                 artist.get_timestamp());
         bands = new BandDTO[artist.get_bands().size()];
         for (int i = 0; i < bands.length; i++)
-            bands[i] = new BandDTO(artist.get_bands().get(i+1));
+            bands[i] = new BandDTO(artist.get_bands().Get(i+1));
         runner = artist.get_runner();
         requests = new RequestDTO[artist.get_requests().size()];
         for (int i = 0; i < requests.length; i++)
-            requests[i] = new RequestDTO(artist.get_requests().get(i+1));
+            requests[i] = new RequestDTO(artist.get_requests().Get(i+1));
     }
 
     public ArtistDTO(User user) {
@@ -54,11 +54,11 @@ public class ArtistDTO extends PerformerDTO {
         if (user.get_authority() == User.Authority.ARTIST) {
             bands = new BandDTO[((Artist) user).get_bands().size()];
             for (int i = 0; i < bands.length; i++)
-                bands[i] = new BandDTO(((Artist) user).get_bands().get(i+1));
+                bands[i] = new BandDTO(((Artist) user).get_bands().Get(i+1));
             runner = ((Artist) user).get_runner();
             requests = new RequestDTO[((Artist) user).get_requests().size()];
             for (int i = 0; i < requests.length; i++)
-                requests[i] = new RequestDTO(((Artist) user).get_requests().get(i+1));
+                requests[i] = new RequestDTO(((Artist) user).get_requests().Get(i+1));
         }
     }
 }

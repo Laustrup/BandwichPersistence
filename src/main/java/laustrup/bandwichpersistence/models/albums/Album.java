@@ -106,7 +106,7 @@ public class Album extends Model {
     public Liszt<AlbumItem> set(Liszt<AlbumItem> items) {
         for (AlbumItem item : items) {
             for (int i = 1; i <= _items.size(); i++) {
-                if (_items.get(i).get_primaryId() == item.get_primaryId()) {
+                if (_items.Get(i).get_primaryId() == item.get_primaryId()) {
                     _items.set(i,item);
                     break;
                 }

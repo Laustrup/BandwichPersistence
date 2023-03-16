@@ -91,7 +91,7 @@ public abstract class Asserter<T,R> extends Actor<T,R> {
             assert expected != null && actual != null;
             if (expected.get_idols().size() == actual.get_idols().size())
                 for (int i = 1; i <= expected.get_idols().size(); i++)
-                    assertEquals(expected.get_idols().get(i).toString(),actual.get_idols().get(i).toString());
+                    assertEquals(expected.get_idols().Get(i).toString(),actual.get_idols().Get(i).toString());
             else
                 fail(notSameSizeMessage(new Object[][]{expected.get_idols().get_data(),actual.get_idols().get_data()}));
         }
@@ -108,7 +108,7 @@ public abstract class Asserter<T,R> extends Actor<T,R> {
             assert expected != null && actual != null;
             if (expected.get_members().size() == actual.get_members().size())
                 for (int i = 1; i <= expected.get_members().size(); i++)
-                    assertEquals(expected.get_members().get(i).toString(),actual.get_members().get(i).toString());
+                    assertEquals(expected.get_members().Get(i).toString(),actual.get_members().Get(i).toString());
             else fail("Bands are not the same size");
             assertEquals(expected.get_runner(),actual.get_runner());
         }
@@ -125,7 +125,7 @@ public abstract class Asserter<T,R> extends Actor<T,R> {
         assert expected != null && actual != null;
         if (expected.get_bands().size() == actual.get_bands().size())
             for (int i = 1; i <= expected.get_bands().size(); i++)
-                assertEquals(expected.get_bands().get(i).toString(),actual.get_bands().get(i).toString());
+                assertEquals(expected.get_bands().Get(i).toString(),actual.get_bands().Get(i).toString());
         else
             fail(notSameSizeMessage(new Object[][]{expected.get_bands().get_data(),actual.get_bands().get_data()}));
 
@@ -142,12 +142,12 @@ public abstract class Asserter<T,R> extends Actor<T,R> {
         assertUsers(expected, actual);
         if (expected.get_fans().size() == actual.get_fans().size())
             for (int i = 1; i <= expected.get_fans().size(); i++)
-                assertEquals(expected.get_fans().get(i).toString(),actual.get_fans().get(i).toString());
+                assertEquals(expected.get_fans().Get(i).toString(),actual.get_fans().Get(i).toString());
         else
             fail(notSameSizeMessage(new Object[][]{expected.get_fans().get_data(),actual.get_fans().get_data()}));
         if (expected.get_idols().size() == actual.get_idols().size())
             for (int i = 1; i <= expected.get_idols().size(); i++)
-                assertEquals(expected.get_idols().get(i).toString(),actual.get_idols().get(i).toString());
+                assertEquals(expected.get_idols().Get(i).toString(),actual.get_idols().Get(i).toString());
         else
             fail(notSameSizeMessage(new Object[][]{expected.get_idols().get_data(),actual.get_idols().get_data()}));
     }
@@ -201,18 +201,18 @@ public abstract class Asserter<T,R> extends Actor<T,R> {
         if (expectations != null && actuals != null) {
             if (expectations.size() == actuals.size()) {
                 for (int i = 1; i <= expectations.size(); i++) {
-                    Album expected = expectations.get(i),
-                            actual = actuals.get(i);
+                    Album expected = expectations.Get(i),
+                            actual = actuals.Get(i);
                     if (!expected.get_items().isEmpty() && !actual.get_items().isEmpty())
                         for (int j = 1; j <= expected.get_items().size(); j++) {
-                            for (int k = 1; k <= expected.get_items().get(j).get_tags().size(); k++) {
-                                assertEquals(expected.get_items().get(j).get_tags().get(k).get_primaryId(),
-                                        actual.get_items().get(j).get_tags().get(k).get_primaryId());
+                            for (int k = 1; k <= expected.get_items().Get(j).get_tags().size(); k++) {
+                                assertEquals(expected.get_items().Get(j).get_tags().Get(k).get_primaryId(),
+                                        actual.get_items().Get(j).get_tags().Get(k).get_primaryId());
                             }
-                                assertEquals(expected.get_items().get(j).get_endpoint(),actual.get_items().get(j).get_endpoint());
-                            if (expected.get_items().get(j).get_event() != null)
-                                assertEquals(expected.get_items().get(j).get_event().get_primaryId(),actual.get_items().get(j).get_primaryId());
-                            assertEquals(expected.get_items().get(j).get_kind(),actual.get_items().get(j).get_kind());
+                                assertEquals(expected.get_items().Get(j).get_endpoint(),actual.get_items().Get(j).get_endpoint());
+                            if (expected.get_items().Get(j).get_event() != null)
+                                assertEquals(expected.get_items().Get(j).get_event().get_primaryId(),actual.get_items().Get(j).get_primaryId());
+                            assertEquals(expected.get_items().Get(j).get_kind(),actual.get_items().Get(j).get_kind());
                         }
                 }
             } else fail(notSameSizeMessage(new Object[][]{expectations.get_data(),actuals.get_data()}));
@@ -228,8 +228,8 @@ public abstract class Asserter<T,R> extends Actor<T,R> {
         if (expectations != null && actuals != null) {
             if (expectations.size() == actuals.size()) {
                 for (int i = 1; i <= expectations.size(); i++) {
-                    Rating expected = expectations.get(i),
-                            actual = actuals.get(i);
+                    Rating expected = expectations.Get(i),
+                            actual = actuals.Get(i);
                     if (expected.get_appointed() != null && actual.get_appointed() != null)
                         assertEquals(expected.get_appointed().get_primaryId(),actual.get_appointed().get_primaryId());
                     if (expected.get_judge() != null && actual.get_judge() != null)
@@ -252,11 +252,11 @@ public abstract class Asserter<T,R> extends Actor<T,R> {
         if (expectations != null && actuals != null) {
             if (expectations.size() == actuals.size()) {
                 for (int i = 1; i <= expectations.size(); i++) {
-                    ChatRoom expected = expectations.get(i),
-                            actual = actuals.get(i);
+                    ChatRoom expected = expectations.Get(i),
+                            actual = actuals.Get(i);
                     assertMails(expected.get_mails(),actual.get_mails());
                     for (int j = 1; j <= expected.get_chatters().size(); j++)
-                        assertEquals(expected.get_chatters().get(j).toString(),actual.get_chatters().get(j).toString());
+                        assertEquals(expected.get_chatters().Get(j).toString(),actual.get_chatters().Get(j).toString());
                     assertEquals(expected.get_responsible().toString(),actual.get_responsible().toString());
                     assertEquals(expected.get_answeringTime(),actual.get_answeringTime());
                     assertEquals(expected.is_answered(),actual.is_answered());
@@ -273,8 +273,8 @@ public abstract class Asserter<T,R> extends Actor<T,R> {
     protected void assertMails(Liszt<Mail> expectations, Liszt<Mail> actuals) {
         if (expectations.size() == actuals.size()) {
             for (int i = 1; i <= expectations.size(); i++) {
-                Mail expected = expectations.get(i),
-                        actual = actuals.get(i);
+                Mail expected = expectations.Get(i),
+                        actual = actuals.Get(i);
                 assertEquals(expected.get_primaryId(),actual.get_primaryId());
                 assertEquals(expected.get_chatRoom().toString(),actual.get_chatRoom().toString());
                 assertEquals(expected.get_author().toString(),actual.get_author().toString());
@@ -319,8 +319,8 @@ public abstract class Asserter<T,R> extends Actor<T,R> {
         if (expectations != null && actuals != null) {
             if (expectations.size() == actuals.size()) {
                 for (int i = 1; i <= expectations.size(); i++) {
-                    Request expected = expectations.get(i),
-                            actual = actuals.get(i);
+                    Request expected = expectations.Get(i),
+                            actual = actuals.Get(i);
                     assertUsers(expected.get_user(),actual.get_user());
                     asserting(expected.get_event(),actual.get_event());
                     assertEquals(expected.get_approved().get_truth(),actual.get_approved().get_truth());
@@ -355,8 +355,8 @@ public abstract class Asserter<T,R> extends Actor<T,R> {
         if (expectations != null && actuals != null) {
             if (expectations.size() == actuals.size()) {
                 for (int i = 1; i <= expectations.size(); i++) {
-                    Bulletin expected = expectations.get(i),
-                            actual = actuals.get(i);
+                    Bulletin expected = expectations.Get(i),
+                            actual = actuals.Get(i);
                     assertEquals(expected.get_primaryId(),actual.get_primaryId());
                     assertUsers(expected.get_author(), actual.get_author());
                     if (expected.get_author() != null && actual.get_author() != null)
@@ -383,7 +383,7 @@ public abstract class Asserter<T,R> extends Actor<T,R> {
         if (expectations != null && actuals != null)
             if (expectations.size() == actuals.size())
                 for (int i = 1; i <= expectations.size(); i++)
-                    asserting(expectations.get(i),actuals.get(i));
+                    asserting(expectations.Get(i),actuals.Get(i));
             else
                 fail(notSameSizeMessage(new Object[][]{expectations.get_data(),actuals.get_data()}));
     }
@@ -429,7 +429,7 @@ public abstract class Asserter<T,R> extends Actor<T,R> {
         if (expectations != null && actuals != null) {
             if (expectations.size() == actuals.size())
                 for (int i = 1; i <= expectations.size(); i++)
-                    asserting(expectations.get(i),actuals.get(i));
+                    asserting(expectations.Get(i),actuals.Get(i));
             else
                 fail(notSameSizeMessage(new Object[][]{expectations.get_data(),actuals.get_data()}));
         }
@@ -453,7 +453,7 @@ public abstract class Asserter<T,R> extends Actor<T,R> {
         if (expectations != null && actuals != null) {
             if (expectations.size() == actuals.size())
                 for (int i = 1; i <= expectations.size(); i++)
-                    asserting(expectations.get(i),actuals.get(i));
+                    asserting(expectations.Get(i),actuals.Get(i));
             else
                 fail(notSameSizeMessage(new Object[][]{expectations.get_data(),actuals.get_data()}));
         }

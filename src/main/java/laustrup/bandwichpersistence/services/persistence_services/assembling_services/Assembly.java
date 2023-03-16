@@ -105,7 +105,7 @@ public class Assembly extends Assembler {
             return _describer.describeChatRooms(_handler.handleChatRooms(
                     ChatRepository.get_instance().chatRooms(new Liszt<>(new Long[]{id})),
                     new Liszt<>())
-            ).get(1);
+            ).Get(1);
         } catch (SQLException e) {
             Printer.get_instance().print("Couldn't get ChatRoom...", e);
         }
@@ -119,7 +119,7 @@ public class Assembly extends Assembler {
      */
     private Liszt<User> userAssembling(Liszt<User> users) {
         for (int i = 1; i <= users.size(); i++)
-            users.set(i, userAssembling(users.get(i), false));
+            users.set(i, userAssembling(users.Get(i), false));
 
         return userFinishing(users);
     }
@@ -224,7 +224,7 @@ public class Assembly extends Assembler {
      */
     private Liszt<Event> eventAssembling(Liszt<Event> events) {
         for (int i = 1; i <= events.size(); i++)
-            events.set(i, assembling(events.get(i), false));
+            events.set(i, assembling(events.Get(i), false));
 
         return eventFinishing(events);
     }

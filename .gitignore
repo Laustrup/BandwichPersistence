@@ -35,6 +35,7 @@ build/
 ### Hidden Data ###
 /src/main/java/laustrup/bandwichpersistence/Defaults.java
 /src/main/resources/sqls/default_values.sql
+/src/main/resources/sqls/h2_init.sql
 
 ### Build ###
 /out/artifacts/BandwichPersistence_jar/BandwichPersistence.jar

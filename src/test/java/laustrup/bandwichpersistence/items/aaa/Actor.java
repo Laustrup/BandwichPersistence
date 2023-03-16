@@ -16,12 +16,11 @@ public abstract class Actor<T,R> extends Arranger<T,R> {
      * @return The generated output.
      */
     private String generateActualPrint() {
-        long performance = calculatePerformance();
-        long seconds = (performance / 1000),
+        long seconds = (_performance / 1000),
                 minutes = seconds/60;
-        return performance <= 0 ? "The acting performance of current test took less than a millisecond!" :
+        return _performance <= 0 ? "The acting performance of current test took less than a millisecond!" :
                 ("The acting performance of current test" + (seconds>0 ? seconds + ":\n\n" : " is ")
-                        + performance + " in milliseconds."
+                        + _performance + " in milliseconds."
                         + (seconds>0 ? seconds + "\n in seconds\n" : "")
                         + (minutes>0 ? minutes + " in minutes" : ""));
     }
@@ -33,12 +32,11 @@ public abstract class Actor<T,R> extends Arranger<T,R> {
      * @return The generated output.
      */
     private String generateActualPrint(String title) {
-        long performance = calculatePerformance();
-        long seconds = (performance / 1000),
+        long seconds = (_performance / 1000),
                 minutes = seconds/60;
-        return performance <= 0 ? "The acting performance of " + title + "took less than a millisecond!" :
+        return _performance <= 0 ? "The acting performance of " + title + "took less than a millisecond!" :
                 ("The acting performance of " + title + (seconds>0 ? seconds + ":\n\n" : " is ")
-                        + performance + " in milliseconds."
+                        + _performance + " in milliseconds."
                         + (seconds>0 ? seconds + "\n in seconds\n" : "")
                         + (minutes>0 ? minutes + " in minutes" : ""));
     }

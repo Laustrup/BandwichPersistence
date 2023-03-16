@@ -1,21 +1,13 @@
 package laustrup.bandwichpersistence.services;
 
-import org.w3c.dom.CharacterData;
-
 import java.util.Random;
 
 public class RandomCreatorService {
 
     /**
-     * Random utility for making random elements.
-     */
-    private Random _random = new Random();
-
-    /**
      * Singleton instance of the Service.
      */
     private static RandomCreatorService _instance = null;
-
     /**
      * Checks first if instance is null, otherwise will create a new instance of the object.
      * Created as a lazyfetch.
@@ -27,6 +19,11 @@ public class RandomCreatorService {
     }
 
     private RandomCreatorService() {}
+
+    /**
+     * Random utility for making random elements.
+     */
+    private Random _random = new Random();
 
     /**
      * Generates a random.

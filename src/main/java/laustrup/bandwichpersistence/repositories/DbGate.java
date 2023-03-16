@@ -53,12 +53,14 @@ public class DbGate {
      */
     private boolean createConnection() {
         DbLibrary library = DbLibrary.get_instance();
+
         try {
             _connection = DriverManager.getConnection(library.get_path(), library.get_user(), library.get_password());
             return isOpen().get_truth();
         } catch (SQLException e) {
             Printer.get_instance().print("Couldn't open connection...",e);
         }
+
         return false;
     }
 

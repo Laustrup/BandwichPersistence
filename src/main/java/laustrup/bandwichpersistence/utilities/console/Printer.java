@@ -1,11 +1,10 @@
 package laustrup.bandwichpersistence.utilities.console;
 
-import laustrup.bandwichpersistence.repositories.DbLibrary;
+import laustrup.bandwichpersistence.Program;
 import laustrup.bandwichpersistence.utilities.collections.Liszt;
 
 import lombok.Data;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -13,9 +12,13 @@ import java.util.Collection;
 /** This class will handle printing of statements to the console. */
 public class Printer extends Painter implements IPrinter {
 
+    /** Determines if the message that is to be printed is an error message or not */
+    private boolean _isAnErrorMessage = false;
+
     /** The specified PrinterMode for this Printer, that will behave depending on the choosen enum. */
     @Getter
-    private PrinterMode _mode = DbLibrary.get_instance().is_testing() ? PrinterMode.HIGH_CONTRAST : PrinterMode.NOIRE;
+    private PrinterMode _mode = Program.get_instance().get_state().equals(Program.State.TESTING)
+            ? PrinterMode.HIGH_CONTRAST : PrinterMode.NOIRE;
 
     /**
      * Configures the mode for the Printer.
@@ -23,7 +26,7 @@ public class Printer extends Painter implements IPrinter {
      * @return The configured mode.
      */
     public PrinterMode set_mode(PrinterMode mode) {
-        _mode = mode;
+        _mode = Program.get_instance().get_state().equals(Program.State.TESTING) ? PrinterMode.HIGH_CONTRAST : mode;
         set_startRow();
         return _mode;
     }
@@ -44,8 +47,8 @@ public class Printer extends Painter implements IPrinter {
     /**
      * Will determined the allowed length of a print.
      */
-    @Getter @Setter
-    private final int _length = 143;
+    @Getter
+    private final int _length = 143*2;
 
     /**
      * Will indicate how a row of the content will start.
@@ -103,6 +106,7 @@ public class Printer extends Painter implements IPrinter {
     public void print(String content) { handlePrint(content); }
     @Override
     public void print(String content, Exception ex) {
+        _isAnErrorMessage = true;
         handlePrint((content != null && !content.isEmpty() ? content + "\n\n-- EXCEPTION\n\n" : "-- EXCEPTION\n\n") + manage(ex));
     }
 
@@ -133,6 +137,8 @@ public class Printer extends Painter implements IPrinter {
                 _latest = _content == null || _content.toString().isEmpty() ? _emptyIndicator : _content.toString();
             }
         }
+
+        _isAnErrorMessage = false;
     }
 
     /**
@@ -229,7 +235,7 @@ public class Printer extends Painter implements IPrinter {
         else if (_content.toString().contains("-- EXCEPTION"))
             colour = Colour.RED;
         else
-            colour = Colour.GREEN;
+            colour = _isAnErrorMessage ? Colour.WHITE : Colour.GREEN;
 
         return colour;
     }

@@ -35,7 +35,7 @@ public class CustomHikariConfig extends HikariConfig {
     private Properties addProperties() {
         Properties properties = new Properties();
 
-        if (DbLibrary._instance.is_testing())
+        if (Program.get_instance().get_state().equals(Program.State.TESTING))
             properties.put("spring.jpa.database-platform","org.hibernate.dialect.H2Dialect");
 
         return properties;

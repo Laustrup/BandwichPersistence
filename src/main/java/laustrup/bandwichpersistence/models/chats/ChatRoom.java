@@ -171,7 +171,7 @@ public class ChatRoom extends Model {
             StringBuilder usernames = new StringBuilder();
 
             for (int i = 1; i <= _chatters.size(); i++)
-                usernames.append(_chatters.get(i).get_username()).append(i < _chatters.size() ? ", " : "");
+                usernames.append(_chatters.Get(i).get_username()).append(i < _chatters.size() ? ", " : "");
 
             return usernames.toString();
         }
@@ -187,7 +187,7 @@ public class ChatRoom extends Model {
     private Liszt<Mail> setChatRoomOfMails(){
         if (_assembling) {
             for (int i = 1; i <= _mails.size(); i++)
-                _mails.get(i).set_chatRoom(this);
+                _mails.Get(i).set_chatRoom(this);
 
             _assembling = false;
         }
@@ -247,8 +247,8 @@ public class ChatRoom extends Model {
      */
     public List<Mail> remove(Mail mail) {
         for (int i = 1; i <= _mails.size(); i++) {
-            if (_mails.get(i).get_primaryId() == mail.get_primaryId()) {
-                _mails.remove(_mails.get(i));
+            if (_mails.Get(i).get_primaryId() == mail.get_primaryId()) {
+                _mails.remove(_mails.Get(i));
                 break;
             }
         }
@@ -262,8 +262,8 @@ public class ChatRoom extends Model {
      */
     public List<User> remove(User chatter) {
         for (int i = 1; i <= _chatters.size(); i++) {
-            if (_chatters.get(i).get_primaryId() == chatter.get_primaryId()) {
-                _chatters.remove(_chatters.get(i));
+            if (_chatters.Get(i).get_primaryId() == chatter.get_primaryId()) {
+                _chatters.remove(_chatters.Get(i));
                 break;
             }
         }
@@ -277,7 +277,7 @@ public class ChatRoom extends Model {
      */
     public boolean edit(Mail mail) {
         for (int i = 1; i <= _mails.size(); i++) {
-            if (_mails.get(i).get_primaryId() == mail.get_primaryId())
+            if (_mails.Get(i).get_primaryId() == mail.get_primaryId())
                 return mail == _mails.set(i, mail);
         }
         return false;
@@ -300,7 +300,7 @@ public class ChatRoom extends Model {
      */
     private Long calculateAnsweringTime() {
         if (_answered) {
-            _answeringTime = Duration.between(_mails.get(1).get_timestamp(),
+            _answeringTime = Duration.between(_mails.Get(1).get_timestamp(),
                     findResponsibleAnswer().get_timestamp()).toMinutes();
             return _answeringTime;
         }

@@ -115,20 +115,20 @@ public abstract class UserDTO extends ModelDTO {
         this.description = description;
         this.albums = new AlbumDTO[albums.size()];
         for (int i = 0; i < this.albums.length; i++)
-            this.albums[i] = new AlbumDTO(albums.get(i+1));
+            this.albums[i] = new AlbumDTO(albums.Get(i+1));
         this.ratings = new RatingDTO[ratings.size()];
         for (int i = 0; i < this.ratings.length; i++)
-            this.ratings[i] = new RatingDTO(ratings.get(i+1));
+            this.ratings[i] = new RatingDTO(ratings.Get(i+1));
         this.events = new EventDTO[events.size()];
         for (int i = 0; i < this.events.length; i++)
-            this.events[i] = new EventDTO(events.get(i+1));
+            this.events[i] = new EventDTO(events.Get(i+1));
         this.chatRooms = new ChatRoomDTO[chatRooms.size()];
         for (int i = 0; i < this.chatRooms.length; i++)
-            this.chatRooms[i] = new ChatRoomDTO(chatRooms.get(i+1));
+            this.chatRooms[i] = new ChatRoomDTO(chatRooms.Get(i+1));
         this.subscription = subscription;
         this.bulletins = new BulletinDTO[bulletins.size()];
         for (int i = 0; i < this.bulletins.length; i++)
-            this.bulletins[i] = new BulletinDTO(bulletins.get(i+1));
+            this.bulletins[i] = new BulletinDTO(bulletins.Get(i+1));
         this.authority = authority;
     }
 
@@ -143,28 +143,28 @@ public abstract class UserDTO extends ModelDTO {
         if (albums != null) {
             this.albums = new AlbumDTO[albums.size()];
             for (int i = 0; i < this.albums.length; i++)
-                this.albums[i] = new AlbumDTO(albums.get(i+1));
+                this.albums[i] = new AlbumDTO(albums.Get(i+1));
         }
         if (ratings != null) {
             this.ratings = new RatingDTO[ratings.size()];
             for (int i = 0; i < this.ratings.length; i++)
-                this.ratings[i] = new RatingDTO(ratings.get(i+1));
+                this.ratings[i] = new RatingDTO(ratings.Get(i+1));
         }
         if (events != null) {
             this.events = new EventDTO[events.size()];
             for (int i = 0; i < this.events.length; i++)
-                this.events[i] = new EventDTO(events.get(i+1));
+                this.events[i] = new EventDTO(events.Get(i+1));
         }
         if (chatRooms != null) {
             this.chatRooms = new ChatRoomDTO[chatRooms.size()];
             for (int i = 0; i < this.chatRooms.length; i++)
-                this.chatRooms[i] = new ChatRoomDTO(chatRooms.get(i+1));
+                this.chatRooms[i] = new ChatRoomDTO(chatRooms.Get(i+1));
         }
         this.subscription = subscription;
         if (bulletins != null) {
             this.bulletins = new BulletinDTO[bulletins.size()];
             for (int i = 0; i < this.bulletins.length; i++)
-                this.bulletins[i] = new BulletinDTO(bulletins.get(i+1));
+                this.bulletins[i] = new BulletinDTO(bulletins.Get(i+1));
         }
         this.authority = authority;
     }
@@ -183,28 +183,28 @@ public abstract class UserDTO extends ModelDTO {
         if (albums != null) {
             this.albums = new AlbumDTO[albums.size()];
             for (int i = 0; i < this.albums.length; i++)
-                this.albums[i] = new AlbumDTO(albums.get(i+1));
+                this.albums[i] = new AlbumDTO(albums.Get(i+1));
         }
         if (ratings != null) {
             this.ratings = new RatingDTO[ratings.size()];
             for (int i = 0; i < this.ratings.length; i++)
-                this.ratings[i] = new RatingDTO(ratings.get(i+1));
+                this.ratings[i] = new RatingDTO(ratings.Get(i+1));
         }
         if (events != null) {
             this.events = new EventDTO[events.size()];
             for (int i = 0; i < this.events.length; i++)
-                this.events[i] = new EventDTO(events.get(i+1));
+                this.events[i] = new EventDTO(events.Get(i+1));
         }
         if (chatRooms != null) {
             this.chatRooms = new ChatRoomDTO[chatRooms.size()];
             for (int i = 0; i < this.chatRooms.length; i++)
-                this.chatRooms[i] = new ChatRoomDTO(chatRooms.get(i+1));
+                this.chatRooms[i] = new ChatRoomDTO(chatRooms.Get(i+1));
         }
         this.subscription = subscription;
         if (bulletins != null) {
             this.bulletins = new BulletinDTO[bulletins.size()];
             for (int i = 0; i < this.bulletins.length; i++)
-                this.bulletins[i] = new BulletinDTO(bulletins.get(i+1));
+                this.bulletins[i] = new BulletinDTO(bulletins.Get(i+1));
         }
         this.authority = authority != null ? Authority.valueOf(authority.toString()) : null;
     }

@@ -47,10 +47,10 @@ public abstract class PerformerDTO extends ParticipantDTO {
         this.authority = authority;
         this.gigs = new GigDTO[gigs.size()];
         for (int i = 0; i < this.gigs.length; i++)
-            this.gigs[i] = new GigDTO(gigs.get(i+1));
+            this.gigs[i] = new GigDTO(gigs.Get(i+1));
         this.fans = new UserDTO[fans.size()];
         for (int i = 0; i < this.fans.length; i++)
-            this.fans[i] = DTOService.get_instance().convertToDTO(fans.get(i+1));
+            this.fans[i] = DTOService.get_instance().convertToDTO(fans.Get(i+1));
     }
 
     public PerformerDTO(long id, String username, String description, ContactInfo contactInfo, Authority authority,
@@ -62,9 +62,9 @@ public abstract class PerformerDTO extends ParticipantDTO {
         this.authority = authority;
         this.gigs = new GigDTO[gigs.size()];
         for (int i = 0; i < this.gigs.length; i++)
-            this.gigs[i] = new GigDTO(gigs.get(i+1));
+            this.gigs[i] = new GigDTO(gigs.Get(i+1));
         this.fans = new UserDTO[fans.size()];
         for (int i = 0; i < this.fans.length; i++)
-            this.fans[i] = DTOService.get_instance().convertToDTO(fans.get(i+1));
+            this.fans[i] = DTOService.get_instance().convertToDTO(fans.Get(i+1));
     }
 }

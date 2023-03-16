@@ -82,7 +82,7 @@ public class UserControllerService extends ControllerService<UserDTO> {
         Liszt<User> users = Assembly.get_instance().getUsers();
         UserDTO[] dtos = new UserDTO[users.size()];
         for (int i = 0; i < dtos.length; i++)
-            dtos[i] = DTOService.get_instance().convertToDTO(users.get(i+1));
+            dtos[i] = DTOService.get_instance().convertToDTO(users.Get(i+1));
         return entityContent(dtos);
     }
 

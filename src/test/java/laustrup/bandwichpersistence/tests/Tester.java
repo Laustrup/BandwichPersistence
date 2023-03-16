@@ -1,10 +1,13 @@
 package laustrup.bandwichpersistence.tests;
 
+import laustrup.bandwichpersistence.Program;
 import laustrup.bandwichpersistence.items.aaa.Asserter;
 import laustrup.bandwichpersistence.items.TestItems;
-
+import laustrup.bandwichpersistence.repositories.DbLibrary;
 import laustrup.bandwichpersistence.services.RandomCreatorService;
 import laustrup.bandwichpersistence.utilities.console.Printer;
+import laustrup.bandwichpersistence.utilities.console.PrinterMode;
+
 import org.junit.jupiter.api.BeforeEach;
 
 import java.util.Random;
@@ -14,6 +17,7 @@ import java.util.function.Function;
  * Adds a few functions to test methods to reuse.
  */
 public abstract class Tester<T,R> extends Asserter<T,R> {
+
 
     /** The object that is to be expected to be asserted as the same as the actual. */
     protected Object _expected;
@@ -50,9 +54,25 @@ public abstract class Tester<T,R> extends Asserter<T,R> {
 
     @BeforeEach
     void beforeEach() {
+        preStart();
+
+        _items = new TestItems();
         _expected = new String();
         _actual = new String();
         _password = RandomCreatorService.get_instance().generatePassword();
+    }
+
+    /**
+     * Will set the program to be run in testing mode.
+     */
+    private void preStart() {
+        if (!Program.get_instance().is_applicationIsRunning()) {
+            Program.get_instance().setTestingMode(true);
+            Printer.get_instance().set_mode(PrinterMode.HIGH_CONTRAST);
+        }
+
+        DbLibrary.get_instance().set_path();
+        Program.get_instance().applicationIsRunning();
     }
 
     /**
@@ -70,6 +90,7 @@ public abstract class Tester<T,R> extends Asserter<T,R> {
             }
         } catch (Exception e) {
             Printer.get_instance().print(_print, e);
+            fail("An exception was caught in the main test method...", e);
         }
     }
 }

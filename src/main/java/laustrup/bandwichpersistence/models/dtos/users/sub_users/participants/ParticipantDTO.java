@@ -32,7 +32,7 @@ public class ParticipantDTO extends UserDTO {
         if (idols != null) {
             idols = new UserDTO[participant.get_idols().size()];
             for (int i = 0; i < idols.length; i++)
-                idols[i] = DTOService.get_instance().convertToDTO(participant.get_idols().get(i+1));
+                idols[i] = DTOService.get_instance().convertToDTO(participant.get_idols().Get(i+1));
         }
     }
 
@@ -44,7 +44,7 @@ public class ParticipantDTO extends UserDTO {
         if (user.get_authority() == User.Authority.PARTICIPANT) {
             idols = new UserDTO[((Participant) user).get_idols().size()];
             for (int i = 0; i < idols.length; i++)
-                idols[i] = DTOService.get_instance().convertToDTO(((Participant) user).get_idols().get(i+1));
+                idols[i] = DTOService.get_instance().convertToDTO(((Participant) user).get_idols().Get(i+1));
         }
     }
 }

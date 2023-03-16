@@ -40,7 +40,7 @@ public class AlbumItemDTO extends Model {
 
         tags = new UserDTO[item.get_tags().size()];
         for (int i = 0; i < tags.length; i++)
-            tags[i] = DTOService.get_instance().convertToDTO(item.get_tags().get(i+1));
+            tags[i] = DTOService.get_instance().convertToDTO(item.get_tags().Get(i+1));
         event = new EventDTO(item.get_event());
     }
 

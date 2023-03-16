@@ -15,7 +15,7 @@ import java.util.*;
  * means, that they will be saved doing add, costing lower performance.
  * @param <E> The type of element that are wished to be used in this class
  */
-public class Liszt<E> extends Utility implements List<E>, ILiszt<E> {
+public class Liszt<E> extends Utility implements List<E>, ILiszt<E>{
 
     /**
      * Contains all the elements that are inside the Liszt.
@@ -257,11 +257,9 @@ public class Liszt<E> extends Utility implements List<E>, ILiszt<E> {
         Object[] storage = new Object[_data.length-1];
 
         try {
-            for (int i = 0; i < storage.length; i++) {
-                if (_data[i] != object) {
+            for (int i = 0; i < storage.length; i++)
+                if (_data[i] != object)
                     storage[i] = _data[i];
-                }
-            }
             _data = (E[]) storage;
             if (!_map.remove(object.toString(),object)) { _map.remove(object.hashCode()); }
         }
@@ -357,11 +355,18 @@ public class Liszt<E> extends Utility implements List<E>, ILiszt<E> {
 
     @Override
     public E get(int index) {
+        if (index < 0 || isEmpty())
+            return null;
+        return _data[index];
+    }
+
+    public E Get(int index) {
         if (index <= 0 || isEmpty())
             return null;
         return _data[index-1];
     }
-    public E get(String key) {
+
+    public E Get(String key) {
         return _map.get(key);
     }
 

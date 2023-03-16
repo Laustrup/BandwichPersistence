@@ -160,7 +160,7 @@ public abstract class Performer extends Participant {
      */
     public void setAuthorOfAlbums() {
         for (int i = 1; i <= _albums.size(); i++)
-            _albums.get(i).setAuthor(this);
+            _albums.Get(i).setAuthor(this);
     }
 
     /**

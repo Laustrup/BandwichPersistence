@@ -110,7 +110,7 @@ public class EventPersistenceService extends EntityService<Event> {
      *         Will return null if Participations is not from same Event.
      */
     public Event upsert(Liszt<Participation> participations) {
-        long eventId = participations.get(1).get_event().get_primaryId();
+        long eventId = participations.Get(1).get_event().get_primaryId();
         boolean eventIsSame = true;
         for (Participation participation : participations) {
             if (eventId != participation.get_event().get_primaryId()) {
@@ -120,7 +120,7 @@ public class EventPersistenceService extends EntityService<Event> {
         }
         if (eventIsSame)
             if (EventRepository.get_instance().upsert(participations))
-                return Assembly.get_instance().getEvent(participations.get(1).get_event().get_primaryId());
+                return Assembly.get_instance().getEvent(participations.Get(1).get_event().get_primaryId());
         EventRepository.get_instance().closeConnection();
         return null;
     }

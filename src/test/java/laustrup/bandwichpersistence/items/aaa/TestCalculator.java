@@ -21,7 +21,9 @@ public abstract class TestCalculator {
      * Must only use before act.
      * Is also used in @BeforeEach, so in case of no ARRANGE, this method is not needed.
      */
-    void begin() { _start = LocalDateTime.now(); }
+    void begin() {
+        _start = LocalDateTime.now();
+    }
 
     /**
      * Calculates the performance time from start to this moment and prints it in milliseconds.

@@ -287,7 +287,7 @@ public class Event extends Model {
     public Liszt<Request> set_requestEvents() {
         if (_assembling)
             for (int i = 1; i <= _requests.size(); i++)
-                _requests.get(i).set_event(this);
+                _requests.Get(i).set_event(this);
         return _requests;
     }
 
@@ -414,7 +414,7 @@ public class Event extends Model {
 
     private Liszt<Request> removeRequest(Performer performer) {
         for (int i = 1; i <= _requests.size(); i++) {
-            if (_requests.get(i).get_user().get_primaryId() == performer.get_primaryId()) {
+            if (_requests.Get(i).get_user().get_primaryId() == performer.get_primaryId()) {
                 _requests.remove(i);
                 break;
             }
@@ -480,13 +480,13 @@ public class Event extends Model {
         try {
             edited = new Request(request.get_user(), request.get_event(), new Plato(true));
             _requests.replace(edited, request);
-            edited = _requests.get(_requests.contains(request.toString()) ? request.toString() : String.valueOf(request.hashCode()));
+            edited = _requests.Get(_requests.contains(request.toString()) ? request.toString() : String.valueOf(request.hashCode()));
         } catch (ClassNotFoundException e) {
             Printer.get_instance().print("Couldn't accept request " + request.get_title() + " for " + _title + "...", e);
         } catch (InputMismatchException e) {
             for (int i = 1; i <= _requests.size(); i++) {
-                if (_requests.get(i).get_primaryId() == request.get_primaryId() &&
-                        Objects.equals(_requests.get(i).get_secondaryId(), request.get_secondaryId())) {
+                if (_requests.Get(i).get_primaryId() == request.get_primaryId() &&
+                        Objects.equals(_requests.Get(i).get_secondaryId(), request.get_secondaryId())) {
                     edited = new Request(request.get_user(), request.get_event(), new Plato(true));
                     _requests.set(i, edited);
                 }
@@ -625,9 +625,9 @@ public class Event extends Model {
      */
     public Participation setParticipation(Participation participation) {
         for (int i = 1; i <= _participations.size(); i++) {
-            if (_participations.get(i).get_participant().get_primaryId() == participation.get_participant().get_primaryId()) {
-                _participations.get(i).set_type(participation.get_type());
-                return _participations.get(i);
+            if (_participations.Get(i).get_participant().get_primaryId() == participation.get_participant().get_primaryId()) {
+                _participations.Get(i).set_type(participation.get_type());
+                return _participations.Get(i);
             }
         }
         return null;
@@ -642,16 +642,16 @@ public class Event extends Model {
         for (int i = 1; i <= _gigs.size(); i++) {
             int sharedActs = 0;
 
-            for (int j = 0; j < _gigs.get(i).get_act().length; j++) {
+            for (int j = 0; j < _gigs.Get(i).get_act().length; j++) {
                 for (Performer performer : gig.get_act()) {
-                    if (_gigs.get(i).get_act()[j].get_primaryId() == performer.get_primaryId()) {
+                    if (_gigs.Get(i).get_act()[j].get_primaryId() == performer.get_primaryId()) {
                         sharedActs++;
                     }
                 }
             }
-            if (sharedActs == _gigs.get(i).get_act().length) {
-                _gigs.get(i).set_start(gig.get_start());
-                _gigs.get(i).set_end(gig.get_end());
+            if (sharedActs == _gigs.Get(i).get_act().length) {
+                _gigs.Get(i).set_start(gig.get_start());
+                _gigs.Get(i).set_end(gig.get_end());
             }
         }
         return null;
@@ -664,8 +664,8 @@ public class Event extends Model {
      * @throws InputMismatchException In case that the end is before the beginning.
      */
     private long calculateTime() throws InputMismatchException {
-        _start = _gigs.isEmpty() ? null : _gigs.get(1).get_start();
-        _end = _gigs.isEmpty() ? null : _gigs.get(1).get_end();
+        _start = _gigs.isEmpty() ? null : _gigs.Get(1).get_start();
+        _end = _gigs.isEmpty() ? null : _gigs.Get(1).get_end();
 
         if ((_end != null && _start != null) && Duration.between(_end, _start).getSeconds() > 0)
             throw new InputMismatchException();

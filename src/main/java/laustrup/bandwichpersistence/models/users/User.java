@@ -277,8 +277,8 @@ public abstract class User extends Model {
     public Liszt<Bulletin> set_bulletinReceivers() {
         if (_assembling) {
             for (int i = 1; i <= _bulletins.size(); i++) {
-                _bulletins.get(i).set_reciever(this);
-                _bulletins.get(i).doneAssembling();
+                _bulletins.Get(i).set_reciever(this);
+                _bulletins.Get(i).doneAssembling();
             }
         }
         return _bulletins;
@@ -314,7 +314,7 @@ public abstract class User extends Model {
     public Liszt<Album> setAlbumsAuthor() {
         if (_assembling)
             for (int i = 1; i <= _albums.size(); i++)
-                _albums.get(i).setAuthor(this);
+                _albums.Get(i).setAuthor(this);
         return _albums;
     }
 
@@ -375,8 +375,8 @@ public abstract class User extends Model {
      */
     public List<Event> remove(Event event) {
         for (int i = 1; i <= _events.size(); i++) {
-            if (_events.get(i).get_primaryId() == event.get_primaryId()) {
-                _events.remove(_events.get(i));
+            if (_events.Get(i).get_primaryId() == event.get_primaryId()) {
+                _events.remove(_events.Get(i));
                 break;
             }
         }
@@ -391,8 +391,8 @@ public abstract class User extends Model {
      */
     public List<ChatRoom> remove(ChatRoom chatRoom) {
         for (int i = 1; i <= _chatRooms.size(); i++) {
-            if (_chatRooms.get(i).get_primaryId() == chatRoom.get_primaryId()) {
-                _chatRooms.remove(_chatRooms.get(i));
+            if (_chatRooms.Get(i).get_primaryId() == chatRoom.get_primaryId()) {
+                _chatRooms.remove(_chatRooms.Get(i));
                 break;
             }
         }
@@ -407,7 +407,7 @@ public abstract class User extends Model {
      */
     public Liszt<Rating> edit(Rating rating) {
         for (int i = 1; i <= _ratings.size(); i++) {
-            if (_ratings.get(i).get_primaryId() == rating.get_primaryId()) {
+            if (_ratings.Get(i).get_primaryId() == rating.get_primaryId()) {
                 _ratings.set(i,rating);
                 break;
             }

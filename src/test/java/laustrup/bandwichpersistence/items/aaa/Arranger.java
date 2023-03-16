@@ -23,7 +23,7 @@ public abstract class Arranger<T,R> extends TestCalculator {
     }
 
     /**
-     * Will apply the function and measure the arrangement performance.
+     * Will apply the function and measure the arrangement performance and and the arrangement setup to the print.
      * @param input The input for the function.
      * @param function The function for the arrangement.
      * @return The performance of the arrangement.

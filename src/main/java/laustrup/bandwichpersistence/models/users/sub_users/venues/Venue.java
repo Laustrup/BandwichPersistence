@@ -127,7 +127,7 @@ public class Venue extends User {
 
         if (_assembling)
             for (int i = 1; i <= requests.size(); i++)
-                requests.get(i).set_user(this);
+                requests.Get(i).set_user(this);
 
         _requests = requests;
         return this;

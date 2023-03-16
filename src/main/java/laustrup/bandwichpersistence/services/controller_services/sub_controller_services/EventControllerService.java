@@ -53,7 +53,7 @@ public class EventControllerService extends ControllerService<EventDTO> {
         Liszt<Event> events = Assembly.get_instance().getEvents();
         EventDTO[] dtos = new EventDTO[events.size()];
         for (int i = 0; i < dtos.length; i++)
-            dtos[i] = new EventDTO(events.get(i+1));
+            dtos[i] = new EventDTO(events.Get(i+1));
         return entityContent(dtos);
     }
 

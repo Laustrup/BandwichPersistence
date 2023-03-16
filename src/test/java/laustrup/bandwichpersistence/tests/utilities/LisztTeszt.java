@@ -28,8 +28,8 @@ class LisztTeszt extends Tester<Object, Object> {
             else {
                 act(e -> _liszt = new Liszt<>(new Object[]{true,false}));
 
-                asserting(true, (_liszt.get(1)));
-                asserting(false, (_liszt.get(2)));
+                asserting(true, (_liszt.Get(1)));
+                asserting(false, (_liszt.Get(2)));
             }
 
             return true;
@@ -46,7 +46,7 @@ class LisztTeszt extends Tester<Object, Object> {
 
             act(expected, e -> _liszt.add(e));
 
-            asserting(expected, _liszt.get(1));
+            asserting(expected, _liszt.Get(1));
 
             return true;
         });
@@ -70,10 +70,10 @@ class LisztTeszt extends Tester<Object, Object> {
             });
 
             for (Band band : _items.get_bands())
-                asserting(band, _liszt.get(band.toString()));
+                asserting(band, _liszt.Get(band.toString()));
 
             for (int i = 1; i <= _items.get_bands().length; i++)
-                asserting(_items.get_bands()[i-1], _liszt.get(i));
+                asserting(_items.get_bands()[i-1], _liszt.Get(i));
 
             return true;
         });
@@ -126,8 +126,8 @@ class LisztTeszt extends Tester<Object, Object> {
 
             act(expectations[4],e -> _liszt.set(3,e));
 
-            asserting(((Band) _liszt.get(3)).get_runner(),expectations[4].get_runner());
-            asserting(((Band) _liszt.get(expectations[4].toString())).get_runner(),expectations[4].get_runner());
+            asserting(((Band) _liszt.Get(3)).get_runner(),expectations[4].get_runner());
+            asserting(((Band) _liszt.Get(expectations[4].toString())).get_runner(),expectations[4].get_runner());
 
             return true;
         });

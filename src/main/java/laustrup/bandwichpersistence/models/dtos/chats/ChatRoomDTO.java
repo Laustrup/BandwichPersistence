@@ -47,10 +47,10 @@ public class ChatRoomDTO extends ModelDTO {
                         "ChatRoom-"+chatRoom.get_primaryId() : chatRoom.get_title(), chatRoom.get_timestamp());
         mails = new MailDTO[chatRoom.get_mails().size()];
         for (int i = 0; i < mails.length; i++)
-            mails[i] = new MailDTO(chatRoom.get_mails().get(i+1));
+            mails[i] = new MailDTO(chatRoom.get_mails().Get(i+1));
         chatters = new UserDTO[chatRoom.get_chatters().size()];
         for (int i = 0; i < chatters.length; i++)
-            chatters[i] = DTOService.get_instance().convertToDTO(chatRoom.get_chatters().get(i+1));
+            chatters[i] = DTOService.get_instance().convertToDTO(chatRoom.get_chatters().Get(i+1));
         responsible = DTOService.get_instance().convertToDTO(chatRoom.get_responsible());
         answered = chatRoom.is_answered();
     }
