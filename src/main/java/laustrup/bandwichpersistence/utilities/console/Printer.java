@@ -1,16 +1,17 @@
 package laustrup.bandwichpersistence.utilities.console;
 
 import laustrup.bandwichpersistence.Program;
-import laustrup.bandwichpersistence.utilities.collections.Liszt;
 
-import lombok.Data;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 
 /** This class will handle printing of statements to the console. */
 public class Printer extends Painter implements IPrinter {
+
+    /** Containing previous printed contents */
+    @Getter
+    public PrintDatabase _db = new PrintDatabase();
 
     /** Determines if the message that is to be printed is an error message or not */
     private boolean _isAnErrorMessage = false;
@@ -31,12 +32,8 @@ public class Printer extends Painter implements IPrinter {
         return _mode;
     }
 
-    /** Contains the last content that was printed. */
-    @Getter
-    private String _latest;
-
     /** The content that is meant to be printed. */
-    private StringBuilder _content;
+    private String _content = new String();
 
     /**
      * This will be printed, if the content is unrecognisable,
@@ -48,7 +45,13 @@ public class Printer extends Painter implements IPrinter {
      * Will determined the allowed length of a print.
      */
     @Getter
-    private final int _length = 143*2;
+    private final int _length = 143;
+
+    /** Determines how many rows are in the print, including the current. */
+    private int _rows = 1;
+
+    /** The index of the content. */
+    private int _index;
 
     /**
      * Will indicate how a row of the content will start.
@@ -76,15 +79,11 @@ public class Printer extends Painter implements IPrinter {
      */
     private String generateBorder() { return "-".repeat(2); }
 
-    /**
-     * Is used to be reused as a border for beginning and ending of a print.
-     */
+    /** Is used to be reused as a border for beginning and ending of a print. */
     private final String _startBorder = "\n-+ " + _border + " +\n $",
         _endBorder = "\n $\n-+ " + _border + " +\n";
 
-    /**
-     * Singleton instance of the Printer.
-     */
+    /** Singleton instance of the Printer. */
     public static Printer _instance = null;
 
     /**
@@ -127,14 +126,16 @@ public class Printer extends Painter implements IPrinter {
      * @param content The content that is wished to be handled.
      */
     private void handlePrint(String content) {
+        _content = new String();
+
         switch (_mode) {
             case DEFAULT -> {
                 System.out.println(content);
-                _latest = content;
+                savePrint(content);
             }
             default -> {
-                systemOut(generateContent(content));
-                _latest = _content == null || _content.toString().isEmpty() ? _emptyIndicator : _content.toString();
+                systemOut(generate(content));
+                savePrint();
             }
         }
 
@@ -148,8 +149,12 @@ public class Printer extends Painter implements IPrinter {
      * @return The print param for saving to be latest.
      */
     private String systemOut(String print) {
-        System.out.println(_mode.equals(PrinterMode.HIGH_CONTRAST) ? cyan(_startBorder) + print + cyan(_endBorder)
-                : _startBorder + print + _endBorder);
+        System.out.println(
+            _mode.equals(PrinterMode.HIGH_CONTRAST)
+                ? cyan(_startBorder) + print + cyan(_endBorder)
+                : _startBorder + print + _endBorder
+        );
+        _rows = 1;
         return print;
     }
 
@@ -175,44 +180,76 @@ public class Printer extends Painter implements IPrinter {
 
     /**
      * Will generate the content with rules of the permitted length and start of lines.
-     * @param element The element the content should be generated from.
+     * @param content The element the content should be generated from.
      * @return The generated content.
      */
-    private String generateContent(String element) {
-        if (element == null || element.isEmpty()) {
-            String generated = _startRow +
-                    (_mode.equals(PrinterMode.HIGH_CONTRAST) ? green(_emptyIndicator) : _emptyIndicator);
-            _content = new StringBuilder();
+    private String generate(String content) {
+        if (content == null || content.isEmpty()) {
+            String generated = _startRow + (_mode.equals(PrinterMode.HIGH_CONTRAST)
+                ? green(_emptyIndicator)
+                : _emptyIndicator);
+            _content = new String();
             return generated;
         }
 
-        StringBuilder generated = new StringBuilder();
-        _content = new StringBuilder();
+        StringBuilder print = new StringBuilder(_startRow);
 
-        for (int i = 0; i < element.length(); i++) {
-            generated = generate(generated,element,i);
-            _content.append(element.charAt(i));
+        for (_index = 0; _index < content.length(); _index++) {
+            int index = _index;
+            print = generate(print,content);
+            if (index == _index)
+                _content += content.charAt(index);
         }
 
-        return generated.toString();
+        return print.toString();
     }
 
     /**
      * Will generate the text that will be printed on the console from the original text.
-     * @param generated The generated text, that will be updated.
-     * @param original The text, that the generated text will be generated from.
-     * @param index The current index.
+     * @param print The generated text, that will be updated.
+     * @param content The text, that the generated text will be generated from.
      * @return The updated generated text.
      */
-    private StringBuilder generate(StringBuilder generated, String original, int index) {
-        Colour colour = _mode.equals(PrinterMode.HIGH_CONTRAST) ? setColour(original, index) : null;
+    private StringBuilder generate(StringBuilder print, String content) {
+        Colour colour = _mode.equals(PrinterMode.HIGH_CONTRAST) ? setColour(content, _index) : null;
 
-        if (index % _length == 0 || original.charAt(index) == '\n')
-            generated.append(_startRow);
-        if (original.charAt(index) != '\n')
-            generated.append(colorize(String.valueOf(original.charAt(index)),colour));
+        if (wordIsTooLong(content)) {
+            while (content.charAt(_index) != ' ') {
+                print.append(colorize(String.valueOf(content.charAt(_index)),colour));
+                _content += content.charAt(_index);
+                _index++;
+            }
+            print.append(_startRow);
+            _content += content.charAt(_index);
+            _rows++;
+        }
+        else if (_index/_rows > _length || content.charAt(_index) == '\n') {
+            print.append(_startRow);
+            _rows++;
+        }
+        else
+            print.append(colorize(String.valueOf(content.charAt(_index)),colour));
 
-        return generated;
+        return print;
+    }
+
+    /**
+     * Will determine if a new row should be added.
+     * @param content The text, that the generated text will be generated from.
+     * @return True if a whitespace after the current word is on a higher index than the permitted length.
+     */
+    private boolean wordIsTooLong(String content) {
+        boolean whitespaceIsFound = false;
+        int index = _index;
+
+        while (!whitespaceIsFound) {
+            if (index >= content.length()-1)
+                break;
+            if (content.charAt(index) == ' ')
+                whitespaceIsFound = true;
+            index++;
+        }
+        return whitespaceIsFound && index/_rows > _length;
     }
 
     /**
@@ -232,7 +269,7 @@ public class Printer extends Painter implements IPrinter {
 
         if (yellowIndexLengthIsAllowed && ((beforeIsAStartBorder && headlineIdentifier) || isStillHeadline))
             colour = Colour.YELLOW;
-        else if (_content.toString().contains("-- EXCEPTION"))
+        else if (_content.contains("-- EXCEPTION"))
             colour = Colour.RED;
         else
             colour = _isAnErrorMessage ? Colour.WHITE : Colour.GREEN;
@@ -240,36 +277,60 @@ public class Printer extends Painter implements IPrinter {
         return colour;
     }
 
-    @Override
-    public void compare(Collection<Object> objects, Collection<Double[]> values) {
-        if (objects.size()==values.size()) {
-            Object[] convertedObjects = objects.toArray();
-            Object[] convertedValues = values.toArray();
-
-            Liszt<ComparingObject> comparingObjects = new Liszt<>();
-            for (int i = 0; i < objects.size(); i++) { comparingObjects.add(new ComparingObject(convertedObjects[i], (Double) convertedValues[i])); }
-
-            String content = "Comparing of following objects are: \n\n";
-            int place = 1;
-            for (ComparingObject object : comparingObjects) {
-                content += "\tPlace " + place + " is " + object.get_data().toString() +
-                        " with the value of " + convertedValues[place-1].toString() + ".\n";
-                place++;
-            }
-
-            print(content);
-        }
-        print("The two array inputs are not the same in Printer...", new ArrayIndexOutOfBoundsException());
+    /**
+     * Adds the print to be stored.
+     * @return The stored prints.
+     */
+    private String[] savePrint() {
+        return _db.add(_content == null || _content.isEmpty() ? _emptyIndicator : _content);
     }
-    @Data
-    private static class ComparingObject {
-        private Object _data;
 
-        private double _value;
-        public ComparingObject(Object data, double value) {
-            _data = data;
-            _value = value;
+    /**
+     * Adds the print to be stored.
+     * @return The stored prints.
+     */
+    private String[] savePrint(String content) {
+        _content = content;
+        return _db.add(_content == null || _content.isEmpty() ? _emptyIndicator : _content);
+    }
+
+    /** A class created to save prints of the Printer */
+    public class PrintDatabase {
+
+        /** The permitted amount of prints to be stored */
+        private final int _storageSize = 5;
+
+        /** The stored prints */
+        @Getter
+        private String[] _data = new String[_storageSize];
+
+        /** The last print that was stored */
+        @Getter
+        private String _last;
+
+        /** The index of the print to be overwritten */
+        @Getter
+        private int _index;
+
+        /**
+         * Will add some print to the data. Also increments the index.
+         * @param print The print that will be saved.
+         * @return The data of the prints.
+         */
+        public String[] add(String print) {
+            _data[_index] = print;
+            _last = _data[_index];
+            increment();
+            return _data;
         }
 
+        /** Will increment the index, if the index is the same as the storage size, it will be reset */
+        private int increment() {
+            if (_index == _storageSize-1)
+                _index = 0;
+            else
+                _index++;
+            return _index;
+        }
     }
 }

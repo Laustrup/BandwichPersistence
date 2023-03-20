@@ -49,6 +49,19 @@ public abstract class Painter extends Utility {
     }
 
     /**
+     * Removes all colours that are being used in this Painter.
+     * Needs to be updated everytime a new colour is a possible use.
+     * @param content The String that should have its colour escape-sequences removed.
+     * @return The content without any colours.
+     */
+    protected String removeColours(String content) {
+        for (int i = 90; i <= 97; i++)
+            content = content.replace(colourCode(0,i),"");
+        content = content.replace(colourCode(0),"");
+        return content;
+    }
+
+    /**
      * This determines which colour have been used for previous colouring.
      */
     protected Colour _previousColour;

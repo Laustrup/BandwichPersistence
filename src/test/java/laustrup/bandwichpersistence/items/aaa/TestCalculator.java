@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 public abstract class TestCalculator {
 
     /** The content of all the data observations of the test. */
-    protected String _print = "Information of the test";
+    protected String _print = "-- Information of the test";
 
     /**
      * Will be the start of the ACT in tests

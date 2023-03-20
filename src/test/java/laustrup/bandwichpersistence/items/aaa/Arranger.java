@@ -32,7 +32,7 @@ public abstract class Arranger<T,R> extends TestCalculator {
         begin();
         R arranged = function.apply(input);
         _arrangement = calculatePerformance();
-        addToPrint("The arrangement is: " + arranged);
+        addToPrint("The arrangement is:\n" + arranged);
         return arranged;
     }
 }

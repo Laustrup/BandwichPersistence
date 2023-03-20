@@ -1,7 +1,6 @@
 package laustrup.bandwichpersistence.tests.utilities;
 
 import laustrup.bandwichpersistence.tests.Tester;
-
 import laustrup.bandwichpersistence.utilities.console.Printer;
 
 import org.junit.jupiter.params.ParameterizedTest;
@@ -9,6 +8,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 public class PrinterTests extends Tester<String, String> {
 
+    /** The Printer that is used for this test */
     private static final Printer _printer = Printer.get_instance();
 
     /**
@@ -22,6 +22,18 @@ public class PrinterTests extends Tester<String, String> {
      */
     private final String _numberFormatException = "NumberFormatException";
 
+    /**
+     * Will find the print of the act.
+     * @return The found print.
+     */
+    private String printOfAct() {
+        return _printer.get_db().get_data()[
+            _printer.get_db().get_index() == 0
+                ? _printer.get_db().get_data().length-1
+                : _printer.get_db().get_index() - 1
+        ];
+    }
+
     @ParameterizedTest
     @CsvSource(value = {_null, _empty, _single, _multiple, _borderCheck})
     void canPrint(String content) {
@@ -30,7 +42,7 @@ public class PrinterTests extends Tester<String, String> {
 
             String actual = act(expected, e -> {
                 _printer.print(e);
-                return _printer.get_latest();
+                return printOfAct();
             });
 
             asserting(expected == null || expected.isEmpty() ? "Nothing to print..." : expected, actual);
@@ -41,25 +53,26 @@ public class PrinterTests extends Tester<String, String> {
 
     @ParameterizedTest
     @CsvSource(value = {
-            _null+_divider+ _numberFormatException,
-            _empty+_divider+ _numberFormatException,
-            _single+_divider+ _numberFormatException,
-            _multiple+_divider+ _numberFormatException,
-            _borderCheck+_divider+ _numberFormatException}, delimiter = _delimiter)
+            _null+_divider+_numberFormatException,
+            _empty+_divider+_numberFormatException,
+            _single+_divider+_numberFormatException,
+            _multiple+_divider+_numberFormatException,
+            _borderCheck+_divider+_numberFormatException}, delimiter = _delimiter)
     void canPrint(String content, String exception) {
         test(t -> {
-            String expected = arrange(content, e -> {
-                String arranged = arrange(e);
+            String expected = arrange(e -> {
+                String arranged = arrange(content);
                 _exception = determine(exception);
                 if (_exception != null)
-                    return (!e.isEmpty() ? e + "\n\n-- EXCEPTION\n\n" : "-- EXCEPTION\n\n")
-                            + _exception.toString();
+                    return ((arranged != null && !arranged.isEmpty())
+                        ? arranged + "\n\n-- EXCEPTION\n\n"
+                        : "-- EXCEPTION\n\n") + _exception;
                 return arranged;
             });
 
-            String actual = act(expected, e -> {
-                _printer.print(e,_exception);
-                return _printer.get_latest();
+            String actual = act(e -> {
+                _printer.print(arrange(content),_exception);
+                return printOfAct();
             });
 
             asserting(expected, actual);
