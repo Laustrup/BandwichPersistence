@@ -69,7 +69,7 @@ public abstract class Tester<T,R> extends Asserter<T,R> {
         if (!Program.get_instance().is_applicationIsRunning()) {
             Program.get_instance().setTestingMode(true);
             Printer.get_instance().set_mode(PrinterMode.HIGH_CONTRAST);
-            DbLibrary.get_instance().set_path();
+            //DbLibrary.get_instance().set_path();
         }
 
         Program.get_instance().applicationIsRunning();

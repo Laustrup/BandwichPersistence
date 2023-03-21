@@ -1,5 +1,7 @@
 package laustrup.bandwichpersistence.items.aaa;
 
+import laustrup.bandwichpersistence.utilities.console.Printer;
+
 import java.util.function.Function;
 
 /** Is used for acting of tests. Will also print the performances of arrangement and act after an act. */
@@ -16,13 +18,7 @@ public abstract class Actor<T,R> extends Arranger<T,R> {
      * @return The generated output.
      */
     private String generateActualPrint() {
-        long seconds = (_performance / 1000),
-                minutes = seconds/60;
-        return _performance <= 0 ? "The acting performance of current test took less than a millisecond!" :
-                ("The acting performance of current test" + (seconds>0 ? seconds + ":\n\n" : " is ")
-                        + _performance + " in milliseconds."
-                        + (seconds>0 ? seconds + "\n in seconds\n" : "")
-                        + (minutes>0 ? minutes + " in minutes" : ""));
+        return "The acting performance" + Printer.get_instance().measurePerformance(_performance);
     }
 
     /**
@@ -32,13 +28,7 @@ public abstract class Actor<T,R> extends Arranger<T,R> {
      * @return The generated output.
      */
     private String generateActualPrint(String title) {
-        long seconds = (_performance / 1000),
-                minutes = seconds/60;
-        return _performance <= 0 ? "The acting performance of " + title + "took less than a millisecond!" :
-                ("The acting performance of " + title + (seconds>0 ? seconds + ":\n\n" : " is ")
-                        + _performance + " in milliseconds."
-                        + (seconds>0 ? seconds + "\n in seconds\n" : "")
-                        + (minutes>0 ? minutes + " in minutes" : ""));
+        return "The acting performance of " + title + Printer.get_instance().measurePerformance(_performance);
     }
 
     /**
@@ -46,13 +36,7 @@ public abstract class Actor<T,R> extends Arranger<T,R> {
      * @return The generated output.
      */
     private String generateArrangementPrint() {
-        long seconds = (_arrangement / 1000),
-                minutes = seconds/60;
-        return _arrangement <= 0 ? "The arrangement performance of current test took less than a millisecond!" :
-                ("The arrangement performance of current test" + (seconds>0 ? seconds + ":\n\n" : " is ")
-                        + _arrangement + " in milliseconds."
-                        + (seconds>0 ? seconds + "\n in seconds\n" : "")
-                        + (minutes>0 ? minutes + " in minutes" : ""));
+        return "The arrangement performance of current test" + Printer.get_instance().measurePerformance(_arrangement);
     }
 
     /**

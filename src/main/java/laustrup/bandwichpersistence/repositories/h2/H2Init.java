@@ -40,7 +40,7 @@ public class H2Init {
                 )
         );
 
-        measurePerformance(start);
+        Printer.get_instance().print("h2_init.sql generation",start);
     }
 
     /**
@@ -206,20 +206,6 @@ public class H2Init {
         }
 
         return translation + "))";
-    }
-
-    /**
-     * Measures the performance till now and prints it.
-     * @param start The time the performance started.
-     */
-    private void measurePerformance(LocalDateTime start) {
-        long performance = Duration.between(start, LocalDateTime.now()).toMillis();
-        Printer.get_instance().print("h2_init.sql was generated in " + (
-            performance > 1000
-                ? performance / 1000 + " seconds!"
-                : performance + " milliseconds!"
-            )
-        );
     }
 
     /**

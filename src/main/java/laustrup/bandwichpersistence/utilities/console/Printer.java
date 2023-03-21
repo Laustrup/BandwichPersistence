@@ -4,6 +4,7 @@ import laustrup.bandwichpersistence.Program;
 
 import lombok.Getter;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 
 /** This class will handle printing of statements to the console. */
@@ -107,6 +108,110 @@ public class Printer extends Painter implements IPrinter {
     public void print(String content, Exception ex) {
         _isAnErrorMessage = true;
         handlePrint((content != null && !content.isEmpty() ? content + "\n\n-- EXCEPTION\n\n" : "-- EXCEPTION\n\n") + manage(ex));
+    }
+
+    @Override
+    public void print(String content, long performance) {
+        handlePrint(content + measurePerformance(performance));
+    }
+
+    @Override
+    public void print(String content, LocalDateTime start) {
+        handlePrint(content + measurePerformance(start));
+    }
+
+    @Override
+    public String measurePerformance(LocalDateTime start) {
+        return measurePerformance(Duration.between(start,LocalDateTime.now()).toMillis());
+    }
+
+    /**
+     * Calculates and measures a performance from the start to now.
+     * @param performance The performance measured in milliseconds.
+     * @return The calculated and measured performance in writing.
+     */
+    @Override
+    public String measurePerformance(long performance) {
+        long milliseconds = performance >= 1000 ? performance%1000 : performance,
+             seconds = performance >= 1000 ? (performance%60000)/1000 : 0,
+             minutes = performance >= 3600000 ? (performance%3600000)/60000 : performance/60000,
+             hours = performance/3600000;
+
+        return measurePerformance(milliseconds, seconds, minutes, hours);
+    }
+
+    /**
+     * Calculates and measures a performance from the start to now.
+     * @param milliseconds The performance in milliseconds.
+     * @param seconds The performance in seconds.
+     * @param minutes The performance in minutes.
+     * @param hours The performance in hours.
+     * @return A String with the result written as a statement.
+     */
+    private String measurePerformance(long milliseconds, long seconds, long minutes, long hours) {
+        String hour = hours > 0 ? measurementStatement(hours,"hour",new boolean[] {
+            minutes > 0 && (seconds > 0 || milliseconds > 0),
+            minutes > 0 || seconds > 0 || milliseconds > 0
+        }) : "",
+        minute = minutes > 0 ? measurementStatement(minutes,"minute",new boolean[] {
+            seconds > 0 && milliseconds > 0,
+            seconds > 0 || milliseconds > 0
+        }) : "",
+        second = seconds > 0 ? measurementStatement(seconds,"second",new boolean[] {
+            milliseconds > 0
+        }) : "",
+        millisecond = milliseconds > 0 ? measurementStatement(milliseconds,"millisecond",new boolean[]{}) : "";
+
+        return milliseconds < 0
+            ? "...\nPerformance is negative..."
+            : milliseconds == 0 && seconds == 0 && minutes == 0 && hours == 0
+                ? " took less than a millisecond!"
+                : " took " +
+                (hours > 0
+                    ? hour + minute + second + millisecond
+                    : minutes > 0
+                        ? minute + second + millisecond
+                    : seconds > 0
+                        ? second + millisecond
+                    : milliseconds > 0
+                        ? millisecond
+                    : "...\n Couldn't measure performance..."
+                );
+    }
+
+    /**
+     * Will insert values into isPlural and splitter statement, to create a statement for measuring.
+     * @param amount The amount of the first mentioning unit.
+     * @param word The title of the first mentioning unit.
+     * @param statements boolean statements needed to determine amount of measurements.
+     * @return The generated measuring statement.
+     */
+    private String measurementStatement(long amount, String word, boolean[] statements) {
+        return isPlural(amount, word) + splitter(statements);
+    }
+
+    /**
+     * Will determine if the amount is more than one
+     * and in that case will change the word into plural.
+     * @param amount The amount of the word.
+     * @param word The name of the amount that will occur.
+     * @return The amount followed by the word in singular or plural.
+     */
+    private String isPlural(long amount, String word) {
+        return amount + (amount > 1 ? " " + word + "s" : " " + word);
+    }
+
+    /**
+     * Will decide whether to put a , or and between statements as a splitter.
+     * @param statements boolean statements needed to determine amount of measurements.
+     * @return , or and.
+     */
+    private String splitter(boolean[] statements) {
+        return statements.length == 0 ? "!"
+            : statements.length == 1 ? (statements[0] ? " and " : "!")
+            : statements.length == 2 ? (statements[0] ? ", " : statements[1] ? " and " : "!")
+            : ""
+        ;
     }
 
     /**
