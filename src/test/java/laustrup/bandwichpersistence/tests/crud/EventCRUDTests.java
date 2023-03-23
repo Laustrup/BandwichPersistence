@@ -13,6 +13,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
+import static laustrup.bandwichpersistence.items.aaa.assertions.AssertionFailer.failing;
+
 public class EventCRUDTests extends Tester<Object, Object> {
 
     @Test
@@ -69,8 +71,8 @@ public class EventCRUDTests extends Tester<Object, Object> {
                 expected.set_description("This is a new description");
                 actual = update(expected);
                 asserting(expected, actual);
-            } else fail(isNullMessage(actual));
-        } else fail(isNullMessage(actual));
+            } else failing(isNullMessage(actual));
+        } else failing(isNullMessage(actual));
 
         asserting(delete(actual == null ? expected : actual));
     }

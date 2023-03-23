@@ -1,9 +1,8 @@
 package laustrup.bandwichpersistence.tests;
 
 import laustrup.bandwichpersistence.Program;
-import laustrup.bandwichpersistence.items.aaa.Asserter;
+import laustrup.bandwichpersistence.items.aaa.assertions.Asserter;
 import laustrup.bandwichpersistence.items.TestItems;
-import laustrup.bandwichpersistence.repositories.DbLibrary;
 import laustrup.bandwichpersistence.services.RandomCreatorService;
 import laustrup.bandwichpersistence.utilities.console.Printer;
 import laustrup.bandwichpersistence.utilities.console.PrinterMode;
@@ -12,6 +11,8 @@ import org.junit.jupiter.api.BeforeEach;
 
 import java.util.Random;
 import java.util.function.Function;
+
+import static laustrup.bandwichpersistence.items.aaa.assertions.AssertionFailer.failing;
 
 /**
  * Adds a few functions to test methods to reuse.
@@ -90,7 +91,7 @@ public abstract class Tester<T,R> extends Asserter<T,R> {
             }
         } catch (Exception e) {
             Printer.get_instance().print(_print, e);
-            fail("An exception was caught in the main test method...", e);
+            failing("An exception was caught in the main test method...", e);
         }
     }
 }

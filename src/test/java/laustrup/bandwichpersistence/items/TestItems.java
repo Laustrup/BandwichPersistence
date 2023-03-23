@@ -38,6 +38,8 @@ import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 
+import static laustrup.bandwichpersistence.items.aaa.assertions.AssertionFailer.failing;
+
 /**
  * Contains different attributes that imitates models.
  * Primary intended to be used for tests, involving models.
@@ -545,7 +547,7 @@ public class TestItems extends Tester<Object, Object> {
             } catch (Exception e) {
                 Printer.get_instance().print("Test items caught an Exception...", e);
 
-                fail("Items could not be reset...", e);
+                failing("Items could not be reset...", e);
             }
 
             return true;

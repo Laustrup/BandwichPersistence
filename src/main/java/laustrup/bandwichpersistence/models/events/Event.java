@@ -475,24 +475,7 @@ public class Event extends Model {
      * @return The Request that is changed. If it is not changed, it returns null.
      */
     public Request acceptRequest(Request request) {
-        Request edited = null;
-
-        try {
-            edited = new Request(request.get_user(), request.get_event(), new Plato(true));
-            _requests.replace(edited, request);
-            edited = _requests.Get(_requests.contains(request.toString()) ? request.toString() : String.valueOf(request.hashCode()));
-        } catch (ClassNotFoundException e) {
-            Printer.get_instance().print("Couldn't accept request " + request.get_title() + " for " + _title + "...", e);
-        } catch (InputMismatchException e) {
-            for (int i = 1; i <= _requests.size(); i++) {
-                if (_requests.Get(i).get_primaryId() == request.get_primaryId() &&
-                        Objects.equals(_requests.Get(i).get_secondaryId(), request.get_secondaryId())) {
-                    edited = new Request(request.get_user(), request.get_event(), new Plato(true));
-                    _requests.set(i, edited);
-                }
-            }
-        }
-        return edited;
+        return _requests.set(request, new Request(request.get_user(), request.get_event(), new Plato(true)));
     }
 
     /**

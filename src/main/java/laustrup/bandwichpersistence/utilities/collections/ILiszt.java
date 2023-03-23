@@ -1,67 +1,6 @@
 package laustrup.bandwichpersistence.utilities.collections;
 
-import laustrup.bandwichpersistence.utilities.collections.Liszt;
-
-import java.util.Collection;
-import java.util.InputMismatchException;
-
 public interface ILiszt<E> {
-
-    /**
-     * Puts an element replacement at the former element, which is replaced.
-     * @param replacement The new element, that is wished to be replaced.
-     * @param index The index the replacement will happen. Is counted as 1 being the first value
-     * @return All the data of the Liszt.
-     */
-    E[] replace(E replacement, int index) throws InputMismatchException, ClassNotFoundException;
-
-    /**
-     * Puts an element replacement at the former element, which is replaced.
-     * @param replacement The new element, that is wished to be replaced.
-     * @param original The original element, that will be replaced.
-     * @return All the data of the Liszt.
-     */
-    E[] replace(E replacement, E original) throws InputMismatchException, ClassNotFoundException;
-
-    /**
-     * Will add the input into the data array and map as well.
-     * @param element An object of type E.
-     * @return The same object, that has been added to the Liszt.
-     * Will return null, if it is not a successful add.
-     */
-    E addDda(E element);
-
-    /**
-     * Will add the input into the data array and map as well.
-     * @param elements An Array of objects of type E.
-     * @return The whole Liszt object and its elements.
-     * Will return null, if it is not a successful add.
-     */
-    Liszt<E> addDdaForAll(E[] elements);
-
-    /**
-     * Will add the input into the data array and map as well.
-     * @param element An object of type E.
-     * @return The whole Liszt object and its elements.
-     * Will return null, if it is not a successful add.
-     */
-    Liszt<E> addDdas(E element);
-
-    /**
-     * Will add the input into the data array and map as well.
-     * @param elements An array of objects of type E.
-     * @return The data of Liszt as an array.
-     * Will return null, if it is not a successful add.
-     */
-    E[] addDdasForAll(Collection<E> elements);
-
-    /**
-     * Will add the input into the data array and map as well.
-     * @param elements An array of objects of type E.
-     * @return The data of Liszt as an array.
-     * Will return null, if it is not a successful add.
-     */
-    E[] addDdasForAll(E[] elements);
 
     /**
      * Ensures that this collection contains the specified element (optional operation).
@@ -92,4 +31,29 @@ public interface ILiszt<E> {
      * @return All the element data of the Liszt.
      */
     E[] addUnique(E[] elements);
+
+    /**
+     * Replaces the element with the override with the specified element.
+     * Uses the key from the toString(), to identify the element.
+     * @param element The element to replace.
+     * @param replacement The element that will become the replacement.
+     * @return The final element.
+     */
+    E set(E element, E replacement);
+
+    /**
+     * Replaces the element with the override with the specified element.
+     * Uses the key from the toString(), to identify the element.
+     * If elements are empty or null the replacements will be added,
+     * otherwise if replacements are empty or null, the elements will be removed,
+     * these if cases also takes place for any indexes that is left.
+     * @param elements The elements to replace.
+     * @param replacements The elements that will become the replacements.
+     * @return An empty array if both parameters are null or empty otherwise the data elements.
+     */
+    E[] set(E[] elements, E[] replacements);
+
+    E[] Get(E[] elements);
+
+    E[] remove(E[] elements);
 }

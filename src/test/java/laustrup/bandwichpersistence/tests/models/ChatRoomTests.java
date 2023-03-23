@@ -11,6 +11,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 public class ChatRoomTests extends Tester<Liszt<User>, Object> {
 
     @ParameterizedTest
+    @SuppressWarnings("unchecked")
     @CsvSource(value = {"null","empty"})
     void canDefineTitle(String title) {
         test(t -> {

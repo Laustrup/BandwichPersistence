@@ -21,6 +21,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import java.time.LocalDateTime;
 
+import static laustrup.bandwichpersistence.items.aaa.assertions.AssertionFailer.failing;
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserCRUDTests extends Tester<User, Object> {
@@ -30,6 +31,7 @@ class UserCRUDTests extends Tester<User, Object> {
     private Subscription.Status _prevStatus, _postStatus;
 
     @Test
+    @SuppressWarnings("unchecked")
     void canReadAllUsers() {
         test(t -> {
             arrange();
@@ -306,9 +308,9 @@ class UserCRUDTests extends Tester<User, Object> {
                     actual = update(expected,_password,authority);
 
                     asserting(expected, actual, authority);
-                } else fail(isNullMessage(actual));
-            } else fail(isNullMessage(actual));
-        } else fail(isNullMessage(actual));
+                } else failing(isNullMessage(actual));
+            } else failing(isNullMessage(actual));
+        } else failing(isNullMessage(actual));
 
         assertTrue(delete(actual == null ? expected : actual, authority));
     }
