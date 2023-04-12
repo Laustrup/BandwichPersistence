@@ -25,7 +25,7 @@ import laustrup.bandwichpersistence.models.users.sub_users.venues.Venue;
 import laustrup.bandwichpersistence.services.TimeService;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembly;
 import laustrup.bandwichpersistence.tests.Tester;
-import laustrup.bandwichpersistence.utilities.collections.Liszt;
+import laustrup.bandwichpersistence.utilities.collections.lists.Liszt;
 import laustrup.bandwichpersistence.utilities.parameters.Plato;
 import laustrup.bandwichpersistence.utilities.console.Printer;
 

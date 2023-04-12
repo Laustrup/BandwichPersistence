@@ -5,7 +5,7 @@ import lombok.Getter;
 /**
  * The super class of any utilities that shares common methods or fields.
  */
-public class Utility {
+public abstract class Utility {
 
     /** Used for the version number as year|version|update. */
     @Getter

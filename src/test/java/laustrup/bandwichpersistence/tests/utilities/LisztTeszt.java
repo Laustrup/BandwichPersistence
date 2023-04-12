@@ -3,7 +3,7 @@ package laustrup.bandwichpersistence.tests.utilities;
 import laustrup.bandwichpersistence.tests.Tester;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.sub_users.bands.Band;
-import laustrup.bandwichpersistence.utilities.collections.Liszt;
+import laustrup.bandwichpersistence.utilities.collections.lists.Liszt;
 
 import laustrup.bandwichpersistence.utilities.console.Printer;
 import org.junit.jupiter.api.Test;
@@ -169,7 +169,7 @@ class LisztTeszt extends Tester<Object, Object> {
                 Band actual = (Band) _liszt.get(i),
                      expected = (Band) replacements[i];
                 asserting(_liszt.contains(expected));
-                asserting(expected,actual);
+                assertBand(expected,actual);
             }
 
             return true;

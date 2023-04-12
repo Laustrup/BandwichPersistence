@@ -8,7 +8,7 @@ import laustrup.bandwichpersistence.models.events.Participation;
 import laustrup.bandwichpersistence.services.controller_services.ControllerService;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembly;
 import laustrup.bandwichpersistence.services.persistence_services.entity_services.sub_entity_services.EventPersistenceService;
-import laustrup.bandwichpersistence.utilities.collections.Liszt;
+import laustrup.bandwichpersistence.utilities.collections.lists.Liszt;
 
 import laustrup.bandwichpersistence.utilities.parameters.Plato;
 import org.springframework.http.ResponseEntity;

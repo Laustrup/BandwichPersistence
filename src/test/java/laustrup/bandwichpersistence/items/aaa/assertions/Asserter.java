@@ -18,7 +18,7 @@ import laustrup.bandwichpersistence.models.users.sub_users.bands.Band;
 import laustrup.bandwichpersistence.models.users.sub_users.participants.Participant;
 import laustrup.bandwichpersistence.models.users.sub_users.venues.Venue;
 import laustrup.bandwichpersistence.models.users.subscriptions.Subscription;
-import laustrup.bandwichpersistence.utilities.collections.Liszt;
+import laustrup.bandwichpersistence.utilities.collections.lists.Liszt;
 import laustrup.bandwichpersistence.utilities.console.Printer;
 import laustrup.bandwichpersistence.utilities.parameters.Plato;
 
@@ -62,7 +62,7 @@ public abstract class Asserter<T,R> extends Actor<T,R> {
         Printer.get_instance().print("Expected = " + expected + "\n\nActual = " + actual);
         switch (authority) {
             case PARTICIPANT -> assertParticipants((Participant) expected, (Participant) actual, true);
-            case BAND -> assertBands((Band) expected,(Band) actual);
+            case BAND -> assertBand((Band) expected,(Band) actual);
             case ARTIST -> assertArtists((Artist) expected,(Artist) actual, true);
             case VENUE -> assertVenues((Venue) expected,(Venue) actual);
             default -> failing(switchElementUnknown(authority), new UnknownElementException(null,authority));
@@ -95,7 +95,7 @@ public abstract class Asserter<T,R> extends Actor<T,R> {
      * @param expected The Band that is arranged and defined.
      * @param actual The Band that is the result of an action.
      */
-    protected void assertBands(Band expected, Band actual) {
+    protected void assertBand(Band expected, Band actual) {
         doAssert(a -> {
             if (!allowObjects(expected,actual))
                 return objectMessage(expected,actual);

@@ -4,7 +4,7 @@ import laustrup.bandwichpersistence.models.events.Gig;
 import laustrup.bandwichpersistence.models.users.User;
 import laustrup.bandwichpersistence.models.users.sub_users.bands.Band;
 import laustrup.bandwichpersistence.repositories.sub_repositories.UserRepository;
-import laustrup.bandwichpersistence.utilities.collections.Liszt;
+import laustrup.bandwichpersistence.utilities.collections.lists.Liszt;
 import laustrup.bandwichpersistence.utilities.console.Printer;
 
 import java.sql.ResultSet;
@@ -46,7 +46,7 @@ public class BandAssembly extends UserAssembler {
 
         if (set != null)
             while (set.next())
-                bands.addUnique(assemble(set, isTemplate));
+                bands.add(assemble(set, isTemplate));
 
         return bands;
     }

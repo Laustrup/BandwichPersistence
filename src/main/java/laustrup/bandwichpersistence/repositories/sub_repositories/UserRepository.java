@@ -10,7 +10,7 @@ import laustrup.bandwichpersistence.models.users.subscriptions.Card;
 import laustrup.bandwichpersistence.models.users.subscriptions.Subscription;
 import laustrup.bandwichpersistence.models.users.sub_users.venues.Venue;
 import laustrup.bandwichpersistence.repositories.Repository;
-import laustrup.bandwichpersistence.utilities.collections.Liszt;
+import laustrup.bandwichpersistence.utilities.collections.lists.Liszt;
 import laustrup.bandwichpersistence.utilities.console.Printer;
 
 import java.sql.ResultSet;

@@ -1,6 +1,7 @@
 package laustrup.bandwichpersistence.utilities.collections;
 
-public interface ILiszt<E> {
+//TODO update documentation
+public interface ICollectionUtility<E> {
 
     /**
      * Ensures that this collection contains the specified element (optional operation).
@@ -17,20 +18,6 @@ public interface ILiszt<E> {
      * @return true if this collection changed as a result of the call
      */
     boolean add(E[] elements);
-
-    /**
-     * Will only add the element, if it doesn't contain the key in the map.
-     * @param element The element that will be added depending on the situation.
-     * @return All the element data of the Liszt.
-     */
-    E[] addUnique(E element);
-
-    /**
-     * Will only add the elements, if it doesn't contain the key in the map.
-     * @param elements The elements that will be added depending on the situation.
-     * @return All the element data of the Liszt.
-     */
-    E[] addUnique(E[] elements);
 
     /**
      * Replaces the element with the override with the specified element.
@@ -56,4 +43,5 @@ public interface ILiszt<E> {
     E[] Get(E[] elements);
 
     E[] remove(E[] elements);
+    boolean contains(E[] elements);
 }

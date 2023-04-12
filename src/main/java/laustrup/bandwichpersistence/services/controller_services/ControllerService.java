@@ -2,7 +2,7 @@ package laustrup.bandwichpersistence.services.controller_services;
 
 import laustrup.bandwichpersistence.models.Response;
 import laustrup.bandwichpersistence.models.Search;
-import laustrup.bandwichpersistence.utilities.collections.Liszt;
+import laustrup.bandwichpersistence.utilities.collections.lists.Liszt;
 import laustrup.bandwichpersistence.utilities.parameters.Plato;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -1,6 +1,6 @@
 package laustrup.bandwichpersistence.items.aaa.assertions;
 
-import laustrup.bandwichpersistence.utilities.collections.Liszt;
+import laustrup.bandwichpersistence.utilities.collections.lists.Liszt;
 
 /**
  * Will check for assertion scenarios such as is null or different length of inputs.

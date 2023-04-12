@@ -1,8 +1,7 @@
-package laustrup.bandwichpersistence.utilities.collections;
+package laustrup.bandwichpersistence.utilities.collections.lists;
 
-import laustrup.bandwichpersistence.utilities.Utility;
+import laustrup.bandwichpersistence.utilities.collections.ICollectionUtility;
 import laustrup.bandwichpersistence.utilities.console.Printer;
-import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -18,24 +17,11 @@ import java.util.stream.Stream;
  * An extra detail is that this class also uses a map, which means that
  * the approach of getting also can be done through the map, this also
  * means, that they will be saved doing add, costing lower performance.
- * @param <E> The type of element that are wished to be used in this class
+ * Index can both start at 0 or 1, every method starting with an uppercase
+ * letter starts with 1 instead 0 in the parameters.
+ * @param <E> The type of element that are wished to be used in this class.
  */
-public class Liszt<E> extends Utility implements List<E>, ILiszt<E>{
-
-    /** Contains all the elements that are inside the Liszt. */
-    @Getter
-    private E[] _data;
-
-    /** Containing all data elements in a map for quick access. */
-    @SuppressWarnings("all")
-    private Map<String,E> _map;
-
-    /** The destinations for the map, before being inserted into the map */
-    @SuppressWarnings("all")
-    private Map<String,E> _destinations;
-
-    /** The keys that the map can use for inserting relevant data from the destinations into the map. */
-    private String[] _destinationKeys;
+public class Liszt<E> extends ListUtility<E> implements List<E>, ICollectionUtility<E> {
 
     /** Creates the Liszt with empty data and a hash type of map. */
     public Liszt() { this(false); }
@@ -44,14 +30,7 @@ public class Liszt<E> extends Utility implements List<E>, ILiszt<E>{
      * Creates the Liszt with empty data.
      * @param isLinked Decides if the map should be linked or hash type.
      */
-    public Liszt(boolean isLinked) {
-        super(LocalDateTime.now().getYear(),1,1);
-        _data = convert(new Object[0]);
-        _destinationKeys = new String[0];
-
-        if (isLinked) _map = new LinkedHashMap<>(); else _map = new HashMap<>();
-        if (isLinked) _destinations = new LinkedHashMap<>(); else _destinations = new HashMap<>();
-    }
+    public Liszt(boolean isLinked) { super(isLinked, LocalDateTime.now().getYear(),1,1); }
 
     /**
      * Creates the Liszt with data and a hash type of map.
@@ -123,21 +102,6 @@ public class Liszt<E> extends Utility implements List<E>, ILiszt<E>{
     }
 
     @Override
-    public E[] addUnique(E element) {
-        if (!contains(element.toString()))
-            add(element);
-        return _data;
-    }
-
-    @Override
-    public E[] addUnique(E[] elements) {
-        for (E element : elements)
-            if (!contains(element.toString()))
-                add(element);
-        return _data;
-    }
-
-    @Override
     public E[] set(E[] elements, E[] replacements) {
         boolean elementsIsNullOrEmpty = elements == null || elements.length == 0,
                 replacementsIsNullOrEmpty = replacements == null || replacements.length == 0;
@@ -170,34 +134,35 @@ public class Liszt<E> extends Utility implements List<E>, ILiszt<E>{
                 if (elementsRemoved > elements.length || replacements.length <= replacement)
                     break;
             }
-            if (replacement < replacements.length)
-                for (; replacement < replacements.length; replacement++)
-                    add(replacements[replacement]);
-            if (elementsRemoved < elements.length)
-                for (; elementsRemoved < elements.length; elementsRemoved++)
-                    remove(elements[elementsRemoved]);
+            if (replacement < replacements.length) {
+                E[] extras = convert(new Object[elements.length - elementsRemoved]);
+
+                for (int i = 0; i + replacement < replacements.length; i++)
+                    extras[i] = replacements[i + replacement];
+
+                add(extras);
+            }
+            if (elementsRemoved < elements.length) {
+                E[] extras = convert(new Object[elements.length - elementsRemoved]);
+
+                for (int i = 0; i + elementsRemoved < elements.length; i++)
+                    extras[i] = elements[i + elementsRemoved];
+
+                remove(extras);
+            }
         }
 
-
-        return Get(replacements);
+        return Get(Objects.requireNonNull(replacements));
     }
 
     @Override
     public E[] Get(E[] elements) {
         E[] gathered = convert(new Object[elements.length]);
+
         for (int i = 0; i < gathered.length; i++)
             gathered[i] = Get(elements[i].toString());
-        return gathered;
-    }
 
-    /**
-     * Converting Objects into the element type and suppresses warning of cast.
-     * @param objects The Objects that will become element type.
-     * @return The element type version of the Objects.
-     */
-    @SuppressWarnings("unchecked")
-    private E[] convert(Object[] objects) {
-        return (E[]) objects;
+        return gathered;
     }
 
     @Override
@@ -212,9 +177,9 @@ public class Liszt<E> extends Utility implements List<E>, ILiszt<E>{
     @Override
     public E set(int index, E element) {
         try {
-            E original = _data[index-1];
+            _map.remove(_data[index-1].toString());
             _data[index-1] = element;
-            _map.replace(original.toString(),element);
+            _map.put(element.toString(),element);
         } catch (IndexOutOfBoundsException e) {
             Printer.get_instance().print("At setting " + element + " in Liszt, the index " + index +
                     " was out of bounce of size " + size() + "...",e);
@@ -298,53 +263,82 @@ public class Liszt<E> extends Utility implements List<E>, ILiszt<E>{
     }
 
     @Override
-    public boolean remove(Object object) {
-        if (object == null)
-            return false;
-
-        int size = size();
-        return size+1 == remove(convert(new Object[]{object})).length;
-    }
-
-    @Override
     public E[] remove(E[] elements) {
         elements = filterElements(elements);
-        Object[] storage = new Object[_data.length - elements.length];
-        int storageIndex = 0;
 
         try {
-            for (E datum : _data) {
-                for (int i = 0; i < elements.length; i++) {
-                    if (elements[i].toString().equals(datum.toString()))
-                        break;
-                    else if (i == elements.length - 1) {
-                        storage[storageIndex] = elements[i];
-                        storageIndex++;
-                    }
-                }
-                if (storage.length == _data.length - elements.length)
-                    break;
-            }
-
-            _data = convert(storage);
             for (E element : elements)
-                if (!_map.remove(element.toString(),element)) { _map.remove(element.hashCode()); }
+                remove(element);
         }
         catch (Exception e) {
-            Printer.get_instance().print("Couldn't remove object an object in remove multiple elements...", e);
+            Printer.get_instance().print("Couldn't remove object in remove multiple elements...", e);
         }
 
         return _data;
     }
 
     @Override
-    public boolean containsAll(Collection<?> collection) {
-        for (E e : _data) { if (!collection.contains(e)) { return false; } }
-        for (Object item : collection) {
-            if (!_map.containsKey(item.toString()) || !_map.containsKey(item.hashCode())) {
+    public boolean contains(E[] elements) {
+        for (E element : elements)
+            if (!contains(element))
                 return false;
+
+        return true;
+    }
+
+    @Override
+    public boolean remove(Object object) {
+        if (object != null)
+            try {
+                int index = indexOf(object);
+
+                while (index >= 0) {
+                    if (remove(index) == null)
+                        break;
+
+                    index = indexOf(object);
+                }
+                return true;
+            }
+            catch (Exception e) {
+                Printer.get_instance().print("Couldn't remove " + object + "...", e);
+            }
+
+        return false;
+    }
+
+    public E Remove(int index) { return remove(index-1); }
+    @Override
+    public E remove(int index) {
+        if (index > size() || 0 > index)
+            return null;
+
+        E element = null;
+        E[] storage = convert(new Object[size()-1]);
+        int storageIndex = 0;
+
+        for (int i = 0; i < size(); i++) {
+            if (i != index) {
+                storage[storageIndex] = get(i);
+                storageIndex++;
+            }
+            else {
+                element = get(i);
+                _map.remove(get(i).toString());
             }
         }
+        _data = storage;
+
+        return element;
+    }
+
+    @Override
+    public boolean containsAll(Collection<?> collection) {
+        for (E datum : _data)
+            if (!collection.contains(datum)) return false;
+        for (Object item : collection)
+            if (!_map.containsKey(item.toString()))
+                return false;
 
         return true;
     }
@@ -361,7 +355,7 @@ public class Liszt<E> extends Utility implements List<E>, ILiszt<E>{
     }
 
     @Override
-    public boolean addAll(int index, Collection<? extends E> collection) {
+    public boolean addAll(int index, Collection<? extends E> c) {
         return false;
     }
 
@@ -383,7 +377,7 @@ public class Liszt<E> extends Utility implements List<E>, ILiszt<E>{
 
         try {
             for (Object item : collection) {
-                if (!_map.containsKey(item.toString()) || !_map.containsKey(item.hashCode())) {
+                if (!_map.containsKey(item.toString())) {
                     remove(index);
                 }
                 index++;
@@ -435,37 +429,53 @@ public class Liszt<E> extends Utility implements List<E>, ILiszt<E>{
 
     }
 
-    @Override
-    public E remove(int index) {
-        return null;
+    public int IndexOf(E element) {
+        return indexOf(element) + 1;
     }
-
     @Override
     public int indexOf(Object object) {
-        for (int i = 0; i < _data.length; i++) { if (_data[i] == object) return i; }
+        for (int i = 0; i < _data.length; i++)
+            if (_data[i] == object)
+                return i;
+
         return -1;
     }
 
+    public int LastIndexOf(E element) { return lastIndexOf(element) + 1; }
     @Override
     public int lastIndexOf(Object object) {
-        for (int i = _data.length; i >= 0; i--) { if (_data[i] == object) return i; }
+        for (int i = _data.length-1; i == 0; i--)
+            if (get(i) == object) return i;
+
         return -1;
     }
 
     @Override
-    public ListIterator<E> listIterator() {
-        return null;
+    public ListIterator<E> listIterator() { return Arrays.stream(_data).toList().listIterator(); }
+    @Override
+    public ListIterator<E> listIterator(int index) { return Arrays.stream(_data).toList().listIterator(index); }
+
+    public List<E> SubList(int min, int max) { return subList(min - 1, max - 1); }
+    @Override
+    public List<E> subList(int min, int max) { return Arrays.stream(subArray(min, max)).toList(); }
+
+    public Liszt<E> SubLiszt(int min, int max) { return subLiszt(min - 1, max - 1); }
+    public Liszt<E> subLiszt(int min, int max) { return new Liszt<>(subArray(min, max)); }
+
+    public E[] SubArray(int min, int max) { return subArray(min - 1, max - 1); }
+
+    //TODO Test subArray in Liszt
+    public E[] subArray(int min, int max) {
+        E[] subList = convert(new Object[max-min]);
+
+        for (int iteration = min, index = 0;
+             iteration < max;
+             iteration++, index++
+        ) subList[index] = _data[iteration];
+
+        return subList;
     }
 
-    @Override
-    public ListIterator<E> listIterator(int index) {
-        return null;
-    }
-
-    @Override
-    public List<E> subList(int fromIndex, int toIndex) {
-        return null;
-    }
 
     @Override
     public Spliterator<E> spliterator() {

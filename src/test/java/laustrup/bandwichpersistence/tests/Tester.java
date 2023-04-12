@@ -94,4 +94,14 @@ public abstract class Tester<T,R> extends Asserter<T,R> {
             failing("An exception was caught in the main test method...", e);
         }
     }
+
+    /**
+     * Is for the ending of a test, will add to the print that the test has been completed.
+     * @param title The title of the current test.
+     * @return Always true, since the test made its finally goal.
+     */
+    protected boolean end(String title) {
+        addToPrint("The test " + title + " made it through the end without any exceptions occurring!");
+        return true;
+    }
 }

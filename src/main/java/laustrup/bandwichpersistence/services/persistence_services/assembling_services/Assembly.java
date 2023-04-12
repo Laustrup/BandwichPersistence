@@ -10,7 +10,7 @@ import laustrup.bandwichpersistence.repositories.DbGate;
 import laustrup.bandwichpersistence.repositories.sub_repositories.ChatRepository;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.sub_assemblings.EventAssembly;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.sub_assemblings.user_assemblings.UserAssembly;
-import laustrup.bandwichpersistence.utilities.collections.Liszt;
+import laustrup.bandwichpersistence.utilities.collections.lists.Liszt;
 import laustrup.bandwichpersistence.utilities.parameters.Plato;
 import laustrup.bandwichpersistence.utilities.console.Printer;
 
