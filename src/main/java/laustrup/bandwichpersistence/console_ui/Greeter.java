@@ -31,7 +31,7 @@ public class Greeter extends GreeterContents {
     /**
      * Will set up the Printer before it will start up by printing instructions and scanning the inputs.
      */
-    public static void startUp() {
+    public static void setup() {
         System.out.println(_introduction + _sectionSkip);
         readInput();
 
@@ -46,9 +46,9 @@ public class Greeter extends GreeterContents {
     /**
      * When the application is running, this will display an information of the success.
      */
-    public static void running() {
-        Printer.get_instance().print("The application has now started.\n" +
-                "like any other running program, press ctrl+c to close");
+    public static void startupStatus() {
+        Printer.get_instance().print("The application has now started and will receive and respond on requests.\n" +
+            "You have the options to either restart by typing restart or stop the application by typing exit.");
     }
 
     /**

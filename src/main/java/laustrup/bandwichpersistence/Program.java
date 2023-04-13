@@ -1,5 +1,6 @@
 package laustrup.bandwichpersistence;
 
+import laustrup.bandwichpersistence.repositories.DbLibrary;
 import lombok.Getter;
 
 /**
@@ -58,6 +59,8 @@ public class Program {
         boolean alreadyInTestingMode = _state.equals(State.TESTING);
         if (isTesting)
             _state = State.TESTING;
+        if (isTesting != alreadyInTestingMode)
+            DbLibrary.get_instance();
 
         return alreadyInTestingMode;
     }

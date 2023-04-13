@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
  * Creates a h2_init.sql at the SQL directory, that is composed by the boilerplate.sql and default_values.sql
  * and translate for the H2 to generate start values and schemas.
  */
-public class H2Init {
+class H2Init {
 
     /** The location of the directory containing SQL scripts. */
     protected final String _sqlDirectory = Defaults.get_instance().get_directory("/") + "src/main/resources/sqls/";
@@ -31,12 +31,12 @@ public class H2Init {
 
         FileService.get_instance().delete(location);
         FileService.get_instance().write(location,
-            FileService.get_instance().getContent(_sqlDirectory, "boilerplate.sql",
-                replacements) +
-                (Defaults.get_instance().is_included()
-                        ? FileService.get_instance().getContent(_sqlDirectory, "default_values.sql",
-                        replacements) : ""
-                )
+        FileService.get_instance().getContent(_sqlDirectory, "boilerplate.sql",
+            replacements) +
+            (Defaults.get_instance().is_included()
+                    ? FileService.get_instance().getContent(_sqlDirectory, "default_values.sql",
+                    replacements) : ""
+            )
         );
 
         Printer.get_instance().print("h2_init.sql generation",start);
@@ -205,14 +205,5 @@ public class H2Init {
         }
 
         return translation + "))";
-    }
-
-    /**
-     * Will generate a string that will run a script at initiating the H2 database,
-     * that is the boilerplate.sql and default_values.sql
-     * @return The generated init String.
-     */
-    protected String h2Init() {
-        return "INIT=RUNSCRIPT FROM '" + _h2InitFileLocation + "'";
     }
 }

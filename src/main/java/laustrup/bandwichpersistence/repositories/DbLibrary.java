@@ -33,10 +33,13 @@ public class DbLibrary extends H2Config {
 
     /** Value for the DbGate with the purpose of creating a connection. */
     @Getter
-    private String _path = set_path(),
-        _user = Program.get_instance().get_state().equals(Program.State.TESTING) ? "sa" : Defaults.get_instance().get_dbUser(),
-        _password = Program.get_instance().get_state().equals(Program.State.TESTING) ? "" : Defaults.get_instance().get_dbPassword(),
-        _driverClassName = Program.get_instance().get_state().equals(Program.State.TESTING) ? "org.h2.Driver" : "com.mysql.cj.jdbc.Driver";
+    private final String _path = set_path();
+    @Getter
+    private String _user = Program.get_instance().get_state().equals(Program.State.TESTING) ? "sa" : Defaults.get_instance().get_dbUser();
+    @Getter
+    private String _password = Program.get_instance().get_state().equals(Program.State.TESTING) ? "" : Defaults.get_instance().get_dbPassword();
+    @Getter
+    private final String _driverClassName = Program.get_instance().get_state().equals(Program.State.TESTING) ? "org.h2.Driver" : "com.mysql.cj.jdbc.Driver";
 
     /**
      * Will change the fields of crating a connection for the database,
@@ -66,7 +69,7 @@ public class DbLibrary extends H2Config {
             _location = changeLocation ?  location : _location;
             _port = changePort ? port : _port;
             _schema = changeSchema ? schema : _schema;
-            _allowMultipleQueries = !allowMultipleQueries ? new String() : _allowMultipleQueries;
+            _allowMultipleQueries = !allowMultipleQueries ? "" : _allowMultipleQueries;
             _user = changeUser ? user : _user;
             _password = changePassword ? password : _password;
         }
@@ -101,7 +104,7 @@ public class DbLibrary extends H2Config {
         return "jdbc:" +
             (Program.get_instance().get_state().equals(Program.State.TESTING)
                 ? "h2:mem:TESTING" +
-                ";CACHE_SIZE=8192;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE;DB_CLOSE_DELAY=-1;" + h2Init()
+                ";CACHE_SIZE=8192;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE;DB_CLOSE_DELAY=-1;" + h2InitRunScript()
                     : "mysql://" + _location + ":" + _port + "/" + _schema + _allowMultipleQueries);
     }
 

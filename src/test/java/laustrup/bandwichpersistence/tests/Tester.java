@@ -53,6 +53,18 @@ public abstract class Tester<T,R> extends Asserter<T,R> {
     /** Defines a character that is used to separate CSVSources */
     protected final char _delimiter = '|';
 
+    /**
+     * Can be used for testing with multiple adds.
+     * Contains two Artists.
+     */
+    protected Object[] _addings;
+
+    /**
+     * Can be used for testing with a single add.
+     * Contains one Artist.
+     */
+    protected Object _adding;
+
     @BeforeEach
     void beforeEach() {
         preStart();
@@ -61,16 +73,16 @@ public abstract class Tester<T,R> extends Asserter<T,R> {
         _expected = new String();
         _actual = new String();
         _password = RandomCreatorService.get_instance().generatePassword();
+
+        _addings = new Object[]{_items.get_carlos(), _items.get_bjarke(), _items.get_tir()};
+        _adding = _items.get_carlos();
     }
 
-    /**
-     * Will set the program to be run in testing mode.
-     */
+    /** Will set the program to be run in testing mode. */
     private void preStart() {
         if (!Program.get_instance().is_applicationIsRunning()) {
             Program.get_instance().setTestingMode(true);
             Printer.get_instance().set_mode(PrinterMode.HIGH_CONTRAST);
-            //DbLibrary.get_instance().set_path();
         }
 
         Program.get_instance().applicationIsRunning();

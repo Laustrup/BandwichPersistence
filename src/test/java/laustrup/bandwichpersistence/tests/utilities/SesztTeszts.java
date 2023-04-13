@@ -4,30 +4,9 @@ import laustrup.bandwichpersistence.models.users.sub_users.bands.Artist;
 import laustrup.bandwichpersistence.tests.Tester;
 import laustrup.bandwichpersistence.utilities.collections.sets.Seszt;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class SesztTeszts extends Tester<Object, Object> {
-
-    /**
-     * This is the Seszt, that will be used for testing.
-     * The beforeEach method will reset it before each test.
-     */
-    private Seszt<Object> _seszt;
-
-    /**
-     * Can be used for testing with multiple adds.
-     * Contains two Artists.
-     */
-    private Object[] _addings = new Object[]{_items.get_carlos(), _items.get_bjarke(), _items.get_tir()};
-
-    /**
-     * Can be used for testing with a single add.
-     * Contains one Artist.
-     */
-    private Object _adding = _items.get_carlos();
-
-    @BeforeEach void beforeEach() { _seszt = new Seszt<>(); }
+public class SesztTeszts extends UtilityTester {
 
     @Test
     void canContain() {
