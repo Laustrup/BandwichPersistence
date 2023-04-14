@@ -30,6 +30,8 @@ public abstract class SetUtility<E> extends CollectionUtility<E> {
     public abstract boolean addAll(CollectionUtility<? extends E> c);
 
     public abstract boolean removeAll(CollectionUtility<?> collection);
+    public abstract boolean remove(int index);
+    public abstract boolean Remove(int index);
 
     public abstract boolean retainAll(CollectionUtility<?> c);
 }

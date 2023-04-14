@@ -137,11 +137,6 @@ public class Seszt<E> extends SetUtility<E> implements Set<E>, ICollectionUtilit
     }
 
     @Override
-    public E[] remove(E[] elements) {
-        return null;
-    }
-
-    @Override
     public boolean contains(E[] elements) {
         for (E element : elements)
             if (!contains(element))
@@ -151,8 +146,50 @@ public class Seszt<E> extends SetUtility<E> implements Set<E>, ICollectionUtilit
     }
 
     @Override
-    public boolean remove(Object o) {
-        return false;
+    public boolean removeAll(Collection<?> collection) {
+        int previousSize = size();
+        remove(convert(collection.toArray()));
+        return previousSize == size() + collection.size();
+    }
+
+    @Override
+    public E[] remove(E[] elements) {
+        for (E element : elements)
+            remove(element);
+
+        return _data;
+    }
+
+    @Override
+    public boolean remove(Object object) {
+        int index = -1;
+
+        for (int i = 0; i < size(); i++) {
+            if (object.toString().equals(_data[i].toString())) {
+                index = i;
+                break;
+            }
+        }
+
+        return remove(index);
+    }
+
+    @Override
+    public boolean Remove(int index) {
+        if (index == 0)
+            return false;
+
+        return remove(index-1);
+    }
+
+    @Override
+    public boolean remove(int index) {
+        if (index < 0)
+            return false;
+
+        int previousSize = size();
+        handleRemove(index);
+        return previousSize == size() + 1;
     }
 
     @Override
@@ -172,13 +209,6 @@ public class Seszt<E> extends SetUtility<E> implements Set<E>, ICollectionUtilit
         }
 
         return Arrays.equals(_data, convert(collection.toArray()));
-    }
-
-    @Override
-    public boolean removeAll(Collection<?> collection) {
-        int previousSize = size();
-        remove(collection.toArray());
-        return previousSize == size() + collection.size();
     }
 
     @Override

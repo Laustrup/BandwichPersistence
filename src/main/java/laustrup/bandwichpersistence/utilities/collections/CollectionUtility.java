@@ -2,6 +2,7 @@ package laustrup.bandwichpersistence.utilities.collections;
 
 import laustrup.bandwichpersistence.utilities.Utility;
 
+import laustrup.bandwichpersistence.utilities.console.Printer;
 import lombok.Getter;
 
 import java.util.HashMap;
@@ -57,6 +58,25 @@ public abstract class CollectionUtility<E> extends Utility {
     }
 
     /**
+     * Will remove the index of the data and its key in the map.
+     * @param index The index of the data that will be removed.
+     */
+    protected void handleRemove(int index) {
+        E[] storage = convert(new Object[_data.length-1]);
+        int storageIndex = 0;
+
+        for (int i = 0; i < _data.length; i++) {
+            if (i != index) {
+                storage[storageIndex] = _data[i];
+                storageIndex++;
+            }
+            else
+                _map.remove(_data[i].toString());
+        }
+        _data = storage;
+    }
+
+    /**
      * Will add the elements to the E[] data and the map.
      * Null elements will be filtered away.
      * @param elements The elements to add.
@@ -77,6 +97,11 @@ public abstract class CollectionUtility<E> extends Utility {
         insertDestinationsIntoMap();
     }
 
+    /**
+     * Elements that are null will be removed.
+     * @param elements The elements that will be filtered.
+     * @return The filtered elements.
+     */
     protected E[] filterElements(E[] elements) {
         int length = 0;
         for (E element : elements)
@@ -110,6 +135,7 @@ public abstract class CollectionUtility<E> extends Utility {
 
         return element;
     }
+
     /**
      * Adds the potential key to the destinationKeys.
      * @param key The potential key of an element.
@@ -127,6 +153,10 @@ public abstract class CollectionUtility<E> extends Utility {
         return storage;
     }
 
+    /**
+     * Inserts the destination keys into the map.
+     * Is intended to be removed for better performance.
+     */
     private void insertDestinationsIntoMap() {
         for (String destinationKey : _destinationKeys)
             _map.put(destinationKey, _destinations.get(destinationKey));
