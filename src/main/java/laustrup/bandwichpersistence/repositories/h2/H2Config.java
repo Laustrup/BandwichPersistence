@@ -22,7 +22,7 @@ public class H2Config extends H2Init {
      * @return The H2 translated SQL query.
      */
     public String translateMySQLIntoH2(String query) {
-        return query.replace("`","\"");
+        return query.replace("`", "\"");
     }
 
     /**

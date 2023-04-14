@@ -13,10 +13,10 @@ import java.util.stream.Stream;
 
 /**
  * Implements a Set of element E in an append way of adding elements.
- * It also implements ISeszt, which contains extra useful methods.
+ * It also implements the interface ICollectionUtility, which contains extra useful methods.
  * An extra detail is that this class also uses a map, which means that
  * the approach of getting also can be done through the map, this also
- * means, that they will be saved doing add, costing lower performance.
+ * means, that they will be saved doing add and removed at remove.
  * Index can both start at 0 or 1, every method starting with an uppercase
  * letter starts with 1 instead 0 in the parameters.
  * @param <E> The type of element that are wished to be used in this class.

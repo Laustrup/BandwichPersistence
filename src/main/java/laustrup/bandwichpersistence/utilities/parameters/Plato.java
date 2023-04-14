@@ -10,8 +10,7 @@ import java.util.Random;
 
 /**
  * A utility class, that behaves as a boolean, but with extra features.
- * Is named after the philosopher Plato ironically,
- * because of Plato's duality.
+ * Is named after the philosopher Plato ironically, because of Plato's duality theory.
  * Instead of just being true or false, it has more values, such as undefined.
  * Uses an enum for identifying those values.
  * Can also be null, since it's a class object.

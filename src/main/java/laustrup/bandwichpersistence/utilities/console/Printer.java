@@ -7,7 +7,13 @@ import lombok.Getter;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
-/** This class will handle printing of statements to the console. */
+/**
+ * Will handle printing of statements to the console.
+ * Contains three different options for modes, default will use a normal println,
+ * the others have a border around each print, noir mode is without colour
+ * and high contrast mode is with colour of high contrast.
+ * Is intended to log each print, but isn't implemented yet.
+ */
 public class Printer extends Painter implements IPrinter {
 
     /** Containing previous printed contents */
