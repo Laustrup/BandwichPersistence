@@ -108,9 +108,15 @@ public class Seszt<E> extends SetUtility<E> implements Set<E>, ICollectionUtilit
     private E[] filterUniques(E[] elements) {
         E[] filtered = convert(new Object[elements.length]);
 
-        for (int i = 0; i < elements.length; i++)
-            if (elements[i] != null && !contains(elements[i]))
+        for (int i = 0; i < elements.length; i++) {
+            boolean notIncludedInFilter = true;
+            for (E element : filtered)
+                if (element != null && element.toString().equals(elements[i].toString()))
+                    notIncludedInFilter = false;
+
+            if (elements[i] != null && !contains(elements[i]) && notIncludedInFilter)
                 filtered[i] = elements[i];
+        }
 
         return filtered;
     }

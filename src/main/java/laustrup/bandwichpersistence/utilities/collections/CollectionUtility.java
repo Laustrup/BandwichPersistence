@@ -161,18 +161,18 @@ public abstract class CollectionUtility<E> extends Utility {
                 (keySet[i+1].contains("description")
                     || keySet[i+1].contains("timestamp")
                     || keySet[i+1].contains("runner")))
-                keys.append("\n\t\t\t");
+                keys.append("\n\t\t");
             String key = keySet[i];
             keys.append(key);
         }
 
-        keys.insert(1,"\n\t\t\t");
-        keys.insert(keys.length()-1, "\n\t\t");
+        keys.insert(1,"\n\t\t");
+        keys.insert(keys.length()-1, "\n\t");
 
         return getClass().getSimpleName() + "(" +
-            "\n\t\tsize:" + _data.length +
-            ",\n\t\tisLinked:" + (_map.getClass() == LinkedHashMap.class ? "Linked" : "Unlinked") +
-            ",\n\t\tmap:" + keys +
+            "\n\tsize:" + _data.length +
+            ",\n\tisLinked:" + (_map.getClass() == LinkedHashMap.class ? "Linked" : "Unlinked") +
+            ",\n\tmap:" + keys +
         "\n)";
     }
 }

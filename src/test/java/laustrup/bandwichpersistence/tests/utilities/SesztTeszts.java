@@ -45,7 +45,10 @@ public class SesztTeszts extends UtilityTester {
     @Test
     void canAdd() {
         test(t -> {
-            Object expected = arrange(e -> _adding);
+            Object expected = arrange(e -> {
+                _seszt = new Seszt<>(new Object[]{_adding});
+                return _adding;
+            });
 
             act(e -> _seszt.add(expected));
 
@@ -58,9 +61,10 @@ public class SesztTeszts extends UtilityTester {
     @Test
     void canAddUniques() {
         test(t -> {
-            Artist[] expectations = (Artist[]) arrange(e ->
-                new Artist[]{_items.get_tir(),_items.get_laust()}
-            );
+            Artist[] expectations = (Artist[]) arrange(e -> {
+                _seszt = new Seszt<>(new Artist[]{_items.get_tir(), _items.get_laust()});
+                return new Artist[]{_items.get_tir(), _items.get_laust()};
+            });
 
             act(e -> _seszt.add(expectations));
 
@@ -71,11 +75,12 @@ public class SesztTeszts extends UtilityTester {
     }
 
     @Test
-    void canNotAddSame() {
+    void canOnlyAddUnique() {
         test(t -> {
-            Artist[] arrangement = (Artist[]) arrange(e ->
-                new Artist[]{_items.get_carlos(),_items.get_carlos()}
-            );
+            Artist[] arrangement = (Artist[]) arrange(e -> {
+                _seszt = new Seszt<>(new Artist[]{_items.get_carlos(), _items.get_carlos()});
+                return new Artist[]{_items.get_carlos(), _items.get_carlos()};
+            });
 
             act(e -> _seszt.add(arrangement));
 
