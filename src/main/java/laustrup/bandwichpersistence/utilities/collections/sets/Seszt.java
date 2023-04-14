@@ -51,7 +51,9 @@ public class Seszt<E> extends SetUtility<E> implements Set<E>, ICollectionUtilit
     @Override public Object[] toArray() { return Arrays.stream(_data).toArray(); }
 
     @Override @SuppressWarnings("all")
-    public boolean contains(Object object) { return _map.containsValue(object); }
+    public boolean contains(Object object) {
+        return _map.containsValue(object);
+    }
     @Override @SuppressWarnings("unchecked")
     public <T> T[] toArray(T[] a) { return (T[]) Arrays.stream(_data).toArray(); }
     @Override @SuppressWarnings("unchecked")
@@ -60,13 +62,57 @@ public class Seszt<E> extends SetUtility<E> implements Set<E>, ICollectionUtilit
     @Override
     public boolean add(E element) {
         int size = size();
-        add(convert(new Object[]{element}));
+        Add(convert(new Object[]{element}));
         return size < size();
     }
 
     @Override
     public boolean add(E[] elements) {
-        return false;
+        int size = size();
+        Add(elements);
+        return size < size();
+    }
+
+    @Override
+    public boolean addAll(Collection<? extends E> collection) {
+        int previousSize = size();
+        Add(convert(collection.toArray()));
+        return previousSize == size() - collection.size();
+    }
+
+    @Override
+    public boolean addAll(CollectionUtility<? extends E> collection) {
+        int previousSize = size();
+        Add(collection.get_data());
+        return previousSize == size() - collection.get_data().length;
+    }
+
+    @Override
+    public E[] Add(E element) {
+        return Add(convert(new Object[]{element}));
+    }
+
+    @Override
+    public E[] Add(E[] elements) {
+        handleAdd(filterUniques(elements));
+        return _data;
+    }
+
+    /**
+     * Since the Seszt is a Set kind, it will only allow elements that are unique.
+     * Therefor this filters away any that aren't unique,
+     * This also applies to toStrings.
+     * @param elements The elements to be filtered.
+     * @return The filtered elements.
+     */
+    private E[] filterUniques(E[] elements) {
+        E[] filtered = convert(new Object[elements.length]);
+
+        for (int i = 0; i < elements.length; i++)
+            if (elements[i] != null && !contains(elements[i]))
+                filtered[i] = elements[i];
+
+        return filtered;
     }
 
     @Override
@@ -109,13 +155,6 @@ public class Seszt<E> extends SetUtility<E> implements Set<E>, ICollectionUtilit
     }
 
     @Override
-    public boolean addAll(Collection<? extends E> collection) {
-        int previousSize = size();
-        add(convert(collection.toArray()));
-        return previousSize == size() - collection.size();
-    }
-
-    @Override
     public boolean retainAll(Collection<?> collection) {
         int previousSize = size();
 
@@ -146,13 +185,6 @@ public class Seszt<E> extends SetUtility<E> implements Set<E>, ICollectionUtilit
     }
 
     @Override
-    public boolean addAll(CollectionUtility<? extends E> collection) {
-        int previousSize = size();
-        add(collection.get_data());
-        return previousSize == size() - collection.get_data().length;
-    }
-
-    @Override
     public boolean removeAll(CollectionUtility<?> collection) {
         int previousSize = size();
         remove(collection.get_data());
@@ -164,9 +196,7 @@ public class Seszt<E> extends SetUtility<E> implements Set<E>, ICollectionUtilit
         return false;
     }
 
-    @Override public boolean removeIf(Predicate<? super E> filter) {
-        return Set.super.removeIf(filter);
-    }
+    @Override public boolean removeIf(Predicate<? super E> filter) { return Set.super.removeIf(filter); }
 
     @Override
     public void clear() {
@@ -174,13 +204,8 @@ public class Seszt<E> extends SetUtility<E> implements Set<E>, ICollectionUtilit
         _map = _map.getClass() == LinkedHashMap.class ? new LinkedHashMap<>() : new HashMap<>();
     }
 
-    @Override public Spliterator<E> spliterator() {
-        return Set.super.spliterator();
-    }
-    @Override public Stream<E> stream() {
-        return Set.super.stream();
-    }
-    @Override public Stream<E> parallelStream() {
-        return Set.super.parallelStream();
-    }
+    @Override public Spliterator<E> spliterator() { return Set.super.spliterator(); }
+    @Override public Stream<E> stream() { return Set.super.stream(); }
+    @Override public Stream<E> parallelStream() { return Set.super.parallelStream(); }
+
 }

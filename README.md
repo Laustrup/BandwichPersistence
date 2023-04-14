@@ -35,6 +35,8 @@ View project can be found [HERE](https://github.com/Laustrup/BandwichView), alth
 There are used special implemented utilities,
 that are used across the project and are meant to be moved to another project with connection in maven.
 
+All utilities are free to use for all users.
+
 The utilities are:
 
 ##### Collections

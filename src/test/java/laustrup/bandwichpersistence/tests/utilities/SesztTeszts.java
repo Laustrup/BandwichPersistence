@@ -1,7 +1,6 @@
 package laustrup.bandwichpersistence.tests.utilities;
 
 import laustrup.bandwichpersistence.models.users.sub_users.bands.Artist;
-import laustrup.bandwichpersistence.tests.Tester;
 import laustrup.bandwichpersistence.utilities.collections.sets.Seszt;
 
 import org.junit.jupiter.api.Test;

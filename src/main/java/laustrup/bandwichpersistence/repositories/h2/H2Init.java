@@ -21,25 +21,34 @@ class H2Init {
     protected final String _h2InitFileLocation = _sqlDirectory + "h2_init.sql";
 
     /**
+     * Is true, if there has been generated a script of the MySQL boilerplate.sql into H2 init script.
+     * If it is false, it will allow one to be generated.
+     */
+    private boolean _hasGeneratedInitScript = false;
+
+    /**
      * If the h2_init.sql already exists, it will reset the values, otherwise create it from scratch.
      * @param location The location the file will be generated.
      */
     void generateH2InitScript(String location) {
-        LocalDateTime start = LocalDateTime.now();
+        if (!_hasGeneratedInitScript) {
+            LocalDateTime start = LocalDateTime.now();
 
-        String[][] replacements = mySQLTranslations();
+            String[][] replacements = mySQLTranslations();
 
-        FileService.get_instance().delete(location);
-        FileService.get_instance().write(location,
-        FileService.get_instance().getContent(_sqlDirectory, "boilerplate.sql",
-            replacements) +
-            (Defaults.get_instance().is_included()
+            FileService.get_instance().delete(location);
+            FileService.get_instance().write(location,
+            FileService.get_instance().getContent(_sqlDirectory, "boilerplate.sql",
+                replacements) +
+                (Defaults.get_instance().is_included()
                     ? FileService.get_instance().getContent(_sqlDirectory, "default_values.sql",
                     replacements) : ""
-            )
-        );
+                )
+            );
+            _hasGeneratedInitScript = true;
 
-        Printer.get_instance().print("h2_init.sql generation",start);
+            Printer.get_instance().print("h2_init.sql generation",start);
+        }
     }
 
     /**

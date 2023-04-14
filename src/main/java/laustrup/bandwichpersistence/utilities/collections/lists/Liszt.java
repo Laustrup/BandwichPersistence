@@ -102,6 +102,16 @@ public class Liszt<E> extends ListUtility<E> implements List<E>, ICollectionUtil
     }
 
     @Override
+    public E[] Add(E element) {
+        return null;
+    }
+
+    @Override
+    public E[] Add(E[] elements) {
+        return null;
+    }
+
+    @Override
     public E[] set(E[] elements, E[] replacements) {
         boolean elementsIsNullOrEmpty = elements == null || elements.length == 0,
                 replacementsIsNullOrEmpty = replacements == null || replacements.length == 0;
@@ -188,79 +198,7 @@ public class Liszt<E> extends ListUtility<E> implements List<E>, ICollectionUtil
         return _map.containsKey(element.toString()) ? Get(element.toString()) : _data[index-1];
     }
 
-    private void handleAdd(E[] elements) {
-        elements = filterElements(elements);
-        E[] storage = convert(new Object[_data.length + elements.length]);
 
-        System.arraycopy(_data, 0, storage, 0, _data.length);
-
-        int index = _data.length;
-        for (E element : elements) {
-            storage[index] = addElementToDestination(element);
-            index++;
-        }
-
-        _data = storage;
-        insertDestinationsIntoMap();
-    }
-
-    private E[] filterElements(E[] elements) {
-        int length = 0;
-        for (E element : elements)
-            if (element != null)
-                length++;
-
-        int index = 0;
-        E[] filtered = convert(new Object[length]);
-        for (E element : elements) {
-            if (element != null) {
-                filtered[index] = element;
-                index++;
-            }
-        }
-
-        return filtered;
-    }
-
-    /**
-     * Adds the element to destination, before it's either added to data or map.
-     * This is for the reason, to prevent two of the same keyes in maps,
-     * if element's toString() already is a key, it will at its hashcode.
-     * @param element An element that is wished to be added.
-     * @return The same element of the input.
-     */
-    private E addElementToDestination(E element) {
-        String key = _map.containsKey(element.toString()) ? String.valueOf(element.hashCode()) : element.toString();
-
-        _destinations.put(key,element);
-        addDestinationKey(key);
-
-        return element;
-    }
-    /**
-     * Adds the potential key to the destinationKeys.
-     * @param key The potential key of an element.
-     * @return The destinationKeys
-     */
-    private String[] addDestinationKey(String key) {
-        String[] storage = new String[_destinationKeys.length+1];
-
-        for (int i = 0; i < storage.length; i++) {
-            if (i < _destinationKeys.length) storage[i] = _destinationKeys[i];
-            else storage[i] = key;
-        }
-        _destinationKeys = storage;
-
-        return storage;
-    }
-
-    private void insertDestinationsIntoMap() {
-        for (String destinationKey : _destinationKeys)
-            _map.put(destinationKey, _destinations.get(destinationKey));
-
-        _destinationKeys = new String[0];
-        _destinations.clear();
-    }
 
     @Override
     public E[] remove(E[] elements) {
@@ -494,13 +432,4 @@ public class Liszt<E> extends ListUtility<E> implements List<E>, ICollectionUtil
 
     public E getLast() { return _data.length > 0 ? _data[size()-1] : null; }
     public E getFirst() { return _data[0]; }
-
-    @Override
-    public String toString() {
-        return "Liszt(" +
-                    "size:"+size()+
-                    ",isLinked:"+(_map.getClass() == LinkedHashMap.class ? "Linked" : "Unlinked") +
-                    ",map:" + _map.keySet() +
-                ")";
-    }
 }

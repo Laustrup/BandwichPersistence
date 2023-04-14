@@ -7,6 +7,7 @@ import lombok.Getter;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * A Utility that contains collections of data such as a Map and an array.
@@ -56,6 +57,85 @@ public abstract class CollectionUtility<E> extends Utility {
     }
 
     /**
+     * Will add the elements to the E[] data and the map.
+     * Null elements will be filtered away.
+     * @param elements The elements to add.
+     */
+    protected void handleAdd(E[] elements) {
+        elements = filterElements(elements);
+        E[] storage = convert(new Object[_data.length + elements.length]);
+
+        System.arraycopy(_data, 0, storage, 0, _data.length);
+
+        int index = _data.length;
+        for (E element : elements) {
+            storage[index] = addElementToDestination(element);
+            index++;
+        }
+
+        _data = storage;
+        insertDestinationsIntoMap();
+    }
+
+    protected E[] filterElements(E[] elements) {
+        int length = 0;
+        for (E element : elements)
+            if (element != null)
+                length++;
+
+        int index = 0;
+        E[] filtered = convert(new Object[length]);
+        for (E element : elements) {
+            if (element != null) {
+                filtered[index] = element;
+                index++;
+            }
+        }
+
+        return filtered;
+    }
+
+    /**
+     * Adds the element to destination, before it's either added to data or map.
+     * This is for the reason, to prevent two of the same keyes in maps,
+     * if element's toString() already is a key, it will at its hashcode.
+     * @param element An element that is wished to be added.
+     * @return The same element of the input.
+     */
+    private E addElementToDestination(E element) {
+        String key = _map.containsKey(element.toString()) ? String.valueOf(element.hashCode()) : element.toString();
+
+        _destinations.put(key,element);
+        addDestinationKey(key);
+
+        return element;
+    }
+    /**
+     * Adds the potential key to the destinationKeys.
+     * @param key The potential key of an element.
+     * @return The destinationKeys
+     */
+    private String[] addDestinationKey(String key) {
+        String[] storage = new String[_destinationKeys.length+1];
+
+        for (int i = 0; i < storage.length; i++) {
+            if (i < _destinationKeys.length) storage[i] = _destinationKeys[i];
+            else storage[i] = key;
+        }
+        _destinationKeys = storage;
+
+        return storage;
+    }
+
+    private void insertDestinationsIntoMap() {
+        for (String destinationKey : _destinationKeys)
+            _map.put(destinationKey, _destinations.get(destinationKey));
+
+        _destinationKeys = new String[0];
+        _destinations.clear();
+    }
+
+    /**
      * Converting Objects into the element type and suppresses warning of cast.
      * @param objects The Objects that will become element type.
      * @return The element type version of the Objects.
@@ -70,4 +150,29 @@ public abstract class CollectionUtility<E> extends Utility {
      */
     @SuppressWarnings("unchecked")
     protected E convert(Object object) { return (E) object; }
+
+    @Override
+    public String toString() {
+        String[] keySet = _map.keySet().toString().split(",");
+        StringBuilder keys = new StringBuilder();
+
+        for (int i = 0; i < keySet.length; i++) {
+            if (i < keySet.length - 1 &&
+                (keySet[i+1].contains("description")
+                    || keySet[i+1].contains("timestamp")
+                    || keySet[i+1].contains("runner")))
+                keys.append("\n\t\t\t");
+            String key = keySet[i];
+            keys.append(key);
+        }
+
+        keys.insert(1,"\n\t\t\t");
+        keys.insert(keys.length()-1, "\n\t\t");
+
+        return getClass().getSimpleName() + "(" +
+            "\n\t\tsize:" + _data.length +
+            ",\n\t\tisLinked:" + (_map.getClass() == LinkedHashMap.class ? "Linked" : "Unlinked") +
+            ",\n\t\tmap:" + keys +
+        "\n)";
+    }
 }

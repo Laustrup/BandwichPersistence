@@ -19,6 +19,10 @@ public interface ICollectionUtility<E> {
      */
     boolean add(E[] elements);
 
+    E[] Add(E element);
+
+    E[] Add(E[] elements);
+
     /**
      * Replaces the element with the override with the specified element.
      * Uses the key from the toString(), to identify the element.
