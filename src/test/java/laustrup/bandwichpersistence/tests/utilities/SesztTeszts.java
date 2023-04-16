@@ -8,6 +8,58 @@ import org.junit.jupiter.api.Test;
 public class SesztTeszts extends UtilityTester {
 
     @Test
+    void canGetByIndex() {
+        test(t -> {
+            Artist expected = (Artist) arrange(e -> {
+                _seszt = new Seszt<>(_adding);
+                return _adding;
+            });
+
+            Artist actual = (Artist) act(e -> _seszt.get(0));
+
+            asserting(expected,actual);
+
+            actual = (Artist) act(e -> _seszt.Get(1));
+
+            asserting(expected,actual);
+
+            return end("canGetByIndex");
+        });
+    }
+
+    @Test
+    void canGetByKey() {
+        test(t -> {
+            Artist expected = (Artist) arrange(e -> {
+                _seszt = new Seszt<>(_adding);
+                return _adding;
+            });
+
+            Artist actual = (Artist) act(e -> _seszt.get(expected.toString()));
+
+            asserting(expected,actual);
+
+            return end("canGetByKey");
+        });
+    }
+
+    @Test
+    void canGet() {
+        test(t -> {
+            Artist expected = (Artist) arrange(e -> {
+                _seszt = new Seszt<>(_adding);
+                return _adding;
+            });
+
+            Artist actual = (Artist) act(e -> _seszt.get(expected));
+
+            asserting(expected,actual);
+
+            return end("canGet");
+        });
+    }
+
+    @Test
     void canContain() {
         test(t -> {
             arrange(e -> _seszt = new Seszt<>(new Object[]{ _adding }));
@@ -46,7 +98,7 @@ public class SesztTeszts extends UtilityTester {
     void canAdd() {
         test(t -> {
             Object expected = arrange(e -> {
-                _seszt = new Seszt<>(new Object[]{_adding});
+                _seszt = new Seszt<>();
                 return _adding;
             });
 

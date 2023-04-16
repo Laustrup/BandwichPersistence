@@ -23,18 +23,41 @@ import java.util.stream.Stream;
  */
 public class Seszt<E> extends SetUtility<E> implements Set<E>, ICollectionUtility<E> {
 
+    /** Default constructor that will build the Seszt without containing any data and the map as linked. */
     public Seszt() {
         this(false);
     }
 
+    /**
+     * A Seszt without containing any data.
+     * @param isLinked Will initialize the map as linked if true, else as hash.
+     */
     public Seszt(boolean isLinked) {
         super(isLinked, LocalDateTime.now().getYear(), 1, 1);
     }
 
+    /**
+     * The Seszt will contain a single datum and the map will be initialized as linked.
+     * @param datum The datum that will be contained at initialization.
+     */
+    @SuppressWarnings("unchecked")
+    public Seszt(E datum) {
+        this((E[]) new Object[]{datum});
+    }
+
+    /**
+     * The Seszt will contain data and the map will be initialized as linked.
+     * @param data The data that will be contained at initialization.
+     */
     public Seszt(E[] data) {
         this(data,false);
     }
 
+    /**
+     * The Seszt will contain data at initialization.
+     * @param data The data that will be contained at initialization.
+     * @param isLinked Will initialize the map as linked if true, else as hash.
+     */
     public Seszt(E[] data, boolean isLinked) {
         super(LocalDateTime.now().getYear(), 1, 1);
 
@@ -50,12 +73,34 @@ public class Seszt<E> extends SetUtility<E> implements Set<E>, ICollectionUtilit
     @Override public void forEach(Consumer<? super E> action) { Set.super.forEach(action); }
     @Override public Object[] toArray() { return Arrays.stream(_data).toArray(); }
 
-    @Override @SuppressWarnings("all")
-    public boolean contains(Object object) {
-        return _map.containsValue(object);
+    @Override
+    public boolean containsAll(Collection<?> collection) {
+        for (Object item : collection)
+            if (!contains(item))
+                return false;
+
+        return true;
     }
+
+    @Override
+    public boolean contains(E[] elements) {
+        for (E element : elements)
+            if (!_map.containsValue(element))
+                return false;
+
+        return true;
+    }
+    @Override
+    public boolean contains(Object object) {
+        if (size() > 0 && object.getClass() == get(0).getClass())
+            return contains(convert(new Object[]{ object }));
+
+        return false;
+    }
+
     @Override @SuppressWarnings("unchecked")
     public <T> T[] toArray(T[] a) { return (T[]) Arrays.stream(_data).toArray(); }
+
     @Override @SuppressWarnings("unchecked")
     public <T> T[] toArray(IntFunction<T[]> generator) { return (T[]) Set.super.toArray(Object[]::new); }
 
@@ -95,7 +140,7 @@ public class Seszt<E> extends SetUtility<E> implements Set<E>, ICollectionUtilit
     @Override
     public E[] Add(E[] elements) {
         handleAdd(filterUniques(elements));
-        return _data;
+        return get_data();
     }
 
     /**
@@ -130,19 +175,31 @@ public class Seszt<E> extends SetUtility<E> implements Set<E>, ICollectionUtilit
     public E[] set(E[] elements, E[] replacements) {
         return null;
     }
+    @Override public E get(int index) { return handleGet(index); }
 
     @Override
-    public E[] Get(E[] elements) {
+    public E get(E element) {
+        if (size() > 0 && !element.getClass().isPrimitive())
+            return contains(element) ? _map.get(element.toString()) : null;
+        else
+            for (E datum : get_data())
+                if (datum == element)
+                    return datum;
+
         return null;
     }
 
     @Override
-    public boolean contains(E[] elements) {
-        for (E element : elements)
-            if (!contains(element))
-                return false;
+    public E Get(int index) {
+        if (index > 0)
+            return handleGet(index-1);
 
-        return true;
+        return null;
+    }
+
+    @Override
+    public E get(String key) {
+        return _map.get(key);
     }
 
     @Override
@@ -171,6 +228,9 @@ public class Seszt<E> extends SetUtility<E> implements Set<E>, ICollectionUtilit
             }
         }
 
+        if (index < 0)
+            return false;
+
         return remove(index);
     }
 
@@ -190,11 +250,6 @@ public class Seszt<E> extends SetUtility<E> implements Set<E>, ICollectionUtilit
         int previousSize = size();
         handleRemove(index);
         return previousSize == size() + 1;
-    }
-
-    @Override
-    public boolean containsAll(Collection<?> c) {
-        return false;
     }
 
     @Override

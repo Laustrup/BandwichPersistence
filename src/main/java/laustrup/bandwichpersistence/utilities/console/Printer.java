@@ -7,6 +7,7 @@ import lombok.Getter;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
+// Todo first \t of a row only appears as a space.
 /**
  * Will handle printing of statements to the console.
  * Contains three different options for modes, default will use a normal println,

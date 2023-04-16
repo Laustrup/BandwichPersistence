@@ -162,17 +162,7 @@ public class Liszt<E> extends ListUtility<E> implements List<E>, ICollectionUtil
             }
         }
 
-        return Get(Objects.requireNonNull(replacements));
-    }
-
-    @Override
-    public E[] Get(E[] elements) {
-        E[] gathered = convert(new Object[elements.length]);
-
-        for (int i = 0; i < gathered.length; i++)
-            gathered[i] = Get(elements[i].toString());
-
-        return gathered;
+        return Objects.requireNonNull(replacements);
     }
 
     @Override

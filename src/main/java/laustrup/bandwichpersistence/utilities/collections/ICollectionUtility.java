@@ -44,8 +44,6 @@ public interface ICollectionUtility<E> {
      */
     E[] set(E[] elements, E[] replacements);
 
-    E[] Get(E[] elements);
-
     E[] remove(E[] elements);
     boolean contains(E[] elements);
 }

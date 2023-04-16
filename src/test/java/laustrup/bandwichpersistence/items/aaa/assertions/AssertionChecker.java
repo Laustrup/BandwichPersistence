@@ -58,7 +58,7 @@ public class AssertionChecker {
      * @return True if they should be allowed to be asserted.
      */
     static boolean allowCollection(Object[] expectations, Object[] actuals) {
-        return (expectations == null || actuals == null) || expectations.length != actuals.length;
+        return (expectations != null && actuals != null) || expectations.length != actuals.length;
     }
     /**
      * Checks if the inputs should be allowed to be asserted.
@@ -78,6 +78,6 @@ public class AssertionChecker {
      * @return True if they should be allowed to be asserted.
      */
     static boolean allowObjects(Object expected, Object actual) {
-        return (expected == null || actual == null);
+        return expected != null && actual != null;
     }
 }

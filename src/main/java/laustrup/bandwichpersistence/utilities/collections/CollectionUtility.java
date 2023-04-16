@@ -77,6 +77,18 @@ public abstract class CollectionUtility<E> extends Utility {
     }
 
     /**
+     * Will find the element at the index position, with index starting at 0.
+     * @param index The index position of the element to be found.
+     * @return The found element.
+     */
+    protected E handleGet(int index) {
+        if (index < _data.length)
+            return _data[index];
+
+        return null;
+    }
+
+    /**
      * Will add the elements to the E[] data and the map.
      * Null elements will be filtered away.
      * @param elements The elements to add.
