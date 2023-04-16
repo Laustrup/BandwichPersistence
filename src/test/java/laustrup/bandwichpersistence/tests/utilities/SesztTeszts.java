@@ -184,4 +184,24 @@ public class SesztTeszts extends UtilityTester {
             return end("canRemoveMultiple");
         });
     }
+
+    @Test
+    void canRetain() {
+        test(t -> {
+            Artist[] expecations = (Artist[]) arrange(e -> {
+                _seszt = new Seszt<>(_addings);
+                Artist[] retains = new Artist[_seszt.size() - 1];
+                for (int i = 0; i < retains.length; i++)
+                    retains[i] = (Artist) _seszt.get(i);
+
+                return retains;
+            });
+
+            act(e -> _seszt.retain(expecations));
+
+            asserting(expecations,_seszt.get_data());
+
+            return end("canRetain");
+        });
+    }
 }

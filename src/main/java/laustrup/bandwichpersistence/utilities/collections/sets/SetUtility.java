@@ -36,5 +36,5 @@ public abstract class SetUtility<E> extends CollectionUtility<E> {
     public abstract E get(E element);
     public abstract E Get(int index);
     public abstract E get(String key);
-    public abstract boolean retainAll(CollectionUtility<?> c);
+    public abstract E[] retain(E[] elements);
 }

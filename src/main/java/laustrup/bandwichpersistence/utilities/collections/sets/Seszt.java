@@ -254,16 +254,35 @@ public class Seszt<E> extends SetUtility<E> implements Set<E>, ICollectionUtilit
 
     @Override
     public boolean retainAll(Collection<?> collection) {
-        int previousSize = size();
-
         try {
-            _data = convert(collection.toArray());
+            retain(convert(collection.toArray()));
         } catch (Exception e) {
             Printer.get_instance().print(Printer.get_instance().arrayContent(collection.toArray()) +
                 " couldn't be contained, since it is of different type that E...",e);
         }
 
         return Arrays.equals(_data, convert(collection.toArray()));
+    }
+
+    @Override
+    public E[] retain(E[] elements) {
+        try {
+            E[] removes = convert(new Object[elements.length]);
+            int index = 0;
+            for (E element : elements)
+                if (!contains(element))
+                    removes[index] = element;
+
+            _data = elements;
+
+            for (E element : removes)
+                remove(element);
+        } catch (Exception e) {
+            Printer.get_instance().print(Printer.get_instance().arrayContent(elements) +
+                    " couldn't be contained, since it is of different type that E...",e);
+        }
+
+        return get_data();
     }
 
     @Override
@@ -280,11 +299,6 @@ public class Seszt<E> extends SetUtility<E> implements Set<E>, ICollectionUtilit
         int previousSize = size();
         remove(collection.get_data());
         return previousSize == size() + collection.get_data().length;
-    }
-
-    @Override
-    public boolean retainAll(CollectionUtility<?> c) {
-        return false;
     }
 
     @Override public boolean removeIf(Predicate<? super E> filter) { return Set.super.removeIf(filter); }
