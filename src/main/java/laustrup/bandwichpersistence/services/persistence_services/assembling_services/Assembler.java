@@ -1,10 +1,10 @@
 package laustrup.bandwichpersistence.services.persistence_services.assembling_services;
 
-import laustrup.bandwichpersistence.models.users.User;
-import laustrup.bandwichpersistence.models.users.sub_users.bands.Artist;
-import laustrup.bandwichpersistence.models.users.sub_users.bands.Band;
-import laustrup.bandwichpersistence.models.users.sub_users.participants.Participant;
-import laustrup.bandwichpersistence.models.users.sub_users.venues.Venue;
+import laustrup.models.users.User;
+import laustrup.models.users.sub_users.bands.Artist;
+import laustrup.models.users.sub_users.bands.Band;
+import laustrup.models.users.sub_users.participants.Participant;
+import laustrup.models.users.sub_users.venues.Venue;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.logic_assemblings.AssemblyDescriber;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.logic_assemblings.AssemblyHandler;
 

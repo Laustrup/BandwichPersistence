@@ -1,13 +1,13 @@
 package laustrup.bandwichpersistence.services.controller_services.sub_controller_services;
 
-import laustrup.bandwichpersistence.models.Response;
-import laustrup.bandwichpersistence.models.chats.ChatRoom;
-import laustrup.bandwichpersistence.models.chats.messages.Mail;
-import laustrup.bandwichpersistence.models.dtos.chats.ChatRoomDTO;
+import laustrup.models.Response;
+import laustrup.models.chats.ChatRoom;
+import laustrup.models.chats.messages.Mail;
+import laustrup.dtos.chats.ChatRoomDTO;
 import laustrup.bandwichpersistence.services.controller_services.ControllerService;
 import laustrup.bandwichpersistence.services.persistence_services.entity_services.sub_entity_services.ChatPersistenceService;
+import laustrup.utilities.parameters.Plato;
 
-import laustrup.bandwichpersistence.utilities.parameters.Plato;
 import org.springframework.http.ResponseEntity;
 
 public class ChatRoomControllerService extends ControllerService<ChatRoomDTO> {

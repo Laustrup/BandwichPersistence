@@ -1,8 +1,8 @@
 package laustrup.bandwichpersistence.repositories;
 
 import laustrup.bandwichpersistence.Program;
-import laustrup.bandwichpersistence.utilities.parameters.Plato;
-import laustrup.bandwichpersistence.utilities.console.Printer;
+import laustrup.utilities.parameters.Plato;
+import laustrup.utilities.console.Printer;
 
 import java.sql.*;
 

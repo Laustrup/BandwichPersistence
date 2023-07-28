@@ -1,22 +1,22 @@
 package laustrup.bandwichpersistence.services.controller_services.sub_controller_services;
 
-import laustrup.bandwichpersistence.models.Rating;
-import laustrup.bandwichpersistence.models.Response;
-import laustrup.bandwichpersistence.models.Search;
-import laustrup.bandwichpersistence.models.albums.Album;
-import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
-import laustrup.bandwichpersistence.models.dtos.users.UserDTO;
-import laustrup.bandwichpersistence.models.users.Login;
-import laustrup.bandwichpersistence.models.users.User;
-import laustrup.bandwichpersistence.models.users.subscriptions.Card;
-import laustrup.bandwichpersistence.services.DTOService;
+import laustrup.models.Rating;
+import laustrup.models.Response;
+import laustrup.models.Search;
+import laustrup.models.albums.Album;
+import laustrup.models.chats.messages.Bulletin;
+import laustrup.dtos.users.UserDTO;
+import laustrup.models.users.Login;
+import laustrup.models.users.User;
+import laustrup.models.users.subscriptions.Card;
+import laustrup.services.DTOService;
 import laustrup.bandwichpersistence.services.controller_services.ControllerService;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembly;
 import laustrup.bandwichpersistence.services.persistence_services.entity_services.sub_entity_services.ChatPersistenceService;
 import laustrup.bandwichpersistence.services.persistence_services.entity_services.sub_entity_services.UserPersistenceService;
-import laustrup.bandwichpersistence.utilities.collections.lists.Liszt;
+import laustrup.utilities.collections.lists.Liszt;
+import laustrup.utilities.parameters.Plato;
 
-import laustrup.bandwichpersistence.utilities.parameters.Plato;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 

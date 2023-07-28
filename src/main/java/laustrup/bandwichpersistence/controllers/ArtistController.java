@@ -1,9 +1,9 @@
 package laustrup.bandwichpersistence.controllers;
 
-import laustrup.bandwichpersistence.models.Response;
-import laustrup.bandwichpersistence.models.dtos.users.sub_users.bands.ArtistDTO;
-import laustrup.bandwichpersistence.models.users.sub_users.bands.Artist;
+import laustrup.dtos.users.sub_users.bands.ArtistDTO;
+import laustrup.models.Response;
 import laustrup.bandwichpersistence.services.controller_services.sub_controller_services.ArtistControllerService;
+import laustrup.models.users.sub_users.bands.Artist;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

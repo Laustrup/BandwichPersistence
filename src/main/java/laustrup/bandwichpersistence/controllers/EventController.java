@@ -1,15 +1,15 @@
 package laustrup.bandwichpersistence.controllers;
 
-import laustrup.bandwichpersistence.models.Response;
-import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
-import laustrup.bandwichpersistence.models.dtos.chats.messages.BulletinDTO;
-import laustrup.bandwichpersistence.models.dtos.events.EventDTO;
-import laustrup.bandwichpersistence.models.dtos.events.ParticipationDTO;
-import laustrup.bandwichpersistence.models.events.Event;
-import laustrup.bandwichpersistence.models.events.Participation;
+import laustrup.models.Response;
+import laustrup.models.chats.messages.Bulletin;
+import laustrup.dtos.chats.messages.BulletinDTO;
+import laustrup.dtos.events.EventDTO;
+import laustrup.dtos.events.ParticipationDTO;
+import laustrup.models.events.Event;
+import laustrup.models.events.Participation;
 import laustrup.bandwichpersistence.services.controller_services.sub_controller_services.EventControllerService;
-import laustrup.bandwichpersistence.utilities.collections.lists.Liszt;
-import laustrup.bandwichpersistence.utilities.parameters.Plato;
+import laustrup.utilities.collections.lists.Liszt;
+import laustrup.utilities.parameters.Plato;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

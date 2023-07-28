@@ -1,13 +1,13 @@
 package laustrup.bandwichpersistence.repositories.sub_repositories;
 
-import laustrup.bandwichpersistence.models.Rating;
-import laustrup.bandwichpersistence.models.albums.Album;
-import laustrup.bandwichpersistence.models.albums.AlbumItem;
-import laustrup.bandwichpersistence.models.users.User;
-import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
-import laustrup.bandwichpersistence.models.users.subscriptions.Subscription;
+import laustrup.models.Rating;
+import laustrup.models.albums.Album;
+import laustrup.models.albums.AlbumItem;
+import laustrup.models.users.User;
+import laustrup.models.users.contact_infos.ContactInfo;
+import laustrup.models.users.subscriptions.Subscription;
 import laustrup.bandwichpersistence.repositories.Repository;
-import laustrup.bandwichpersistence.utilities.console.Printer;
+import laustrup.utilities.console.Printer;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

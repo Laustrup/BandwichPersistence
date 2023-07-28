@@ -1,8 +1,8 @@
 package laustrup.bandwichpersistence.controllers;
 
-import laustrup.bandwichpersistence.models.Response;
-import laustrup.bandwichpersistence.models.dtos.users.sub_users.participants.ParticipantDTO;
-import laustrup.bandwichpersistence.models.users.sub_users.participants.Participant;
+import laustrup.models.Response;
+import laustrup.dtos.users.sub_users.participants.ParticipantDTO;
+import laustrup.models.users.sub_users.participants.Participant;
 import laustrup.bandwichpersistence.services.controller_services.sub_controller_services.ParticipantControllerService;
 
 import org.springframework.http.MediaType;

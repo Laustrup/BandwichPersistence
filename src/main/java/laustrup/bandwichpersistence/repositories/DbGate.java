@@ -1,7 +1,7 @@
 package laustrup.bandwichpersistence.repositories;
 
-import laustrup.bandwichpersistence.utilities.parameters.Plato;
-import laustrup.bandwichpersistence.utilities.console.Printer;
+import laustrup.utilities.parameters.Plato;
+import laustrup.utilities.console.Printer;
 
 import lombok.Getter;
 

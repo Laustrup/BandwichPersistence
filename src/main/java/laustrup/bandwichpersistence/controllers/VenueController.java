@@ -1,8 +1,8 @@
 package laustrup.bandwichpersistence.controllers;
 
-import laustrup.bandwichpersistence.models.Response;
-import laustrup.bandwichpersistence.models.dtos.users.sub_users.venues.VenueDTO;
-import laustrup.bandwichpersistence.models.users.sub_users.venues.Venue;
+import laustrup.models.Response;
+import laustrup.dtos.users.sub_users.venues.VenueDTO;
+import laustrup.models.users.sub_users.venues.Venue;
 import laustrup.bandwichpersistence.services.controller_services.sub_controller_services.VenueControllerService;
 
 import org.springframework.http.MediaType;

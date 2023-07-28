@@ -1,7 +1,8 @@
 package laustrup.bandwichpersistence.console_ui;
 
 import laustrup.bandwichpersistence.BandwichPersistenceApplication;
-import laustrup.bandwichpersistence.utilities.console.Printer;
+import laustrup.utilities.console.Printer;
+
 import org.springframework.context.ConfigurableApplicationContext;
 
 import java.util.Scanner;

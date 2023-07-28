@@ -1,18 +1,18 @@
 package laustrup.bandwichpersistence.tests.crud;
 
-import laustrup.bandwichpersistence.tests.Tester;
-import laustrup.bandwichpersistence.models.chats.ChatRoom;
-import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
-import laustrup.bandwichpersistence.models.chats.messages.Mail;
-import laustrup.bandwichpersistence.models.users.User;
+import laustrup.bandwichpersistence.tests.PersistenceTester;
+import laustrup.models.chats.ChatRoom;
+import laustrup.models.chats.messages.Bulletin;
+import laustrup.models.chats.messages.Mail;
+import laustrup.models.users.User;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembly;
 import laustrup.bandwichpersistence.services.persistence_services.entity_services.sub_entity_services.ChatPersistenceService;
-import laustrup.bandwichpersistence.utilities.collections.lists.Liszt;
+import laustrup.utilities.collections.lists.Liszt;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class ChatCRUDTests extends Tester<Object, Object> {
+public class ChatCRUDTests extends PersistenceTester<Object> {
 
     private String _prevTitle, _postTitle, _prevContent, _postContent;
 
@@ -39,38 +39,38 @@ public class ChatCRUDTests extends Tester<Object, Object> {
         _actualMail = null;
     }
 
-    @Test
+    @Test // TODO ChatRoom no longer has responsible
     void canCRUDChatRoomAndMail() {
-        test(t -> {
-            arrange(e -> {
+        test(() -> {
+            arrange(() -> {
                 _postTitle = "New chat room";
                 _prevContent = "This is test content";
                 _postContent = "Changed content";
 
-                _chatter = _items.get_artsy();
-                _responsible = _items.get_carlos();
+                _chatter = get_artsy();
+                _responsible = get_carlos();
                 _expectedChatRoom = new ChatRoom(false, null,
                         new Liszt<>(new User[]{_responsible, _chatter}), _responsible);
 
                 return null;
             });
 
-            _actualChatRoom = (ChatRoom) act(e -> canInsert(_expectedChatRoom));
+            _actualChatRoom = (ChatRoom) act(() -> canInsert(_expectedChatRoom));
 
-            arrange(actual -> {
+            arrange(() -> {
                 _expectedChatRoom = new ChatRoom(_actualChatRoom.get_primaryId(), _expectedChatRoom.is_local(),
                         _expectedChatRoom.get_title(), _expectedChatRoom.get_mails(), _expectedChatRoom.get_chatters(),
                         _expectedChatRoom.get_responsible(),_actualChatRoom.get_timestamp());
                 _prevTitle = _expectedChatRoom.get_title();
 
-                return null;
+                return _expectedChatRoom;
             });
 
             assertChatRooms(new Liszt<>(new ChatRoom[]{_expectedChatRoom}), new Liszt<>(new ChatRoom[]{_actualChatRoom}));
-            _expectedMail = (Mail) arrange(e -> new Mail(_expectedChatRoom, _chatter));
-            _actualChatRoom = (ChatRoom) act(e -> canInsert(_expectedMail));
+            _expectedMail = (Mail) arrange(() -> new Mail(_expectedChatRoom, _chatter));
+            _actualChatRoom = (ChatRoom) act(() -> canInsert(_expectedMail));
 
-            arrange(e -> {
+            arrange(() -> {
                 _actualMail = _actualChatRoom.get_mails().getLast();
                 _expectedChatRoom = new ChatRoom(_actualChatRoom.get_primaryId(), _expectedChatRoom.is_local(),
                         _expectedChatRoom.get_title(), _actualChatRoom.get_mails(), _expectedChatRoom.get_chatters(),
@@ -84,7 +84,7 @@ public class ChatCRUDTests extends Tester<Object, Object> {
 
             assertMails(new Liszt<>(new Mail[]{_expectedMail}), new Liszt<>(new Mail[]{_actualMail}));
 
-            arrange(e -> {
+            arrange(() -> {
                 _expectedChatRoom.set_title(_postTitle);
                 return null;
             });
@@ -96,13 +96,13 @@ public class ChatCRUDTests extends Tester<Object, Object> {
 
             assertChatRooms(new Liszt<>(new ChatRoom[]{_expectedChatRoom}), new Liszt<>(new ChatRoom[]{_actualChatRoom}));
 
-            arrange(e -> {
+            arrange(() -> {
                 _expectedChatRoom.set_title(_prevTitle);
                 return null;
             });
             _actualChatRoom = canUpdate(_expectedChatRoom);
 
-            arrange(e -> {
+            arrange(() -> {
                 _expectedMail.set_content(_postContent);
                 return null;
             });
@@ -110,15 +110,13 @@ public class ChatCRUDTests extends Tester<Object, Object> {
             _actualChatRoom = canUpdate(_expectedMail);
             assertMails(new Liszt<>(new Mail[]{_expectedMail}), new Liszt<>(new Mail[]{_actualChatRoom.get_mails().getLast()}));
 
-            arrange(e -> {
+            arrange(() -> {
                 _expectedMail.set_content(_prevContent);
                 return null;
             });
 
             _actualChatRoom = canUpdate(_expectedMail);
             asserting(canDelete(_expectedChatRoom));
-
-            return true;
         });
     }
 
@@ -175,8 +173,8 @@ public class ChatCRUDTests extends Tester<Object, Object> {
 
     @Test
     void canCrudBulletin() {
-        test(t -> {
-            Bulletin expected = (Bulletin) arrange(e -> _items.generateBulletins(Assembly.get_instance().getEvent(1))[0]);
+        test(() -> {
+            Bulletin expected = (Bulletin) arrange(() -> _items.generateBulletins(Assembly.get_instance().getEvent(1))[0]);
 
             User user = canInsert(expected);
             Bulletin actual = user.get_bulletins().getLast();
@@ -193,8 +191,6 @@ public class ChatCRUDTests extends Tester<Object, Object> {
             assertBulletins(new Liszt<>(new Bulletin[]{expected}), new Liszt<>(new Bulletin[]{actual}));
 
             asserting(canDelete(expected));
-
-            return true;
         });
 
     }
@@ -218,7 +214,7 @@ public class ChatCRUDTests extends Tester<Object, Object> {
     }
 
     /**
-     * Acts the delete of Bulletin for the delete purpose.
+     * Acts delete of Bulletin for the delete purpose.
      * @param bulletin The Bulletin that will be used for the delete method.
      * @return The result of the act, where the Plato argument is as a boolean truth.
      */

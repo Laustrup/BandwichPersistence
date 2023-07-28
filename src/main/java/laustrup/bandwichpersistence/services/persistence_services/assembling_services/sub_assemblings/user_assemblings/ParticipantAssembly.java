@@ -1,8 +1,8 @@
 package laustrup.bandwichpersistence.services.persistence_services.assembling_services.sub_assemblings.user_assemblings;
 
-import laustrup.bandwichpersistence.models.users.User;
-import laustrup.bandwichpersistence.models.users.sub_users.participants.Participant;
-import laustrup.bandwichpersistence.utilities.collections.lists.Liszt;
+import laustrup.models.users.User;
+import laustrup.models.users.sub_users.participants.Participant;
+import laustrup.utilities.collections.lists.Liszt;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

@@ -1,8 +1,8 @@
 package laustrup.bandwichpersistence.services.persistence_services.entity_services.sub_entity_services;
 
-import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
-import laustrup.bandwichpersistence.models.users.subscriptions.Subscription;
-import laustrup.bandwichpersistence.models.users.sub_users.venues.Venue;
+import laustrup.models.users.contact_infos.ContactInfo;
+import laustrup.models.users.subscriptions.Subscription;
+import laustrup.models.users.sub_users.venues.Venue;
 import laustrup.bandwichpersistence.repositories.sub_repositories.VenueRepository;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembly;
 import laustrup.bandwichpersistence.services.persistence_services.entity_services.EntityService;

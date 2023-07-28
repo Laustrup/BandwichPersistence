@@ -2,15 +2,13 @@ package laustrup.bandwichpersistence;
 
 import laustrup.bandwichpersistence.console_ui.Greeter;
 import laustrup.bandwichpersistence.console_ui.Runner;
-import laustrup.bandwichpersistence.utilities.console.Printer;
+import laustrup.utilities.console.Printer;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
-
-import java.util.Scanner;
 
 @SpringBootApplication
 public class BandwichPersistenceApplication extends SpringBootServletInitializer {

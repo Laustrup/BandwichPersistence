@@ -1,18 +1,18 @@
 package laustrup.bandwichpersistence.services.persistence_services.assembling_services;
 
-import laustrup.bandwichpersistence.models.Search;
-import laustrup.bandwichpersistence.models.chats.ChatRoom;
-import laustrup.bandwichpersistence.models.events.Event;
-import laustrup.bandwichpersistence.models.users.Login;
-import laustrup.bandwichpersistence.models.users.User;
+import laustrup.models.Search;
+import laustrup.models.chats.ChatRoom;
+import laustrup.models.events.Event;
+import laustrup.models.users.Login;
+import laustrup.models.users.User;
 import laustrup.bandwichpersistence.repositories.sub_repositories.ArtistRepository;
 import laustrup.bandwichpersistence.repositories.DbGate;
 import laustrup.bandwichpersistence.repositories.sub_repositories.ChatRepository;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.sub_assemblings.EventAssembly;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.sub_assemblings.user_assemblings.UserAssembly;
-import laustrup.bandwichpersistence.utilities.collections.lists.Liszt;
-import laustrup.bandwichpersistence.utilities.parameters.Plato;
-import laustrup.bandwichpersistence.utilities.console.Printer;
+import laustrup.utilities.collections.lists.Liszt;
+import laustrup.utilities.parameters.Plato;
+import laustrup.utilities.console.Printer;
 
 import java.sql.SQLException;
 

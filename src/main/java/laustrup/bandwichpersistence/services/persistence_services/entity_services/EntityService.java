@@ -1,9 +1,9 @@
 package laustrup.bandwichpersistence.services.persistence_services.entity_services;
 
-import laustrup.bandwichpersistence.models.users.User;
-import laustrup.bandwichpersistence.models.users.sub_users.bands.Artist;
-import laustrup.bandwichpersistence.models.users.sub_users.bands.Band;
-import laustrup.bandwichpersistence.models.users.sub_users.venues.Venue;
+import laustrup.models.users.User;
+import laustrup.models.users.sub_users.bands.Artist;
+import laustrup.models.users.sub_users.bands.Band;
+import laustrup.models.users.sub_users.venues.Venue;
 import laustrup.bandwichpersistence.repositories.sub_repositories.ModelRepository;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembly;
 

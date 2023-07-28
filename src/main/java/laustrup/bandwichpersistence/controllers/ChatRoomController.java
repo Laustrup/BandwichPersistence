@@ -1,14 +1,14 @@
 package laustrup.bandwichpersistence.controllers;
 
-import laustrup.bandwichpersistence.models.Response;
-import laustrup.bandwichpersistence.models.chats.ChatRoom;
-import laustrup.bandwichpersistence.models.chats.messages.Mail;
-import laustrup.bandwichpersistence.models.dtos.chats.ChatRoomDTO;
-import laustrup.bandwichpersistence.models.dtos.chats.messages.BulletinDTO;
-import laustrup.bandwichpersistence.models.dtos.chats.messages.MailDTO;
+import laustrup.models.Response;
+import laustrup.models.chats.ChatRoom;
+import laustrup.models.chats.messages.Mail;
+import laustrup.dtos.chats.ChatRoomDTO;
+import laustrup.dtos.chats.messages.BulletinDTO;
+import laustrup.dtos.chats.messages.MailDTO;
 import laustrup.bandwichpersistence.services.controller_services.sub_controller_services.ChatRoomControllerService;
+import laustrup.utilities.parameters.Plato;
 
-import laustrup.bandwichpersistence.utilities.parameters.Plato;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

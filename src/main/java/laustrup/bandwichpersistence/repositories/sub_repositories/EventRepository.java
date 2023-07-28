@@ -1,13 +1,13 @@
 package laustrup.bandwichpersistence.repositories.sub_repositories;
 
-import laustrup.bandwichpersistence.models.chats.Request;
-import laustrup.bandwichpersistence.models.events.Event;
-import laustrup.bandwichpersistence.models.events.Gig;
-import laustrup.bandwichpersistence.models.events.Participation;
-import laustrup.bandwichpersistence.models.users.sub_users.Performer;
+import laustrup.models.chats.Request;
+import laustrup.models.events.Event;
+import laustrup.models.events.Gig;
+import laustrup.models.events.Participation;
+import laustrup.models.users.sub_users.Performer;
 import laustrup.bandwichpersistence.repositories.Repository;
-import laustrup.bandwichpersistence.utilities.collections.lists.Liszt;
-import laustrup.bandwichpersistence.utilities.console.Printer;
+import laustrup.utilities.collections.lists.Liszt;
+import laustrup.utilities.console.Printer;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

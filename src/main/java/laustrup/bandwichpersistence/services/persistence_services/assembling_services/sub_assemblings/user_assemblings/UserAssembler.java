@@ -1,15 +1,15 @@
 package laustrup.bandwichpersistence.services.persistence_services.assembling_services.sub_assemblings.user_assemblings;
 
-import laustrup.bandwichpersistence.models.Rating;
-import laustrup.bandwichpersistence.models.albums.Album;
-import laustrup.bandwichpersistence.models.chats.ChatRoom;
-import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
-import laustrup.bandwichpersistence.models.events.Event;
-import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
-import laustrup.bandwichpersistence.models.users.subscriptions.Subscription;
+import laustrup.models.Rating;
+import laustrup.models.albums.Album;
+import laustrup.models.chats.ChatRoom;
+import laustrup.models.chats.messages.Bulletin;
+import laustrup.models.events.Event;
+import laustrup.models.users.contact_infos.ContactInfo;
+import laustrup.models.users.subscriptions.Subscription;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembler;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.sub_assemblings.ModelAssembly;
-import laustrup.bandwichpersistence.utilities.collections.lists.Liszt;
+import laustrup.utilities.collections.lists.Liszt;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

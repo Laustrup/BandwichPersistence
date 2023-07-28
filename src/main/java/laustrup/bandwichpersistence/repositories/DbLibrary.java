@@ -2,8 +2,8 @@ package laustrup.bandwichpersistence.repositories;
 
 import laustrup.bandwichpersistence.Defaults;
 import laustrup.bandwichpersistence.Program;
-
 import laustrup.bandwichpersistence.repositories.h2.H2Config;
+
 import lombok.Getter;
 
 /**

@@ -1,13 +1,13 @@
 package laustrup.bandwichpersistence.services.persistence_services.assembling_services.sub_assemblings.user_assemblings;
 
-import laustrup.bandwichpersistence.models.chats.ChatRoom;
-import laustrup.bandwichpersistence.models.chats.messages.Mail;
-import laustrup.bandwichpersistence.models.users.Login;
-import laustrup.bandwichpersistence.models.users.User;
+import laustrup.models.chats.ChatRoom;
+import laustrup.models.chats.messages.Mail;
+import laustrup.models.users.Login;
+import laustrup.models.users.User;
 import laustrup.bandwichpersistence.repositories.sub_repositories.UserRepository;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembler;
-import laustrup.bandwichpersistence.utilities.collections.lists.Liszt;
-import laustrup.bandwichpersistence.utilities.console.Printer;
+import laustrup.utilities.collections.lists.Liszt;
+import laustrup.utilities.console.Printer;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

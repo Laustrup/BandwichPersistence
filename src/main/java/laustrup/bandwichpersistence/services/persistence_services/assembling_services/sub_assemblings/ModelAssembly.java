@@ -1,11 +1,11 @@
 package laustrup.bandwichpersistence.services.persistence_services.assembling_services.sub_assemblings;
 
-import laustrup.bandwichpersistence.models.users.contact_infos.Address;
-import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
-import laustrup.bandwichpersistence.models.users.contact_infos.Country;
-import laustrup.bandwichpersistence.models.users.contact_infos.Phone;
-import laustrup.bandwichpersistence.models.users.subscriptions.Subscription;
-import laustrup.bandwichpersistence.models.users.subscriptions.SubscriptionOffer;
+import laustrup.models.users.contact_infos.Address;
+import laustrup.models.users.contact_infos.ContactInfo;
+import laustrup.models.users.contact_infos.Country;
+import laustrup.models.users.contact_infos.Phone;
+import laustrup.models.users.subscriptions.Subscription;
+import laustrup.models.users.subscriptions.SubscriptionOffer;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

@@ -1,17 +1,17 @@
 package laustrup.bandwichpersistence.services.persistence_services.entity_services.sub_entity_services;
 
-import laustrup.bandwichpersistence.models.Rating;
-import laustrup.bandwichpersistence.models.albums.Album;
-import laustrup.bandwichpersistence.models.users.Login;
-import laustrup.bandwichpersistence.models.users.User;
-import laustrup.bandwichpersistence.models.users.subscriptions.Card;
-import laustrup.bandwichpersistence.models.users.subscriptions.Subscription;
+import laustrup.models.Rating;
+import laustrup.models.albums.Album;
+import laustrup.models.users.Login;
+import laustrup.models.users.User;
+import laustrup.models.users.subscriptions.Card;
+import laustrup.models.users.subscriptions.Subscription;
 import laustrup.bandwichpersistence.repositories.DbGate;
 import laustrup.bandwichpersistence.repositories.sub_repositories.ModelRepository;
 import laustrup.bandwichpersistence.repositories.sub_repositories.UserRepository;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembly;
-import laustrup.bandwichpersistence.utilities.parameters.Plato;
-import laustrup.bandwichpersistence.utilities.console.Printer;
+import laustrup.utilities.parameters.Plato;
+import laustrup.utilities.console.Printer;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

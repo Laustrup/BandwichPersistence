@@ -1,4 +1,4 @@
-# Bandwich
+## Bandwich
 
 Bandwich is a collection of projects, where venues and bands/artists can connect with each other,
 with the purposes of arranging gigs together with one and another.
@@ -6,7 +6,7 @@ with the purposes of arranging gigs together with one and another.
 These gigs can be hosted as an event for a venue on Bandwich, this event can be published and promoted with Bandwich,
 including other profiles of participants can sign up and join the events.
 
-## BandwichPersistence
+# BandwichPersistence
 
 ### Introduction
 Is still in development, which is test driven with solo developer Laust Eberhardt Bonnesen aka. Laustrup.
@@ -23,59 +23,64 @@ The responsibilities of this application is:
 
 It can use either customized connections-strings or defaults.
 
-Default connection-strings and database test values is not included, since they are hidden by gitignore.
-The DbLibrary will need the information of your connection strings.
+Default connection-strings and database test values is not included, since they are hidden by .gitignore.
+The DbLibrary will need the information of your connection strings. In order to make this work,
+create a java class at laustrup.bandwichpersistence called Defaults.java, it could look like this, with hidden values changed with your values:
 
-For testing is there a SQL file called default_values.sql, which is also hidden by the gitignore.
+```
+public class Defaults {
+
+    public static Defaults _instance = null;
+
+    public static Defaults get_instance() {
+        if (_instance == null) { _instance = new Defaults(); }
+        return _instance;
+    }
+
+    private Defaults() {}
+
+    @Getter
+    private final boolean _included = true;
+
+    @Getter
+    private final String _sqlAllowMultipleQueries = "?allowMultiQueries=true";
+
+    @Getter
+    private final String _dbLocation = "***.*.*.*";
+
+    @Getter
+    private final int _dbPort = ****;
+
+    @Getter
+    private final String _dbSchema = "****_schema";
+
+    @Getter
+    private final String _dbPath = "jdbc:mysql://" + _dbLocation + ":" + _dbPort + "/" + _dbSchema + _sqlAllowMultipleQueries,
+            _dbUser = "****", _dbPassword = "****";
+
+    @Getter
+    private final String _directory = "C:*****/IdeaProjects/BandwichPersistence";
+
+    public String get_directory(String delimiter) {
+        return _directory + delimiter;
+    }
+}
+```
+
+For testing there is a SQL file called default_values.sql, which is also hidden by the .gitignore.
 
 View project can be found [HERE](https://github.com/Laustrup/BandwichView), although it is still being developed.
 
-### Utilities
+### Laustrup dependencies
+There are some Laustrup dependencies used in this project, they can be read at:
 
-There are used special implemented utilities,
-that are used across the project and are meant to be moved to another project with connection in maven.
+* [Utilities](https://github.com/laustrup/utilities)
+* [Models](https://github.com/Laustrup/Models/tree/master/BandwichModels)
+* [Tests](https://github.com/Laustrup/QualityAssurance)
 
-All utilities are free to use for all users.
 
-The utilities are:
-
-##### Collections
-
-* ###### Liszt
-  Implements a List of element E in an append way of adding elements.
-  It also implements the interface ICollectionUtility, which contains extra useful methods.
-  An extra detail is that this class also uses a map, which means that
-  the approach of getting also can be done through the map, this also
-  means, that they will be saved doing add and removed at remove.
-  Index can both start at 0 or 1, every method starting with an uppercase
-  letter starts with 1 instead 0 in the parameters.
-
-* ###### Seszt
-  Implements a Set of element E in an append way of adding elements.
-  It also implements the interface ICollectionUtility, which contains extra useful methods.
-  An extra detail is that this class also uses a map, which means that
-  the approach of getting also can be done through the map, this also
-  means, that they will be saved doing add and removed at remove.
-  Index can both start at 0 or 1, every method starting with an uppercase
-  letter starts with 1 instead 0 in the parameters.
-
-##### Console
-
-* ###### Printer
-  Will handle printing of statements to the console.
-  Contains three different options for modes, default will use a normal println,
-  the others have a border around each print, noir mode is without colour
-  and high contrast mode is with colour of high contrast.
-  Is intended to log each print, but isn't implemented yet.
-
-##### Parameters
-
-* ###### Plato
-  A utility class, that behaves as a boolean, but with extra features.
-  Is named after the philosopher Plato ironically, because of Plato's duality theory.
-  Instead of just being true or false, it has more values, such as undefined.
-  Uses an enum for identifying those values.
-  Can also be null, since it's a class object.
+Keep in mind, that at the moment these dependencies are only uploaded to the GitHub packages of Maven, and not the local Maven repository.
+This might respond in some issues when downloading them.
 
 ### Starting the application
 This application should be started as a maven project, either from an IDEA with a configuration or with the console through maven with the commandline ```mvn spring-boot:run``` at the root of the project.

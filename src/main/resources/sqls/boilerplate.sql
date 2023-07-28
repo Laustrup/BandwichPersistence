@@ -195,6 +195,7 @@ CREATE TABLE followings(
     FOREIGN KEY(idol_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+-- Must be changed to fit new values that doesn't calculate answering time
 CREATE TABLE chat_rooms(
     id BIGINT(20) NOT NULL AUTO_INCREMENT,
     is_local BOOL NOT NULL,

@@ -1,9 +1,9 @@
 package laustrup.bandwichpersistence.repositories.h2;
 
 import laustrup.bandwichpersistence.Defaults;
-import laustrup.bandwichpersistence.services.FileService;
-import laustrup.bandwichpersistence.utilities.collections.lists.Liszt;
-import laustrup.bandwichpersistence.utilities.console.Printer;
+import laustrup.services.FileService;
+import laustrup.utilities.collections.lists.Liszt;
+import laustrup.utilities.console.Printer;
 
 import java.time.LocalDateTime;
 

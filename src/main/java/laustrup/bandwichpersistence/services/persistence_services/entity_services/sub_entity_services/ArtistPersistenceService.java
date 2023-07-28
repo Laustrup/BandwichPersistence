@@ -1,6 +1,6 @@
 package laustrup.bandwichpersistence.services.persistence_services.entity_services.sub_entity_services;
 
-import laustrup.bandwichpersistence.models.users.sub_users.bands.Artist;
+import laustrup.models.users.sub_users.bands.Artist;
 import laustrup.bandwichpersistence.repositories.DbGate;
 import laustrup.bandwichpersistence.repositories.sub_repositories.ArtistRepository;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembly;

@@ -1,8 +1,8 @@
 package laustrup.bandwichpersistence.console_ui;
 
 import laustrup.bandwichpersistence.repositories.DbLibrary;
-import laustrup.bandwichpersistence.utilities.console.Printer;
-import laustrup.bandwichpersistence.utilities.console.PrinterMode;
+import laustrup.utilities.console.Printer;
+import laustrup.utilities.console.PrinterMode;
 
 import lombok.Data;
 

@@ -1,10 +1,10 @@
 package laustrup.bandwichpersistence.services.controller_services.sub_controller_services;
 
-import laustrup.bandwichpersistence.models.Response;
-import laustrup.bandwichpersistence.models.dtos.users.sub_users.participants.ParticipantDTO;
-import laustrup.bandwichpersistence.models.users.Login;
-import laustrup.bandwichpersistence.models.users.sub_users.participants.Participant;
-import laustrup.bandwichpersistence.services.DTOService;
+import laustrup.models.Response;
+import laustrup.dtos.users.sub_users.participants.ParticipantDTO;
+import laustrup.models.users.Login;
+import laustrup.models.users.sub_users.participants.Participant;
+import laustrup.services.DTOService;
 import laustrup.bandwichpersistence.services.controller_services.ControllerService;
 import laustrup.bandwichpersistence.services.persistence_services.entity_services.sub_entity_services.ParticipantPersistenceService;
 import org.springframework.http.HttpStatus;

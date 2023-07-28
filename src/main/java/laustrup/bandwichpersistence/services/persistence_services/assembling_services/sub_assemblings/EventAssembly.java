@@ -1,19 +1,19 @@
 package laustrup.bandwichpersistence.services.persistence_services.assembling_services.sub_assemblings;
 
-import laustrup.bandwichpersistence.models.albums.Album;
-import laustrup.bandwichpersistence.models.chats.Request;
-import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
-import laustrup.bandwichpersistence.models.events.Event;
-import laustrup.bandwichpersistence.models.events.Gig;
-import laustrup.bandwichpersistence.models.events.Participation;
-import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
-import laustrup.bandwichpersistence.models.users.sub_users.bands.Artist;
-import laustrup.bandwichpersistence.models.users.sub_users.venues.Venue;
+import laustrup.models.albums.Album;
+import laustrup.models.chats.Request;
+import laustrup.models.chats.messages.Bulletin;
+import laustrup.models.events.Event;
+import laustrup.models.events.Gig;
+import laustrup.models.events.Participation;
+import laustrup.models.users.contact_infos.ContactInfo;
+import laustrup.models.users.sub_users.bands.Artist;
+import laustrup.models.users.sub_users.venues.Venue;
 import laustrup.bandwichpersistence.repositories.sub_repositories.EventRepository;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembler;
-import laustrup.bandwichpersistence.utilities.collections.lists.Liszt;
-import laustrup.bandwichpersistence.utilities.parameters.Plato;
-import laustrup.bandwichpersistence.utilities.console.Printer;
+import laustrup.utilities.collections.lists.Liszt;
+import laustrup.utilities.parameters.Plato;
+import laustrup.utilities.console.Printer;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

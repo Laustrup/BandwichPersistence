@@ -1,22 +1,22 @@
 package laustrup.bandwichpersistence.services.persistence_services.assembling_services.logic_assemblings;
 
-import laustrup.bandwichpersistence.models.chats.ChatRoom;
-import laustrup.bandwichpersistence.models.chats.Request;
-import laustrup.bandwichpersistence.models.chats.messages.Bulletin;
-import laustrup.bandwichpersistence.models.events.Event;
-import laustrup.bandwichpersistence.models.events.Gig;
-import laustrup.bandwichpersistence.models.events.Participation;
-import laustrup.bandwichpersistence.models.users.User;
-import laustrup.bandwichpersistence.models.users.sub_users.Performer;
-import laustrup.bandwichpersistence.models.users.sub_users.participants.Participant;
+import laustrup.models.chats.ChatRoom;
+import laustrup.models.chats.Request;
+import laustrup.models.chats.messages.Bulletin;
+import laustrup.models.events.Event;
+import laustrup.models.events.Gig;
+import laustrup.models.events.Participation;
+import laustrup.models.users.User;
+import laustrup.models.users.sub_users.Performer;
+import laustrup.models.users.sub_users.participants.Participant;
 import laustrup.bandwichpersistence.repositories.sub_repositories.ChatRepository;
 import laustrup.bandwichpersistence.repositories.sub_repositories.EventRepository;
 import laustrup.bandwichpersistence.repositories.sub_repositories.UserRepository;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.Assembly;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.sub_assemblings.EventAssembly;
 import laustrup.bandwichpersistence.services.persistence_services.assembling_services.sub_assemblings.user_assemblings.UserAssembly;
-import laustrup.bandwichpersistence.utilities.collections.lists.Liszt;
-import laustrup.bandwichpersistence.utilities.console.Printer;
+import laustrup.utilities.collections.lists.Liszt;
+import laustrup.utilities.console.Printer;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

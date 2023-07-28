@@ -1,17 +1,17 @@
 package laustrup.bandwichpersistence.repositories.sub_repositories;
 
-import laustrup.bandwichpersistence.models.users.Login;
-import laustrup.bandwichpersistence.models.users.User;
-import laustrup.bandwichpersistence.models.users.contact_infos.ContactInfo;
-import laustrup.bandwichpersistence.models.users.sub_users.bands.Artist;
-import laustrup.bandwichpersistence.models.users.sub_users.bands.Band;
-import laustrup.bandwichpersistence.models.users.sub_users.participants.Participant;
-import laustrup.bandwichpersistence.models.users.subscriptions.Card;
-import laustrup.bandwichpersistence.models.users.subscriptions.Subscription;
-import laustrup.bandwichpersistence.models.users.sub_users.venues.Venue;
+import laustrup.models.users.Login;
+import laustrup.models.users.User;
+import laustrup.models.users.contact_infos.ContactInfo;
+import laustrup.models.users.sub_users.bands.Artist;
+import laustrup.models.users.sub_users.bands.Band;
+import laustrup.models.users.sub_users.participants.Participant;
+import laustrup.models.users.subscriptions.Card;
+import laustrup.models.users.subscriptions.Subscription;
+import laustrup.models.users.sub_users.venues.Venue;
 import laustrup.bandwichpersistence.repositories.Repository;
-import laustrup.bandwichpersistence.utilities.collections.lists.Liszt;
-import laustrup.bandwichpersistence.utilities.console.Printer;
+import laustrup.utilities.collections.lists.Liszt;
+import laustrup.utilities.console.Printer;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
