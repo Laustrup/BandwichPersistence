@@ -81,7 +81,7 @@ public class ContactInfo extends Model {
      * @param country A Country object for the information of which Country the User is living in.
      * @param timestamp The date and time this ContactInfo was created.
      */
-    public ContactInfo(UUID id, String email, Seszt<Phone> phones, Address address, Country country, LocalDateTime timestamp) {
+    public ContactInfo(UUID id, String email, Seszt<Phone> phones, Address address, Country country, Instant timestamp) {
         _primaryId = id;
         _title = "Contact-info: " + id;
         _email = email;

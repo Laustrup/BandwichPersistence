@@ -5,7 +5,7 @@ import laustrup.bandwichpersistence.core.persistence.DatabaseParameter;
 import laustrup.bandwichpersistence.core.persistence.Scriptorian;
 import laustrup.bandwichpersistence.core.services.FileService;
 import laustrup.bandwichpersistence.core.services.persistence.JDBCService;
-import laustrup.bandwichpersistence.core.scriptorian.services.ScriptorianQueryService;
+import laustrup.bandwichpersistence.core.scriptorian.repositories.ScriptorianRepository;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -41,7 +41,7 @@ public class ScriptorianManager {
         List<File> scripts = namingConvention();
 
         databaseInteraction(() -> {
-            ScriptorianQueryService.createDefaultSchemaIfNotExists();
+            ScriptorianRepository.createDefaultSchemaIfNotExists();
             List<Scriptorian.Scriptory> scriptoriesWithoutSuccess = scriptoriesWithoutSuccess();
             if (!scriptoriesWithoutSuccess.isEmpty())
                 throw new IllegalStateException(String.format("""
@@ -59,12 +59,12 @@ public class ScriptorianManager {
             File currentFile = null;
 
             try {
-                for (File file : findScriptsNotRecorded(scripts, buildScriptories(ScriptorianQueryService.findAllScriptories()))) {
+                for (File file : findScriptsNotRecorded(scripts, buildScriptories(ScriptorianRepository.findAllScriptories()))) {
                     currentFile = file;
                     currentFileName = file.getName();
 
-                    ScriptorianQueryService.executeScript(FileService.getContent(file));
-                    ScriptorianQueryService.putScriptory(generateParameters(currentFile, null));
+                    ScriptorianRepository.executeScript(FileService.getContent(file));
+                    ScriptorianRepository.putScriptory(generateParameters(currentFile, null));
 
                     _logger.log(
                             Level.INFO,
@@ -72,7 +72,7 @@ public class ScriptorianManager {
                     );
                 }
             } catch (Exception exception) {
-                ScriptorianQueryService.putScriptory(generateParameters(currentFile, exception.getMessage()));
+                ScriptorianRepository.putScriptory(generateParameters(currentFile, exception.getMessage()));
 
                 _logger.log(
                         Level.WARNING,
@@ -145,7 +145,7 @@ public class ScriptorianManager {
     }
 
     private static List<Scriptorian.Scriptory> scriptoriesWithoutSuccess() {
-        return buildScriptories(ScriptorianQueryService.findScriptoriesWithoutSuccess());
+        return buildScriptories(ScriptorianRepository.findScriptoriesWithoutSuccess());
     }
 
     private static List<File> findScriptsNotRecorded(List<File> scripts, List<Scriptorian.Scriptory> scriptories) {

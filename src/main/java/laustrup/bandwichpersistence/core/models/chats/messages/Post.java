@@ -52,7 +52,7 @@ public class Post extends Message {
             LocalDateTime isEdited,
             boolean isPublic,
             History history,
-            LocalDateTime timestamp
+            Instant timestamp
     ) {
         super(id, author, content, isSent, isEdited, isPublic, history, timestamp);
         _receiver = receiver;

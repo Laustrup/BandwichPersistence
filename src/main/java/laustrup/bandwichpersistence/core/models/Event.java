@@ -260,7 +260,7 @@ public class Event extends Model {
             Seszt<Post> posts,
             Seszt<Album> albums,
             History history,
-            LocalDateTime timestamp
+            Instant timestamp
     ) throws InputMismatchException {
         super(id, title == null || title.isEmpty() ? "Untitled event" : title, history, timestamp);
 
@@ -1105,7 +1105,7 @@ public class Event extends Model {
                 LocalDateTime start,
                 LocalDateTime end,
                 History history,
-                LocalDateTime timestamp
+                Instant timestamp
         ) {
             super(id, "Gig:" + id, history, timestamp);
             _event = event;
@@ -1244,7 +1244,7 @@ public class Event extends Model {
          * @param participant The Participant of the participation.
          * @param type The type of which participant is participating in the participation.
          */
-        public Participation(UUID id, Participant participant, Type type, History history, LocalDateTime timestamp) {
+        public Participation(UUID id, Participant participant, Type type, History history, Instant timestamp) {
             super(
                     id,
                     participant.get_primaryId(),
@@ -1292,7 +1292,7 @@ public class Event extends Model {
                     new String[] {
                             String.valueOf(get_primaryId()),
                             String.valueOf(get_secondaryId()),
-                            get_title(),
+                            get_name(),
                             get_type().name()
                     }
             );

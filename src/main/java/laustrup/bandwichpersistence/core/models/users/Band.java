@@ -1,28 +1,43 @@
 package laustrup.bandwichpersistence.core.models.users;
 
 import laustrup.bandwichpersistence.core.models.*;
-import laustrup.bandwichpersistence.core.utilities.collections.lists.Liszt;
-import laustrup.bandwichpersistence.core.models.chats.ChatRoom;
+import laustrup.bandwichpersistence.core.services.UserService;
 import laustrup.bandwichpersistence.core.models.chats.messages.Post;
 import laustrup.bandwichpersistence.core.utilities.collections.sets.Seszt;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 
-import java.time.LocalDateTime;
-import java.util.InputMismatchException;
-import java.util.UUID;
+import java.time.Instant;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Extends performer and contains Artists as members
  */
 @Getter @FieldNameConstants
-public class Band extends Performer {
+public class Band extends Model {
 
     /**
      * Contains all the Artists, that are members of this band.
      */
     private Seszt<Artist> _members;
+
+    private String _description;
+
+    private Subscription _subscription;
+
+    private Seszt<Album> _albums;
+
+    private Seszt<Event> _events;
+
+    private Seszt<User> _fans;
+
+    private Seszt<Post> _posts;
+
+    private String _name;
+
+    private String _runner;
 
     /**
      * Will translate a transport object of this object into a construct of this object.
@@ -30,81 +45,41 @@ public class Band extends Performer {
      */
     public Band(Band.DTO band) {
         super(band);
-        if (band.getMembers().length == 0)
-            throw new InputMismatchException("There is no members in the band");
-
-        _username = band.getUsername();
-
-        _members = new Seszt<>();
-        for (Artist.DTO member : band.getMembers())
-            _members.add(new Artist(member));
+        _description = band.getDescription();
+        _subscription = new Subscription(band.getSubscription());
+        _albums = new Seszt<>(band.getAlbums().stream().map(Album::new));
+        _events = new Seszt<>(band.getEvents().stream().map(Event::new));
+        _fans = new Seszt<>(band.getFans().stream().map(UserService::from));
+        _posts = new Seszt<>(band.getPosts().stream().map(Post::new));
+        _name = band.getName();
+        _runner = band.getRunner();
     }
 
-    /**
-     * A constructor with all the values of this Object.
-     * @param id The primary id that identifies this unique Object.
-     * @param username The title of the user, that the user uses to use as a title for the profile.
-     * @param description This is what the user uses to describe itself.
-     * @param contactInfo An object that has the different attributes,
-     *                    that can be used to contact this Band.
-     * @param albums An album consisting of images.
-     * @param ratings Ratings made from other users on this user based on a value.
-     * @param events The Events that this user is included in.
-     * @param gigs Describes all the gigs, that the Performer is a part of an act.
-     * @param chatRooms These ChatRooms can be used to communicate with other users.
-     * @param subscription The Subscription of this Artist.
-     * @param posts Messages by other Users.
-     * @param members Contains all the Artists, that are members of this band.
-     * @param runner A description of the gear, that the Artist possesses and what they require for an Event.
-     * @param fans All the participants that are following this Performer, is included here.
-     * @param idols The people that are following this Object.
-     * @param history The Events for this object.
-     * @param timestamp The date and time this ContactInfo was created.
-     */
     public Band(
             UUID id,
-            String username,
+            String name,
             String description,
-            ContactInfo contactInfo,
-            Liszt<Album> albums,
-            Liszt<Rating> ratings,
+            Seszt<Album> albums,
             Seszt<Event> events,
-            Seszt<Event.Gig> gigs,
-            Seszt<ChatRoom> chatRooms,
             Subscription subscription,
-            Liszt<Post> posts,
+            Seszt<Post> posts,
             Seszt<Artist> members,
             String runner,
             Seszt<User> fans,
-            Seszt<User> idols,
             History history,
-            LocalDateTime timestamp
+            Instant timestamp
     ) {
-        super(
-                id,
-                null,
-                null,
-                username,
-                description,
-                contactInfo,
-                albums,
-                ratings,
-                events,
-                gigs,
-                chatRooms,
-                subscription,
-                posts,
-                fans,
-                idols,
-                runner,
-                history,
-                timestamp
-        );
-        if (members.isEmpty())
-            throw new InputMismatchException("There is no members in this band");
+        super(id, name + "|" + id, history, timestamp);
 
-        _username = username;
+        _name = name;
+        _description = description;
+        _albums = albums;
+        _events = events;
+        _fans = fans;
+        _subscription = subscription;
+        _posts = posts;
         _members = members;
+        _runner = runner;
     }
 
     /**
@@ -164,7 +139,7 @@ public class Band extends Performer {
             },
             new String[] {
                 String.valueOf(get_primaryId()),
-                get_username(),
+                get_name(),
                 get_description(),
                 Model.Fields._timestamp
             }
@@ -177,16 +152,27 @@ public class Band extends Performer {
      * Doesn't have any logic.
      */
     @Getter @Setter
-    public static class DTO extends PerformerDTO {
+    public static class DTO extends ModelDTO {
 
         /**
          * Contains all the Artists, that are members of this band.
          */
-        private Artist.DTO[] members;
+        private Set<Artist.DTO> members;
 
-        /**
-         * A description of the gear, that the band possesses and what they require for an Event.
-         */
+        private String description;
+
+        private Subscription.DTO subscription;
+
+        private Set<Album.DTO> albums;
+
+        private Set<Event.DTO> events;
+
+        private Set<User.UserDTO> fans;
+
+        private Set<Post.DTO> posts;
+
+        private String name;
+
         private String runner;
 
         /**
@@ -195,10 +181,25 @@ public class Band extends Performer {
          */
         public DTO(Band band) {
             super(band);
-            members = new Artist.DTO[band.get_members().size()];
-            for (int i = 0; i < members.length; i++)
-                members[i] = new Artist.DTO(band.get_members().Get(i+1));
+            members = Arrays.stream(band.get_members().get_data())
+                    .map(Artist.DTO::new)
+                    .collect(Collectors.toSet());
+            description = band.get_description();
+            subscription = new Subscription.DTO(band.get_subscription());
+            albums = Arrays.stream(band.get_albums().get_data())
+                    .map(Album.DTO::new)
+                    .collect(Collectors.toSet());
+            events = Arrays.stream(band.get_events().get_data())
+                    .map(Event.DTO::new)
+                    .collect(Collectors.toSet());
+            fans = Arrays.stream(band.get_fans().get_data())
+                    .map(UserService::from)
+                    .collect(Collectors.toSet());
+            posts = Arrays.stream(band.get_posts().get_data())
+                    .map(Post.DTO::new)
+                    .collect(Collectors.toSet());
 
+            name = band.get_name();
             runner = band.get_runner();
         }
     }

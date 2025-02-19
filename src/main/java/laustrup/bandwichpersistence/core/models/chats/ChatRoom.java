@@ -80,7 +80,7 @@ public class ChatRoom extends Model {
             Liszt<Mail> mails,
             Seszt<User> chatters,
             History history,
-            LocalDateTime timestamp
+            Instant timestamp
     ) {
         super(id, title, history, timestamp);
         _chatters = chatters;

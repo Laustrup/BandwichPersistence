@@ -71,7 +71,7 @@ public class Participant extends User {
             Liszt<Post> posts,
             Seszt<User> idols,
             History history,
-            LocalDateTime timestamp
+            Instant timestamp
     ) {
         super(
                 id,

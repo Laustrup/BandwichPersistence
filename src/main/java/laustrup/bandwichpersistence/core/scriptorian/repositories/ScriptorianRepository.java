@@ -1,4 +1,4 @@
-package laustrup.bandwichpersistence.core.scriptorian.services;
+package laustrup.bandwichpersistence.core.scriptorian.repositories;
 
 import laustrup.bandwichpersistence.core.persistence.DatabaseManager;
 import laustrup.bandwichpersistence.core.persistence.DatabaseParameter;
@@ -9,7 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-public class ScriptorianQueryService {
+public class ScriptorianRepository {
 
     public static void createDefaultSchemaIfNotExists() {
         DatabaseManager.create(ScriptorianQueries.createTableIfNotExists);

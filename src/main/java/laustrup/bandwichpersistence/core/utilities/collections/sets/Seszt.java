@@ -8,6 +8,7 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -25,6 +26,14 @@ public class Seszt<E> extends Collection<E> implements ISeszt<E>, Set<E>, IColle
     /** Default constructor that will build the Seszt without containing any data and the map as linked. */
     public Seszt() {
         this(false);
+    }
+
+    public Seszt(Collection<? extends E> collection) {
+        this(collection.get_data());
+    }
+
+    public Seszt(Stream<? extends E> stream) {
+        this((E[]) stream.toArray());
     }
 
     /**

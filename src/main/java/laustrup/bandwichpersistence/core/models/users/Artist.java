@@ -89,7 +89,7 @@ public class Artist extends Performer {
             Seszt<User> idols,
             Liszt<Request> requests,
             History history,
-            LocalDateTime timestamp
+            Instant timestamp
     ) {
         super(
                 id,

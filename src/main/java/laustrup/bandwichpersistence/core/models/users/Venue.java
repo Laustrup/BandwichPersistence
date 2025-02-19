@@ -99,7 +99,7 @@ public class Venue extends User {
             int size,
             Liszt<Request> requests,
             History history,
-            LocalDateTime timestamp
+            Instant timestamp
     ) {
         super(
                 id,

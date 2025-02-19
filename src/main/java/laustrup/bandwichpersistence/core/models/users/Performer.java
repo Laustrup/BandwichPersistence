@@ -94,7 +94,7 @@ public abstract class Performer extends Participant {
             Seszt<User> idols,
             String runner,
             History history,
-            LocalDateTime timestamp
+            Instant timestamp
     ) {
         super(
                 id,

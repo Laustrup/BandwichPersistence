@@ -2,7 +2,7 @@ package laustrup.bandwichpersistence.core.libraries;
 
 import laustrup.bandwichpersistence.core.persistence.SQL;
 import laustrup.bandwichpersistence.core.managers.ManagerService;
-import laustrup.bandwichpersistence.core.services.persistence.DatabaseLibraryQueryService;
+import laustrup.bandwichpersistence.core.services.persistence.repositories.DatabaseLibraryRepository;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -87,7 +87,7 @@ public class DatabaseLibrary {
         _user = user;
         _password = password;
         _properties = properties;
-        ManagerService.databaseInteraction(() -> DatabaseLibraryQueryService.createSchemaIfNotExists(_schema));
+        ManagerService.databaseInteraction(() -> DatabaseLibraryRepository.createSchemaIfNotExists(_schema));
         _isConfigured = true;
     }
 

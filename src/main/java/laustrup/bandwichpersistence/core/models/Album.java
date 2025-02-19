@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.UUID;
 
@@ -68,7 +68,7 @@ public class Album extends Model {
             Seszt<Item> items,
             UUID authorId,
             History history,
-            LocalDateTime timestamp
+            Instant timestamp
     ) {
         super(id, title, history, timestamp);
         _items = items;
@@ -266,7 +266,7 @@ public class Album extends Model {
                 Seszt<UUID> tags,
                 Event event,
                 History history,
-                LocalDateTime timestamp
+                Instant timestamp
         ) {
             super(title, history, timestamp);
             _endpoint = endpoint;

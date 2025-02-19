@@ -81,7 +81,7 @@ public abstract class Message extends Model {
             LocalDateTime isEdited,
             boolean isPublic,
             History history,
-            LocalDateTime timestamp
+            Instant timestamp
     ) {
         super(id, "Message-"+id, history, timestamp);
         _author = author;

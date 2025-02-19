@@ -64,7 +64,7 @@ public class Ticket extends TicketBase {
             LocalDateTime arrived,
             Option option,
             History history,
-            LocalDateTime timestamp
+            Instant timestamp
     ) {
         super(
                 participantId,
@@ -96,7 +96,7 @@ public class Ticket extends TicketBase {
                 new String[]{
                         String.valueOf(_primaryId),
                         String.valueOf(_secondaryId),
-                        get_title(),
+                        get_name(),
                         String.valueOf(get_price()),
                         get_seat(),
                         String.valueOf(get_arrived()),
@@ -157,7 +157,7 @@ public class Ticket extends TicketBase {
                     ticketOption.getPrimaryId(),
                     ticketOption.getEventIds(),
                     ticketOption.getVenueId(),
-                    ticketOption.getTitle(),
+                    ticketOption.getName(),
                     ticketOption.getSeat(),
                     ticketOption.getPrice(),
                     ticketOption.getValuta(),
@@ -188,7 +188,7 @@ public class Ticket extends TicketBase {
                 BigDecimal price,
                 String valuta,
                 History history,
-                LocalDateTime timestamp
+                Instant timestamp
         ) {
             super(
                     id,
@@ -231,7 +231,7 @@ public class Ticket extends TicketBase {
             return new Ticket(
                     participantId,
                     eventId,
-                    get_title(),
+                    get_name(),
                     get_seat(),
                     get_price(),
                     get_valuta(),
@@ -255,7 +255,7 @@ public class Ticket extends TicketBase {
                     },
                     new String[]{
                             String.valueOf(_primaryId),
-                            get_title(),
+                            get_name(),
                             String.valueOf(get_price()),
                             get_seat(),
                             String.valueOf(_timestamp)

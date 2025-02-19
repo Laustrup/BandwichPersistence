@@ -93,13 +93,13 @@ public class Request extends Model {
             LocalDateTime approved,
             String message,
             History history,
-            LocalDateTime timestamp
+            Instant timestamp
     ) {
         super(
             user != null ? user.get_primaryId() : null,
             event != null ? event.get_primaryId() : null,
             user != null && event != null
-                ? "Request of " + user.get_username() + " to " + event.get_title() : "Empty Request",
+                ? "Request of " + user.get_username() + " to " + event.get_name() : "Empty Request",
             history,
             timestamp
         );
@@ -122,13 +122,13 @@ public class Request extends Model {
         super(
                 user.get_primaryId(),
                 event.get_primaryId(),
-                "Request of " + user.get_username() + " to " + event.get_title()
+                "Request of " + user.get_username() + " to " + event.get_name()
         );
         _message = """
                 This request wishes @user to perform at @event
                 """
                 .replace("@user", user.get_username())
-                .replace("@event", event.get_title());
+                .replace("@event", event.get_name());
     }
 
     @Override

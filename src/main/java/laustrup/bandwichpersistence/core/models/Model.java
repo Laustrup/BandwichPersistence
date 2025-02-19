@@ -27,22 +27,6 @@ public abstract class Model {
     protected UUID _primaryId;
 
     /**
-     * Another identification value in the database for a specific entity.
-     * Must be unique with primary id.
-     * Is used for incidents, where there are a connection between two entities,
-     * and they are both being used as primary keys
-     */
-    protected UUID _secondaryId;
-
-    /**
-     * Gets the secondary id, if there isn't any, it will get the primary id.
-     * @return The gathered id.
-     */
-    public UUID get_secondaryId() {
-        return !hasSecondaryId() ? get_primaryId() : _secondaryId;
-    }
-
-    /**
      * The name for an entity or model.
      * Can be of different purposes,
      * such as username or simply for naming a unit.
@@ -96,7 +80,6 @@ public abstract class Model {
      */
     public Model(ModelDTO model) {
         _primaryId = model.getPrimaryId();
-        _secondaryId = model.getSecondaryId();
         _title = model.getClass().getSimpleName() + " \"" + model.getPrimaryId() + "\"";
         _situation = model.getSituation();
         _history = model.getHistory();
@@ -149,49 +132,6 @@ public abstract class Model {
         _primaryId = id;
         _title = title;
         _timestamp = Instant.now();
-    }
-
-    /**
-     * Will generate a timestamp of the moment now in datetime.
-     * @param primaryId A hex decimal value identifying this item uniquely.
-     * @param secondaryId Another hex decimal value identifying another item uniquely.
-     * @param title A title describing this entity internally.
-     */
-    public Model(UUID primaryId, UUID secondaryId, String title) {
-        _primaryId = primaryId;
-        _secondaryId = secondaryId;
-        _title = title;
-        _timestamp = Instant.now();
-    }
-
-    /**
-     * @param primaryId A hex decimal value identifying this item uniquely.
-     * @param secondaryId Another hex decimal value identifying another item uniquely.
-     * @param history A collection of events that has occurred.
-     * @param title A title describing this entity internally.
-     * @param timestamp Specifies the time this entity was created.
-     */
-    public Model(
-            UUID primaryId,
-            UUID secondaryId,
-            String title,
-            History history,
-            Instant timestamp
-    ) {
-        _primaryId = primaryId;
-        _secondaryId = secondaryId;
-        _title = title;
-        _history = history;
-        _timestamp = timestamp;
-    }
-
-
-    /**
-     * Checks if secondary id is null.
-     * @return True if secondary id isn't null.
-     */
-    public boolean hasSecondaryId() {
-        return _secondaryId != null;
     }
 
     /**
@@ -285,8 +225,7 @@ public abstract class Model {
 
         public ModelDTO(Model model) {
             primaryId = model.get_primaryId();
-            secondaryId = model.get_secondaryId();
-            title = model.get_title();
+            title = model.get_name();
             history = model.get_history();
             timestamp = model.get_timestamp();
             situation = model.get_situation();

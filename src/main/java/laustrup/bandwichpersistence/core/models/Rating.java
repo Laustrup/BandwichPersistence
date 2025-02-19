@@ -53,7 +53,7 @@ public class Rating extends Model {
             UUID judgeId,
             String comment,
             History history,
-            LocalDateTime timestamp
+            Instant timestamp
     ) {
         super(appointedId, judgeId, appointedId + "-" + judgeId, history, timestamp);
         _comment = comment;

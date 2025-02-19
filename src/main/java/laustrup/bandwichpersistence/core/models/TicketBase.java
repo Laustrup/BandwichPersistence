@@ -5,7 +5,6 @@ import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
@@ -38,7 +37,7 @@ public abstract class TicketBase extends Model {
     public TicketBase(TicketBase.DTO ticket) {
         this(
                 ticket.getPrimaryId(),
-                ticket.getTitle(),
+                ticket.getName(),
                 ticket.getSeat(),
                 ticket.getPrice(),
                 ticket.getValuta(),
@@ -65,7 +64,7 @@ public abstract class TicketBase extends Model {
             BigDecimal price,
             String valuta,
             History history,
-            LocalDateTime timestamp
+            Instant timestamp
     ) {
         super(id, title, history, timestamp);
         _seat = seat;
@@ -94,7 +93,7 @@ public abstract class TicketBase extends Model {
             BigDecimal price,
             String valuta,
             History history,
-            LocalDateTime timestamp
+            Instant timestamp
     ) {
         super(participantId, eventId, title, history, timestamp);
         _seat = seat;
