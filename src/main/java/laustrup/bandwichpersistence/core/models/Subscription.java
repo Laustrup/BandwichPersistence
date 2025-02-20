@@ -11,15 +11,16 @@ import java.util.UUID;
  * Defines the kind of subscription a user is having.
  * Only Artists and Bands can have a paying subscription.
  */
-@FieldNameConstants
+@Getter @FieldNameConstants
 public class Subscription extends Model {
 
     /**
      * An enum that determines what kind of status, the situation of the Subscription is in.
      */
-    @Getter
     @Setter
     private Status _status;
+
+    private Kind _kind;
 
     /**
      * Will translate a transport object of this object into a construct of this object.
@@ -28,6 +29,7 @@ public class Subscription extends Model {
     public Subscription(DTO subscription) {
         super(subscription);
         _status = Status.valueOf(subscription.getStatus().toString());
+        _kind = subscription.getKind();
     }
 
     /**
@@ -39,11 +41,13 @@ public class Subscription extends Model {
     public Subscription(
             UUID id,
             Status status,
+            Kind kind,
             Instant timestamp
     ) {
         _primaryId = id;
         _title = "Subscription: " + id;
         _status = status;
+        _kind = kind;
         _timestamp = timestamp;
     }
 
@@ -52,9 +56,10 @@ public class Subscription extends Model {
      * Timestamp will be now.
      * @param status An enum that determines what kind of status, the situation of the Subscription is in.
      */
-    public Subscription(Status status) {
+    public Subscription(Status status, Kind kind) {
         _title = "New-Subscription";
         _status = status;
+        _kind = kind;
         _timestamp = Instant.now();
     }
 
@@ -82,8 +87,14 @@ public class Subscription extends Model {
         ACCEPTED,
         BLOCKED,
         DEACTIVATED,
+        SUSPENDED,
         PENDING,
         CLOSED
+    }
+
+    public enum Kind {
+        PAYING,
+        FREE
     }
 
     /**
@@ -99,9 +110,12 @@ public class Subscription extends Model {
          */
         private Subscription.Status status;
 
+        private Subscription.Kind kind;
+
         public DTO(Subscription subscription) {
             super(subscription);
             status = Subscription.Status.valueOf(subscription.get_status().toString());
+            kind = subscription.get_kind();
         }
     }
 }

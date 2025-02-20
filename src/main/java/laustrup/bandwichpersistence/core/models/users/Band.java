@@ -20,8 +20,15 @@ public class Band extends Model {
 
     /**
      * Contains all the Artists, that are members of this band.
+     * They are responsible for the subscription fees, since they own the band.
      */
     private Seszt<Artist> _members;
+
+    /**
+     * A musician that are paid and are hired to perform at gigs.
+     * Are exempt from paying the subscription fees.
+     */
+    private Seszt<Artist> _sessionMembers;
 
     private String _description;
 
@@ -45,6 +52,8 @@ public class Band extends Model {
      */
     public Band(Band.DTO band) {
         super(band);
+        _members = new Seszt<>(band.getMembers().stream().map(Artist::new));
+        _sessionMembers = new Seszt<>(band.getSessionMembers().stream().map(Artist::new));
         _description = band.getDescription();
         _subscription = new Subscription(band.getSubscription());
         _albums = new Seszt<>(band.getAlbums().stream().map(Album::new));
@@ -64,6 +73,7 @@ public class Band extends Model {
             Subscription subscription,
             Seszt<Post> posts,
             Seszt<Artist> members,
+            Seszt<Artist> sessionMembers,
             String runner,
             Seszt<User> fans,
             History history,
@@ -79,6 +89,7 @@ public class Band extends Model {
         _subscription = subscription;
         _posts = posts;
         _members = members;
+        _sessionMembers = sessionMembers;
         _runner = runner;
     }
 
@@ -159,6 +170,8 @@ public class Band extends Model {
          */
         private Set<Artist.DTO> members;
 
+        private Set<Artist.DTO> sessionMembers;
+
         private String description;
 
         private Subscription.DTO subscription;
@@ -182,6 +195,9 @@ public class Band extends Model {
         public DTO(Band band) {
             super(band);
             members = Arrays.stream(band.get_members().get_data())
+                    .map(Artist.DTO::new)
+                    .collect(Collectors.toSet());
+            sessionMembers = Arrays.stream(band.get_sessionMembers().get_data())
                     .map(Artist.DTO::new)
                     .collect(Collectors.toSet());
             description = band.get_description();

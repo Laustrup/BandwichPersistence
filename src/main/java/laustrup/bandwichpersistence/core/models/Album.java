@@ -216,10 +216,6 @@ public class Album extends Model {
         /** The endpoint for a URL, that is used to get the file of the item. */
         private String _endpoint;
 
-        /** An Album can have a relation to an Event, but doesn't necessarily have to. */
-        @Setter
-        private Event _event;
-
         /**
          * This is an Enum.
          * The Album might either be a MUSIC or IMAGE Album.
@@ -255,7 +251,6 @@ public class Album extends Model {
          * @param endpoint The endpoint location for the file.
          * @param kind Determines if this is music or an image.
          * @param tags The people joined at this item.
-         * @param event The Event that is joined at this item.
          * @param history The Events for this object.
          * @param timestamp The date this item is posted.
          */
@@ -264,7 +259,6 @@ public class Album extends Model {
                 String endpoint,
                 Kind kind,
                 Seszt<UUID> tags,
-                Event event,
                 History history,
                 Instant timestamp
         ) {
@@ -272,7 +266,6 @@ public class Album extends Model {
             _endpoint = endpoint;
             _kind = kind;
             _tags = tags;
-            _event = event;
         }
 
         /**
@@ -282,14 +275,12 @@ public class Album extends Model {
          * @param endpoint The endpoint location for the file.
          * @param kind Determines if this is music or an image.
          * @param tags The people joined at this item.
-         * @param event The Event that is joined at this item.
          */
-        public Item(String title, String endpoint, Kind kind, Seszt<UUID> tags, Event event) {
+        public Item(String title, String endpoint, Kind kind, Seszt<UUID> tags) {
             super(title);
             _endpoint = endpoint;
             _kind = kind;
             _tags = tags;
-            _event = event;
         }
 
         /**
@@ -358,9 +349,6 @@ public class Album extends Model {
             /** The endpoint for a URL, that is used to get the file of the item. */
             private String endpoint;
 
-            /** An Album can have a relation to an Event, but doesn't necessarily have to. */
-            private Event.DTO event;
-
             /**
              * This is an Enum.
              * The Album might either be a MUSIC or IMAGE Album.
@@ -379,8 +367,6 @@ public class Album extends Model {
                 tags = new UUID[item.get_tags().size()];
                 for (int i = 0; i < tags.length; i++)
                     tags[i] = item.get_tags().get(i);
-
-                event = new Event.DTO(item.get_event());
             }
 
             /** An enum that will describe the type of Album. */

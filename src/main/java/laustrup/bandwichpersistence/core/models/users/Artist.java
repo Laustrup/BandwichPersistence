@@ -1,24 +1,20 @@
 package laustrup.bandwichpersistence.core.models.users;
 
 import laustrup.bandwichpersistence.core.models.*;
-import laustrup.bandwichpersistence.core.utilities.collections.lists.Liszt;
 import laustrup.bandwichpersistence.core.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.core.models.chats.Request;
-import laustrup.bandwichpersistence.core.models.chats.messages.Post;
 import laustrup.bandwichpersistence.core.utilities.collections.sets.Seszt;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
-/**
- * An Artist can either be a solo Performer or member of a Band, which changes the Subscription, if it ain't freemium.
- * Extends from Performer.
- */
 @Getter @FieldNameConstants
-public class Artist extends Performer {
+public class Artist extends BusinessUser {
 
     /**
      * The Bands that the Artist is a member of.
@@ -28,7 +24,19 @@ public class Artist extends Performer {
     /**
      * The Requests requested for this Artist.
      */
-    private Liszt<Request> _requests;
+    private Seszt<Request> _requests;
+
+    private Seszt<Album> _albums;
+
+    private Seszt<Follow> _follows;
+
+    private Seszt<Event.Gig> _gigs;
+
+    /**
+     * A description of the gear, that the Artist possesses and what they require for an Event.
+     */
+    @Setter
+    private String _runner;
 
     /**
      * Will translate a transport object of this object into a construct of this object.
@@ -40,35 +48,11 @@ public class Artist extends Performer {
         for (Band.DTO band : artist.getBands())
             _bands.add(new Band(band));
 
-        _requests = new Liszt<>();
+        _requests = new Seszt<>();
         for (Request.DTO request : artist.getRequests())
             _requests.add(new Request(request));
     }
 
-    /**
-     * A constructor with all the values of this Object.
-     * @param id The primary id that identifies this unique Object.
-     * @param username The title of the user, that the user uses to use as a title for the profile.
-     * @param firstName The real first name of the user's name.
-     * @param lastName The real last name of the user's name.
-     * @param description This is what the user uses to describe itself.
-     * @param contactInfo An object that has the different attributes,
-     *                    that can be used to contact this user.
-     * @param albums An album consisting of images.
-     * @param ratings Ratings made from other users on this user based on a value.
-     * @param events The Events that this user is included in.
-     * @param gigs Describes all the gigs, that the Performer is a part of an act.
-     * @param chatRooms These ChatRooms can be used to communicate with other users.
-     * @param subscription The Subscription of this Artist.
-     * @param posts Messages by other Users.
-     * @param bands The Bands that the Artist is a member of.
-     * @param runner A description of the gear, that the Artist possesses and what they require for an Event.
-     * @param fans All the participants that are following this Performer, is included here.
-     * @param idols The people that are following this Object.
-     * @param requests The Requests requested for this Artist.
-     * @param history The Events for this object.
-     * @param timestamp The date and time this ContactInfo was created.
-     */
     public Artist(
             UUID id,
             String username,
@@ -76,43 +60,40 @@ public class Artist extends Performer {
             String lastName,
             String description,
             ContactInfo contactInfo,
-            Liszt<Album> albums,
-            Liszt<Rating> ratings,
+            Seszt<Album> albums,
             Seszt<Event> events,
-            Seszt<Event.Gig> gigs,
-            Seszt<ChatRoom> chatRooms,
             Subscription subscription,
-            Liszt<Post> posts,
+            Seszt<Authority> authorities,
+            Seszt<ChatRoom> chatRooms,
             Seszt<Band> bands,
+            Seszt<Event.Gig> gigs,
             String runner,
-            Seszt<User> fans,
-            Seszt<User> idols,
-            Liszt<Request> requests,
+            Seszt<Follow> follows,
+            Seszt<Request> requests,
             History history,
             Instant timestamp
     ) {
         super(
-                id,
+            id,
                 username,
                 firstName,
                 lastName,
                 description,
                 contactInfo,
-                albums,
-                ratings,
                 events,
-                gigs,
-                chatRooms,
                 subscription,
-                posts,
-                fans,
-                idols,
-                runner,
+                authorities,
+                chatRooms,
                 history,
                 timestamp
         );
+        _albums = albums;
         _bands = bands;
         _requests = requests;
+        _runner = runner;
+        _gigs = gigs;
+        _follows = follows;
+
     }
 
     /**
@@ -156,7 +137,7 @@ public class Artist extends Performer {
      * @param request An object of Request, that is wished to be added.
      * @return The whole Liszt of Requests.
      */
-    public Liszt<Request> add(Request request) {
+    public Seszt<Request> add(Request request) {
         return _requests.Add(request);
     }
 
@@ -165,7 +146,7 @@ public class Artist extends Performer {
      * @param request An object of Request, that is wished to be removed.
      * @return The whole Liszt of Requests.
      */
-    public Liszt<Request> remove(Request request) {
+    public Seszt<Request> remove(Request request) {
         return _requests.remove(new Request[]{request});
     }
 
@@ -193,17 +174,35 @@ public class Artist extends Performer {
      * Doesn't have any logic.
      */
     @Getter @Setter
-    public static class DTO extends PerformerDTO {
+    public static class DTO extends BusinessUserDTO {
 
         /**
          * The Bands that the Artist is a member of.
          */
-        private Band.DTO[] bands;
+        private Set<Band.DTO> bands;
 
         /**
          * The Requests requested for this Artist.
          */
-        private Request.DTO[] requests;
+        private Set<Request.DTO> requests;
+
+        /**
+         * Describes all the gigs, that the Performer is a part of an act.
+         */
+        protected Set<Event.Gig.DTO> gigs;
+
+        /**
+         * All the participants that are following this Performer, is included here.
+         */
+        protected Set<Follow.DTO> follows;
+
+        protected Set<Album.DTO> albums;
+
+        /**
+         * A description of the gear, that the Artist possesses and what they require for an Event.
+         */
+        @Setter
+        private String runner;
 
         /**
          * Converts into this DTO Object.
@@ -211,12 +210,12 @@ public class Artist extends Performer {
          */
         public DTO(Artist artist) {
             super(artist);
-            bands = new Band.DTO[artist.get_bands().size()];
-            for (int i = 0; i < bands.length; i++)
-                bands[i] = new Band.DTO(artist.get_bands().Get(i+1));
-            requests = new Request.DTO[artist.get_requests().size()];
-            for (int i = 0; i < requests.length; i++)
-                requests[i] = new Request.DTO(artist.get_requests().Get(i+1));
+            bands = artist.get_bands().stream().map(Band.DTO::new).collect(Collectors.toSet());
+            requests = artist.get_requests().stream().map(Request.DTO::new).collect(Collectors.toSet());
+            gigs = artist.get_gigs().stream().map(Event.Gig.DTO::new).collect(Collectors.toSet());
+            follows = artist.get_follows().stream().map(Follow.DTO::new).collect(Collectors.toSet());
+            albums = artist.get_albums().stream().map(Album.DTO::new).collect(Collectors.toSet());
+            runner = artist.get_runner();
         }
     }
 }

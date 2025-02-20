@@ -10,7 +10,6 @@ import laustrup.bandwichpersistence.core.models.chats.Request;
 import laustrup.bandwichpersistence.core.models.chats.messages.Post;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
 import laustrup.bandwichpersistence.core.models.users.Performer;
-import laustrup.bandwichpersistence.core.models.users.Venue;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;

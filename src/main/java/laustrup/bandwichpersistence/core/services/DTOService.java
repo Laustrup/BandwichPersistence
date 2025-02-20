@@ -6,7 +6,7 @@ import laustrup.bandwichpersistence.core.models.User;
 import laustrup.bandwichpersistence.core.models.users.Artist;
 import laustrup.bandwichpersistence.core.models.users.Band;
 import laustrup.bandwichpersistence.core.models.users.Participant;
-import laustrup.bandwichpersistence.core.models.users.Venue;
+import laustrup.bandwichpersistence.core.models.Venue;
 
 import static laustrup.bandwichpersistence.core.models.User.UserDTO;
 import static laustrup.bandwichpersistence.core.models.Model.ModelDTO;

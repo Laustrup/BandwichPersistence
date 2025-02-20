@@ -1,17 +1,16 @@
 package laustrup.bandwichpersistence.core.models.users;
 
 import laustrup.bandwichpersistence.core.models.*;
-import laustrup.bandwichpersistence.core.utilities.collections.lists.Liszt;
-import laustrup.bandwichpersistence.core.models.chats.ChatRoom;
-import laustrup.bandwichpersistence.core.models.chats.messages.Post;
-import laustrup.bandwichpersistence.core.services.DTOService;
 import laustrup.bandwichpersistence.core.utilities.collections.sets.Seszt;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Defines a User, that will attend an Event as an audience.
@@ -24,7 +23,12 @@ public class Participant extends User {
      * These are the Users that the Participant can follow,
      * indicating that new content will be shared with the Participant.
      */
-    private Seszt<User> _idols;
+    private Seszt<Follow> _follows;
+
+    /**
+     * Ratings made from other users on this user based on a value.
+     */
+    protected Seszt<Rating> _ratings;
 
     /**
      * Will translate a transport object of this object into a construct of this object.
@@ -32,30 +36,16 @@ public class Participant extends User {
      */
     public Participant(DTO participant) {
         super(participant);
-        _idols = new Seszt<>();
-        for (UserDTO idol : participant.getIdols())
-            _idols.add((User) DTOService.convert(idol));
+        _follows = new Seszt<>(
+                participant.getFollows().stream()
+                .map(Follow::new)
+        );
+        _ratings = new Seszt<>(
+                participant.getRatings().stream()
+                        .map(Rating::new)
+        );
     }
 
-    /**
-     * Constructor with all fields.
-     * @param id The primary unique id.
-     * @param username The name that this User identifies by.
-     * @param firstName The real first name of this User.
-     * @param lastName The real last name of this User.
-     * @param description A description to inform other Users of this User.
-     * @param contactInfo An Object that will describe ways to come in contact with this User.
-     * @param albums Any kinds of files that this User has stored.
-     * @param ratings Values given to this User.
-     * @param events Events that this User joins or hosts.
-     * @param chatRooms Rooms that Users can communicate in.
-     * @param subscription Defines the details of this User's subscription.
-     * @param posts Messages that can be written publicly on dashboard.
-     * @param idols These are the Users that the Participant can follow,
-     *              indicating that new content will be shared with the Participant.
-     * @param history The Events for this object.
-     * @param timestamp The time this User was created.
-     */
     public Participant(
             UUID id,
             String username,
@@ -63,13 +53,11 @@ public class Participant extends User {
             String lastName,
             String description,
             ContactInfo contactInfo,
-            Liszt<Album> albums,
-            Liszt<Rating> ratings,
+            Seszt<Rating> ratings,
             Seszt<Event> events,
-            Seszt<ChatRoom> chatRooms,
-            User.Subscription subscription,
-            Liszt<Post> posts,
-            Seszt<User> idols,
+            Subscription subscription,
+            Seszt<User.Authority> authorities,
+            Seszt<Follow> follows,
             History history,
             Instant timestamp
     ) {
@@ -80,16 +68,14 @@ public class Participant extends User {
                 lastName,
                 description,
                 contactInfo,
-                albums,
-                ratings,
                 events,
-                chatRooms,
                 subscription,
-                posts,
+                authorities,
                 history,
                 timestamp
         );
-        _idols = idols;
+        _ratings = ratings;
+        _follows = follows;
     }
 
     /**
@@ -97,8 +83,8 @@ public class Participant extends User {
      * @param following A User, that is wished to be added.
      * @return All the followings of the Participant.
      */
-    public Seszt<User> add(User following) {
-        return _idols.Add(following);
+    public Seszt<Follow> add(Follow following) {
+        return _follows.Add(following);
     }
 
     /**
@@ -106,8 +92,8 @@ public class Participant extends User {
      * @param following a User, that is wished to be removed.
      * @return All the followings of the Participant.
      */
-    public Seszt<User> remove(User following) {
-        return _idols.remove(new User[]{following});
+    public Seszt<Follow> remove(Follow following) {
+        return _follows.remove(new Follow[]{following});
     }
 
     @Override
@@ -140,7 +126,12 @@ public class Participant extends User {
          * These are the Users that the Participant can follow,
          * indicating that new content will be shared with the Participant.
          */
-        private UserDTO[] idols;
+        private Set<Follow.DTO> follows;
+
+        /**
+         * Ratings made from other users on this user based on a value.
+         */
+        protected Set<Rating.DTO> ratings;
 
         /**
          * Converts the object to the data transport object.
@@ -148,25 +139,12 @@ public class Participant extends User {
          */
         public DTO(Participant participant) {
             super(participant);
-            if (idols != null) {
-                idols = new UserDTO[participant.get_idols().size()];
-                for (int i = 0; i < idols.length; i++)
-                    idols[i] = DTOService.convert(participant.get_idols().Get(i+1));
-            }
-        }
-
-        /**
-         * Converts the object to the data transport object.
-         * @param user The object to be converted.
-         */
-        public DTO(User user) {
-            super(user);
-            if (user.getClass() == Participant.class) {
-                idols = new UserDTO[((Participant) user).get_idols().size()];
-                for (int i = 0; i < idols.length; i++)
-                    idols[i] = DTOService.convert(((Participant) user).get_idols().Get(i+1));
-            }
+            follows = Arrays.stream(participant.get_follows().get_data())
+                    .map(Follow.DTO::new)
+                    .collect(Collectors.toSet());
+            ratings = Arrays.stream(participant.get_ratings().get_data())
+                    .map(Rating.DTO::new)
+                    .collect(Collectors.toSet());
         }
     }
-
 }
