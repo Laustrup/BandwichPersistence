@@ -15,7 +15,7 @@ import java.util.UUID;
  * It will use the DateTime of now.
  */
 @FieldNameConstants
-@ToString(of = {"_primaryId", "_title", "_timestamp"})
+@ToString(of = {"_id", "_title", "_timestamp"})
 public abstract class Model {
 
     /**
@@ -24,7 +24,7 @@ public abstract class Model {
      * UUIDs are unique hex decimal values of the specific entity.
      */
     @Getter
-    protected UUID _primaryId;
+    protected UUID _id;
 
     /**
      * The name for an entity or model.
@@ -79,7 +79,7 @@ public abstract class Model {
      * @param model The data transport model to be converted.
      */
     public Model(ModelDTO model) {
-        _primaryId = model.getPrimaryId();
+        _id = model.getPrimaryId();
         _title = model.getClass().getSimpleName() + " \"" + model.getPrimaryId() + "\"";
         _situation = model.getSituation();
         _history = model.getHistory();
@@ -118,7 +118,7 @@ public abstract class Model {
      * @param timestamp Specifies the time this entity was created.
      */
     public Model(UUID id, String title, History history, Instant timestamp) {
-        _primaryId = id;
+        _id = id;
         _title = title;
         _history = history;
         _timestamp = timestamp;
@@ -129,7 +129,7 @@ public abstract class Model {
      * @param title A title describing this entity internally.
      */
     public Model(UUID id, String title) {
-        _primaryId = id;
+        _id = id;
         _title = title;
         _timestamp = Instant.now();
     }
@@ -170,7 +170,7 @@ public abstract class Model {
         } catch (Exception e) {
             String message = title + " had an error when trying to define its ToString.";
             Printer.print(message, e);
-            content = new StringBuilder(get_primaryId() != null ? String.valueOf(get_primaryId()) : message);
+            content = new StringBuilder(get_id() != null ? String.valueOf(get_id()) : message);
         }
 
         return title + "(\n \t" + content + "\n)";
@@ -224,8 +224,8 @@ public abstract class Model {
         protected Situation situation;
 
         public ModelDTO(Model model) {
-            primaryId = model.get_primaryId();
-            title = model.get_name();
+            primaryId = model.get_id();
+            title = model.get_title();
             history = model.get_history();
             timestamp = model.get_timestamp();
             situation = model.get_situation();

@@ -3,7 +3,6 @@ package laustrup.bandwichpersistence.core.models;
 import laustrup.bandwichpersistence.core.utilities.collections.lists.Liszt;
 import laustrup.bandwichpersistence.core.utilities.collections.sets.Seszt;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 
 import java.time.Instant;
@@ -192,12 +191,12 @@ public class Album extends Model {
         return defineToString(
             getClass().getSimpleName(),
             new String[]{
-                Model.Fields._primaryId,
+                Model.Fields._id,
                 Model.Fields._title,
                 Model.Fields._timestamp
             },
             new String[]{
-                String.valueOf(_primaryId),
+                String.valueOf(_id),
                 _title,
                 String.valueOf(_timestamp)
         });

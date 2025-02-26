@@ -101,12 +101,12 @@ public class Participant extends User {
         return defineToString(
             getClass().getSimpleName(),
             new String[] {
-                Model.Fields._primaryId,
+                Model.Fields._id,
                 User.Fields._description,
                 Model.Fields._timestamp
             },
             new String[] {
-                String.valueOf(get_primaryId()),
+                String.valueOf(get_id()),
                 get_username(),
                 get_description(),
                 String.valueOf(get_timestamp())

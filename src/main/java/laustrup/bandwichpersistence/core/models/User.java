@@ -2,6 +2,7 @@ package laustrup.bandwichpersistence.core.models;
 
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
 import laustrup.bandwichpersistence.core.models.chats.ChatRoom;
+import laustrup.bandwichpersistence.core.models.users.Participant;
 import laustrup.bandwichpersistence.core.utilities.collections.sets.Seszt;
 import lombok.Getter;
 import lombok.Setter;
@@ -53,9 +54,9 @@ public abstract class User extends Model {
     protected ContactInfo _contactInfo;
 
     /**
-     * The Events that this user is included in.
+     * The participation of the Events that this user is included in.
      */
-    protected Seszt<Event> _events;
+    protected Seszt<Participation> _participations;
 
     /**
      * This subscription defines details of subscription,
@@ -84,9 +85,9 @@ public abstract class User extends Model {
         _contactInfo = new ContactInfo(user.getContactInfo());
         _description = user.getDescription();
 
-        _events = new Seszt<>();
-        for (Event.DTO event : user.getEvents())
-            _events.add(new Event(event));
+        _participations = new Seszt<>();
+        for (Parti.DTO event : user.getEvents())
+            _participations.add(new Participation(event));
 
         _subscription = new Subscription(user.getSubscription());
         _authorities = new Seszt<>(user.getAuthorities().stream());
@@ -99,7 +100,7 @@ public abstract class User extends Model {
             String lastName,
             String description,
             ContactInfo contactInfo,
-            Seszt<Event> events,
+            Seszt<Participation> participations,
             Subscription subscription,
             Seszt<Authority> authorities,
             History history,
@@ -116,7 +117,7 @@ public abstract class User extends Model {
         _lastName = lastName;
         _contactInfo = contactInfo;
         _description = description;
-        _events = events;
+        _participations = participations;
         _subscription = subscription;
         _authorities = authorities;
     }
@@ -141,7 +142,7 @@ public abstract class User extends Model {
         _lastName = lastName;
         _description = description;
 
-        _events = new Seszt<>();
+        _participations = new Seszt<>();
 
         _subscription = subscription;
 
@@ -162,7 +163,7 @@ public abstract class User extends Model {
         _username = username;
         _description = description;
 
-        _events = new Seszt<>();
+        _participations = new Seszt<>();
 
         _subscription = subscription;
 
@@ -187,34 +188,50 @@ public abstract class User extends Model {
         return _subscription;
     }
 
-    /**
-     * Will add an Event to this User.
-     * @param event An Event object, that is wished to be added to this User.
-     * @return All the Events of this User.
-     */
-    public Seszt<Event> add(Event event) {
-        return _events.Add(event);
+    public Seszt<Participation> add(Participation participation) {
+        return _participations.Add(participation);
     }
 
-    /**
-     * Removes an Event of this User.
-     * @param event An Event object, that is wished to be added to this User.
-     * @return All the Events of this User.
-     */
-    public Seszt<Event> remove(Event event) {
-        for (int i = 1; i <= _events.size(); i++) {
-            if (_events.Get(i).get_primaryId() == event.get_primaryId()) {
-                _events.remove(_events.Get(i));
+    public Seszt<Participation> remove(Participation participation) {
+        for (int i = 1; i <= _participations.size(); i++) {
+            if (_participations.Get(i).get_id() == participation.get_id()) {
+                _participations.remove(_participations.Get(i));
                 break;
             }
         }
 
-        return _events;
+        return _participations;
     }
 
     public enum Authority {
         STANDARD,
         ADMIN
+    }
+
+    @Getter
+    public static class Participation extends laustrup.bandwichpersistence.core.models.Participation {
+
+        private Event _event;
+
+        public Participation(UUID primaryId, UUID secondaryId, String title, Type type, Event event) {
+            super(primaryId, secondaryId, title, type);
+            _event = event;
+        }
+
+        public Participation(UUID primaryId, UUID secondaryId, String title, Type type, Event event, History history, Instant timestamp) {
+            super(primaryId, secondaryId, title, type, history, timestamp);
+            _event = event;
+        }
+
+        public static class DTO extends laustrup.bandwichpersistence.core.models.Participation.DTO {
+
+            private Event.DTO event;
+
+            public DTO(Participation participation) {
+                super(participation);
+                event = new Event.DTO(participation.get_event());
+            }
+        }
     }
 
     /**
@@ -289,7 +306,7 @@ public abstract class User extends Model {
             description = user.get_description();
             contactInfo = new ContactInfo.DTO(user.get_contactInfo());
 
-            events = Arrays.stream(user.get_events().get_data())
+            events = Arrays.stream(user.get_participations().get_data())
                     .map(Event.DTO::new)
                     .collect(Collectors.toSet());
 

@@ -12,7 +12,6 @@ import laustrup.bandwichpersistence.core.utilities.collections.sets.Seszt;
 import lombok.Getter;
 import lombok.experimental.FieldNameConstants;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static laustrup.bandwichpersistence.core.models.User.UserDTO;
@@ -200,7 +199,7 @@ public class ChatRoom extends Model {
         for (User user : _chatters)
             if (
                 user.getClass() == chatter.getClass()
-                && user.get_primaryId() == chatter.get_primaryId()
+                && user.get_id() == chatter.get_id()
             )
                 return true;
 
@@ -214,7 +213,7 @@ public class ChatRoom extends Model {
      */
     public Liszt<Mail> remove(Mail mail) {
         for (int i = 1; i <= _mails.size(); i++) {
-            if (_mails.Get(i).get_primaryId() == mail.get_primaryId()) {
+            if (_mails.Get(i).get_id() == mail.get_id()) {
                 _mails.remove(_mails.Get(i));
                 break;
             }
@@ -230,7 +229,7 @@ public class ChatRoom extends Model {
      */
     public Seszt<User> remove(User chatter) {
         for (int i = 1; i <= _chatters.size(); i++) {
-            if (_chatters.Get(i).get_primaryId() == chatter.get_primaryId()) {
+            if (_chatters.Get(i).get_id() == chatter.get_id()) {
                 _chatters.remove(_chatters.Get(i));
                 break;
             }
@@ -246,7 +245,7 @@ public class ChatRoom extends Model {
      */
     public boolean edit(Mail mail) {
         for (int i = 1; i <= _mails.size(); i++)
-            if (_mails.Get(i).get_primaryId() == mail.get_primaryId())
+            if (_mails.Get(i).get_id() == mail.get_id())
                 return mail == _mails.set(i, mail);
 
         return false;
@@ -257,12 +256,12 @@ public class ChatRoom extends Model {
         return defineToString(
             getClass().getSimpleName(),
             new String[]{
-                Model.Fields._primaryId,
+                Model.Fields._id,
                 Model.Fields._title,
                 Model.Fields._timestamp
             },
             new String[]{
-                String.valueOf(_primaryId),
+                String.valueOf(_id),
                 _title,
                 String.valueOf(_timestamp)
             }

@@ -1,7 +1,7 @@
 package laustrup.bandwichpersistence.core.models.chats.messages;
 
 import laustrup.bandwichpersistence.core.models.History;
-import laustrup.bandwichpersistence.core.models.JoinedModel;
+import laustrup.bandwichpersistence.core.models.JointModel;
 import laustrup.bandwichpersistence.core.models.User;
 import laustrup.bandwichpersistence.core.services.DTOService;
 import lombok.Getter;
@@ -18,7 +18,7 @@ import static laustrup.bandwichpersistence.core.models.User.UserDTO;
  * An abstract class that contains common attributes for Messages.
  */
 @Getter @FieldNameConstants
-public abstract class Message extends JoinedModel {
+public abstract class Message extends JointModel {
 
     /**
      * The User that wrote the Message.

@@ -96,8 +96,8 @@ public class Request extends Model {
             Instant timestamp
     ) {
         super(
-            user != null ? user.get_primaryId() : null,
-            event != null ? event.get_primaryId() : null,
+            user != null ? user.get_id() : null,
+            event != null ? event.get_id() : null,
             user != null && event != null
                 ? "Request of " + user.get_username() + " to " + event.get_name() : "Empty Request",
             history,
@@ -120,8 +120,8 @@ public class Request extends Model {
      */
     public Request(User user, Event event) {
         super(
-                user.get_primaryId(),
-                event.get_primaryId(),
+                user.get_id(),
+                event.get_id(),
                 "Request of " + user.get_username() + " to " + event.get_name()
         );
         _message = """
@@ -136,13 +136,13 @@ public class Request extends Model {
         return defineToString(
             getClass().getSimpleName(),
             new String[]{
-                Model.Fields._primaryId,
+                Model.Fields._id,
                 Model.Fields._secondaryId,
                 Fields._approved,
                 Model.Fields._timestamp
             },
             new String[]{
-                String.valueOf(_primaryId),
+                String.valueOf(_id),
                 String.valueOf(_secondaryId),
                 _approved != null ? _approved.toString() : null,
                 String.valueOf(_timestamp)

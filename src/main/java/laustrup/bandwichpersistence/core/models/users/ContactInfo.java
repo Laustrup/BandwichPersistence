@@ -8,7 +8,6 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.FieldNameConstants;
 
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.UUID;
@@ -64,7 +63,7 @@ public class ContactInfo extends Model {
      * @param country A Country object for the information of which Country the User is living in.
      */
     public ContactInfo(UUID id, String email, Seszt<Phone> phones, Address address, Country country) {
-        _primaryId = id;
+        _id = id;
         _title = "Contact-info: " + id;
         _email = email;
         _phones = phones;
@@ -82,7 +81,7 @@ public class ContactInfo extends Model {
      * @param timestamp The date and time this ContactInfo was created.
      */
     public ContactInfo(UUID id, String email, Seszt<Phone> phones, Address address, Country country, Instant timestamp) {
-        _primaryId = id;
+        _id = id;
         _title = "Contact-info: " + id;
         _email = email;
         _phones = phones;
@@ -104,14 +103,14 @@ public class ContactInfo extends Model {
         return defineToString(
             getClass().getSimpleName(),
             new String[] {
-                Model.Fields._primaryId,
+                Model.Fields._id,
                 Fields._email,
                 Fields._address,
                 Fields._phones,
                 Fields._country
             },
             new String[] {
-                String.valueOf(get_primaryId()),
+                String.valueOf(get_id()),
                 get_email(),
                 get_address().toString(),
                 get_phones().toString(),

@@ -85,7 +85,7 @@ public class Ticket extends TicketBase {
         return defineToString(
                 getClass().getSimpleName(),
                 new String[]{
-                        Model.Fields._primaryId,
+                        Model.Fields._id,
                         Model.Fields._secondaryId,
                         Model.Fields._title,
                         TicketBase.Fields._price,
@@ -94,7 +94,7 @@ public class Ticket extends TicketBase {
                         Model.Fields._timestamp
                 },
                 new String[]{
-                        String.valueOf(_primaryId),
+                        String.valueOf(_id),
                         String.valueOf(_secondaryId),
                         get_name(),
                         String.valueOf(get_price()),
@@ -247,14 +247,14 @@ public class Ticket extends TicketBase {
             return defineToString(
                     getClass().getSimpleName(),
                     new String[]{
-                            Model.Fields._primaryId,
+                            Model.Fields._id,
                             Model.Fields._title,
                             TicketBase.Fields._price,
                             TicketBase.Fields._seat,
                             Model.Fields._timestamp
                     },
                     new String[]{
-                            String.valueOf(_primaryId),
+                            String.valueOf(_id),
                             get_name(),
                             String.valueOf(get_price()),
                             get_seat(),

@@ -476,7 +476,7 @@ public class Event extends Model {
                 for (Gig gig : _gigs)
                     for (Performer performer : gig.get_act())
                         if (
-                            stranger.get_primaryId() != performer.get_primaryId()
+                            stranger.get_id() != performer.get_id()
                             && !gigs[i].get_start().isEqual(gig.get_start())
                             && !gigs[i].get_end().isEqual(gig.get_end())
                         )
@@ -532,7 +532,7 @@ public class Event extends Model {
     private boolean isPerformerInOtherGigs(Performer performer) {
         for (Gig gig : _gigs)
             for (Performer gigPerformer : gig.get_act())
-                if (gigPerformer.get_primaryId() == performer.get_primaryId())
+                if (gigPerformer.get_id() == performer.get_id())
                     return true;
 
         return false;
@@ -545,7 +545,7 @@ public class Event extends Model {
      */
     private Liszt<Request> removeRequests(Performer performer) {
         for (int i = 1; i <= _requests.size(); i++) {
-            if (_requests.Get(i).get_user().get_primaryId() == performer.get_primaryId()) {
+            if (_requests.Get(i).get_user().get_id() == performer.get_id()) {
                 _requests.Remove(i);
                 break;
             }
@@ -596,7 +596,7 @@ public class Event extends Model {
             for (User user : gigs[i].get_act()) {
                 boolean requestAlreadyExist = false;
                 for (Request request : _requests) {
-                    if (request.get_user().get_primaryId() == user.get_primaryId()) {
+                    if (request.get_user().get_id() == user.get_id()) {
                         requestAlreadyExist = true;
                         break;
                     }
@@ -620,7 +620,7 @@ public class Event extends Model {
             return null;
 
         for (Request local : _requests) {
-            if (local.get_primaryId().equals(request.get_primaryId())) {
+            if (local.get_id().equals(request.get_id())) {
                 local.set_approved(LocalDateTime.now());
                 return _requests;
             }
@@ -651,7 +651,7 @@ public class Event extends Model {
     public Venue set_venue(Venue venue) {
         for (Request request : _requests) {
             if (request.get_user().getClass() == Venue.class
-                    && request.get_user().get_primaryId() == _venue.get_primaryId()) {
+                    && request.get_user().get_id() == _venue.get_id()) {
                 _requests.remove(request);
                 break;
             }
@@ -670,7 +670,7 @@ public class Event extends Model {
      * @return The isCancelled Plato value.
      */
     public LocalDateTime changeCancelledStatus(Venue venue) {
-        if (venue.get_primaryId() == _venue.get_primaryId())
+        if (venue.get_id() == _venue.get_id())
             _cancelled = _cancelled == null
                     ? null
                     : LocalDateTime.now();
@@ -732,7 +732,7 @@ public class Event extends Model {
      */
     public Participation set(Participation participation) {
         for (int i = 1; i <= _participations.size(); i++) {
-            if (_participations.Get(i).get_participant().get_primaryId() == participation.get_participant().get_primaryId()) {
+            if (_participations.Get(i).get_participant().get_id() == participation.get_participant().get_id()) {
                 _participations.Get(i).set_type(participation.get_type());
                 return _participations.Get(i);
             }
@@ -750,7 +750,7 @@ public class Event extends Model {
         for (int i = 1; i <= _posts.size(); i++) {
             Post localPost = _posts.Get(i);
 
-            if (localPost.get_primaryId() == post.get_primaryId()) {
+            if (localPost.get_id() == post.get_id()) {
                 _posts.Set(i, post);
                 return _posts.Get(i);
             }
@@ -769,7 +769,7 @@ public class Event extends Model {
             Request localRequest = _requests.Get(i);
 
             if (
-                localRequest.get_primaryId() == request.get_primaryId()
+                localRequest.get_id() == request.get_id()
                 && Objects.equals(localRequest.get_secondaryId(), request.get_secondaryId())
             ) {
                return _requests.Set(i, request).Get(i);
@@ -788,7 +788,7 @@ public class Event extends Model {
         for (int i = 1; i <= _albums.size(); i++) {
             Album localAlbum = _albums.Get(i);
 
-            if (localAlbum.get_primaryId() == album.get_primaryId()) {;
+            if (localAlbum.get_id() == album.get_id()) {;
                 return _albums.Set(i, album).Get(i);
             }
         }
@@ -807,7 +807,7 @@ public class Event extends Model {
 
             for (int j = 0; j < _gigs.get(i).get_act().size(); j++)
                 for (Performer performer : gig.get_act())
-                    if (_gigs.get(i).get_act().get(j).get_primaryId() == performer.get_primaryId())
+                    if (_gigs.get(i).get_act().get(j).get_id() == performer.get_id())
                         sharedActs++;
 
             if (sharedActs == _gigs.get(i).get_act().size()) {
@@ -852,13 +852,13 @@ public class Event extends Model {
         return defineToString(
             getClass().getSimpleName(),
             new String[]{
-                Model.Fields._primaryId,
+                Model.Fields._id,
                 Model.Fields._title,
                 Fields._description,
                 Model.Fields._timestamp
             },
             new String[]{
-                String.valueOf(_primaryId),
+                String.valueOf(_id),
                 _title,
                 _description,
                 String.valueOf(_timestamp)
@@ -1133,7 +1133,7 @@ public class Event extends Model {
          */
         public boolean contains(Performer performer) {
             for (Performer actor : _act)
-                if (actor.get_primaryId() == performer.get_primaryId())
+                if (actor.get_id() == performer.get_id())
                     return true;
 
             return false;
@@ -1163,12 +1163,12 @@ public class Event extends Model {
             return defineToString(
                     getClass().getSimpleName(),
                     new String[] {
-                            Model.Fields._primaryId,
+                            Model.Fields._id,
                             Fields._start,
                             Fields._end
                     },
                     new String[] {
-                            String.valueOf(get_primaryId()),
+                            String.valueOf(get_id()),
                             String.valueOf(get_start()),
                             String.valueOf(get_end())
                     }
@@ -1215,18 +1215,12 @@ public class Event extends Model {
      * Determines type of which a Participant is participating in an Event.
      */
     @Getter @FieldNameConstants
-    public static class Participation extends Model {
+    public static class Participation extends laustrup.bandwichpersistence.core.models.Participation {
 
         /**
          * The Participant of the participation.
          */
         private Participant _participant;
-
-        /**
-         * The type of which participant is participating in the participation.
-         */
-        @Setter
-        private Type _type;
 
         /**
          * Will translate a transport object of this object into a construct of this object.
@@ -1246,11 +1240,11 @@ public class Event extends Model {
         public Participation(UUID id, Participant participant, Type type, History history, Instant timestamp) {
             super(
                     id,
-                    participant.get_primaryId(),
+                    participant.get_id(),
                     """
                     Participation of participant @participantId and Event @eventId
                     """
-                            .replace("@participantId", participant.get_primaryId().toString())
+                            .replace("@participantId", participant.get_id().toString())
                             .replace("@eventId", id.toString()),
                     history,
                     timestamp
@@ -1268,10 +1262,10 @@ public class Event extends Model {
         public Participation(Participant participant, Type type) {
             super(
                     null,
-                    participant.get_primaryId(),
+                    participant.get_id(),
                     """
                     Participation of participant @participantId and Event @eventId
-                    """.replace("@participantId", participant.get_primaryId().toString())
+                    """.replace("@participantId", participant.get_id().toString())
             );
             _participant = participant;
             _type = type;
@@ -1283,22 +1277,19 @@ public class Event extends Model {
             return defineToString(
                     getClass().getSimpleName(),
                     new String[] {
-                            Model.Fields._primaryId,
+                            Model.Fields._id,
                             Model.Fields._secondaryId,
                             Model.Fields._title,
                             Fields._type
                     },
                     new String[] {
-                            String.valueOf(get_primaryId()),
+                            String.valueOf(get_id()),
                             String.valueOf(get_secondaryId()),
                             get_name(),
                             get_type().name()
                     }
             );
         }
-
-        /** Each Participation have four different choices of participating. */
-        public enum Type { ACCEPTED, IN_DOUBT, CANCELED, INVITED }
 
         /**
          * The Data Transfer Object.

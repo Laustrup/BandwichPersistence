@@ -6,7 +6,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-public abstract class JoinedModel extends Model {
+public abstract class JointModel extends Model {
 
     /**
      * Another identification value in the database for a specific entity.
@@ -16,7 +16,7 @@ public abstract class JoinedModel extends Model {
      */
     protected UUID _secondaryId;
 
-    public JoinedModel(JoinedModelDTO model) {
+    public JointModel(JoinedModelDTO model) {
         super(model);
         _secondaryId = model.getSecondaryId();
     }
@@ -27,8 +27,8 @@ public abstract class JoinedModel extends Model {
      * @param secondaryId Another hex decimal value identifying another item uniquely.
      * @param title A title describing this entity internally.
      */
-    public JoinedModel(UUID primaryId, UUID secondaryId, String title) {
-        _primaryId = primaryId;
+    public JointModel(UUID primaryId, UUID secondaryId, String title) {
+        _id = primaryId;
         _secondaryId = secondaryId;
         _title = title;
         _timestamp = Instant.now();
@@ -41,14 +41,14 @@ public abstract class JoinedModel extends Model {
      * @param title A title describing this entity internally.
      * @param timestamp Specifies the time this entity was created.
      */
-    public JoinedModel(
+    public JointModel(
             UUID primaryId,
             UUID secondaryId,
             String title,
             History history,
             Instant timestamp
     ) {
-        _primaryId = primaryId;
+        _id = primaryId;
         _secondaryId = secondaryId;
         _title = title;
         _history = history;
@@ -67,7 +67,7 @@ public abstract class JoinedModel extends Model {
         protected UUID secondaryId;
 
 
-        public JoinedModelDTO(JoinedModel model) {
+        public JoinedModelDTO(JointModel model) {
             super(model);
             secondaryId = model.get_secondaryId();
         }

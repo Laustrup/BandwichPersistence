@@ -79,7 +79,7 @@ public class Post extends Message {
         return defineToString(
             getClass().getSimpleName(),
             new String[]{
-                Model.Fields._primaryId,
+                Model.Fields._id,
                 Message.Fields._content,
                 Message.Fields._sent,
                 Message.Fields._edited,
@@ -87,7 +87,7 @@ public class Post extends Message {
                 Model.Fields._timestamp
             },
             new String[]{
-                String.valueOf(_primaryId),
+                String.valueOf(_id),
                 _content,
                 String.valueOf(_sent),
                 String.valueOf(_edited),

@@ -79,7 +79,7 @@ public class Mail extends Message {
         return defineToString(
             getClass().getSimpleName(),
             new String[] {
-                Model.Fields._primaryId,
+                Model.Fields._id,
                 Message.Fields._author,
                 Fields._chatRoom,
                 Message.Fields._content,
@@ -88,7 +88,7 @@ public class Mail extends Message {
                 Message.Fields._public,
                 Model.Fields._timestamp
             }, new String[] {
-                String.valueOf(_primaryId),
+                String.valueOf(_id),
                 _author != null ? _author.toString() : null,
                 _chatRoom != null ? _chatRoom.toString() : null,
                 _content,

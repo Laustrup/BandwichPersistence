@@ -15,11 +15,11 @@ import java.util.UUID;
  */
 @Getter
 @FieldNameConstants
-public class Rating extends JoinedModel {
+public class Rating extends JointModel {
 
     /**
      * The value of the rating that is appointed.
-     * Must be between 0 and 5.
+     * Must be between 1 and 5.
      */
     private int _value;
 
@@ -76,7 +76,7 @@ public class Rating extends JoinedModel {
      * Sets the value of this Rating.
      * @param value The specific value, that is wished to be set as the value of the Rating.
      * @return The new value of the current Rating.
-     * @throws InputMismatchException Will be thrown if the value is not between 0 and 5.
+     * @throws InputMismatchException Will be thrown if the value is not between 1 and 5.
      */
     public int set_value(int value) throws InputMismatchException {
         if (0 < value && value <= 5 )

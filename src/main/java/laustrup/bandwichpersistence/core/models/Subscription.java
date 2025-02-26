@@ -44,7 +44,7 @@ public class Subscription extends Model {
             Kind kind,
             Instant timestamp
     ) {
-        _primaryId = id;
+        _id = id;
         _title = "Subscription: " + id;
         _status = status;
         _kind = kind;
@@ -68,12 +68,12 @@ public class Subscription extends Model {
         return defineToString(
                 getClass().getSimpleName(),
                 new String[] {
-                        Model.Fields._primaryId,
+                        Model.Fields._id,
                         Fields._status,
                         Model.Fields._timestamp
                 },
                 new String[] {
-                        String.valueOf(get_primaryId()),
+                        String.valueOf(get_id()),
                         get_status() != null ? get_status().name() : null,
                         String.valueOf(get_timestamp())
                 }

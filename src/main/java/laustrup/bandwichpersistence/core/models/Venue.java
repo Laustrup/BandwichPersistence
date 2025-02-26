@@ -95,13 +95,13 @@ public class Venue extends Model {
         return defineToString(
             getClass().getSimpleName(),
                 new String[] {
-                    Model.Fields._primaryId,
+                    Model.Fields._id,
                     Fields._location,
                     Fields._stageSetup,
                     Model.Fields._timestamp
                 },
                 new String[] {
-                    String.valueOf(get_primaryId()),
+                    String.valueOf(get_id()),
                     get_location().toString(),
                     get_stageSetup(),
                     String.valueOf(get_timestamp())
