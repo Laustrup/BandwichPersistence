@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.InputMismatchException;
 import java.util.UUID;
 
@@ -15,7 +15,7 @@ import java.util.UUID;
  */
 @Getter
 @FieldNameConstants
-public class Rating extends Model {
+public class Rating extends JoinedModel {
 
     /**
      * The value of the rating that is appointed.
@@ -69,7 +69,7 @@ public class Rating extends Model {
      * @param comment A comment that is attached to the Rating.
      */
     public Rating(int value, UUID appointedId, UUID judgeId, String comment) {
-        this(value, appointedId, judgeId, comment, null,  LocalDateTime.now());
+        this(value, appointedId, judgeId, comment, null,  Instant.now());
     }
 
     /**
@@ -108,7 +108,7 @@ public class Rating extends Model {
      * Doesn't have any logic.
      */
     @Getter @Setter
-    public static class DTO extends ModelDTO {
+    public static class DTO extends JoinedModelDTO {
 
         /**
          * The value of the rating that is appointed.

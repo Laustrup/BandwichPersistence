@@ -1,13 +1,14 @@
 package laustrup.bandwichpersistence.core.models.chats.messages;
 
 import laustrup.bandwichpersistence.core.models.History;
-import laustrup.bandwichpersistence.core.models.Model;
+import laustrup.bandwichpersistence.core.models.JoinedModel;
 import laustrup.bandwichpersistence.core.models.User;
 import laustrup.bandwichpersistence.core.services.DTOService;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -17,7 +18,7 @@ import static laustrup.bandwichpersistence.core.models.User.UserDTO;
  * An abstract class that contains common attributes for Messages.
  */
 @Getter @FieldNameConstants
-public abstract class Message extends Model {
+public abstract class Message extends JoinedModel {
 
     /**
      * The User that wrote the Message.
@@ -143,7 +144,7 @@ public abstract class Message extends Model {
      * An abstract class that contains common attributes for Messages.
      */
     @Getter
-    protected abstract static class DTO extends ModelDTO {
+    protected abstract static class DTO extends JoinedModelDTO {
 
         /**
          * The User that wrote the Message.
