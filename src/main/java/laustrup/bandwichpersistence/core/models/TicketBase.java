@@ -36,7 +36,7 @@ public abstract class TicketBase extends Model {
      */
     public TicketBase(TicketBase.DTO ticket) {
         this(
-                ticket.getPrimaryId(),
+                ticket.getId(),
                 ticket.getName(),
                 ticket.getSeat(),
                 ticket.getPrice(),

@@ -154,7 +154,7 @@ public class Ticket extends TicketBase {
          */
         public Option(DTO ticketOption) {
             this(
-                    ticketOption.getPrimaryId(),
+                    ticketOption.getId(),
                     ticketOption.getEventIds(),
                     ticketOption.getVenueId(),
                     ticketOption.getName(),

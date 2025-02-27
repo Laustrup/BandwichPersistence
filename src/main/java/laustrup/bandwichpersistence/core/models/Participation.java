@@ -4,30 +4,35 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.Instant;
-import java.util.UUID;
 
 @Getter
-public abstract class Participation extends JointModel {
+public abstract class Participation {
 
     /**
      * The type of which participant is participating in the participation.
      */
     @Setter
-    private Type _type;
+    protected Type _type;
+
+    protected Instant _timestamp;
 
     public Participation(DTO participation) {
-        super(participation);
-        _type = participation.getType();
+        this(
+                participation.getType(),
+                participation.getTimestamp()
+        );
     }
 
-    public Participation(UUID primaryId, UUID secondaryId, String title, Type type) {
-        super(primaryId, secondaryId, title);
-        _type = type;
+    public Participation(Type type) {
+        this(
+                type,
+                Instant.now()
+        );
     }
 
-    public Participation(UUID primaryId, UUID secondaryId, String title, Type type, History history, Instant timestamp) {
-        super(primaryId, secondaryId, title, history, timestamp);
+    public Participation(Type type, Instant timestamp) {
         _type = type;
+        _timestamp = timestamp;
     }
 
     /** Each Participation have four different choices of participating. */
@@ -42,13 +47,15 @@ public abstract class Participation extends JointModel {
     }
 
     @Getter
-    public static class DTO extends JoinedModelDTO {
+    public static class DTO {
 
-        private Type type;
+        protected Type type;
+
+        protected Instant timestamp;
 
         public DTO(Participation participation) {
-            super(participation);
             type = participation.get_type();
+            timestamp = participation.get_timestamp();
         }
     }
 }

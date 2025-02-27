@@ -1,5 +1,6 @@
 package laustrup.bandwichpersistence.core.models;
 
+import laustrup.bandwichpersistence.core.utilities.collections.Collection;
 import laustrup.bandwichpersistence.core.utilities.console.Printer;
 import lombok.Getter;
 import lombok.Setter;
@@ -79,8 +80,8 @@ public abstract class Model {
      * @param model The data transport model to be converted.
      */
     public Model(ModelDTO model) {
-        _id = model.getPrimaryId();
-        _title = model.getClass().getSimpleName() + " \"" + model.getPrimaryId() + "\"";
+        _id = model.getId();
+        _title = model.getClass().getSimpleName() + " \"" + model.getId() + "\"";
         _situation = model.getSituation();
         _history = model.getHistory();
         _timestamp = model.getTimestamp();
@@ -132,6 +133,10 @@ public abstract class Model {
         _id = id;
         _title = title;
         _timestamp = Instant.now();
+    }
+
+    protected String defineToString(String title, Collection<ToStringArgument> arguments) {
+        return defineToString(title, ToStringArgument.convert(arguments));
     }
 
     /**
@@ -189,15 +194,7 @@ public abstract class Model {
          * Must be unique, if there ain't other ids for this entity.
          * UUIDs are unique hex decimal values of the specific entity.
          */
-        protected UUID primaryId;
-
-        /**
-         * Another identification value in the database for a specific entity.
-         * Must be unique with primary id.
-         * Is used for incidents, where there are an connection between two entities,
-         * and they are both being used as primary keys
-         */
-        protected UUID secondaryId;
+        protected UUID id;
 
         /**
          * The name for an entity or model.
@@ -224,7 +221,7 @@ public abstract class Model {
         protected Situation situation;
 
         public ModelDTO(Model model) {
-            primaryId = model.get_id();
+            id = model.get_id();
             title = model.get_title();
             history = model.get_history();
             timestamp = model.get_timestamp();

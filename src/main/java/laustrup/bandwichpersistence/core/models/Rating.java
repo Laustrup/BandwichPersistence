@@ -15,7 +15,9 @@ import java.util.UUID;
  */
 @Getter
 @FieldNameConstants
-public class Rating extends JointModel {
+public class Rating {
+
+    private UUID _appointedId, _reviewerId;
 
     /**
      * The value of the rating that is appointed.
@@ -29,35 +31,42 @@ public class Rating extends JointModel {
     @Setter
     private String _comment;
 
+    private Instant _timestamp;
+
     /**
      * Will translate a transport object of this object into a construct of this object.
      * @param rating The transport object to be transformed.
      */
     public Rating(DTO rating) throws InputMismatchException {
-        super(rating);
-        _value = set_value(rating.getValue());
+        this(
+                rating.getValue(),
+                rating.getAppointedId(),
+                rating.getReviewerId(),
+                rating.getComment(),
+                rating.getTimestamp()
+        );
     }
 
     /**
      * Constructor with all values.
      * @param value The value of the Rating given.
      * @param appointedId The one receiving the Rating.
-     * @param judgeId The one giving the Rating.
+     * @param reviewerId The one giving the Rating.
      * @param comment A comment that is attached to the Rating.
-     * @param history The Events for this object.
      * @param timestamp Specifies the time the Rating was created.
      */
     public Rating(
             int value,
             UUID appointedId,
-            UUID judgeId,
+            UUID reviewerId,
             String comment,
-            History history,
             Instant timestamp
     ) {
-        super(appointedId, judgeId, appointedId + "-" + judgeId, history, timestamp);
-        _comment = comment;
         _value = set_value(value);
+        _appointedId = appointedId;
+        _reviewerId = reviewerId;
+        _comment = comment;
+        _timestamp = timestamp;
     }
 
     /**
@@ -69,7 +78,7 @@ public class Rating extends JointModel {
      * @param comment A comment that is attached to the Rating.
      */
     public Rating(int value, UUID appointedId, UUID judgeId, String comment) {
-        this(value, appointedId, judgeId, comment, null,  Instant.now());
+        this(value, appointedId, judgeId, comment, Instant.now());
     }
 
     /**
@@ -89,16 +98,14 @@ public class Rating extends JointModel {
 
     @Override
     public String toString() {
-        return defineToString(
-            getClass().getSimpleName(),
-            new String[] {
-                Fields._value,
-                Model.Fields._timestamp
-            },
-            new String[] {
-                String.valueOf(get_value()),
-                String.valueOf(get_timestamp())
-            }
+        return String.format("""
+                %s(%s=%s,%s=%s)
+                """,
+                getClass().getSimpleName(),
+                Fields._appointedId,
+                get_appointedId(),
+                Fields._reviewerId,
+                get_reviewerId()
         );
     }
 
@@ -108,7 +115,9 @@ public class Rating extends JointModel {
      * Doesn't have any logic.
      */
     @Getter @Setter
-    public static class DTO extends JoinedModelDTO {
+    public static class DTO {
+
+        private UUID appointedId, reviewerId;
 
         /**
          * The value of the rating that is appointed.
@@ -121,10 +130,14 @@ public class Rating extends JointModel {
          */
         private String comment;
 
+        private Instant timestamp;
+
         public DTO(Rating rating) {
-            super(rating);
+            appointedId = rating.get_appointedId();
+            reviewerId = rating.get_reviewerId();
             value = rating.get_value();
             comment = rating.get_comment();
+            timestamp = rating.get_timestamp();
         }
     }
 }

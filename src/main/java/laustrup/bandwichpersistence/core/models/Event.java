@@ -15,6 +15,7 @@ import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -1227,9 +1228,11 @@ public class Event extends Model {
          * @param participation The transport object to be transformed.
          */
         public Participation(DTO participation) {
-            super(participation);
-            _participant = (Participant) DTOService.convert(participation.getParticipant());
-            _type = Type.valueOf(participation.getType().toString());
+            this(
+                    new Participant(participation.getParticipant()),
+                    participation.getType(),
+                    participation.getTimestamp()
+            );
         }
 
         /**
@@ -1237,20 +1240,9 @@ public class Event extends Model {
          * @param participant The Participant of the participation.
          * @param type The type of which participant is participating in the participation.
          */
-        public Participation(UUID id, Participant participant, Type type, History history, Instant timestamp) {
-            super(
-                    id,
-                    participant.get_id(),
-                    """
-                    Participation of participant @participantId and Event @eventId
-                    """
-                            .replace("@participantId", participant.get_id().toString())
-                            .replace("@eventId", id.toString()),
-                    history,
-                    timestamp
-            );
+        public Participation(Participant participant, Type type, Instant timestamp) {
+            super(type, timestamp);
             _participant = participant;
-            _type = type;
         }
 
         /**
@@ -1260,34 +1252,20 @@ public class Event extends Model {
          * @param type The type of which participant is participating in the participation.
          */
         public Participation(Participant participant, Type type) {
-            super(
-                    null,
-                    participant.get_id(),
-                    """
-                    Participation of participant @participantId and Event @eventId
-                    """.replace("@participantId", participant.get_id().toString())
-            );
-            _participant = participant;
-            _type = type;
+            this(participant, type, Instant.now());
         }
 
 
         @Override
         public String toString() {
-            return defineToString(
+            return String.format("""
+                    %s(%s=%s,%s=%s)
+                    """,
                     getClass().getSimpleName(),
-                    new String[] {
-                            Model.Fields._id,
-                            Model.Fields._secondaryId,
-                            Model.Fields._title,
-                            Fields._type
-                    },
-                    new String[] {
-                            String.valueOf(get_id()),
-                            String.valueOf(get_secondaryId()),
-                            get_name(),
-                            get_type().name()
-                    }
+                    Participant.class.getSimpleName(),
+                    _participant.get_id(),
+                    Type.class.getSimpleName(),
+                    _type
             );
         }
 
@@ -1297,16 +1275,10 @@ public class Event extends Model {
          * Doesn't have any logic.
          */
         @Getter @Setter
-        public static class DTO extends ModelDTO {
+        public static class DTO extends laustrup.bandwichpersistence.core.models.Participation.DTO {
 
             /** The Participant of the participation. */
             private Participant.DTO participant;
-
-            /** The Event of the participation. */
-            private Event.DTO event;
-
-            /** The type of which participant is participating in the participation. */
-            private ParticipationType type;
 
             /**
              * Converts into this DTO Object.
@@ -1315,15 +1287,6 @@ public class Event extends Model {
             public DTO(Participation participation) {
                 super(participation);
                 participant = new Participant.DTO(participation.get_participant());
-                type = ParticipationType.valueOf(participation.get_type().toString());
-            }
-
-            /** Each Participation have four different choices of participating. */
-            public enum ParticipationType {
-                ACCEPTED,
-                IN_DOUBT,
-                CANCELED,
-                INVITED
             }
         }
     }

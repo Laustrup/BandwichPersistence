@@ -73,24 +73,20 @@ public abstract class User extends Model {
      * @param user The transport object to be transformed.
      */
     public User(UserDTO user) {
-        super(
-                user.getPrimaryId(),
-                user.getUsername() + "-" + user.getPrimaryId(),
+        this(
+                user.getId(),
+                user.getUsername(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getDescription(),
+                new ContactInfo(user.getContactInfo()),
+                user.getParticipations().stream()
+                        .map(User.Participation::new),
+                user.getSubscription(),
+                user.getAuthorities(),
                 user.getHistory(),
                 user.getTimestamp()
         );
-        _username = user.getUsername();
-        _firstName = user.getFirstName();
-        _lastName = user.getLastName();
-        _contactInfo = new ContactInfo(user.getContactInfo());
-        _description = user.getDescription();
-
-        _participations = new Seszt<>();
-        for (Parti.DTO event : user.getEvents())
-            _participations.add(new Participation(event));
-
-        _subscription = new Subscription(user.getSubscription());
-        _authorities = new Seszt<>(user.getAuthorities().stream());
     }
 
     public User(
@@ -213,16 +209,24 @@ public abstract class User extends Model {
 
         private Event _event;
 
-        public Participation(UUID primaryId, UUID secondaryId, String title, Type type, Event event) {
-            super(primaryId, secondaryId, title, type);
+        public Participation(DTO participation) {
+            this(
+                new Event(participation.getEvent()),
+                participation.getType(),
+                participation.getTimestamp()
+            );
+        }
+
+        public Participation(Event event, Type type) {
+            this(event, type, Instant.now());
+        }
+
+        public Participation(Event event, Type type, Instant timestamp) {
+            super(type, timestamp);
             _event = event;
         }
 
-        public Participation(UUID primaryId, UUID secondaryId, String title, Type type, Event event, History history, Instant timestamp) {
-            super(primaryId, secondaryId, title, type, history, timestamp);
-            _event = event;
-        }
-
+        @Getter
         public static class DTO extends laustrup.bandwichpersistence.core.models.Participation.DTO {
 
             private Event.DTO event;
@@ -277,7 +281,7 @@ public abstract class User extends Model {
         /**
          * The Events that this user is included in.
          */
-        protected Set<Event.DTO> events;
+        protected Set<User.Participation.DTO> participations;
 
         /**
          * These ChatRooms can be used to communicate with other users.
@@ -306,8 +310,8 @@ public abstract class User extends Model {
             description = user.get_description();
             contactInfo = new ContactInfo.DTO(user.get_contactInfo());
 
-            events = Arrays.stream(user.get_participations().get_data())
-                    .map(Event.DTO::new)
+            participations = Arrays.stream(user.get_participations().get_data())
+                    .map(Participation.DTO::new)
                     .collect(Collectors.toSet());
 
             subscription = new Subscription.DTO(user.get_subscription());

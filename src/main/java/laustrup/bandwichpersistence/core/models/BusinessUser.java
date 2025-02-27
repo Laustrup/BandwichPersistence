@@ -28,10 +28,10 @@ public abstract class BusinessUser extends User {
             String lastName,
             String description,
             ContactInfo contactInfo,
-            Seszt<Event> events,
             Subscription subscription,
             Seszt<Authority> authorities,
             Seszt<ChatRoom> chatRooms,
+            Seszt<Participation> participations,
             History history,
             Instant timestamp
     ) {
@@ -42,7 +42,7 @@ public abstract class BusinessUser extends User {
                 lastName,
                 description,
                 contactInfo,
-                events,
+                participations,
                 subscription,
                 authorities,
                 history,

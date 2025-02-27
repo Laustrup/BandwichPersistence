@@ -32,6 +32,8 @@ public class Artist extends BusinessUser {
 
     private Seszt<Event.Gig> _gigs;
 
+    private Seszt<Rating> _ratings;
+
     /**
      * A description of the gear, that the Artist possesses and what they require for an Event.
      */
@@ -43,14 +45,27 @@ public class Artist extends BusinessUser {
      * @param artist The transport object to be transformed.
      */
     public Artist(DTO artist) {
-        super(artist);
-        _bands = new Seszt<>();
-        for (Band.DTO band : artist.getBands())
-            _bands.add(new Band(band));
-
-        _requests = new Seszt<>();
-        for (Request.DTO request : artist.getRequests())
-            _requests.add(new Request(request));
+        this(
+                artist.getId(),
+                artist.getUsername(),
+                artist.getFirstName(),
+                artist.getLastName(),
+                artist.getDescription(),
+                new ContactInfo(artist.getContactInfo()),
+                new Seszt<>(artist.getAlbums().stream().map(Album::new)),
+                new Subscription(artist.getSubscription()),
+                new Seszt<>(artist.getAuthorities().stream()),
+                new Seszt<>(artist.getChatRooms().stream().map(ChatRoom::new)),
+                new Seszt<>(artist.getParticipations().stream().map(Participation::new)),
+                new Seszt<>(artist.getBands().stream().map(Band::new)),
+                new Seszt<>(artist.getGigs().stream().map(Event.Gig::new)),
+                artist.getRunner(),
+                new Seszt<>(artist.getFollows().stream().map(Follow::new)),
+                new Seszt<>(artist.getRequests().stream().map(Request::new)),
+                new Seszt<>(artist.getRatings().stream().map(Rating::new)),
+                artist.getHistory(),
+                artist.getTimestamp()
+        );
     }
 
     public Artist(
@@ -61,15 +76,16 @@ public class Artist extends BusinessUser {
             String description,
             ContactInfo contactInfo,
             Seszt<Album> albums,
-            Seszt<Event> events,
             Subscription subscription,
             Seszt<Authority> authorities,
             Seszt<ChatRoom> chatRooms,
+            Seszt<Participation> participations,
             Seszt<Band> bands,
             Seszt<Event.Gig> gigs,
             String runner,
             Seszt<Follow> follows,
             Seszt<Request> requests,
+            Seszt<Rating> ratings,
             History history,
             Instant timestamp
     ) {
@@ -80,16 +96,17 @@ public class Artist extends BusinessUser {
                 lastName,
                 description,
                 contactInfo,
-                events,
                 subscription,
                 authorities,
                 chatRooms,
+                participations,
                 history,
                 timestamp
         );
         _albums = albums;
         _bands = bands;
         _requests = requests;
+        _ratings = ratings;
         _runner = runner;
         _gigs = gigs;
         _follows = follows;
@@ -198,6 +215,8 @@ public class Artist extends BusinessUser {
 
         protected Set<Album.DTO> albums;
 
+        protected Set<Rating.DTO> ratings;
+
         /**
          * A description of the gear, that the Artist possesses and what they require for an Event.
          */
@@ -215,6 +234,7 @@ public class Artist extends BusinessUser {
             gigs = artist.get_gigs().stream().map(Event.Gig.DTO::new).collect(Collectors.toSet());
             follows = artist.get_follows().stream().map(Follow.DTO::new).collect(Collectors.toSet());
             albums = artist.get_albums().stream().map(Album.DTO::new).collect(Collectors.toSet());
+            ratings = artist.get_ratings().stream().map(Rating.DTO::new).collect(Collectors.toSet());
             runner = artist.get_runner();
         }
     }

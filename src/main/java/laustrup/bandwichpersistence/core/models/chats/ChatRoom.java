@@ -1,6 +1,8 @@
 package laustrup.bandwichpersistence.core.models.chats;
 
+import laustrup.bandwichpersistence.core.models.BusinessUser;
 import laustrup.bandwichpersistence.core.models.History;
+import laustrup.bandwichpersistence.core.services.UserService;
 import laustrup.bandwichpersistence.core.utilities.collections.lists.Liszt;
 import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.models.chats.messages.Mail;
@@ -12,7 +14,10 @@ import laustrup.bandwichpersistence.core.utilities.collections.sets.Seszt;
 import lombok.Getter;
 import lombok.experimental.FieldNameConstants;
 
+import java.time.Instant;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static laustrup.bandwichpersistence.core.models.User.UserDTO;
 import static laustrup.bandwichpersistence.core.services.ObjectService.ifExists;
@@ -266,6 +271,47 @@ public class ChatRoom extends Model {
                 String.valueOf(_timestamp)
             }
         );
+    }
+
+    @Getter
+    public static class Template extends Model {
+
+        private Seszt<BusinessUser> _chatters;
+
+        public Template(DTO settings) {
+            this(
+                    settings.getId(),
+                    settings.getTitle(),
+                    new Seszt<>(settings.getChatters().stream()
+                            .map(UserService::fromBusinessUser)),
+                    settings.getHistory(),
+                    settings.getTimestamp()
+            );
+        }
+
+        public Template(
+                UUID id,
+                String title,
+                Seszt<BusinessUser> chatters,
+                History history,
+                Instant timestamp
+        ) {
+            super(id, title, history, timestamp);
+            _chatters = chatters;
+        }
+
+        @Getter
+        public static class DTO extends ModelDTO {
+
+            private Set<BusinessUser.BusinessUserDTO> chatters;
+
+            public DTO(Template settings) {
+                super(settings);
+                chatters = settings.get_chatters().stream()
+                        .map(UserService::fromBusinessUser)
+                        .collect(Collectors.toSet());
+            }
+        }
     }
 
     /**
