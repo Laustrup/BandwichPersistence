@@ -28,9 +28,9 @@ public class Venue extends Model {
 
     private String _description;
 
-    private Seszt<Album> _albums;
+    private Seszt<Organisation> _organisations;
 
-    private Seszt<Event> _events;
+    private Seszt<Album> _albums;
 
     private Seszt<Post> _posts;
 
@@ -58,8 +58,8 @@ public class Venue extends Model {
                 venue.getId(),
                 venue.getTitle(),
                 venue.getDescription(),
+                new Seszt<>(venue.getOrganisations().stream().map(Organisation::new)),
                 new Seszt<>(venue.getAlbums().stream().map(Album::new)),
-                new Seszt<>(venue.getEvents().stream().map(Event::new)),
                 new ContactInfo.Address(venue.getLocation()),
                 venue.getStageSetup(),
                 new Seszt<>(venue.getPosts().stream().map(Post::new)),
@@ -74,8 +74,8 @@ public class Venue extends Model {
             UUID id,
             String title,
             String description,
+            Seszt<Organisation> organisations,
             Seszt<Album> albums,
-            Seszt<Event> events,
             ContactInfo.Address location,
             String stageSetup,
             Seszt<Post> posts,
@@ -86,8 +86,8 @@ public class Venue extends Model {
     ) {
         super(id, title, history, timestamp);
         _description = description;
+        _organisations = organisations;
         _albums = albums;
-        _events = events;
         _location = location;
         _stageSetup = stageSetup;
         _posts = posts;
@@ -129,9 +129,9 @@ public class Venue extends Model {
 
         private String description;
 
-        private Set<Album.DTO> albums;
+        private Set<Organisation.DTO> organisations;
 
-        private Set<Event.DTO> events;
+        private Set<Album.DTO> albums;
 
         private Set<Post.DTO> posts;
 
@@ -156,8 +156,8 @@ public class Venue extends Model {
 
             location = new ContactInfo.Address.DTO(venue.get_location());
             description = venue.get_description();
+            organisations = venue.get_organisations().stream().map(Organisation.DTO::new).collect(Collectors.toSet());
             albums = venue.get_albums().stream().map(Album.DTO::new).collect(Collectors.toSet());
-            events = venue.get_events().stream().map(Event.DTO::new).collect(Collectors.toSet());
             posts = venue.get_posts().stream().map(Post.DTO::new).collect(Collectors.toSet());
             ratings = venue.get_ratings().stream().map(Rating.DTO::new).collect(Collectors.toSet());
             stageSetup = venue.get_stageSetup();

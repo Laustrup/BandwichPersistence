@@ -18,18 +18,6 @@ import java.util.stream.Collectors;
 @Getter @FieldNameConstants
 public class Band extends Model {
 
-    /**
-     * Contains all the Artists, that are members of this band.
-     * They are responsible for the subscription fees, since they own the band.
-     */
-    private Seszt<Artist> _members;
-
-    /**
-     * A musician that are paid and are hired to perform at gigs.
-     * Are exempt from paying the subscription fees.
-     */
-    private Seszt<Artist> _sessionMembers;
-
     private String _description;
 
     private Subscription _subscription;
@@ -51,17 +39,19 @@ public class Band extends Model {
      * @param band The transport object to be transformed.
      */
     public Band(Band.DTO band) {
-        super(band);
-        _members = new Seszt<>(band.getMembers().stream().map(Artist::new));
-        _sessionMembers = new Seszt<>(band.getSessionMembers().stream().map(Artist::new));
-        _description = band.getDescription();
-        _subscription = new Subscription(band.getSubscription());
-        _albums = new Seszt<>(band.getAlbums().stream().map(Album::new));
-        _events = new Seszt<>(band.getEvents().stream().map(Event::new));
-        _fans = new Seszt<>(band.getFans().stream().map(UserService::from));
-        _posts = new Seszt<>(band.getPosts().stream().map(Post::new));
-        _name = band.getName();
-        _runner = band.getRunner();
+        this(
+                band.getId(),
+                band.getName(),
+                band.getDescription(),
+                new Seszt<>(band.getAlbums().stream().map(Album::new)),
+                new Seszt<>(band.getEvents().stream().map(Event::new)),
+                new Subscription(band.getSubscription()),
+                new Seszt<>(band.getPosts().stream().map(Post::new)),
+                band.getRunner(),
+                new Seszt<>(band.getFans().stream().map(UserService::from)),
+                band.getHistory(),
+                band.getTimestamp()
+        );
     }
 
     public Band(
@@ -72,8 +62,6 @@ public class Band extends Model {
             Seszt<Event> events,
             Subscription subscription,
             Seszt<Post> posts,
-            Seszt<Artist> members,
-            Seszt<Artist> sessionMembers,
             String runner,
             Seszt<User> fans,
             History history,
@@ -88,45 +76,7 @@ public class Band extends Model {
         _fans = fans;
         _subscription = subscription;
         _posts = posts;
-        _members = members;
-        _sessionMembers = sessionMembers;
         _runner = runner;
-    }
-
-    /**
-     * Adds an Artist to the Liszt of members.
-     * @param artist An object of Artist, that is wished to be added.
-     * @return The whole Liszt of members.
-     */
-    public Seszt<Artist> add(Artist artist) {
-        return add(new Artist[]{artist});
-    }
-
-    /**
-     * Adds Artists to the Liszt of members.
-     * @param artists An array of artists, that is wished to be added.
-     * @return The whole Liszt of members.
-     */
-    public Seszt<Artist> add(Artist[] artists) {
-        return _members.Add(artists);
-    }
-
-    /**
-     * Removes an Artist of the Liszt of members.
-     * @param artist An object of Artist, that is wished to be removed.
-     * @return The whole Liszt of members.
-     */
-    public Seszt<Artist> remove(Artist artist) {
-        return remove(new Artist[]{artist});
-    }
-
-    /**
-     * Removes Artists of the Liszt of members.
-     * @param artists An array of artists, that is wished to be removed.
-     * @return The whole Liszt of members.
-     */
-    public Seszt<Artist> remove(Artist[] artists) {
-        return _members.remove(artists);
     }
 
     /**
@@ -165,12 +115,6 @@ public class Band extends Model {
     @Getter @Setter
     public static class DTO extends ModelDTO {
 
-        /**
-         * Contains all the Artists, that are members of this band.
-         */
-        private Set<Artist.DTO> members;
-
-        private Set<Artist.DTO> sessionMembers;
 
         private String description;
 
@@ -194,12 +138,6 @@ public class Band extends Model {
          */
         public DTO(Band band) {
             super(band);
-            members = Arrays.stream(band.get_members().get_data())
-                    .map(Artist.DTO::new)
-                    .collect(Collectors.toSet());
-            sessionMembers = Arrays.stream(band.get_sessionMembers().get_data())
-                    .map(Artist.DTO::new)
-                    .collect(Collectors.toSet());
             description = band.get_description();
             subscription = new Subscription.DTO(band.get_subscription());
             albums = Arrays.stream(band.get_albums().get_data())
@@ -217,6 +155,42 @@ public class Band extends Model {
 
             name = band.get_name();
             runner = band.get_runner();
+        }
+    }
+
+    @Getter
+    public static class Membership {
+
+        private Artist _member;
+
+        private Association _association;
+
+        public Membership(DTO membership) {
+            _member = new Artist(membership.getMember());
+            _association = membership.getAssociation();
+        }
+
+        public Membership(Artist member, Association association) {
+            _member = member;
+            _association = association;
+        }
+
+        public enum Association {
+            SESSION,
+            OWNER
+        }
+
+        @Getter
+        public static class DTO {
+
+            private Artist.DTO member;
+
+            private Association association;
+
+            public DTO(Membership membership) {
+                member = new Artist.DTO(membership.get_member());
+                association = membership.get_association();
+            }
         }
     }
 }
