@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.Optional;
 import java.util.Random;
 
 /**
@@ -16,7 +17,7 @@ import java.util.Random;
  * Can also be null, since it's a class object.
  */
 @ToString
-public class Plato extends Utility implements IPlato {
+public class NotBoolean extends Utility implements IPlato {
 
     /**
      * Determines the value of the Plato class.
@@ -71,12 +72,16 @@ public class Plato extends Utility implements IPlato {
     public boolean get_truth() { return _truth && (_argument == Argument.TRUE || _argument == Argument.ABOVE_HALF); }
 
     /** Sets the argument to undefined */
-    public Plato() { this(Argument.UNDEFINED); }
-    public Plato(Argument argument) {
+    public NotBoolean() { this(Argument.UNDEFINED); }
+    public NotBoolean(Argument argument) {
         set_argument(argument);
     }
-    public Plato(boolean isTrue) {
+    public NotBoolean(boolean isTrue) {
         set_argument(isTrue);
+    }
+
+    public static NotBoolean ofNullable(NotBoolean notBoolean) {
+        return Optional.ofNullable(notBoolean).orElse(new NotBoolean(NotBoolean.Argument.UNDEFINED));
     }
 
     @Override

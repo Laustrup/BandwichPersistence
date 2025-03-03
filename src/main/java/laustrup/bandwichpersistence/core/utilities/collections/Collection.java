@@ -4,16 +4,14 @@ import laustrup.bandwichpersistence.core.utilities.Utility;
 import laustrup.bandwichpersistence.core.utilities.console.Printer;
 import lombok.Getter;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 /**
  * A Utility that contains collections of data such as a Map and an array.
  * @param <E> The type of element that are wished to be used in this class.
  */
-public abstract class Collection<E> extends Utility<E> {
+public abstract class Collection<E> extends Utility<E> implements java.util.Collection<E> {
 
     /** Contains all the elements that are inside the Liszt. */
     @Getter
@@ -213,6 +211,10 @@ public abstract class Collection<E> extends Utility<E> {
      */
     @SuppressWarnings("unchecked")
     protected E convert(Object object) { return (E) object; }
+
+    public Set<E> toSet() {
+        return new HashSet<>(_map.values());
+    }
 
     @Override
     public String toString() {

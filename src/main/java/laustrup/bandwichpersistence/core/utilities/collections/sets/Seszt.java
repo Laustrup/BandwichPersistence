@@ -6,6 +6,7 @@ import laustrup.bandwichpersistence.core.utilities.console.Printer;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -121,6 +122,11 @@ public class Seszt<E> extends Collection<E> implements ISeszt<E>, Set<E>, IColle
     @Override
     public Seszt<E> Add(E[] elements) {
         handleAdd(filterUniques(elements));
+        return this;
+    }
+
+    public Seszt<E> Add(Stream<? extends E> stream) {
+        add(stream);
         return this;
     }
 
@@ -337,4 +343,42 @@ public class Seszt<E> extends Collection<E> implements ISeszt<E>, Set<E>, IColle
     @Override public Stream<E> stream() { return Set.super.stream(); }
     @Override public Stream<E> parallelStream() { return Set.super.parallelStream(); }
 
+    @Override
+    public Set<E> asSet() {
+        return Arrays.stream(get_data()).collect(Collectors.toSet());
+    }
+
+    @Override
+    public <M> Set<M> asSet(Function<E, M> conversion) {
+        return Arrays.stream(get_data()).map(conversion).collect(Collectors.toSet());
+    }
+
+    /**
+     * Simply converts a <i>Java Util collection</i> into a <i>Seszt</i> with the same data.<br/>
+     * Creates a new <i>Seszt</i> object with conversion.
+     * @param collection A <i>Java Util</i> such as a List or Set that contains data that should be converted.
+     * @param conversion The function that will convert the object from <b>d</b> -> <b>b</b>, such as a constructor call.
+     * @return The converted <i>Seszt</i> containing data from the <i>Java Util collection</i>.
+     * @param <d> The type of the object to be converted to <b>d</b>.
+     * @param <b> The type of the object that will be converted from <b>d</b>.
+     */
+    public static <d, b> Seszt<b> copy(java.util.Collection<d> collection, Function<d, b> conversion) {
+        return new Seszt<>(Optional.ofNullable(collection).orElse(new HashSet<>()).stream().map(conversion));
+    }
+
+    /**
+     * Simply converts a <i>Seszt</i> into a <i>Java Util Set</i> with the same data.<br/>
+     * Creates a new <i>Java Util Set</i> with conversion.
+     * @param collection A <i>Seszt</i> that contains data that should be converted.
+     * @param conversion The function that will convert the object from <b>d</b> -> <b>b</b>, such as a constructor call.
+     * @return The converted <i>Java Util Set</i> containing the data from the <i>Seszt</i>,
+     *         but if the <i>Seszt</i> is null, then it will be an empty <i>Java Util Set</i>.
+     * @param <d> The type of the object to be converted to <b>d</b>.
+     * @param <b> The type of the object that will be converted from <b>d</b>.
+     */
+    public static <d, b> Set<b> copy(Seszt<d> collection, Function<d, b> conversion) {
+        return Optional.ofNullable(collection).orElse(new Seszt<>()).stream()
+                .map(conversion)
+                .collect(Collectors.toSet());
+    }
 }

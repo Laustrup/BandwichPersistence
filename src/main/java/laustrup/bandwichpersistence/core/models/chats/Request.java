@@ -9,7 +9,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import static laustrup.bandwichpersistence.core.models.User.UserDTO;
 
@@ -98,8 +100,7 @@ public class Request extends Model {
         super(
             user != null ? user.get_id() : null,
             event != null ? event.get_id() : null,
-            user != null && event != null
-                ? "Request of " + user.get_username() + " to " + event.get_name() : "Empty Request",
+            user != null && event != null ? "Request of " + user.get_username() + " to " + event.get_title() : "Empty Request",
             history,
             timestamp
         );
@@ -122,7 +123,7 @@ public class Request extends Model {
         super(
                 user.get_id(),
                 event.get_id(),
-                "Request of " + user.get_username() + " to " + event.get_name()
+                "Request of " + user.get_username() + " to " + event.get_title()
         );
         _message = """
                 This request wishes @user to perform at @event
@@ -137,17 +138,23 @@ public class Request extends Model {
             getClass().getSimpleName(),
             new String[]{
                 Model.Fields._id,
-                Model.Fields._secondaryId,
                 Fields._approved,
                 Model.Fields._timestamp
             },
             new String[]{
                 String.valueOf(_id),
-                String.valueOf(_secondaryId),
                 _approved != null ? _approved.toString() : null,
                 String.valueOf(_timestamp)
             }
         );
+    }
+
+    public UUID get_userId() {
+        return _user.get_id();
+    }
+
+    public UUID get_eventId() {
+        return _event.get_id();
     }
 
     /** Determines if a User have approved to be a part of the Event. */

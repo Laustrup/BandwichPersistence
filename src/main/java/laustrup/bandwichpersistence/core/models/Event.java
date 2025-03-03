@@ -5,7 +5,7 @@ import laustrup.bandwichpersistence.core.services.DTOService;
 import laustrup.bandwichpersistence.core.utilities.collections.lists.Liszt;
 import laustrup.bandwichpersistence.core.utilities.collections.sets.Seszt;
 import laustrup.bandwichpersistence.core.utilities.console.Printer;
-import laustrup.bandwichpersistence.core.utilities.parameters.Plato;
+import laustrup.bandwichpersistence.core.utilities.parameters.NotBoolean;
 import laustrup.bandwichpersistence.core.models.chats.Request;
 import laustrup.bandwichpersistence.core.models.chats.messages.Post;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
@@ -17,9 +17,11 @@ import lombok.experimental.FieldNameConstants;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 
-import static laustrup.bandwichpersistence.core.services.ObjectService.ifExists;
+import static laustrup.bandwichpersistence.core.utilities.collections.sets.Seszt.copy;
+import static laustrup.bandwichpersistence.core.utilities.services.UtilityService.toSet;
 
 /**
  * An Event is a place for gigs, where a venue is having bands playing at specific times.
@@ -32,19 +34,19 @@ public class Event extends Model {
      * not necessarily the same time as when the gigs start.
      * It must be before or same time as the gigs start.
      */
-    private LocalDateTime _openDoors;
+    private Instant _openDoors;
 
     /**
      * This DateTime is determining when the first gig will start.
      * Is being calculated automatically.
      */
-    private LocalDateTime _start;
+    private Instant _start;
 
     /**
      * This DateTime is determining when the last gig will end.
      * Is being calculated automatically.
      */
-    private LocalDateTime _end;
+    private Instant _end;
 
     /**
      * The amount of time it will take the gigs in total in milliseconds.
@@ -62,33 +64,35 @@ public class Event extends Model {
      * This Event is paid or voluntary.
      */
     @Setter
-    private Plato _voluntary;
+    private NotBoolean _charity;
 
     /**
      * If this is a public Event, other Users can view and interact with it.
      * It is public if it is not null, otherwise it has the time that it became public.
      */
-    private LocalDateTime _public;
+    private Instant _public;
 
     /**
      * Will be true, if this Event is cancelled.
      * Can only be cancelled by the Venue.
      * It is cancelled if it is not null, otherwise it has the time that it became cancelled.
      */
-    private LocalDateTime _cancelled;
+    private Instant _cancelled;
 
     /**
      * This is marked if there is no more tickets to sell.
      * It is sold out if it is not null, otherwise it has the time that it became sold out.
      */
     @Setter
-    private LocalDateTime _soldOut;
+    private Instant _soldOut;
 
     /**
      * This is the address or place, whether the Event will be held.
      * Will be used to be search at in Google Maps.
      */
-    private String _location;
+    private ContactInfo.Address _location;
+
+    private ZoneId _zoneId;
 
     /**
      * The options that are available for tickets to be bought or reserved.
@@ -108,7 +112,9 @@ public class Event extends Model {
     /**
      * The gigs with times and acts of the Event.
      */
-    private Liszt<Gig> _gigs;
+    private Seszt<Gig> _gigs;
+
+    private Seszt<Organisation> _organisations;
 
     /**
      * This venue is the ones responsible for the Event,
@@ -119,7 +125,7 @@ public class Event extends Model {
     /**
      * These requests are needed to make sure, everyone wants to be a part of the Event.
      */
-    private Liszt<Request> _requests;
+    private Seszt<Request> _requests;
 
     /**
      * The people that will participate in the Event,
@@ -143,119 +149,50 @@ public class Event extends Model {
      * @param event The transport object to be transformed.
      */
     public Event(DTO event) {
-        super(event);
-
-        _description = event.getDescription();
-
-        ifExists(event.getGigs(), () -> {
-            _gigs = new Liszt<>();
-            for (Gig.DTO gig : event.getGigs())
-                _gigs.add(new Gig(gig));
-        });
-
-        if (_gigs != null && !_gigs.isEmpty())
-            try {
-                calculateTime();
-            } catch (InputMismatchException e) {
-                Printer.print("End date is before beginning date of " + _title + "...", e);
-            }
-        else {
-            _start = event.getOpenDoors() != null ? event.getOpenDoors() : null;
-            _openDoors = _start;
-            _end = event.getEnd() != null ? event.getEnd() : (event.getOpenDoors() != null ? event.getOpenDoors() : null);
-            _duration = _start != null && _end != null ? Duration.between(_start,_end).toMinutes() : 0;
-        }
-
-        if (_start != null && _end != null)
-            if (Duration.between(event.getOpenDoors(), _start).toMinutes() >= 0)
-                _openDoors = event.getOpenDoors();
-            else
-                throw new InputMismatchException();
-
-        _voluntary = new Plato(event.getIsVoluntary());
-        _public = event.getIsPublic();
-        _cancelled = event.getIsCancelled();
-        _soldOut = event.getIsSoldOut();
-        _ticketOptions = new Seszt<>();
-        for (Ticket.Option.DTO option : event.getTicketOptions())
-            _ticketOptions.add(new Ticket.Option(option));
-
-        _tickets = new Seszt<>();
-        for (Ticket.DTO ticket : event.getTickets())
-            _tickets.add(new Ticket(ticket));
-
-        _contactInfo = (ContactInfo) ifExists(event.getContactInfo(), e -> new ContactInfo(event.getContactInfo()));
-        _venue = new Venue(event.getVenue());
-
-        set_location(event.getLocation());
-
-        ifExists(event.getRequests(), () -> {
-            _requests = new Liszt<>();
-            for (Request.DTO request : event.getRequests())
-                _requests.add(new Request(request));
-        });
-
-        ifExists(event.getParticipations(), () -> {
-            _participations = new Seszt<>();
-            for (Participation.DTO participation : event.getParticipations())
-                _participations.add(new Participation(participation));
-        });
-
-        ifExists(event.getPosts(), () -> {
-            _posts = new Seszt<>();
-            for (Post.DTO bulletin : event.getPosts())
-                _posts.add(new Post(bulletin));
-        });
-
-        ifExists(event.getAlbums(), () -> {
-            _albums = new Seszt<>();
-            for (Album.DTO album : event.getAlbums())
-                _albums.add(new Album(album));
-        });
+        this(
+                event.getId(),
+                event.getTitle(),
+                event.getDescription(),
+                event.getOpenDoors(),
+                new NotBoolean(event.getIsCharity()),
+                event.getIsPublic(),
+                event.getIsCancelled(),
+                event.getIsSoldOut(),
+                new ContactInfo.Address(event.getLocation()),
+                event.getZoneId(),
+                copy(event.getTicketOptions(), Ticket.Option::new),
+                copy(event.getTickets(), Ticket::new),
+                new ContactInfo(event.getContactInfo()),
+                copy(event.getGigs(), Gig::new),
+                copy(event.getOrganisations(), Organisation::new),
+                new Venue(event.getVenue()),
+                copy(event.getRequests(), Request::new),
+                copy(event.getParticipations(), Participation::new),
+                copy(event.getPosts(), Post::new),
+                copy(event.getAlbums(), Album::new),
+                event.getHistory(),
+                event.getTimestamp()
+        );
     }
-
-    /**
-     * An Event with all its values as parameters, is meant for being constructed from database.
-     * Start and end times will be calculated from the Gigs.
-     * If there isn't any Request, they will be generated of the Performers of the Gigs.
-     * @param id The unique id of this Event.
-     * @param title The named title of the Event.
-     * @param description A typed String explaining details of this Event.
-     * @param openDoors When the Event will let people in.
-     * @param isVoluntary Determines whether this Event's workers are paid employees.
-     * @param isPublic The visibility of this Event.
-     * @param isCancelled If true this Event is cancelled.
-     * @param isSoldOut Determines the state of the sale of this Event.
-     * @param location Where this Event is being held.
-     * @param ticketOptions The options that are available for tickets to be bought or reserved.
-     * @param tickets The tickets that have been bought or reserved.
-     * @param contactInfo The information of how to contact the people in charge of this Event.
-     * @param gigs The shows that are being held in this Event.
-     * @param venue The Venue responsible for arranging this Event.
-     * @param requests The Requests between the members of the Gigs and this Event.
-     * @param participations Who are joining this Event.
-     * @param posts Messages that are put up on this Event.
-     * @param albums Images or Music promoting this Event.
-     * @param history The Events for this object.
-     * @param timestamp The date and time this Event was created.
-     * @throws InputMismatchException Will be thrown, if the times don't fit each other correctly.
-     */
+    
     public Event(
             UUID id,
             String title,
             String description,
-            LocalDateTime openDoors,
-            Plato isVoluntary,
-            LocalDateTime isPublic,
-            LocalDateTime isCancelled,
-            LocalDateTime isSoldOut,
-            String location,
+            Instant openDoors,
+            NotBoolean isCharity,
+            Instant isPublic,
+            Instant isCancelled,
+            Instant isSoldOut,
+            ContactInfo.Address location,
+            ZoneId zoneId,
             Seszt<Ticket.Option> ticketOptions,
             Seszt<Ticket> tickets,
             ContactInfo contactInfo,
-            Liszt<Gig> gigs,
+            Seszt<Gig> gigs,
+            Seszt<Organisation> organisations,
             Venue venue,
-            Liszt<Request> requests,
+            Seszt<Request> requests,
             Seszt<Participation> participations,
             Seszt<Post> posts,
             Seszt<Album> albums,
@@ -266,7 +203,6 @@ public class Event extends Model {
 
         _description = description;
         _gigs = gigs;
-
         if (!_gigs.isEmpty())
             try {
                 calculateTime();
@@ -278,13 +214,15 @@ public class Event extends Model {
             _start = openDoors;
         }
 
+        _organisations = organisations;
+
         if (_start != null && _end != null)
             if (Duration.between(openDoors, _start).toMinutes() >= 0)
                 _openDoors = openDoors;
             else
                 throw new InputMismatchException();
 
-        _voluntary = isVoluntary;
+        _charity = isCharity;
         _public = isPublic;
         _cancelled = isCancelled;
         _soldOut = isSoldOut;
@@ -294,6 +232,7 @@ public class Event extends Model {
         _venue = venue;
 
         set_location(location);
+        _zoneId = zoneId;
 
         _requests = requests == null || requests.isEmpty()
             ? generateRequests()
@@ -302,57 +241,6 @@ public class Event extends Model {
         _participations = participations;
         _posts = posts;
         _albums = albums;
-    }
-
-    /**
-     * For generating a new Event.
-     * Timestamp of now.
-     * @param title The named title of the Event.
-     * @param description A typed String explaining details of this Event.
-     * @param openDoors When the Event will let people in.
-     * @param isVoluntary Determines whether this Event's workers are paid employees.
-     * @param isPublic The visibility of this Event.
-     * @param location Where this Event is being held.
-     * @param ticketOptions The options that are available for tickets to be bought or reserved.
-     * @param contactInfo The information of how to contact the people in charge of this Event.
-     * @param gigs The shows that are being held in this Event.
-     * @param venue The Venue responsible for arranging this Event.
-     * @throws InputMismatchException Will be thrown, if the times don't fit each other correctly.
-     */
-    public Event(
-            String title,
-            String description,
-            LocalDateTime openDoors,
-            Plato isVoluntary,
-            LocalDateTime isPublic,
-            String location,
-            Seszt<Ticket.Option> ticketOptions,
-            ContactInfo contactInfo,
-            Liszt<Gig> gigs,
-            Venue venue
-    ) {
-        this(
-            null,
-            title,
-            description,
-            openDoors,
-            isVoluntary,
-            isPublic,
-            null,
-            null,
-            location,
-            ticketOptions,
-            null,
-            contactInfo,
-            gigs,
-            venue,
-            null,
-            new Seszt<>(),
-            new Seszt<>(),
-            new Seszt<>(),
-            null,
-            LocalDateTime.now()
-        );
     }
 
     /**
@@ -393,8 +281,8 @@ public class Event extends Model {
      * @param location The new location value.
      * @return The location value.
      */
-    public String set_location(String location) {
-        _location = location == null || location.isEmpty()
+    public ContactInfo.Address set_location(ContactInfo.Address location) {
+        _location = location == null
                 ? (
                 _venue != null
                         ? (
@@ -413,9 +301,9 @@ public class Event extends Model {
      * if there is any Requests already, no Requests will be generated.
      * @return The Requests of this Object.
      */
-    private Liszt<Request> generateRequests() {
+    private Seszt<Request> generateRequests() {
         if (_requests == null)
-            _requests = new Liszt<>();
+            _requests = new Seszt<>();
         if (_requests.isEmpty())
             for (Gig gig : _gigs)
                 for (Performer performer : gig.get_act())
@@ -439,14 +327,14 @@ public class Event extends Model {
      * @param gig A specific Gig of one Performer for a specific time.
      * @return All the Gigs of this Event.
      */
-    public Liszt<Gig> add(Gig gig) { return add(new Gig[]{gig}); }
+    public Seszt<Gig> add(Gig gig) { return add(new Gig[]{gig}); }
 
     /**
      * Adds multiple given Gigs to the Liszt of Gigs in the current Event.
      * @param gigs Determines some specific Gigs of one MusicalUser for a specific time.
      * @return All the Gigs of the current Event.
      */
-    public Liszt<Gig> add(Gig[] gigs) {
+    public Seszt<Gig> add(Gig[] gigs) {
         gigs = filter(gigs);
 
         if (gigs.length > 0) {
@@ -478,8 +366,8 @@ public class Event extends Model {
                     for (Performer performer : gig.get_act())
                         if (
                             stranger.get_id() != performer.get_id()
-                            && !gigs[i].get_start().isEqual(gig.get_start())
-                            && !gigs[i].get_end().isEqual(gig.get_end())
+                            && !gigs[i].get_start().equals(gig.get_start())
+                            && !gigs[i].get_end().equals(gig.get_end())
                         )
                             storage[i] = gigs[i];
 
@@ -505,7 +393,7 @@ public class Event extends Model {
      * @param gig Determines a specific gig, that is wished to be removed.
      * @return All the gigs of the current Event.
      */
-    public Liszt<Gig> remove(Gig gig) { return remove(new Gig[]{gig}); }
+    public Seszt<Gig> remove(Gig gig) { return remove(new Gig[]{gig}); }
 
     /**
      * Removes some given Gigs from the Liszt of gigs from current Event.
@@ -513,7 +401,7 @@ public class Event extends Model {
      * @param gigs Determines some specific gigs, that is wished to be removed.
      * @return All the Gigs of the current Event.
      */
-    public Liszt<Gig> remove(Gig[] gigs) {
+    public Seszt<Gig> remove(Gig[] gigs) {
         _gigs.remove(gigs);
         for (Gig gig : gigs)
             for (Performer performer : gig.get_act())
@@ -544,7 +432,7 @@ public class Event extends Model {
      * @param performer The Performer that should have the Request excluded.
      * @return The Requests of this Event.
      */
-    private Liszt<Request> removeRequests(Performer performer) {
+    private Seszt<Request> removeRequests(Performer performer) {
         for (int i = 1; i <= _requests.size(); i++) {
             if (_requests.Get(i).get_user().get_id() == performer.get_id()) {
                 _requests.Remove(i);
@@ -560,14 +448,14 @@ public class Event extends Model {
      * @param request Determines a specific Request, that is wished to be added.
      * @return All the Requests of the current Event.
      */
-    public Liszt<Request> add(Request request) { return add(new Request[]{request}); }
+    public Seszt<Request> add(Request request) { return add(new Request[]{request}); }
 
     /**
      * Adds some given Requests to the Liszt of requests from current Event.
      * @param requests Determines some specific requests, that is wished to be added.
      * @return All the requests of the current Event.
      */
-    public Liszt<Request> add(Request[] requests) {
+    public Seszt<Request> add(Request[] requests) {
         return add(new Liszt<>(requests));
     }
 
@@ -576,7 +464,7 @@ public class Event extends Model {
      * @param requests Determines some specific requests, that is wished to be added.
      * @return All the requests of the current Event.
      */
-    public Liszt<Request> add(Liszt<Request> requests) {
+    public Seszt<Request> add(Liszt<Request> requests) {
         for (Request request : requests)
             if (!_requests.contains(request))
                 _requests.add(request);
@@ -616,7 +504,7 @@ public class Event extends Model {
      * @param request The Request that is wished to have its approved set to true.
      * @return The Request that is changed. If it is not changed, it returns null.
      */
-    public Liszt<Request> accept(Request request) {
+    public Seszt<Request> accept(Request request) {
         if (!_requests.contains(request))
             return null;
 
@@ -636,33 +524,9 @@ public class Event extends Model {
      */
     public boolean venueHasApproved() {
         for (Request request : _requests)
-
-            if (request.get_user().getClass() == Venue.class && request.isApproved())
+            if (request.get_user().getClass() == Organisation.Employee.class && request.isApproved())
                 return true;
         return false;
-    }
-
-    /**
-     * Sets the Venue and also replaces the request of former Venue to a new request.
-     * This means that the Event will become private instead of public, since the
-     * Venue needs to approve the Event, in order to host it.
-     * @param venue The Venue, that is wished to be set, as the Events new Venue.
-     * @return The Venue that is set of the Event.
-     */
-    public Venue set_venue(Venue venue) {
-        for (Request request : _requests) {
-            if (request.get_user().getClass() == Venue.class
-                    && request.get_user().get_id() == _venue.get_id()) {
-                _requests.remove(request);
-                break;
-            }
-        }
-
-        _public = null;
-        _venue = venue;
-        _requests.add(new Request(venue, this));
-
-        return _venue;
     }
 
     /**
@@ -670,11 +534,11 @@ public class Event extends Model {
      * @param venue Will check if this Venue has the same id as the Venue of this Event.
      * @return The isCancelled Plato value.
      */
-    public LocalDateTime changeCancelledStatus(Venue venue) {
+    public Instant changeCancelledStatus(Venue venue) {
         if (venue.get_id() == _venue.get_id())
             _cancelled = _cancelled == null
                     ? null
-                    : LocalDateTime.now();
+                    : Instant.now();
 
         return _cancelled;
     }
@@ -771,7 +635,7 @@ public class Event extends Model {
 
             if (
                 localRequest.get_id() == request.get_id()
-                && Objects.equals(localRequest.get_secondaryId(), request.get_secondaryId())
+                && Objects.equals(localRequest.get_eventId(), request.get_eventId())
             ) {
                return _requests.Set(i, request).Get(i);
             }
@@ -817,7 +681,7 @@ public class Event extends Model {
             }
         }
 
-        return _gigs.Get(gig.toString());
+        return _gigs.get(gig.toString());
     }
 
     /**
@@ -875,24 +739,26 @@ public class Event extends Model {
     @Getter
     public static class DTO extends ModelDTO {
 
+        private ZoneId zoneId;
+
         /**
          * Is when the participants can enter the event,
          * not necessarily the same time as when the gigs start.
          * It must be before or same time as the gigs start.
          */
-        private LocalDateTime openDoors;
+        private Instant openDoors;
 
         /**
          * This DateTime is determining when the first gig will start.
          * Is being calculated automatically.
          */
-        private LocalDateTime start;
+        private Instant start;
 
         /**
          * This DateTime is determining when the last gig will end.
          * Is being calculated automatically.
          */
-        private LocalDateTime end;
+        private Instant end;
 
         /**
          * The amount of time it will take the gigs in total.
@@ -908,39 +774,39 @@ public class Event extends Model {
         /**
          * This Event is paid or voluntary.
          */
-        private Plato.Argument isVoluntary;
+        private NotBoolean.Argument isCharity;
 
         /**
          * If this is a public Event, other Users can view and interact with it.
          */
-        private LocalDateTime isPublic;
+        private Instant isPublic;
 
         /**
          * Will be true, if this Event is cancelled.
          * Can only be cancelled by the Venue.
          */
-        private LocalDateTime isCancelled;
+        private Instant isCancelled;
 
         /**
          * This is marked if there is no more tickets to sell.
          */
-        private LocalDateTime isSoldOut;
+        private Instant isSoldOut;
 
         /**
          * This is the address or place, whether the Event will be held.
          * Will be used to be searched at in Google Maps.
          */
-        private String location;
+        private ContactInfo.Address.DTO location;
 
         /**
          * The options that are available for tickets to be bought or reserved.
          */
-        private Seszt<Ticket.Option.DTO> ticketOptions;
+        private Set<Ticket.Option.DTO> ticketOptions;
 
         /**
          * The tickets that have been bought or reserved.
          */
-        private Seszt<Ticket.DTO> tickets;
+        private Set<Ticket.DTO> tickets;
 
         /** Different information of contacting. */
         private ContactInfo.DTO contactInfo;
@@ -948,7 +814,9 @@ public class Event extends Model {
         /**
          * The gigs with times and acts of the Event.
          */
-        private Gig.DTO[] gigs;
+        private Set<Gig.DTO> gigs;
+
+        private Set<Organisation.DTO> organisations;
 
         /**
          * This venue is the ones responsible for the Event,
@@ -959,23 +827,23 @@ public class Event extends Model {
         /**
          * These requests are needed to make sure, everyone wants to be a part of the Event.
          */
-        private Request.DTO[] requests;
+        private Set<Request.DTO> requests;
 
         /**
          * The people that will participate in the Event,
          * not including venues or acts.
          */
-        private Participation.DTO[] participations;
+        private Set<Participation.DTO> participations;
 
         /**
          * Post from different people, that will mention contents.
          */
-        private Post.DTO[] posts;
+        private Set<Post.DTO> posts;
 
         /**
          * An Album of images, that can be used to promote this Event.
          */
-        private Album.DTO[] albums;
+        private Set<Album.DTO> albums;
 
         /**
          * Converts into this DTO Object.
@@ -984,56 +852,26 @@ public class Event extends Model {
         public DTO(Event event) {
             super(event);
             description = event.get_description();
-
-            if (event.get_gigs() != null) {
-                gigs = new Gig.DTO[event.get_gigs().size()];
-                for (int i = 0; i < gigs.length; i++)
-                    gigs[i] = new Gig.DTO(event.get_gigs().Get(i+1));
-            }
-
+            gigs = Seszt.copy(event.get_gigs(), Gig.DTO::new);
+            organisations = toSet(event.get_organisations(), Organisation.DTO::new);
             openDoors = event.get_openDoors();
             start = event.get_start();
             end = event.get_end();
             length = event.get_duration();
-
-            isVoluntary = event.get_voluntary() != null ? event.get_voluntary().get_argument() : null;
-            isPublic = event.get_public() != null ? event.get_public() : null;
-            isCancelled = event.get_cancelled() != null ? event.get_cancelled() : null;
-            isSoldOut = event.get_soldOut() != null ? event.get_soldOut() : null;
-
-            ticketOptions = new Seszt<>();
-            for (Ticket.Option option : event.get_ticketOptions())
-                ticketOptions.add(new Ticket.Option.DTO(option));
-
-            tickets = new Seszt<>();
-            for (Ticket ticket : event.get_tickets())
-                tickets.add(new Ticket.DTO(ticket));
-
-            contactInfo = event.get_contactInfo() != null ? new ContactInfo.DTO(event.get_contactInfo()) : null;
+            isCharity = NotBoolean.ofNullable(event.get_charity()).get_argument();
+            isPublic = event.get_public();
+            isCancelled = event.get_cancelled();
+            isSoldOut = event.get_soldOut();
+            ticketOptions = toSet(event.get_ticketOptions(), Ticket.Option.DTO::new);
+            tickets = toSet(event.get_tickets(), Ticket.DTO::new);
+            contactInfo = new ContactInfo.DTO(event.get_contactInfo());
             venue = new Venue.DTO(event.get_venue());
-
-            location = event.get_location();
-
-            if (event.get_requests() != null) {
-                requests = new Request.DTO[event.get_requests().size()];
-                for (int i = 0; i < requests.length; i++)
-                    requests[i] = new Request.DTO(event.get_requests().Get(i+1));
-            }
-            if (event.get_participations() != null) {
-                participations = new Participation.DTO[event.get_participations().size()];
-                for (int i = 0; i < participations.length; i++)
-                    participations[i] = new Participation.DTO(event.get_participations().Get(i+1));
-            }
-            if (event.get_posts() != null) {
-                posts = new Post.DTO[event.get_posts().size()];
-                for (int i = 0; i < posts.length; i++)
-                    posts[i] = new Post.DTO(event.get_posts().Get(i+1));
-            }
-            if (event.get_albums() != null) {
-                albums = new Album.DTO[event.get_albums().size()];
-                for (int i = 0; i < albums.length; i++)
-                    albums[i] = new Album.DTO(event.get_albums().Get(i+1));
-            }
+            location = new ContactInfo.Address.DTO(event.get_location());
+            zoneId = event.get_zoneId();
+            requests = toSet(event.get_requests(), Request.DTO::new);
+            participations = toSet(event.get_participations(), Participation.DTO::new);
+            posts = toSet(event.get_posts(), Post.DTO::new);
+            albums = toSet(event.get_albums(), Album.DTO::new);
         }
     }
 
@@ -1056,12 +894,12 @@ public class Event extends Model {
         /**
          * The start of the Gig, where the act will begin.
          */
-        private LocalDateTime _start;
+        private Instant _start;
 
         /**
          * The end of the Gig, where the act will end.
          */
-        private LocalDateTime _end;
+        private Instant _end;
 
         /**
          * Will translate a transport object of this object into a construct of this object.
@@ -1102,8 +940,8 @@ public class Event extends Model {
                 UUID id,
                 Event event,
                 Seszt<Performer> act,
-                LocalDateTime start,
-                LocalDateTime end,
+                Instant start,
+                Instant end,
                 History history,
                 Instant timestamp
         ) {
@@ -1122,8 +960,8 @@ public class Event extends Model {
          * @param start The start of the Gig, where the act will begin.
          * @param end The end of the Gig, where the act will end.
          */
-        public Gig(Event event, Seszt<Performer> act, LocalDateTime start, LocalDateTime end) {
-            this(null, event, act, start, end, null, LocalDateTime.now());
+        public Gig(Event event, Seszt<Performer> act, Instant start, Instant end) {
+            this(null, event, act, start, end, null, Instant.now());
         }
 
         /**
@@ -1191,10 +1029,10 @@ public class Event extends Model {
             private Performer.PerformerDTO[] act;
 
             /** The start of the Gig, where the act will begin. */
-            private LocalDateTime start;
+            private Instant start;
 
             /** The end of the Gig, where the act will end. */
-            private LocalDateTime end;
+            private Instant end;
 
             /**
              * Converts into this DTO Object.
@@ -1216,7 +1054,7 @@ public class Event extends Model {
      * Determines type of which a Participant is participating in an Event.
      */
     @Getter @FieldNameConstants
-    public static class Participation extends laustrup.bandwichpersistence.core.models.Participation {
+    public static class Participation extends ParticipationBase {
 
         /**
          * The Participant of the participation.
@@ -1275,7 +1113,7 @@ public class Event extends Model {
          * Doesn't have any logic.
          */
         @Getter @Setter
-        public static class DTO extends laustrup.bandwichpersistence.core.models.Participation.DTO {
+        public static class DTO extends ParticipationBase.DTO {
 
             /** The Participant of the participation. */
             private Participant.DTO participant;

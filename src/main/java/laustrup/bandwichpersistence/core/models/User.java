@@ -2,7 +2,6 @@ package laustrup.bandwichpersistence.core.models;
 
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
 import laustrup.bandwichpersistence.core.models.chats.ChatRoom;
-import laustrup.bandwichpersistence.core.models.users.Participant;
 import laustrup.bandwichpersistence.core.utilities.collections.sets.Seszt;
 import lombok.Getter;
 import lombok.Setter;
@@ -205,7 +204,7 @@ public abstract class User extends Model {
     }
 
     @Getter
-    public static class Participation extends laustrup.bandwichpersistence.core.models.Participation {
+    public static class Participation extends ParticipationBase {
 
         private Event _event;
 
@@ -227,7 +226,7 @@ public abstract class User extends Model {
         }
 
         @Getter
-        public static class DTO extends laustrup.bandwichpersistence.core.models.Participation.DTO {
+        public static class DTO extends ParticipationBase.DTO {
 
             private Event.DTO event;
 

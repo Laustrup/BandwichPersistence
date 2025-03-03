@@ -25,7 +25,7 @@ public class Relation {
     }
 
     @Getter @AllArgsConstructor
-    public static class MemberBands {
+    public static class MembershipBands {
 
         private Band.Membership member;
 
@@ -33,7 +33,7 @@ public class Relation {
     }
 
     @Getter @AllArgsConstructor
-    public static class BandMembers {
+    public static class BandMemberships {
 
         private Band band;
 

@@ -6,7 +6,7 @@ import lombok.Setter;
 import java.time.Instant;
 
 @Getter
-public abstract class Participation {
+public abstract class ParticipationBase {
 
     /**
      * The type of which participant is participating in the participation.
@@ -16,21 +16,21 @@ public abstract class Participation {
 
     protected Instant _timestamp;
 
-    public Participation(DTO participation) {
+    public ParticipationBase(DTO participation) {
         this(
                 participation.getType(),
                 participation.getTimestamp()
         );
     }
 
-    public Participation(Type type) {
+    public ParticipationBase(Type type) {
         this(
                 type,
                 Instant.now()
         );
     }
 
-    public Participation(Type type, Instant timestamp) {
+    public ParticipationBase(Type type, Instant timestamp) {
         _type = type;
         _timestamp = timestamp;
     }
@@ -53,7 +53,7 @@ public abstract class Participation {
 
         protected Instant timestamp;
 
-        public DTO(Participation participation) {
+        public DTO(ParticipationBase participation) {
             type = participation.get_type();
             timestamp = participation.get_timestamp();
         }

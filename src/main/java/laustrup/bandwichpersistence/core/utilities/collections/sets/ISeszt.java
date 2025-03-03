@@ -2,6 +2,9 @@ package laustrup.bandwichpersistence.core.utilities.collections.sets;
 
 import laustrup.bandwichpersistence.core.utilities.collections.Collection;
 
+import java.util.Set;
+import java.util.function.Function;
+
 /** Contains the unique features of a Seszt. */
 public interface ISeszt<E> {
 
@@ -135,4 +138,19 @@ public interface ISeszt<E> {
      * @return This Seszt<E> containing the retained elements.
      */
     Seszt<E> retain(E[] elements);
+
+    /**
+     * Creates a new Set with the data of this object.
+     * @return The Set of the data of this object.
+     */
+    Set<E> asSet();
+
+    /**
+     * <div>Creates a new Set with the data of this object.</div>
+     * <div>Also able to convert the data with mapping.</div>
+     * @param conversion Defines how the new data should be converted
+     * @return A Set of the data from this object converted by conversion.
+     * @param <M> The previous E type.
+     */
+    <M> Set<M> asSet(Function<E, M> conversion);
 }
