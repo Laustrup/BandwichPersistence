@@ -1,6 +1,7 @@
-package laustrup.bandwichpersistence.core.models.users;
+package laustrup.bandwichpersistence.core.models;
 
-import laustrup.bandwichpersistence.core.models.*;
+import laustrup.bandwichpersistence.core.models.users.Artist;
+import laustrup.bandwichpersistence.core.models.users.Participant;
 import laustrup.bandwichpersistence.core.services.UserService;
 import laustrup.bandwichpersistence.core.models.chats.messages.Post;
 import laustrup.bandwichpersistence.core.utilities.collections.sets.Seszt;
@@ -49,7 +50,6 @@ public class Band extends Model {
                 new Seszt<>(band.getPosts().stream().map(Post::new)),
                 band.getRunner(),
                 new Seszt<>(band.getFans().stream().map(UserService::from)),
-                band.getHistory(),
                 band.getTimestamp()
         );
     }
@@ -64,10 +64,9 @@ public class Band extends Model {
             Seszt<Post> posts,
             String runner,
             Seszt<User> fans,
-            History history,
             Instant timestamp
     ) {
-        super(id, name + "|" + id, history, timestamp);
+        super(id, name + "|" + id, timestamp);
 
         _name = name;
         _description = description;

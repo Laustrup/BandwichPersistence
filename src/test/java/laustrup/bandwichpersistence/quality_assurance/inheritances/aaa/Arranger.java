@@ -1,4 +1,4 @@
-package laustrup.quality_assurance.inheritances.aaa;
+package laustrup.bandwichpersistence.quality_assurance.inheritances.aaa;
 
 import java.util.function.Function;
 import java.util.function.Supplier;

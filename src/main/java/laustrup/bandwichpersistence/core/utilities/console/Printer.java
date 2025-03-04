@@ -14,18 +14,18 @@ import java.time.LocalDateTime;
  * and high contrast mode is with colour of high contrast.
  * Is intended to log each print, but isn't implemented yet.
  */
-public class Printer extends Painter implements IPrinter {
+public class Printer extends Painter {
 
     /** Containing previous printed contents */
     @Getter
-    public PrintDatabase _db = new PrintDatabase();
+    public static PrintDatabase _db = new PrintDatabase();
 
     /** Determines if the message that is to be printed is an error message or not */
-    private boolean _isAnErrorMessage = false;
+    private static boolean _isAnErrorMessage = false;
 
     /** The specified PrinterMode for this Printer, that will behave depending on the choosen enum. */
     @Getter
-    private PrinterMode _mode = /*Program.get_instance().get_state().equals(Program.State.TESTING)
+    private static PrinterMode _mode = /*Program.get_instance().get_state().equals(Program.State.TESTING)
             ?*/ PrinterMode.HIGH_CONTRAST /*: PrinterMode.NOIRE*/;
 
     /**
@@ -40,37 +40,37 @@ public class Printer extends Painter implements IPrinter {
     }
 
     /** The content that is meant to be printed. */
-    private String _content = new String();
+    private static String _content = new String();
 
     /**
      * This will be printed, if the content is unrecognisable,
      * such as empty or null.
      */
-    private final String _emptyIndicator = "Nothing to print...";
+    private static final String _emptyIndicator = "Nothing to print...";
 
     /**
      * Will determined the allowed length of a print.
      */
     @Getter
-    private final int _length = 143;
+    private static final int _length = 143;
 
     /** Determines how many rows are in the print, including the current. */
-    private int _rows = 1;
+    private static int _rows = 1;
 
     /** The index of the content. */
-    private int _index;
+    private static int _index;
 
     /**
      * Will indicate how a row of the content will start.
      */
     @SuppressWarnings("all")
-    private String _startRow = set_startRow();
+    private static String _startRow = set_startRow();
 
     /**
      * Sets the start of each row depending on the mode.
      * @return The start of each row.
      */
-    private String set_startRow() {
+    private static String set_startRow() {
         _startRow = _mode.equals(PrinterMode.HIGH_CONTRAST) ? cyan("\n | ") : "\n | ";
         return _startRow;
     }
@@ -78,17 +78,17 @@ public class Printer extends Painter implements IPrinter {
     /**
      * The border used for separating the print in the console.
      */
-    private final String _border = generateBorder();
+    private static final String _border = generateBorder();
 
     /**
      * Will describe the border from the given length.
      * @return The described border.
      */
-    private String generateBorder() { return "-".repeat(2); }
+    private static String generateBorder() { return "-".repeat(2); }
 
     /** Is used to be reused as a border for beginning and ending of a print. */
-    private final String _startBorder = "\n-+ " + _border + " +\n $",
-        _endBorder = "\n $\n-+ " + _border + " +\n";
+    private static final String _startBorder = "\n-+ " + _border + " +\n $";
+    private static final String _endBorder = "\n $\n-+ " + _border + " +\n";
 
     /** Singleton instance of the Printer. */
     public static Printer _instance = null;
@@ -104,26 +104,21 @@ public class Printer extends Painter implements IPrinter {
         return _instance;
     }
 
-    @Override
-    public void print(String content) { handlePrint(content); }
-    @Override
+    public static void print(String content) { handlePrint(content); }
     public static void print(String content, Exception ex) {
         _isAnErrorMessage = true;
         handlePrint((content != null && !content.isEmpty() ? content + "\n\n-- EXCEPTION\n\n" : "-- EXCEPTION\n\n") + manage(ex));
     }
 
-    @Override
-    public void print(String content, long performance) {
+    public static void print(String content, long performance) {
         handlePrint(content + measurePerformance(performance));
     }
 
-    @Override
-    public void print(String content, LocalDateTime start) {
+    public static void print(String content, LocalDateTime start) {
         handlePrint(content + measurePerformance(start));
     }
 
-    @Override
-    public String measurePerformance(LocalDateTime start) {
+    public static String measurePerformance(LocalDateTime start) {
         return measurePerformance(Duration.between(start,LocalDateTime.now()).toMillis());
     }
 
@@ -132,8 +127,7 @@ public class Printer extends Painter implements IPrinter {
      * @param performance The performance measured in milliseconds.
      * @return The calculated and measured performance in writing.
      */
-    @Override
-    public String measurePerformance(long performance) {
+    public static String measurePerformance(long performance) {
         long milliseconds = performance >= 1000 ? performance%1000 : performance,
              seconds = performance >= 1000 ? (performance%60000)/1000 : 0,
              minutes = performance >= 3600000 ? (performance%3600000)/60000 : performance/60000,
@@ -150,7 +144,7 @@ public class Printer extends Painter implements IPrinter {
      * @param hours The performance in hours.
      * @return A String with the result written as a statement.
      */
-    private String measurePerformance(long milliseconds, long seconds, long minutes, long hours) {
+    private static String measurePerformance(long milliseconds, long seconds, long minutes, long hours) {
         String hour = hours > 0 ? measurementStatement(hours,"hour",new boolean[] {
             minutes > 0 && (seconds > 0 || milliseconds > 0),
             minutes > 0 || seconds > 0 || milliseconds > 0
@@ -188,7 +182,7 @@ public class Printer extends Painter implements IPrinter {
      * @param statements boolean statements needed to determine amount of measurements.
      * @return The generated measuring statement.
      */
-    private String measurementStatement(long amount, String word, boolean[] statements) {
+    private static String measurementStatement(long amount, String word, boolean[] statements) {
         return isPlural(amount, word) + splitter(statements);
     }
 
@@ -199,7 +193,7 @@ public class Printer extends Painter implements IPrinter {
      * @param word The name of the amount that will occur.
      * @return The amount followed by the word in singular or plural.
      */
-    private String isPlural(long amount, String word) {
+    private static String isPlural(long amount, String word) {
         return amount + (amount > 1 ? " " + word + "s" : " " + word);
     }
 
@@ -208,7 +202,7 @@ public class Printer extends Painter implements IPrinter {
      * @param statements boolean statements needed to determine amount of measurements.
      * @return , or and.
      */
-    private String splitter(boolean[] statements) {
+    private static String splitter(boolean[] statements) {
         return statements.length == 0 ? "!"
             : statements.length == 1 ? (statements[0] ? " and " : "!")
             : statements.length == 2 ? (statements[0] ? ", " : statements[1] ? " and " : "!")
@@ -221,19 +215,18 @@ public class Printer extends Painter implements IPrinter {
      * @param exception The exception that will be managed before displayed.
      * @return The managed exception, as a String representation.
      */
-    private String manage(Exception exception) {
+    private static String manage(Exception exception) {
         return exception.toString();
     }
 
-    @Override
     public void print(Object[] array) { handlePrint(toString(array)); }
 
     /**
      * Will save the content as current, use the content to be printed to console and then save it the latest.
      * @param content The content that is wished to be handled.
      */
-    private void handlePrint(String content) {
-        _content = new String();
+    private static void handlePrint(String content) {
+        _content = "";
 
         switch (_mode) {
             case DEFAULT -> {
@@ -255,7 +248,7 @@ public class Printer extends Painter implements IPrinter {
      * @param print The content that will be printed without borders.
      * @return The print param for saving to be latest.
      */
-    private String systemOut(String print) {
+    private static String systemOut(String print) {
         System.out.println(
             _mode.equals(PrinterMode.HIGH_CONTRAST)
                 ? cyan(_startBorder) + print + cyan(_endBorder)
@@ -265,15 +258,13 @@ public class Printer extends Painter implements IPrinter {
         return print;
     }
 
-    @Override
-    public String toString(Object[] objects) {
+    public static String toString(Object[] objects) {
         return "{ " + arrayContent(objects) + " }";
     }
 
-    @Override
-    public String arrayContent(Object[] objects) {
+    public static String arrayContent(Object[] objects) {
 
-        StringBuilder content = new StringBuilder("");
+        StringBuilder content = new StringBuilder();
 
         for (int i = 0; i < objects.length; i++) {
             content.append(objects[i] == null ? "null" : objects[i].toString());
@@ -290,12 +281,12 @@ public class Printer extends Painter implements IPrinter {
      * @param content The element the content should be generated from.
      * @return The generated content.
      */
-    private String generate(String content) {
+    private static String generate(String content) {
         if (content == null || content.isEmpty()) {
             String generated = _startRow + (_mode.equals(PrinterMode.HIGH_CONTRAST)
                 ? green(_emptyIndicator)
                 : _emptyIndicator);
-            _content = new String();
+            _content = "";
             return generated;
         }
 
@@ -303,7 +294,7 @@ public class Printer extends Painter implements IPrinter {
 
         for (_index = 0; _index < content.length(); _index++) {
             int index = _index;
-            print = generate(print,content);
+            print.append(generate(print,content));
             if (index == _index)
                 _content += content.charAt(index);
         }
@@ -317,7 +308,7 @@ public class Printer extends Painter implements IPrinter {
      * @param content The text, that the generated text will be generated from.
      * @return The updated generated text.
      */
-    private StringBuilder generate(StringBuilder print, String content) {
+    private static StringBuilder generate(StringBuilder print, String content) {
         Colour colour = _mode.equals(PrinterMode.HIGH_CONTRAST) ? setColour(content, _index) : null;
 
         if (wordIsTooLong(content)) {
@@ -345,7 +336,7 @@ public class Printer extends Painter implements IPrinter {
      * @param content The text, that the generated text will be generated from.
      * @return True if a whitespace after the current word is on a higher index than the permitted length.
      */
-    private boolean wordIsTooLong(String content) {
+    private static boolean wordIsTooLong(String content) {
         boolean whitespaceIsFound = false;
         int index = _index;
 
@@ -365,7 +356,7 @@ public class Printer extends Painter implements IPrinter {
      * @param index The current index of the text.
      * @return The colour that has been set.
      */
-    private Colour setColour(String text, int index) {
+    private static Colour setColour(String text, int index) {
         Colour colour;
         text = _startRow + text;
         index += _startRow.length();
@@ -388,7 +379,7 @@ public class Printer extends Painter implements IPrinter {
      * Adds the print to be stored.
      * @return The stored prints.
      */
-    private String[] savePrint() {
+    private static String[] savePrint() {
         return _db.add(_content == null || _content.isEmpty() ? _emptyIndicator : _content);
     }
 
@@ -396,13 +387,13 @@ public class Printer extends Painter implements IPrinter {
      * Adds the print to be stored.
      * @return The stored prints.
      */
-    private String[] savePrint(String content) {
+    private static String[] savePrint(String content) {
         _content = content;
         return _db.add(_content == null || _content.isEmpty() ? _emptyIndicator : _content);
     }
 
     /** A class created to save prints of the Printer */
-    public class PrintDatabase {
+    public static class PrintDatabase {
 
         /** The permitted amount of prints to be stored */
         private final int _storageSize = 5;

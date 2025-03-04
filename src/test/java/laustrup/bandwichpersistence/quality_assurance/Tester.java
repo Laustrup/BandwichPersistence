@@ -1,6 +1,6 @@
-package laustrup.quality_assurance;
+package laustrup.bandwichpersistence.quality_assurance;
 
-import laustrup.quality_assurance.inheritances.aaa.Actor;
+import laustrup.bandwichpersistence.quality_assurance.inheritances.aaa.Actor;
 import laustrup.bandwichpersistence.core.utilities.console.Printer;
 import lombok.NoArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;

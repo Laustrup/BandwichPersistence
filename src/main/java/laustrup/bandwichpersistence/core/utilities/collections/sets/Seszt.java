@@ -29,6 +29,7 @@ public class Seszt<E> extends Collection<E> implements ISeszt<E>, Set<E>, IColle
         this(false);
     }
 
+
     public Seszt(Collection<? extends E> collection) {
         this(collection.get_data());
     }
@@ -58,7 +59,7 @@ public class Seszt<E> extends Collection<E> implements ISeszt<E>, Set<E>, IColle
      * The Seszt will contain data and the map will be initialized as linked.
      * @param data The data that will be contained at initialization.
      */
-    public Seszt(E[] data) {
+    public Seszt(E... data) {
         this(data,false);
     }
 
@@ -122,11 +123,6 @@ public class Seszt<E> extends Collection<E> implements ISeszt<E>, Set<E>, IColle
     @Override
     public Seszt<E> Add(E[] elements) {
         handleAdd(filterUniques(elements));
-        return this;
-    }
-
-    public Seszt<E> Add(Stream<? extends E> stream) {
-        add(stream);
         return this;
     }
 
@@ -340,7 +336,9 @@ public class Seszt<E> extends Collection<E> implements ISeszt<E>, Set<E>, IColle
     }
 
     @Override public Spliterator<E> spliterator() { return Set.super.spliterator(); }
-    @Override public Stream<E> stream() { return Set.super.stream(); }
+    @Override public Stream<E> stream() {
+        return new HashSet(Set.of(_data)).stream();
+    }
     @Override public Stream<E> parallelStream() { return Set.super.parallelStream(); }
 
     @Override

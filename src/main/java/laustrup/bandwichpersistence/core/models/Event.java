@@ -1,7 +1,7 @@
 package laustrup.bandwichpersistence.core.models;
 
+import laustrup.bandwichpersistence.core.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.core.models.users.Participant;
-import laustrup.bandwichpersistence.core.services.DTOService;
 import laustrup.bandwichpersistence.core.utilities.collections.lists.Liszt;
 import laustrup.bandwichpersistence.core.utilities.collections.sets.Seszt;
 import laustrup.bandwichpersistence.core.utilities.console.Printer;
@@ -9,14 +9,12 @@ import laustrup.bandwichpersistence.core.utilities.parameters.NotBoolean;
 import laustrup.bandwichpersistence.core.models.chats.Request;
 import laustrup.bandwichpersistence.core.models.chats.messages.Post;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
-import laustrup.bandwichpersistence.core.models.users.Performer;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 
@@ -116,6 +114,8 @@ public class Event extends Model {
 
     private Seszt<Organisation> _organisations;
 
+    private ChatRoom _chatRoom;
+
     /**
      * This venue is the ones responsible for the Event,
      * perhaps even the place it is held, but not necessarily.
@@ -144,6 +144,8 @@ public class Event extends Model {
     @Setter
     private Seszt<Album> _albums;
 
+    private History _history;
+
     /**
      * Will translate a transport object of this object into a construct of this object.
      * @param event The transport object to be transformed.
@@ -165,6 +167,7 @@ public class Event extends Model {
                 new ContactInfo(event.getContactInfo()),
                 copy(event.getGigs(), Gig::new),
                 copy(event.getOrganisations(), Organisation::new),
+                new ChatRoom(event.getChatRoom()),
                 new Venue(event.getVenue()),
                 copy(event.getRequests(), Request::new),
                 copy(event.getParticipations(), Participation::new),
@@ -191,6 +194,7 @@ public class Event extends Model {
             ContactInfo contactInfo,
             Seszt<Gig> gigs,
             Seszt<Organisation> organisations,
+            ChatRoom chatRoom,
             Venue venue,
             Seszt<Request> requests,
             Seszt<Participation> participations,
@@ -199,7 +203,7 @@ public class Event extends Model {
             History history,
             Instant timestamp
     ) throws InputMismatchException {
-        super(id, title == null || title.isEmpty() ? "Untitled event" : title, history, timestamp);
+        super(id, title == null || title.isEmpty() ? "Untitled event" : title, timestamp);
 
         _description = description;
         _gigs = gigs;
@@ -215,6 +219,7 @@ public class Event extends Model {
         }
 
         _organisations = organisations;
+        _chatRoom = chatRoom;
 
         if (_start != null && _end != null)
             if (Duration.between(openDoors, _start).toMinutes() >= 0)
@@ -234,13 +239,11 @@ public class Event extends Model {
         set_location(location);
         _zoneId = zoneId;
 
-        _requests = requests == null || requests.isEmpty()
-            ? generateRequests()
-            : requests
-        ;
+        _requests = requests;
         _participations = participations;
         _posts = posts;
         _albums = albums;
+        _history = history;
     }
 
     /**
@@ -296,24 +299,6 @@ public class Event extends Model {
     }
 
     /**
-     * Generates Requests for the Performers of the Gigs.
-     * May only be used, in case that this Event is just being created and have some Gigs assigned,
-     * if there is any Requests already, no Requests will be generated.
-     * @return The Requests of this Object.
-     */
-    private Seszt<Request> generateRequests() {
-        if (_requests == null)
-            _requests = new Seszt<>();
-        if (_requests.isEmpty())
-            for (Gig gig : _gigs)
-                for (Performer performer : gig.get_act())
-                    if (!_requests.contains(performer.toString()))
-                        _requests.add(new Request(performer, this));
-
-        return _requests;
-    }
-
-    /**
      * Adds the given Participation to participations of this Event.
      * @param participation A User that will join this Event.
      * @return All the Participations of this Event.
@@ -323,116 +308,11 @@ public class Event extends Model {
     }
 
     /**
-     * Adds the given Gig to gigs of this Event.
-     * @param gig A specific Gig of one Performer for a specific time.
-     * @return All the Gigs of this Event.
-     */
-    public Seszt<Gig> add(Gig gig) { return add(new Gig[]{gig}); }
-
-    /**
-     * Adds multiple given Gigs to the Liszt of Gigs in the current Event.
-     * @param gigs Determines some specific Gigs of one MusicalUser for a specific time.
-     * @return All the Gigs of the current Event.
-     */
-    public Seszt<Gig> add(Gig[] gigs) {
-        gigs = filter(gigs);
-
-        if (gigs.length > 0) {
-            _gigs.add(gigs);
-            add(createRequests(gigs));
-
-            try {
-                calculateTime();
-            } catch (InputMismatchException e) {
-                Printer.print("End date is before beginning date of " + _title + "...", e);
-                _gigs.remove(gigs);
-            }
-        }
-
-        return _gigs;
-    }
-
-    /**
-     * Removes all the Gigs, that already exists in this Event.
-     * @param gigs The Gigs that should be filtered.
-     * @return The filtered Gigs.
-     */
-    private Gig[] filter(Gig[] gigs) {
-        Gig[] storage = new Gig[gigs.length];
-
-        for (int i = 0; i < gigs.length; i++)
-            for (Performer stranger : gigs[i].get_act())
-                for (Gig gig : _gigs)
-                    for (Performer performer : gig.get_act())
-                        if (
-                            stranger.get_id() != performer.get_id()
-                            && !gigs[i].get_start().equals(gig.get_start())
-                            && !gigs[i].get_end().equals(gig.get_end())
-                        )
-                            storage[i] = gigs[i];
-
-        int length = 0;
-        for (Gig value : storage)
-            if (value != null)
-                length++;
-
-        int index = 0;
-        Gig[] filtered = new Gig[length];
-        for (Gig gig : storage) {
-            if (gig != null) {
-                filtered[index] = gig;
-                index++;
-            }
-        }
-
-        return filtered;
-    }
-
-    /**
-     * Removes the given Gig from gigs of current Event.
-     * @param gig Determines a specific gig, that is wished to be removed.
-     * @return All the gigs of the current Event.
-     */
-    public Seszt<Gig> remove(Gig gig) { return remove(new Gig[]{gig}); }
-
-    /**
-     * Removes some given Gigs from the Liszt of gigs from current Event.
-     * Also removes the Requests of the given Gigs.
-     * @param gigs Determines some specific gigs, that is wished to be removed.
-     * @return All the Gigs of the current Event.
-     */
-    public Seszt<Gig> remove(Gig[] gigs) {
-        _gigs.remove(gigs);
-        for (Gig gig : gigs)
-            for (Performer performer : gig.get_act())
-                if (!isPerformerInOtherGigs(performer))
-                    removeRequests(performer);
-
-        calculateTime();
-
-        return _gigs;
-    }
-
-    /**
-     * Checks if the Performer is included in any Gig of this Event.
-     * @param performer The Performer that might be included in a Gig.
-     * @return True if the Performer is included in any Gig.
-     */
-    private boolean isPerformerInOtherGigs(Performer performer) {
-        for (Gig gig : _gigs)
-            for (Performer gigPerformer : gig.get_act())
-                if (gigPerformer.get_id() == performer.get_id())
-                    return true;
-
-        return false;
-    }
-
-    /**
      * Will remove any Requests of this Performer for this Event.
      * @param performer The Performer that should have the Request excluded.
      * @return The Requests of this Event.
      */
-    private Seszt<Request> removeRequests(Performer performer) {
+    private Seszt<Request> removeRequests(Band performer) {
         for (int i = 1; i <= _requests.size(); i++) {
             if (_requests.Get(i).get_user().get_id() == performer.get_id()) {
                 _requests.Remove(i);
@@ -473,32 +353,6 @@ public class Event extends Model {
     }
 
     /**
-     * Creates some requests for the gigs that are about to be created to this Event.
-     * Must be done after add of gigs.
-     * @param gigs The gigs that are about to be created a Request for the current gig.
-     * @return All the created Requests.
-     */
-    private Request[] createRequests(Gig[] gigs) {
-        Request[] requests = new Request[gigs.length];
-
-        for (int i = 0; i < gigs.length; i++) {
-            for (User user : gigs[i].get_act()) {
-                boolean requestAlreadyExist = false;
-                for (Request request : _requests) {
-                    if (request.get_user().get_id() == user.get_id()) {
-                        requestAlreadyExist = true;
-                        break;
-                    }
-                }
-                if (!requestAlreadyExist)
-                    requests[i] = new Request(user, this);
-            }
-        }
-
-        return requests;
-    }
-
-    /**
      * Accepts the request by using a toString() to find the Request.
      * Afterwards using the approve() method to set approved to true.
      * @param request The Request that is wished to have its approved set to true.
@@ -509,8 +363,8 @@ public class Event extends Model {
             return null;
 
         for (Request local : _requests) {
-            if (local.get_id().equals(request.get_id())) {
-                local.set_approved(LocalDateTime.now());
+            if (local.get_userId().equals(request.get_userId())) {
+                local.set_approved(Instant.now());
                 return _requests;
             }
         }
@@ -634,7 +488,7 @@ public class Event extends Model {
             Request localRequest = _requests.Get(i);
 
             if (
-                localRequest.get_id() == request.get_id()
+                localRequest.get_userId() == request.get_userId()
                 && Objects.equals(localRequest.get_eventId(), request.get_eventId())
             ) {
                return _requests.Set(i, request).Get(i);
@@ -659,29 +513,6 @@ public class Event extends Model {
         }
 
         return null;
-    }
-
-    /**
-     * Will set the values of a Gig in the Event.
-     * @param gig The Gig, that is wished to be set.
-     * @return If the Gig is set successfully, it will return the Gig, else it will return null.
-     */
-    public Gig set(Gig gig) {
-        for (int i = 1; i <= _gigs.size(); i++) {
-            int sharedActs = 0;
-
-            for (int j = 0; j < _gigs.get(i).get_act().size(); j++)
-                for (Performer performer : gig.get_act())
-                    if (_gigs.get(i).get_act().get(j).get_id() == performer.get_id())
-                        sharedActs++;
-
-            if (sharedActs == _gigs.get(i).get_act().size()) {
-                _gigs.get(i).set_start(gig.get_start());
-                _gigs.get(i).set_end(gig.get_end());
-            }
-        }
-
-        return _gigs.get(gig.toString());
     }
 
     /**
@@ -818,6 +649,8 @@ public class Event extends Model {
 
         private Set<Organisation.DTO> organisations;
 
+        private ChatRoom.DTO chatRoom;
+
         /**
          * This venue is the ones responsible for the Event,
          * perhaps even the place it is held, but not necessarily.
@@ -845,6 +678,8 @@ public class Event extends Model {
          */
         private Set<Album.DTO> albums;
 
+        private History history;
+
         /**
          * Converts into this DTO Object.
          * @param event The Object to be converted.
@@ -854,6 +689,7 @@ public class Event extends Model {
             description = event.get_description();
             gigs = Seszt.copy(event.get_gigs(), Gig.DTO::new);
             organisations = toSet(event.get_organisations(), Organisation.DTO::new);
+            chatRoom = new ChatRoom.DTO(event.get_chatRoom());
             openDoors = event.get_openDoors();
             start = event.get_start();
             end = event.get_end();
@@ -872,6 +708,7 @@ public class Event extends Model {
             participations = toSet(event.get_participations(), Participation.DTO::new);
             posts = toSet(event.get_posts(), Post.DTO::new);
             albums = toSet(event.get_albums(), Album.DTO::new);
+            history = event.get_history();
         }
     }
 
@@ -889,7 +726,7 @@ public class Event extends Model {
         /**
          * This act is of a Gig and can both be assigned as artists or bands.
          */
-        private Seszt<Performer> _act;
+        private Seszt<Band> _act;
 
         /**
          * The start of the Gig, where the act will begin.
@@ -906,24 +743,14 @@ public class Event extends Model {
          * @param gig The transport object to be transformed.
          */
         public Gig(DTO gig) {
-            super(gig);
-            _event = new Event(gig.getEvent());
-            _act = convert(gig.getAct());
-            _start = gig.getStart();
-            _end = gig.getEnd();
-        }
-
-        /**
-         * Converts dto Performers (acts) into the act.
-         * @param dtos The dto objects to be converted.
-         * @return The performances for this Gig.
-         */
-        private Seszt<Performer> convert(Performer.DTO[] dtos) {
-            Seszt<Performer> performances = new Seszt<>();
-            for (Performer.DTO performerDTO : dtos)
-                performances.add((Performer) DTOService.convert(performerDTO));
-
-            return performances;
+            this(
+                    gig.getId(),
+                    new Event(gig.getEvent()),
+                    copy(gig.getAct(), Band::new),
+                    gig.getStart(),
+                    gig.getEnd(),
+                    gig.getTimestamp()
+            );
         }
 
         /**
@@ -933,19 +760,17 @@ public class Event extends Model {
          * @param act This act is of a Gig and can both be assigned as artists or bands.
          * @param start The start of the Gig, where the act will begin.
          * @param end The end of the Gig, where the act will end.
-         * @param history The Events for this object.
          * @param timestamp The time this Object was created.
          */
         public Gig(
                 UUID id,
                 Event event,
-                Seszt<Performer> act,
+                Seszt<Band> act,
                 Instant start,
                 Instant end,
-                History history,
                 Instant timestamp
         ) {
-            super(id, "Gig:" + id, history, timestamp);
+            super(id, "Gig:" + id, timestamp);
             _event = event;
             _act = act;
             _start = start;
@@ -960,8 +785,8 @@ public class Event extends Model {
          * @param start The start of the Gig, where the act will begin.
          * @param end The end of the Gig, where the act will end.
          */
-        public Gig(Event event, Seszt<Performer> act, Instant start, Instant end) {
-            this(null, event, act, start, end, null, Instant.now());
+        public Gig(Event event, Seszt<Band> act, Instant start, Instant end) {
+            this(null, event, act, start, end, Instant.now());
         }
 
         /**
@@ -970,8 +795,8 @@ public class Event extends Model {
          * @return True if the primary ids matches of the Performer and a Performer of the act,
          *         otherwise false.
          */
-        public boolean contains(Performer performer) {
-            for (Performer actor : _act)
+        public boolean contains(Band performer) {
+            for (Band actor : _act)
                 if (actor.get_id() == performer.get_id())
                     return true;
 
@@ -983,7 +808,7 @@ public class Event extends Model {
          * @param performance The Performer object that is wished to be added.
          * @return All the Performers of the act.
          */
-        public Seszt<Performer> add(Performer performance) {
+        public Seszt<Band> add(Band performance) {
             return _act.Add(performance);
         }
 
@@ -992,7 +817,7 @@ public class Event extends Model {
          * @param performance The performance that should be removed from the act.
          * @return The act of this Gig.
          */
-        public Seszt<Performer> remove(Performer performance) {
+        public Seszt<Band> remove(Band performance) {
             _act.remove(performance);
             return _act;
         }
@@ -1026,7 +851,7 @@ public class Event extends Model {
             private Event.DTO event;
 
             /** This act is of a Gig and can both be assigned as artists or bands. */
-            private Performer.PerformerDTO[] act;
+            private Set<Band.DTO> act;
 
             /** The start of the Gig, where the act will begin. */
             private Instant start;
@@ -1041,9 +866,7 @@ public class Event extends Model {
             public DTO(Gig gig) {
                 super(gig);
                 event = new Event.DTO(gig.get_event());
-                act = new Performer.PerformerDTO[gig.get_act().size()];
-                for (int i = 0; i < act.length; i++)
-                    act[i] = (Performer.PerformerDTO) DTOService.convert(gig.get_act().get(i));
+                act = copy(gig.get_act(), Band.DTO::new);
                 start = gig.get_start();
                 end = gig.get_end();
             }

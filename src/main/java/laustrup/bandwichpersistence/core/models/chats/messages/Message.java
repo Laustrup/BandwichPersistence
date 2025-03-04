@@ -1,15 +1,13 @@
 package laustrup.bandwichpersistence.core.models.chats.messages;
 
-import laustrup.bandwichpersistence.core.models.History;
-import laustrup.bandwichpersistence.core.models.JointModel;
+import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.models.User;
-import laustrup.bandwichpersistence.core.services.DTOService;
+import laustrup.bandwichpersistence.core.services.UserService;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static laustrup.bandwichpersistence.core.models.User.UserDTO;
@@ -18,7 +16,7 @@ import static laustrup.bandwichpersistence.core.models.User.UserDTO;
  * An abstract class that contains common attributes for Messages.
  */
 @Getter @FieldNameConstants
-public abstract class Message extends JointModel {
+public abstract class Message extends Model {
 
     /**
      * The User that wrote the Message.
@@ -36,79 +34,46 @@ public abstract class Message extends JointModel {
      * If null it has not been sent, otherwise it has at the time it has.
      */
     @Setter
-    protected LocalDateTime _sent;
+    protected Instant _sent;
 
     /**
      * Can be null in case that it have never been edited, otherwise it will be the time that it was edited.
      */
-    protected LocalDateTime _edited;
+    protected boolean _edited;
 
-    /**
-     * Can be switched between both true and false, if true the message is public for every User.
-     */
-    @Setter
-    protected boolean _public;
+    protected Instant _read;
 
     /**
      * Converts a Data Transport Object into this object.
      * @param message The Data Transport Object that will be converted.
      */
     public Message(DTO message) {
-        super(message);
-        _author = (User) DTOService.convert(message.getAuthor());
-        _content = message.getContent();
-        _sent = message.getSent();
-        _edited = message.getIsEdited();
-        _public = message.isPublic();
+        this(
+                message.getId(),
+                UserService.from(message.getAuthor()),
+                message.getContent(),
+                message.getSent(),
+                message.isEdited(),
+                message.getRead(),
+                message.getTimestamp()
+        );
     }
 
-    /**
-     * A constructor with all the values of this Object.
-     * @param id The primary id that identifies this unique Object.
-     * @param author The User that wrote the Message.
-     * @param content The content of the written Message.
-     * @param isSent True if the Message is sent.
-     * @param isEdited A Plato object, that will be true if the Message has been edited.
-     *                 Undefined if it hasn't been yet and not sent, but false if it is sent and also not edited.
-     * @param isPublic Can be switched between both true and false, if true the message is public for every User.
-     * @param history The Events for this object.
-     * @param timestamp Specifies the time this entity was created.
-     */
     public Message(
             UUID id,
             User author,
             String content,
-            LocalDateTime isSent,
-            LocalDateTime isEdited,
-            boolean isPublic,
-            History history,
+            Instant sent,
+            boolean isEdited,
+            Instant read,
             Instant timestamp
     ) {
-        super(id, "Message-"+id, history, timestamp);
+        super(id, "Message-"+id, timestamp);
         _author = author;
         _content = content;
-        _sent = isSent;
+        _sent = sent;
         _edited = isEdited;
-        _public = isPublic;
-    }
-
-    /**
-     * Generating a new Message as a draft.
-     * Timestamp will be of now.
-     * @param author The User that wrote the Message.
-     * @param content The content of the written Message.
-     * @param isSent True if the Message is sent.
-     * @param isEdited A Plato object, that will be true if the Message has been edited.
-     *                 Undefined if it hasn't been yet and not sent, but false if it is sent and also not edited.
-     * @param isPublic Can be switched between both true and false, if true the message is public for every User.
-     */
-    public Message(User author, String content, LocalDateTime isSent, LocalDateTime isEdited, boolean isPublic) {
-        super(null, "New Message");
-        _author = author;
-        _content = content;
-        _sent = isSent;
-        _edited = isEdited;
-        _public = isPublic;
+        _read = read;
     }
 
     /**
@@ -135,7 +100,7 @@ public abstract class Message extends JointModel {
     public String edit(String content) {
         _content = content;
         if (_sent != null)
-            _edited = LocalDateTime.now();
+            _edited = true;
 
         return _content;
     }
@@ -144,7 +109,7 @@ public abstract class Message extends JointModel {
      * An abstract class that contains common attributes for Messages.
      */
     @Getter
-    protected abstract static class DTO extends JoinedModelDTO {
+    protected abstract static class DTO extends ModelDTO {
 
         /**
          * The User that wrote the Message.
@@ -159,17 +124,14 @@ public abstract class Message extends JointModel {
         /**
          * If null it has not been sent, otherwise it has at the time it has.
          */
-        protected LocalDateTime sent;
+        protected Instant sent;
 
         /**
          * Can be null in case that it have never been edited, otherwise it will be the time that it was edited.
          */
-        protected LocalDateTime isEdited;
+        protected boolean isEdited;
 
-        /**
-         * Can be switched between both true and false, if true the message is public for every User.
-         */
-        protected boolean isPublic;
+        protected Instant read;
 
         /**
          * Converts into this DTO Object.
@@ -177,11 +139,11 @@ public abstract class Message extends JointModel {
          */
         public DTO(Message message) {
             super(message);
-            this.author = DTOService.convert(message.get_author());
-            this.content = message.get_content();
-            this.sent = message.get_sent();
-            this.isEdited = message.get_edited();
-            this.isPublic = message.is_public();
+            author = UserService.from(message.get_author());
+            content = message.get_content();
+            sent = message.get_sent();
+            isEdited = message.isEdited();
+            read = message.get_read();
         }
     }
 }

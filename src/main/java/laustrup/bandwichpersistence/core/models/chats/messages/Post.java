@@ -1,14 +1,15 @@
 package laustrup.bandwichpersistence.core.models.chats.messages;
 
-import laustrup.bandwichpersistence.core.models.History;
 import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.models.User;
-import laustrup.bandwichpersistence.core.services.DTOService;
+import laustrup.bandwichpersistence.core.services.ModelService;
 import lombok.Getter;
 import lombok.experimental.FieldNameConstants;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
+
+import static laustrup.bandwichpersistence.core.services.ModelService.from;
 
 /**
  * A kind of post that can be posted at any Model Object.
@@ -23,54 +24,24 @@ public class Post extends Message {
 
     /**
      * Will translate a transport object of this object into a construct of this object.
-     * @param bulletin The transport object to be transformed.
+     * @param post The transport object to be transformed.
      */
-    public Post(DTO bulletin) {
-        super(bulletin);
-        _receiver = DTOService.convert(bulletin.getReceiver());
+    public Post(DTO post) {
+        super(post);
+        _receiver = from(post);
     }
 
-    /**
-     * A constructor with all the values of a Bulletin.
-     * @param id The primary id that identifies this unique Object.
-     * @param author The User that wrote the Message.
-     * @param receiver The Model receiver that are having the Bulletin posted at its dashboard.
-     * @param content The content of the written Message.
-     * @param isSent True if the Message is sent.
-     * @param isEdited A Plato object, that will be true if the Message has been edited.
-     *                 Undefined if it hasn't been yet and not sent, but false if it is sent and also not edited.
-     * @param isPublic Can be switched between both true and false, if true the message is public for every User.
-     * @param history The Events for this object.
-     * @param timestamp Specifies the time this entity was created.
-     */
     public Post(
             UUID id,
             User author,
             Model receiver,
             String content,
-            LocalDateTime isSent,
-            LocalDateTime isEdited,
-            boolean isPublic,
-            History history,
+            Instant isSent,
+            boolean isEdited,
+            Instant read,
             Instant timestamp
     ) {
-        super(id, author, content, isSent, isEdited, isPublic, history, timestamp);
-        _receiver = receiver;
-    }
-
-    /**
-     * Generating a new Bulletin as a draft.
-     * Timestamp will be of now.
-     * @param author The User that wrote the Message.
-     * @param receiver The Model receiver that are having the Bulletin posted at its dashboard.
-     * @param content The content of the written Message.
-     */
-    public Post(
-            User author,
-            Model receiver,
-            String content
-    ) {
-        super(author, content, null, null, false);
+        super(id, author, content, isSent, isEdited, read, timestamp);
         _receiver = receiver;
     }
 
@@ -83,7 +54,6 @@ public class Post extends Message {
                 Message.Fields._content,
                 Message.Fields._sent,
                 Message.Fields._edited,
-                Message.Fields._public,
                 Model.Fields._timestamp
             },
             new String[]{
@@ -91,7 +61,6 @@ public class Post extends Message {
                 _content,
                 String.valueOf(_sent),
                 String.valueOf(_edited),
-                String.valueOf(_public),
                 String.valueOf(_timestamp)
             }
         );
@@ -116,7 +85,7 @@ public class Post extends Message {
          */
         public DTO(Post post) {
             super(post);
-            receiver = DTOService.convert(post.get_receiver());
+            receiver = ModelService.from(post.get_receiver());
         }
     }
 }

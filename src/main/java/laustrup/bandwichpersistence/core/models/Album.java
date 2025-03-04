@@ -58,7 +58,6 @@ public class Album extends Model {
      * @param title The title of the Album.
      * @param items The items contained on this Album.
      * @param authorId The creator of the Album.
-     * @param history The Events for this object.
      * @param timestamp The date this Album was created.
      */
     public Album(
@@ -66,10 +65,9 @@ public class Album extends Model {
             String title,
             Seszt<Item> items,
             UUID authorId,
-            History history,
             Instant timestamp
     ) {
-        super(id, title, history, timestamp);
+        super(id, title, timestamp);
         _items = items;
         _authorId = authorId;
     }
@@ -258,10 +256,9 @@ public class Album extends Model {
                 String endpoint,
                 Kind kind,
                 Seszt<UUID> tags,
-                History history,
                 Instant timestamp
         ) {
-            super(title, history, timestamp);
+            super(title, timestamp);
             _endpoint = endpoint;
             _kind = kind;
             _tags = tags;

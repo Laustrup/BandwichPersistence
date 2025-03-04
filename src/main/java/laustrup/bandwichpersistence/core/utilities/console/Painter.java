@@ -55,7 +55,7 @@ public abstract class Painter extends Utility {
     /**
      * This determines which colour have been used for previous colouring.
      */
-    protected Colour _previousColour;
+    protected static Colour _previousColour;
 
     /**
      * Describes the escape-sequences of colours
@@ -186,7 +186,7 @@ public abstract class Painter extends Utility {
      * @param color The colour of the text as an escape-sequence.
      * @return A String with the text an
      */
-    private String colorize(String text, String  color) {
+    private static String colorize(String text, String color) {
         return color + text + RESET;
     }
 
@@ -196,7 +196,7 @@ public abstract class Painter extends Utility {
      * @param colour An enum with the values of the different colours available.
      * @return The generated text with its colour. If default text, it will be white.
      */
-    protected String colorize(String text, Colour colour) {
+    protected static String colorize(String text, Colour colour) {
         if (colour == null)
             return text;
         switch (colour) {
@@ -213,7 +213,7 @@ public abstract class Painter extends Utility {
      * @param text The text that should be in cyan.
      * @return The text with some escape sequences for the console.
      */
-    protected String cyan(String text) {
+    protected static String cyan(String text) {
         _previousColour = Colour.CYAN;
         return colorize(text, HighIntensity.CYAN._colour);
     }
@@ -223,7 +223,7 @@ public abstract class Painter extends Utility {
      * @param text The text that should be in green.
      * @return The text with some escape sequences for the console.
      */
-    protected String green(String text) {
+    protected static String green(String text) {
         _previousColour = Colour.GREEN;
         return colorize(text, HighIntensity.GREEN._colour);
     }
@@ -233,7 +233,7 @@ public abstract class Painter extends Utility {
      * @param text The text that should be in yellow.
      * @return The text with some escape sequences for the console.
      */
-    protected String yellow(String text) {
+    protected static String yellow(String text) {
         _previousColour = Colour.YELLOW;
         return colorize(text, HighIntensity.YELLOW._colour);
     }
@@ -243,7 +243,7 @@ public abstract class Painter extends Utility {
      * @param text The text that should be in red.
      * @return The text with some escape sequences for the console.
      */
-    protected String red(String text) {
+    protected static String red(String text) {
         _previousColour = Colour.RED;
         return colorize(text, HighIntensity.RED._colour);
     }
@@ -253,7 +253,7 @@ public abstract class Painter extends Utility {
      * @param text The text that should be in white.
      * @return The text with some escape sequences for the console.
      */
-    protected String white(String text) {
+    protected static String white(String text) {
         _previousColour = Colour.WHITE;
         return colorize(text, HighIntensity.WHITE._colour);
     }

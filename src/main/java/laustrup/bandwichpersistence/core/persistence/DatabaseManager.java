@@ -11,6 +11,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class DatabaseManager {
 
@@ -21,18 +22,18 @@ public class DatabaseManager {
     }
 
     public static ResultSet read(Query query, DatabaseParameter databaseParameter) {
-        return read(query, List.of(databaseParameter));
+        return read(query, Stream.of(databaseParameter));
     }
 
-    public static ResultSet read(Query query, List<DatabaseParameter> databaseParameters) {
+    public static ResultSet read(Query query, Stream<DatabaseParameter> databaseParameters) {
         return handle(query, Action.READ, databaseParameters);
     }
 
     public static void upsert(Query query) {
-        upsert(query, new ArrayList<>());
+        upsert(query, new ArrayList<>().stream().map(datum -> (DatabaseParameter) datum));
     }
 
-    public static void upsert(Query query, List<DatabaseParameter> parameters) {
+    public static void upsert(Query query, Stream<DatabaseParameter> parameters) {
         handle(query, Action.CUD, parameters);
     }
 
@@ -40,7 +41,7 @@ public class DatabaseManager {
         handle(query, Action.CREATE);
     }
 
-    public static void create(Query query, List<DatabaseParameter> parameters) {
+    public static void create(Query query, Stream<DatabaseParameter> parameters) {
         handle(query, Action.CREATE, parameters);
     }
 
@@ -55,7 +56,7 @@ public class DatabaseManager {
     private static ResultSet handle(
             Query query,
             Action action,
-            List<DatabaseParameter> parameters
+            Stream<DatabaseParameter> parameters
     ) {
         try {
             return execute(query, action, parameters);
@@ -69,10 +70,10 @@ public class DatabaseManager {
     }
 
     public static ResultSet execute(Query query, Action action, String url) throws SQLException {
-        return execute(query, action, new ArrayList<>(), url);
+        return execute(query, action, new ArrayList<>().stream().map(datum -> (DatabaseParameter) datum), url);
     }
 
-    public static ResultSet execute(Query query, Action action, List<DatabaseParameter> parameters) throws SQLException {
+    public static ResultSet execute(Query query, Action action, Stream<DatabaseParameter> parameters) throws SQLException {
         return execute(query, action, parameters, Objects.requireNonNull(DatabaseLibrary.get_urlPath()));
     }
 
@@ -86,13 +87,13 @@ public class DatabaseManager {
             DatabaseParameter parameter,
             String url
     ) throws SQLException {
-        return execute(query, action, List.of(parameter), url);
+        return execute(query, action, Stream.of(parameter), url);
     }
 
     public static ResultSet execute(
             Query query,
             Action action,
-            List<DatabaseParameter> parameters,
+            Stream<DatabaseParameter> parameters,
             String url
     ) throws SQLException {
         if (action != Action.READ)
@@ -137,7 +138,7 @@ public class DatabaseManager {
 
     private static PreparedStatement prepareStatement(
             Query query,
-            List<DatabaseParameter> parameters,
+            Stream<DatabaseParameter> parameters,
             String url
     ) {
         PreparedStatement preparedStatement;
@@ -145,7 +146,7 @@ public class DatabaseManager {
         try {
             int keyIndex = 0,
                 parameterIndex = 1;
-            Map<String, DatabaseParameter> parametersByKey = parameters.stream()
+            Map<String, DatabaseParameter> parametersByKey = parameters
                     .collect(Collectors.toMap(DatabaseParameter::get_key, parameter -> parameter));
 
             for (char character : query.get_script().toCharArray()) {

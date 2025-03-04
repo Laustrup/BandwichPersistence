@@ -1,30 +1,26 @@
 package laustrup.bandwichpersistence.core.models.chats;
 
-import laustrup.bandwichpersistence.core.models.History;
-import laustrup.bandwichpersistence.core.models.Model;
-import laustrup.bandwichpersistence.core.models.Event;
-import laustrup.bandwichpersistence.core.models.User;
-import laustrup.bandwichpersistence.core.services.DTOService;
+import laustrup.bandwichpersistence.core.models.*;
+import laustrup.bandwichpersistence.core.services.ModelService;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
-import static laustrup.bandwichpersistence.core.models.User.UserDTO;
+import static laustrup.bandwichpersistence.core.services.UserService.fromBusinessUser;
 
 /**
  * Determines if a User have approved to be a part of the Event.
  */
 @Getter @FieldNameConstants
-public class Request extends Model {
+public class Request {
 
     /**
      * The User that needs to approve the Event.
      */
-    private User _user;
+    private BusinessUser _user;
 
     /**
      * The Event that has been requested for.
@@ -36,7 +32,7 @@ public class Request extends Model {
      * From the first date that isn't null, this has been approved.
      */
     @Setter
-    private LocalDateTime _approved;
+    private Instant _approved;
 
     /**
      * Will set the approved to now and therefore approve from now on.
@@ -44,7 +40,7 @@ public class Request extends Model {
      */
     public void approve() {
         if (_approved == null)
-            _approved = LocalDateTime.now();
+            _approved = Instant.now();
     }
 
     /**
@@ -62,87 +58,51 @@ public class Request extends Model {
         _approved = null;
     }
 
-    /**
-     * This message will be shown for the user, in order to inform of the request.
-     */
-    @Setter
-    private String _message;
+    private Instant _timestamp;
 
     /**
      * Will translate a transport object of this object into a construct of this object.
      * @param request The transport object to be transformed.
      */
     public Request(DTO request) {
-        super(request);
-        _user = (User) DTOService.convert(request.getUser());
-        _event = new Event(request.getEvent());
-        _approved = request.getApproved();
-        _message = request.getMessage();
+        this(
+                fromBusinessUser(request.getUser()),
+                new Event(request.getEvent()),
+                request.getApproved(),
+                request.getTimestamp()
+        );
     }
 
-    /**
-     * A constructor with all values as parameters, is meant for assembling from database.
-     * @param user The User that is requested for the Gig.
-     * @param event The Event that is hosting the Gig.
-     * @param approved Defines if the Request have been approved.
-     * @param message Details added about the Request, is optional.
-     * @param history The Events for this object.
-     * @param timestamp The date and time the Request was made.
-     */
     public Request(
-            User user,
+            BusinessUser user,
             Event event,
-            LocalDateTime approved,
-            String message,
-            History history,
+            Instant approved,
             Instant timestamp
     ) {
-        super(
-            user != null ? user.get_id() : null,
-            event != null ? event.get_id() : null,
-            user != null && event != null ? "Request of " + user.get_username() + " to " + event.get_title() : "Empty Request",
-            history,
-            timestamp
-        );
-
         if (user == null || event == null)
             throw new IllegalArgumentException("User and event are both required for Request with timestamp: " + timestamp);
 
         _user = user;
         _event = event;
         _approved = approved;
-        _message = message;
-    }
-
-    /**
-     * Default constructor to generate Requests that are just created.
-     * @param user The User that is requested for the Gig.
-     * @param event The Event that is hosting the Gig.
-     */
-    public Request(User user, Event event) {
-        super(
-                user.get_id(),
-                event.get_id(),
-                "Request of " + user.get_username() + " to " + event.get_title()
-        );
-        _message = """
-                This request wishes @user to perform at @event
-                """
-                .replace("@user", user.get_username())
-                .replace("@event", event.get_name());
+        _timestamp = timestamp;
     }
 
     @Override
     public String toString() {
-        return defineToString(
+        return ModelService.defineToString(
             getClass().getSimpleName(),
+            get_userId(),
+            get_eventId(),
             new String[]{
-                Model.Fields._id,
+                "userId",
+                "eventId",
                 Fields._approved,
                 Model.Fields._timestamp
             },
             new String[]{
-                String.valueOf(_id),
+                String.valueOf(get_userId()),
+                String.valueOf(get_eventId()),
                 _approved != null ? _approved.toString() : null,
                 String.valueOf(_timestamp)
             }
@@ -159,30 +119,28 @@ public class Request extends Model {
 
     /** Determines if a User have approved to be a part of the Event. */
     @Getter
-    public static class DTO extends ModelDTO {
+    public static class DTO {
 
         /** The User that needs to approve the Event. */
-        private UserDTO user;
+        private BusinessUser.BusinessUserDTO user;
 
         /** The Event that has been requested for. */
         private Event.DTO event;
 
         /** The value that indicates if the request for the Event has been approved. */
-        private LocalDateTime approved;
+        private Instant approved;
 
-        /** This message will be shown for the user, in order to inform of the request. */
-        private String message;
+        private Instant timestamp;
 
         /**
          * Converts into this DTO Object.
          * @param request The Object to be converted.
          */
         public DTO(Request request) {
-            super(request);
-            user = DTOService.convert(request.get_user());
+            user = fromBusinessUser(request.get_user());
             event = new Event.DTO(request.get_event());
             approved = request.get_approved();
-            message = request.get_message();
+            timestamp = request.get_timestamp();
         }
     }
 }

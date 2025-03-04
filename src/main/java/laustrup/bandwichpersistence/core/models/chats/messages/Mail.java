@@ -7,7 +7,7 @@ import laustrup.bandwichpersistence.core.models.User;
 import lombok.Getter;
 import lombok.experimental.FieldNameConstants;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 /**
@@ -39,7 +39,6 @@ public class Mail extends Message {
      * @param isSent True if the Message is sent.
      * @param isEdited A Plato object, that will be true if the Message has been edited.
      *                 Undefined if it hasn't been yet and not sent, but false if it is sent and also not edited.
-     * @param isPublic Can be switched between both true and false, if true the message is public for every User.
      * @param history The Events for this object.
      * @param timestamp Specifies the time this entity was created.
      */
@@ -48,29 +47,12 @@ public class Mail extends Message {
             ChatRoom chatRoom,
             User author,
             String content,
-            LocalDateTime isSent,
-            LocalDateTime isEdited,
-            boolean isPublic,
-            History history,
+            Instant isSent,
+            boolean isEdited,
+            Instant isRead,
             Instant timestamp
     ) {
-        super(id, author, content, isSent, isEdited, isPublic, history, timestamp);
-        _chatRoom = chatRoom;
-    }
-
-    /**
-     * Generating a new Mail as a draft.
-     * Timestamp will be of now.
-     * @param chatRoom The ChatRoom forum that are having the Mail posted.
-     * @param author The User that wrote the Message.
-     * @param content The content of the written Message.
-     */
-    public Mail(
-            ChatRoom chatRoom,
-            User author,
-            String content
-    ) {
-        super(author, content, null, null, false);
+        super(id, author, content, isSent, isEdited, isRead, timestamp);
         _chatRoom = chatRoom;
     }
 
@@ -84,8 +66,6 @@ public class Mail extends Message {
                 Fields._chatRoom,
                 Message.Fields._content,
                 Message.Fields._sent,
-                Message.Fields._edited,
-                Message.Fields._public,
                 Model.Fields._timestamp
             }, new String[] {
                 String.valueOf(_id),
@@ -93,8 +73,6 @@ public class Mail extends Message {
                 _chatRoom != null ? _chatRoom.toString() : null,
                 _content,
                 String.valueOf(_sent),
-                _edited != null ? _edited.toString() : null,
-                String.valueOf(_public),
                 String.valueOf(_timestamp)
             }
         );

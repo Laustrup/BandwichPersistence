@@ -6,6 +6,7 @@ import laustrup.bandwichpersistence.core.persistence.Scriptorian;
 import laustrup.bandwichpersistence.core.services.FileService;
 import laustrup.bandwichpersistence.core.services.persistence.JDBCService;
 import laustrup.bandwichpersistence.core.scriptorian.repositories.ScriptorianRepository;
+import laustrup.bandwichpersistence.core.utilities.collections.sets.Seszt;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -38,11 +39,11 @@ public class ScriptorianManager {
                 "Scriptorian started"
         );
 
-        List<File> scripts = namingConvention();
+       Seszt<File> scripts = namingConvention();
 
         databaseInteraction(() -> {
             ScriptorianRepository.createDefaultSchemaIfNotExists();
-            List<Scriptorian.Scriptory> scriptoriesWithoutSuccess = scriptoriesWithoutSuccess();
+            Seszt<Scriptorian.Scriptory> scriptoriesWithoutSuccess = scriptoriesWithoutSuccess();
             if (!scriptoriesWithoutSuccess.isEmpty())
                 throw new IllegalStateException(String.format("""
                         %nThere is a conflict with scriptories, please resolve it.
@@ -84,10 +85,10 @@ public class ScriptorianManager {
         });
     }
 
-    private static List<File> namingConvention() {
+    private static Seszt<File> namingConvention() {
         StringBuilder filesRenamed = new StringBuilder();
 
-        List<File> scripts = getScripts();
+       Seszt<File> scripts = getScripts();
 
         scripts.forEach(script -> {
             if (!fileNamedAccepted(script.getName())) {
@@ -104,9 +105,9 @@ public class ScriptorianManager {
         return filesHasBeenRenamed ? getScripts() : scripts;
     }
 
-    private static List<File> getScripts() {
+    private static Seszt<File> getScripts() {
         try {
-            return FileService.getFiles(PathLibrary.get_migrationDirectoryFullPath()).toList();
+            return new Seszt<>(FileService.getFiles(PathLibrary.get_migrationDirectoryFullPath()));
         } catch (FileNotFoundException e) {
             _logger.log(Level.SEVERE, "Scriptorian script not found", e);
             System.exit(3);
@@ -144,27 +145,25 @@ public class ScriptorianManager {
         }
     }
 
-    private static List<Scriptorian.Scriptory> scriptoriesWithoutSuccess() {
+    private static Seszt<Scriptorian.Scriptory> scriptoriesWithoutSuccess() {
         return buildScriptories(ScriptorianRepository.findScriptoriesWithoutSuccess());
     }
 
-    private static List<File> findScriptsNotRecorded(List<File> scripts, List<Scriptorian.Scriptory> scriptories) {
-        List<String> fileNames = scriptories.stream()
-                .map(Scriptorian.Scriptory::get_fileName)
-                .toList();
+    private static Seszt<File> findScriptsNotRecorded(Seszt<File> scripts,Seszt<Scriptorian.Scriptory> scriptories) {
+        Seszt<String> fileNames = new Seszt<>(scriptories.stream()
+                .map(Scriptorian.Scriptory::get_fileName));
 
-        return scripts.stream()
-                .filter(script -> !fileNames.contains(script.getName()))
-                .toList();
+        return new Seszt<>(scripts.stream()
+                .filter(script -> !fileNames.contains(script.getName())));
     }
 
-    private static List<DatabaseParameter> generateParameters(File file, String errorMessage) {
+    private static Seszt<DatabaseParameter> generateParameters(File file, String errorMessage) {
         if (file == null)
             return null;
 
         String[] name = file.getName().split("\\|");
 
-        return List.of(
+        return new Seszt(
                 new DatabaseParameter(Parameter.TITLE.get_key(), name[1]),
                 new DatabaseParameter(Parameter.FILE_NAME.get_key(), file.getName()),
                 new DatabaseParameter(Parameter.ERROR_MESSAGE.get_key(), errorMessage),
@@ -181,8 +180,8 @@ public class ScriptorianManager {
         return buildScriptories(resultSet).getFirst();
     }
 
-    private static List<Scriptorian.Scriptory> buildScriptories(ResultSet resultSet) {
-        return JDBCService.build(
+    private static Seszt<Scriptorian.Scriptory> buildScriptories(ResultSet resultSet) {
+        return new Seszt<>(JDBCService.build(
                 resultSet,
                 () -> {
                     try {
@@ -208,6 +207,6 @@ public class ScriptorianManager {
                         throw new RuntimeException(exception);
                     }
                 }
-        );
+        ));
     }
 }

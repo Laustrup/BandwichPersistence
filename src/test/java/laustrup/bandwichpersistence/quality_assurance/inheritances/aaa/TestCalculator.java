@@ -1,4 +1,4 @@
-package laustrup.quality_assurance.inheritances.aaa;
+package laustrup.bandwichpersistence.quality_assurance.inheritances.aaa;
 
 import java.time.Duration;
 import java.time.LocalDateTime;

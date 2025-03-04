@@ -10,7 +10,8 @@ import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
+
+import static laustrup.bandwichpersistence.core.utilities.collections.sets.Seszt.copy;
 
 @Getter
 public class Organisation extends Model {
@@ -20,6 +21,8 @@ public class Organisation extends Model {
     private ContactInfo _contactInfo;
 
     private Seszt<Event> _events;
+
+    private Seszt<Venue> _venues;
 
     private Seszt<ChatRoom.Template> _chatRoomTemplates;
 
@@ -31,13 +34,13 @@ public class Organisation extends Model {
         this(
                 organisation.getId(),
                 organisation.getTitle(),
-                new Seszt<>(organisation.getEvents().stream().map(Event::new)),
-                new Seszt<>(organisation.getRequests().stream().map(Request::new)),
+                copy(organisation.getEvents(),Event::new),
+                copy(organisation.getVenues(), Venue::new),
+                copy(organisation.getRequests(),Request::new),
                 new ContactInfo(organisation.getContactInfo()),
-                new Seszt<>(organisation.getChatRoomTemplates().stream().map(ChatRoom.Template::new)),
-                new Seszt<>(organisation.getAlbums().stream().map(Album::new)),
-                new Seszt<>(organisation.getEmployees().stream().map(Employee::new)),
-                organisation.getHistory(),
+                copy(organisation.getChatRoomTemplates(),ChatRoom.Template::new),
+                copy(organisation.getAlbums(),Album::new),
+                copy(organisation.getEmployees(),Employee::new),
                 organisation.getTimestamp()
         );
     }
@@ -46,18 +49,19 @@ public class Organisation extends Model {
             UUID id,
             String title,
             Seszt<Event> events,
+            Seszt<Venue> venues,
             Seszt<Request> requests,
             ContactInfo contactInfo,
             Seszt<ChatRoom.Template> chatRoomTemplates,
             Seszt<Album> albums,
             Seszt<Employee> employees,
-            History history,
             Instant timestamp
     ) {
-        super(id, title, history, timestamp);
+        super(id, title, timestamp);
         _requests = requests;
         _contactInfo = contactInfo;
         _events = events;
+        _venues = venues;
         _chatRoomTemplates = chatRoomTemplates;
         _albums = albums;
         _employees = employees;
@@ -72,6 +76,8 @@ public class Organisation extends Model {
 
         private Set<Event.DTO> events;
 
+        private Set<Venue.DTO> venues;
+
         private Set<ChatRoom.Template.DTO> chatRoomTemplates;
 
         private Set<Album.DTO> albums;
@@ -80,22 +86,13 @@ public class Organisation extends Model {
 
         public DTO(Organisation organisation) {
             super(organisation);
-            requests = organisation.get_requests().stream()
-                    .map(Request.DTO::new)
-                    .collect(Collectors.toSet());
+            requests = organisation.get_requests().asSet(Request.DTO::new);
             contactInfo = new ContactInfo.DTO(organisation.get_contactInfo());
-            events = organisation.get_events().stream()
-                    .map(Event.DTO::new)
-                    .collect(Collectors.toSet());
-            chatRoomTemplates = organisation.get_chatRoomTemplates().stream()
-                    .map(ChatRoom.Template.DTO::new)
-                    .collect(Collectors.toSet());
-            albums = organisation.get_albums().stream()
-                    .map(Album.DTO::new)
-                    .collect(Collectors.toSet());
-            employees = organisation.get_employees().stream()
-                    .map(Employee.DTO::new)
-                    .collect(Collectors.toSet());
+            events = organisation.get_events().asSet(Event.DTO::new);
+            venues = organisation.get_venues().asSet(Venue.DTO::new);
+            chatRoomTemplates = organisation.get_chatRoomTemplates().asSet(ChatRoom.Template.DTO::new);
+            albums = organisation.get_albums().asSet(Album.DTO::new);
+            employees = organisation.get_employees().asSet(Employee.DTO::new);
         }
     }
 

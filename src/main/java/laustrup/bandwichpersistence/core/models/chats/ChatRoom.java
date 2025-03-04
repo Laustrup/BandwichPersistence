@@ -3,13 +3,9 @@ package laustrup.bandwichpersistence.core.models.chats;
 import laustrup.bandwichpersistence.core.models.BusinessUser;
 import laustrup.bandwichpersistence.core.models.History;
 import laustrup.bandwichpersistence.core.services.UserService;
-import laustrup.bandwichpersistence.core.utilities.collections.lists.Liszt;
 import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.models.chats.messages.Mail;
 import laustrup.bandwichpersistence.core.models.User;
-import laustrup.bandwichpersistence.core.models.users.Artist;
-import laustrup.bandwichpersistence.core.models.users.Band;
-import laustrup.bandwichpersistence.core.services.DTOService;
 import laustrup.bandwichpersistence.core.utilities.collections.sets.Seszt;
 import lombok.Getter;
 import lombok.experimental.FieldNameConstants;
@@ -31,7 +27,7 @@ public class ChatRoom extends Model {
     /**
      * All the Mails that has been sent will be stored here.
      */
-    private Liszt<Mail> _mails;
+    private Seszt<Mail> _mails;
 
     /**
      * The Users, except the responsible, that can write with each other.
@@ -44,7 +40,7 @@ public class ChatRoom extends Model {
      */
     public ChatRoom(ChatRoom.DTO chatRoom) {
         super(chatRoom);
-        _mails = new Liszt<>();
+        _mails = new Seszt<>();
         convert(chatRoom.getMails());
         convert(chatRoom.getChatters());
     }
@@ -54,7 +50,7 @@ public class ChatRoom extends Model {
      * @param mails The Data Transport Object that will be converted.
      */
     private void convert(Mail.DTO[] mails) {
-        _mails = new Liszt<>();
+        _mails = new Seszt<>();
         for (Mail.DTO mail : mails)
             _mails.add(new Mail(mail));
     }
@@ -66,7 +62,7 @@ public class ChatRoom extends Model {
     private void convert(UserDTO[] chatters) {
         _chatters = new Seszt<>();
         for (UserDTO chatter : chatters)
-            _chatters.add((User) DTOService.convert(chatter));
+            _chatters.add(UserService.from(chatter));
     }
 
     /**
@@ -75,18 +71,16 @@ public class ChatRoom extends Model {
      * @param title The title of the ChatRoom, if it is null or empty, it will be the usernames of the chatters.
      * @param mails The Mails with relations to this ChatRoom.
      * @param chatters The chatters that are members of this ChatRoom.
-     * @param history The Events for this object.
      * @param timestamp The time this ChatRoom was created.
      */
     public ChatRoom(
             UUID id,
             String title,
-            Liszt<Mail> mails,
+            Seszt<Mail> mails,
             Seszt<User> chatters,
-            History history,
             Instant timestamp
     ) {
-        super(id, title, history, timestamp);
+        super(id, title, timestamp);
         _chatters = chatters;
         _title = determineChatRoomTitle(_title);
         _mails = mails;
@@ -99,7 +93,7 @@ public class ChatRoom extends Model {
      * @param mails The Mails with relations to this ChatRoom.
      * @param chatters The chatters that are members of this ChatRoom.
      */
-    public ChatRoom(String title, Liszt<Mail> mails, Seszt<User> chatters) {
+    public ChatRoom(String title, Seszt<Mail> mails, Seszt<User> chatters) {
         super(title);
         _mails = mails;
         _chatters = chatters;
@@ -139,7 +133,7 @@ public class ChatRoom extends Model {
      * @param mail A Mail object, that is wished to be added.
      * @return All the Mails of this ChatRoom.
      */
-    public Liszt<Mail> add(Mail mail) { return add(new Mail[]{mail}); }
+    public Seszt<Mail> add(Mail mail) { return add(new Mail[]{mail}); }
 
     /**
      * Adds Mails to the ChatRoom, if the author of the Mails is a chatter of the ChatRoom.
@@ -147,7 +141,7 @@ public class ChatRoom extends Model {
      * @param mails Mail objects, that is wished to be added.
      * @return All the Mails of this ChatRoom.
      */
-    public Liszt<Mail> add(Mail[] mails) {
+    public Seszt<Mail> add(Mail[] mails) {
         ifExists(mails, () -> {
             for (Mail mail : mails)
                 if (exists(mail.get_author()))
@@ -178,17 +172,8 @@ public class ChatRoom extends Model {
     public Seszt<User> add(User[] chatters) {
         ifExists(chatters,() -> {
             for (User chatter : chatters) {
-                if (chatter.getClass() == Band.class) {
-                    for (Artist artist : ((Band) chatter).get_members())
-                        if (!_chatters.contains(artist)) {
-                            _chatters.add(artist);
-                            _title = determineChatRoomTitle();
-                        }
-                }
-                else {
-                    _chatters.add(chatter);
-                    _title = determineChatRoomTitle();
-                }
+                _chatters.add(chatter);
+                _title = determineChatRoomTitle();
             }
         });
 
@@ -216,7 +201,7 @@ public class ChatRoom extends Model {
      * @param mail The Mail object that is wished to be removed.
      * @return All the Mails of this ChatRoom.
      */
-    public Liszt<Mail> remove(Mail mail) {
+    public Seszt<Mail> remove(Mail mail) {
         for (int i = 1; i <= _mails.size(); i++) {
             if (_mails.Get(i).get_id() == mail.get_id()) {
                 _mails.remove(_mails.Get(i));
@@ -249,9 +234,12 @@ public class ChatRoom extends Model {
      * @return True if it will be edited correctly.
      */
     public boolean edit(Mail mail) {
-        for (int i = 1; i <= _mails.size(); i++)
-            if (_mails.Get(i).get_id() == mail.get_id())
-                return mail == _mails.set(i, mail);
+        for (int i = 1; i <= _mails.size(); i++) {
+            if (_mails.Get(i).get_id() == mail.get_id()) {
+                _mails.set(i, mail);
+                return mail == _mails.get(i);
+            }
+        }
 
         return false;
     }
@@ -282,9 +270,7 @@ public class ChatRoom extends Model {
             this(
                     settings.getId(),
                     settings.getTitle(),
-                    new Seszt<>(settings.getChatters().stream()
-                            .map(UserService::fromBusinessUser)),
-                    settings.getHistory(),
+                    Seszt.copy(settings.getChatters(), chatter -> UserService.fromBusinessUser(chatter)),
                     settings.getTimestamp()
             );
         }
@@ -293,10 +279,9 @@ public class ChatRoom extends Model {
                 UUID id,
                 String title,
                 Seszt<BusinessUser> chatters,
-                History history,
                 Instant timestamp
         ) {
-            super(id, title, history, timestamp);
+            super(id, title, timestamp);
             _chatters = chatters;
         }
 
@@ -339,7 +324,7 @@ public class ChatRoom extends Model {
                 mails[i] = new Mail.DTO(chatRoom.get_mails().get(i));
             chatters = new User.UserDTO[chatRoom.get_chatters().size()];
             for (int i = 0; i < chatters.length; i++)
-                chatters[i] = DTOService.convert(chatRoom.get_chatters().Get(i+1));
+                chatters[i] = UserService.from(chatRoom.get_chatters().get(i));
         }
     }
 }

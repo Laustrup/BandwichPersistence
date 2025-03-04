@@ -1,6 +1,7 @@
 package laustrup.bandwichpersistence.core.services.persistence;
 
 import laustrup.bandwichpersistence.core.persistence.Query;
+import laustrup.bandwichpersistence.core.utilities.collections.lists.Liszt;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -9,11 +10,13 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 public class JDBCService {
 
-    public static <T> List<T> build(ResultSet resultSet, Supplier<T> supplier) {
-        List<T> ts = new ArrayList<>();
+    public static <T> Stream<T> build(ResultSet resultSet, Supplier<T> supplier) {
+        Liszt<T> ts = new Liszt<>();
+
         try {
             while (resultSet.next()) {
                 ts.add(supplier.get());
@@ -22,7 +25,7 @@ public class JDBCService {
             System.out.println(exception.getMessage());
         }
 
-        return ts;
+        return ts.stream();
     }
 
     public static <T> T get(Timestamp timestamp, Function<Timestamp, T> function) {

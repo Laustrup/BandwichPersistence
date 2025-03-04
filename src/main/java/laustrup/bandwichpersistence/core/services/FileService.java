@@ -1,8 +1,5 @@
 package laustrup.bandwichpersistence.core.services;
 
-import laustrup.bandwichpersistence.core.models.Event;
-import laustrup.bandwichpersistence.core.models.User;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;

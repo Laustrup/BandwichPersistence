@@ -67,6 +67,8 @@ public abstract class User extends Model {
 
     protected Seszt<Authority> _authorities;
 
+    protected History _history;
+
     /**
      * Will translate a transport object of this object into a construct of this object.
      * @param user The transport object to be transformed.
@@ -79,10 +81,9 @@ public abstract class User extends Model {
                 user.getLastName(),
                 user.getDescription(),
                 new ContactInfo(user.getContactInfo()),
-                user.getParticipations().stream()
-                        .map(User.Participation::new),
-                user.getSubscription(),
-                user.getAuthorities(),
+                Seszt.copy(user.getParticipations(), User.Participation::new),
+                new Subscription(user.getSubscription()),
+                new Seszt<>(user.getAuthorities().stream()),
                 user.getHistory(),
                 user.getTimestamp()
         );
@@ -104,7 +105,6 @@ public abstract class User extends Model {
         super(
                 id,
                 username + "-" + id,
-                history,
                 timestamp
         );
         _username = username;
@@ -115,6 +115,7 @@ public abstract class User extends Model {
         _participations = participations;
         _subscription = subscription;
         _authorities = authorities;
+        _history = history;
     }
 
     /**
@@ -189,7 +190,7 @@ public abstract class User extends Model {
 
     public Seszt<Participation> remove(Participation participation) {
         for (int i = 1; i <= _participations.size(); i++) {
-            if (_participations.Get(i).get_id() == participation.get_id()) {
+            if (_participations.Get(i).get_eventId() == participation.get_eventId()) {
                 _participations.remove(_participations.Get(i));
                 break;
             }
@@ -223,6 +224,10 @@ public abstract class User extends Model {
         public Participation(Event event, Type type, Instant timestamp) {
             super(type, timestamp);
             _event = event;
+        }
+
+        public UUID get_eventId() {
+            return _event.get_id();
         }
 
         @Getter
@@ -299,23 +304,20 @@ public abstract class User extends Model {
 
         protected Set<Authority> authorities;
 
+        protected History history;
+
         public UserDTO(User user) {
             super(user);
-
             username = user.get_username();
             firstName = user.get_firstName();
             lastName = user.get_lastName();
             fullName = user.get_fullName();
             description = user.get_description();
             contactInfo = new ContactInfo.DTO(user.get_contactInfo());
-
-            participations = Arrays.stream(user.get_participations().get_data())
-                    .map(Participation.DTO::new)
-                    .collect(Collectors.toSet());
-
+            participations = user.get_participations().asSet(Participation.DTO::new);
             subscription = new Subscription.DTO(user.get_subscription());
-
             authorities = user.get_authorities();
+            history = user.get_history();
         }
     }
 }

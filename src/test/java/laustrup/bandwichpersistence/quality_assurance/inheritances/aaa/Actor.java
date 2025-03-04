@@ -1,4 +1,4 @@
-package laustrup.quality_assurance.inheritances.aaa;
+package laustrup.bandwichpersistence.quality_assurance.inheritances.aaa;
 
 import laustrup.bandwichpersistence.core.utilities.console.Printer;
 

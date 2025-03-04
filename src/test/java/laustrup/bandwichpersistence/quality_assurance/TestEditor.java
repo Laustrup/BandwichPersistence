@@ -1,4 +1,4 @@
-package laustrup.quality_assurance;
+package laustrup.bandwichpersistence.quality_assurance;
 
 /**
  * An interface for editing Test.

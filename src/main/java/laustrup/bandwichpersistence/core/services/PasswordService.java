@@ -94,17 +94,15 @@ public class PasswordService {
         };
     }
 
-    public static void check(String password, User user) throws IllegalAccessException {
-        if (user != null && !PasswordService.matches(
-                password,
-                user.get_password()
-        ))
+    public static void check(String plainText, String encoded, String email) throws IllegalAccessException {
+        if (!PasswordService.matches(plainText, encoded)) {
             throw new IllegalAccessException(String.format("""
                     Passwords "%s" and "%s" does not match for user with email "%s"
                     """,
-                    password,
-                    user.get_password(),
-                    user.get_contactInfo().get_email()
+                    plainText,
+                    encoded,
+                    email
             ));
+        }
     }
 }

@@ -4,6 +4,7 @@ import laustrup.bandwichpersistence.core.persistence.DatabaseManager;
 import laustrup.bandwichpersistence.core.persistence.DatabaseParameter;
 import laustrup.bandwichpersistence.core.persistence.Query;
 import laustrup.bandwichpersistence.core.persistence.queries.ScriptorianQueries;
+import laustrup.bandwichpersistence.core.utilities.collections.sets.Seszt;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -23,8 +24,8 @@ public class ScriptorianRepository {
         return DatabaseManager.read(ScriptorianQueries.findAllScriptories);
     }
 
-    public static void putScriptory(List<DatabaseParameter> parameters) {
-        DatabaseManager.create(ScriptorianQueries.insertIntoScriptories, parameters);
+    public static void putScriptory(Seszt<DatabaseParameter> parameters) {
+        DatabaseManager.create(ScriptorianQueries.insertIntoScriptories, parameters.stream());
     }
 
     public static void executeScript(String content) {

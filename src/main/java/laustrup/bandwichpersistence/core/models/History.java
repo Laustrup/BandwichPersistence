@@ -1,28 +1,26 @@
 package laustrup.bandwichpersistence.core.models;
 
+import laustrup.bandwichpersistence.core.utilities.collections.sets.Seszt;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Getter
 public class History {
 
-    private List<Story> _stories;
+    private Seszt<Story> _stories;
 
     private JoinTableDetails _storyTable;
 
     public History(JoinTableDetails storyTable) {
-        this(new ArrayList<>(), storyTable);
+        this(new Seszt<>(), storyTable);
     }
 
-    public History(List<Story> stories, JoinTableDetails storyTable) {
+    public History(Seszt<Story> stories, JoinTableDetails storyTable) {
         if (stories == null)
-            stories = new ArrayList<>();
+            stories = new Seszt<>();
 
         List<UUID> ownerIds = stories.stream()
                 .map(Story::get_ownerId)
@@ -48,7 +46,7 @@ public class History {
 
         private String _title;
 
-        private List<String> _details;
+        private Seszt<String> _details;
 
         private Instant _timestamp;
 
@@ -56,7 +54,7 @@ public class History {
             _id = story.getId();
             _ownerId = story.getOwnerId();
             _title = story.getTitle();
-            _details = story.getDetails();
+            _details = new Seszt<>(story.getDetails().stream());
             _timestamp = story.getTimestamp();
         }
 
@@ -68,7 +66,7 @@ public class History {
         ) {
             _id = id;
             _title = title;
-            _details = details;
+            _details = new Seszt<>(details.stream());
             _timestamp = timestamp;
         }
 
@@ -97,7 +95,7 @@ public class History {
 
             private String title;
 
-            private List<String> details;
+            private Set<String> details;
 
             private Instant timestamp;
 
@@ -105,7 +103,7 @@ public class History {
                 id = story.get_id();
                 ownerId = story.get_ownerId();
                 title = story.get_title();
-                details = story.get_details();
+                details = story.get_details().asSet();
                 timestamp = story.get_timestamp();
             }
         }

@@ -1,7 +1,7 @@
 package laustrup.bandwichpersistence.core.models;
 
+import laustrup.bandwichpersistence.core.services.ModelService;
 import laustrup.bandwichpersistence.core.utilities.collections.Collection;
-import laustrup.bandwichpersistence.core.utilities.console.Printer;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -15,6 +15,7 @@ import java.util.UUID;
  * When it is created through a constructor, that doesn't ask for a DateTime.
  * It will use the DateTime of now.
  */
+@Getter
 @FieldNameConstants
 @ToString(of = {"_id", "_title", "_timestamp"})
 public abstract class Model {
@@ -24,7 +25,6 @@ public abstract class Model {
      * Must be unique, if there ain't other ids for this entity.
      * UUIDs are unique hex decimal values of the specific entity.
      */
-    @Getter
     protected UUID _id;
 
     /**
@@ -32,13 +32,12 @@ public abstract class Model {
      * Can be of different purposes,
      * such as username or simply for naming a unit.
      */
-    @Getter @Setter
+    @Setter
     protected String _title;
 
     /**
      * Specifies the time this entity was created.
      */
-    @Getter
     protected Instant _timestamp;
 
     /**
@@ -46,14 +45,7 @@ public abstract class Model {
      * Useful to identify an incident or change.
      * Is added to the Response entity class when answering.
      */
-    @Getter
     protected Situation _situation = Situation.NONE;
-
-    /**
-     * Contains stories that consists of events or logs.
-     */
-    @Getter
-    protected History _history;
 
     /**
      * Sets the Situation.
@@ -70,11 +62,6 @@ public abstract class Model {
         return _situation;
     }
 
-    /** For the defineToString of how it should be split. */
-    @FieldNameConstants.Exclude
-    private final String _toStringFieldSplitter = ",\n \t",
-            _toStringKeyValueSplitter = ":\t";
-
     /**
      * Converts the data transport object into this model.
      * @param model The data transport model to be converted.
@@ -83,7 +70,6 @@ public abstract class Model {
         _id = model.getId();
         _title = model.getClass().getSimpleName() + " \"" + model.getId() + "\"";
         _situation = model.getSituation();
-        _history = model.getHistory();
         _timestamp = model.getTimestamp();
     }
 
@@ -103,25 +89,21 @@ public abstract class Model {
 
     /**
      * @param title A title describing this entity internally.
-     * @param history A collection of events that has occurred.
      * @param timestamp Specifies the time this entity was created.
      */
-    public Model(String title, History history, Instant timestamp) {
+    public Model(String title, Instant timestamp) {
         _title = title;
-        _history = history;
         _timestamp = timestamp;
     }
 
     /**
      * @param id A hex decimal value identifying this item uniquely.
      * @param title A title describing this entity internally.
-     * @param history A collection of events that has occurred.
      * @param timestamp Specifies the time this entity was created.
      */
-    public Model(UUID id, String title, History history, Instant timestamp) {
+    public Model(UUID id, String title, Instant timestamp) {
         _id = id;
         _title = title;
-        _history = history;
         _timestamp = timestamp;
     }
 
@@ -161,24 +143,7 @@ public abstract class Model {
      * @return The generated toString.
      */
     protected String defineToString(String title, String[] keys, String[] values) {
-        StringBuilder content = new StringBuilder();
-
-        try {
-            if (values.length <= keys.length)
-                for (int i = 0; i < keys.length; i++) {
-                    content.append(keys[i]).append(_toStringKeyValueSplitter).append(values[i] != null ? values[i] : "null");
-                    if (i < keys.length-1)
-                        content.append(_toStringFieldSplitter);
-                }
-            else
-                content = new StringBuilder("Content couldn't be generated, since there are less attributes than values");
-        } catch (Exception e) {
-            String message = title + " had an error when trying to define its ToString.";
-            Printer.print(message, e);
-            content = new StringBuilder(get_id() != null ? String.valueOf(get_id()) : message);
-        }
-
-        return title + "(\n \t" + content + "\n)";
+        return ModelService.defineToString(title, get_id(), keys, values);
     }
 
     /**
@@ -204,10 +169,6 @@ public abstract class Model {
         @Setter
         protected String title;
 
-        /**
-         * A collection of events that has occurred.
-         */
-        protected History history;
 
         /** Specifies the time this entity was created. */
         protected Instant timestamp;
@@ -223,7 +184,6 @@ public abstract class Model {
         public ModelDTO(Model model) {
             id = model.get_id();
             title = model.get_title();
-            history = model.get_history();
             timestamp = model.get_timestamp();
             situation = model.get_situation();
         }

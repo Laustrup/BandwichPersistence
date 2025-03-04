@@ -10,7 +10,8 @@ import lombok.experimental.FieldNameConstants;
 import java.time.Instant;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
+
+import static laustrup.bandwichpersistence.core.utilities.collections.sets.Seszt.copy;
 
 /**
  * A Venue can be the host to an Event and contains different information about
@@ -58,14 +59,13 @@ public class Venue extends Model {
                 venue.getId(),
                 venue.getTitle(),
                 venue.getDescription(),
-                new Seszt<>(venue.getOrganisations().stream().map(Organisation::new)),
-                new Seszt<>(venue.getAlbums().stream().map(Album::new)),
+                copy(venue.getOrganisations(),Organisation::new),
+                copy(venue.getAlbums(),Album::new),
                 new ContactInfo.Address(venue.getLocation()),
                 venue.getStageSetup(),
-                new Seszt<>(venue.getPosts().stream().map(Post::new)),
-                new Seszt<>(venue.getRatings().stream().map(Rating::new)),
+                copy(venue.getPosts(),Post::new),
+                copy(venue.getRatings(),Rating::new),
                 venue.getSize(),
-                venue.getHistory(),
                 venue.getTimestamp()
         );
     }
@@ -81,10 +81,9 @@ public class Venue extends Model {
             Seszt<Post> posts,
             Seszt<Rating> ratings,
             int size,
-            History history,
             Instant timestamp
     ) {
-        super(id, title, history, timestamp);
+        super(id, title, timestamp);
         _description = description;
         _organisations = organisations;
         _albums = albums;
@@ -153,13 +152,12 @@ public class Venue extends Model {
          */
         public DTO(Venue venue) {
             super(venue);
-
             location = new ContactInfo.Address.DTO(venue.get_location());
             description = venue.get_description();
-            organisations = venue.get_organisations().stream().map(Organisation.DTO::new).collect(Collectors.toSet());
-            albums = venue.get_albums().stream().map(Album.DTO::new).collect(Collectors.toSet());
-            posts = venue.get_posts().stream().map(Post.DTO::new).collect(Collectors.toSet());
-            ratings = venue.get_ratings().stream().map(Rating.DTO::new).collect(Collectors.toSet());
+            organisations = venue.get_organisations().asSet(Organisation.DTO::new);
+            albums = venue.get_albums().asSet(Album.DTO::new);
+            posts = venue.get_posts().asSet(Post.DTO::new);
+            ratings = venue.get_ratings().asSet(Rating.DTO::new);
             stageSetup = venue.get_stageSetup();
             size = venue.get_size();
         }
