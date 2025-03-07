@@ -22,7 +22,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -33,13 +32,18 @@ public class ScriptorianManager {
 
     private static final Logger _logger = Logger.getLogger(ScriptorianManager.class.getSimpleName());
 
+    private static final char _splitter = '_';
+
+    private static final String _dateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+
     public static void onStartup() {
         _logger.log(
                 Level.INFO,
                 "Scriptorian started"
         );
 
-       Seszt<File> scripts = namingConvention();
+        Instant now = Instant.now();
+        Seszt<File> scripts = namingConvention(now);
 
         databaseInteraction(() -> {
             ScriptorianRepository.createDefaultSchemaIfNotExists();
@@ -65,7 +69,7 @@ public class ScriptorianManager {
                     currentFileName = file.getName();
 
                     ScriptorianRepository.executeScript(FileService.getContent(file));
-                    ScriptorianRepository.putScriptory(generateParameters(currentFile, null));
+                    ScriptorianRepository.putScriptory(generateParameters(currentFile, null, now));
 
                     _logger.log(
                             Level.INFO,
@@ -73,7 +77,7 @@ public class ScriptorianManager {
                     );
                 }
             } catch (Exception exception) {
-                ScriptorianRepository.putScriptory(generateParameters(currentFile, exception.getMessage()));
+                ScriptorianRepository.putScriptory(generateParameters(currentFile, exception.getMessage(), now));
 
                 _logger.log(
                         Level.WARNING,
@@ -85,22 +89,22 @@ public class ScriptorianManager {
         });
     }
 
-    private static Seszt<File> namingConvention() {
+    private static Seszt<File> namingConvention(Instant now) {
         StringBuilder filesRenamed = new StringBuilder();
 
-       Seszt<File> scripts = getScripts();
+        Seszt<File> scripts = getScripts();
 
         scripts.forEach(script -> {
             if (!fileNamedAccepted(script.getName())) {
-                filesRenamed.append(script.getName());
-                rename(script);
+                filesRenamed.append("\n").append(script.getName());
+                rename(script, now);
             }
         });
 
         boolean filesHasBeenRenamed = !filesRenamed.isEmpty();
 
         if (filesHasBeenRenamed)
-            _logger.log(Level.INFO, "Renamed " + String.join(filesRenamed.toString(), " - "));
+            _logger.log(Level.INFO, "Renamed " + filesRenamed);
 
         return filesHasBeenRenamed ? getScripts() : scripts;
     }
@@ -119,18 +123,19 @@ public class ScriptorianManager {
     private static boolean fileNamedAccepted(String fileName) {
         char[] chars = fileName.toCharArray();
 
-        return chars.length > 20 && chars[0] == 'V' && chars[20] == '|';
+        return chars.length > 20 && chars[0] == 'V' && chars[20] == _splitter;
     }
 
-    private static void rename(File file) {
+    private static void rename(File file, Instant now) {
         try {
             Files.move(
                     file.toPath(),
                     Paths.get(PathLibrary.get_migrationDirectoryFullPath() + String.format(
-                            "V%s|%s",
-                            LocalDateTime.ofInstant(Instant.now(), ZoneId.of("GMT"))
+                            "V%s%s%s",
+                            LocalDateTime.ofInstant(now, ZoneId.of("GMT"))
                                     .truncatedTo(ChronoUnit.SECONDS)
-                                    .format(DateTimeFormatter.ISO_DATE_TIME),
+                                    .format(DateTimeFormatter.ofPattern(_dateTimeFormat.replace(":", "-"))),
+                            _splitter,
                             file.getName()
                     )),
                     StandardCopyOption.REPLACE_EXISTING
@@ -157,21 +162,13 @@ public class ScriptorianManager {
                 .filter(script -> !fileNames.contains(script.getName())));
     }
 
-    private static Seszt<DatabaseParameter> generateParameters(File file, String errorMessage) {
-        if (file == null)
-            return null;
-
-        String[] name = file.getName().split("\\|");
-
-        return new Seszt(
-                new DatabaseParameter(Parameter.TITLE.get_key(), name[1]),
+    private static Seszt<DatabaseParameter> generateParameters(File file, String errorMessage, Instant versionstamp) {
+        return file == null ? null : new Seszt<>(
+                new DatabaseParameter(Parameter.TITLE.get_key(), file.getName().split(String.valueOf(_splitter))[1]),
                 new DatabaseParameter(Parameter.FILE_NAME.get_key(), file.getName()),
                 new DatabaseParameter(Parameter.ERROR_MESSAGE.get_key(), errorMessage),
                 new DatabaseParameter(Parameter.CONTENT.get_key(), FileService.getContent(file)),
-                new DatabaseParameter(Parameter.VERSIONSTAMP.get_key(), LocalDateTime.parse(
-                        name[0].substring(1).replace('T', ' '),
-                        DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-                )),
+                new DatabaseParameter(Parameter.VERSIONSTAMP.get_key(), versionstamp),
                 new DatabaseParameter(Parameter.SUCCESSSTAMP.get_key(), errorMessage == null ? Instant.now() : null)
         );
     }
