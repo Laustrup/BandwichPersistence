@@ -19,7 +19,7 @@ public class Artist extends BusinessUser {
     /**
      * The Bands that the Artist is a member of.
      */
-    private Seszt<Band> _bands;
+    private Seszt<Band.Membership> _bandMemberships;
 
     /**
      * The Requests requested for this Artist.
@@ -57,7 +57,7 @@ public class Artist extends BusinessUser {
                 new Seszt<>(artist.getAuthorities().stream()),
                 new Seszt<>(artist.getChatRooms().stream().map(ChatRoom::new)),
                 new Seszt<>(artist.getParticipations().stream().map(Participation::new)),
-                new Seszt<>(artist.getBands().stream().map(Band::new)),
+                new Seszt<>(artist.getBandMemberships().stream().map(Band.Membership::new)),
                 new Seszt<>(artist.getGigs().stream().map(Event.Gig::new)),
                 artist.getRunner(),
                 new Seszt<>(artist.getFollows().stream().map(Follow::new)),
@@ -80,7 +80,7 @@ public class Artist extends BusinessUser {
             Seszt<Authority> authorities,
             Seszt<ChatRoom> chatRooms,
             Seszt<Participation> participations,
-            Seszt<Band> bands,
+            Seszt<Band.Membership> bandMemberships,
             Seszt<Event.Gig> gigs,
             String runner,
             Seszt<Follow> follows,
@@ -104,49 +104,13 @@ public class Artist extends BusinessUser {
                 timestamp
         );
         _albums = albums;
-        _bands = bands;
+        _bandMemberships = bandMemberships;
         _requests = requests;
         _ratings = ratings;
         _runner = runner;
         _gigs = gigs;
         _follows = follows;
 
-    }
-
-    /**
-     * Adds a Band to the Liszt of bands.
-     * @param band A specific Band, that is wished to be added.
-     * @return The whole Liszt of bands.
-     */
-    public Seszt<Band> add(Band band) {
-        return add(new Band[]{band});
-    }
-
-    /**
-     * Adds multiple Bands to the Liszt of bands.
-     * @param bands Some specific Bands, that is wished to be added.
-     * @return The whole Liszt of bands.
-     */
-    public Seszt<Band> add(Band[] bands) {
-        return _bands.Add(bands);
-    }
-
-    /**
-     * Removes a Band from the Liszt of bands.
-     * @param band A specific Band, that is wished to be removed.
-     * @return The whole Liszt of bands.
-     */
-    public Seszt<Band> remove(Band band) {
-        return remove(new Band[]{band});
-    }
-
-    /**
-     * Removes multiple Bands from the Liszt of bands.
-     * @param bands Some specific Bands, that is wished to be removed.
-     * @return The whole Liszt of bands.
-     */
-    public Seszt<Band> remove(Band[] bands) {
-        return _bands.remove(bands);
     }
 
     /**
@@ -196,7 +160,7 @@ public class Artist extends BusinessUser {
         /**
          * The Bands that the Artist is a member of.
          */
-        private Set<Band.DTO> bands;
+        private Set<Band.Membership.DTO> bandMemberships;
 
         /**
          * The Requests requested for this Artist.
@@ -229,7 +193,7 @@ public class Artist extends BusinessUser {
          */
         public DTO(Artist artist) {
             super(artist);
-            bands = artist.get_bands().stream().map(Band.DTO::new).collect(Collectors.toSet());
+            bandMemberships = artist.get_bandMemberships().stream().map(Band.Membership.DTO::new).collect(Collectors.toSet());
             requests = artist.get_requests().stream().map(Request.DTO::new).collect(Collectors.toSet());
             gigs = artist.get_gigs().stream().map(Event.Gig.DTO::new).collect(Collectors.toSet());
             follows = artist.get_follows().stream().map(Follow.DTO::new).collect(Collectors.toSet());

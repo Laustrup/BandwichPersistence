@@ -44,6 +44,8 @@ public class Venue extends Model {
     @Setter
     private String _stageSetup;
 
+    private Seszt<String> _areas;
+
     /**
      * The size of the stage and room, that Events can be held at.
      */
@@ -60,11 +62,12 @@ public class Venue extends Model {
                 venue.getTitle(),
                 venue.getDescription(),
                 copy(venue.getOrganisations(),Organisation::new),
-                copy(venue.getAlbums(),Album::new),
+                copy(venue.getAlbums(), Album::new),
                 new ContactInfo.Address(venue.getLocation()),
                 venue.getStageSetup(),
-                copy(venue.getPosts(),Post::new),
-                copy(venue.getRatings(),Rating::new),
+                copy(venue.getPosts(), Post::new),
+                copy(venue.getRatings(), Rating::new),
+                copy(venue.getAreas(), area -> area),
                 venue.getSize(),
                 venue.getTimestamp()
         );
@@ -80,6 +83,7 @@ public class Venue extends Model {
             String stageSetup,
             Seszt<Post> posts,
             Seszt<Rating> ratings,
+            Seszt<String> areas,
             int size,
             Instant timestamp
     ) {
@@ -91,6 +95,7 @@ public class Venue extends Model {
         _stageSetup = stageSetup;
         _posts = posts;
         _ratings = ratings;
+        _areas = areas;
         _size = size;
     }
 
@@ -136,6 +141,8 @@ public class Venue extends Model {
 
         private Set<Rating.DTO> ratings;
 
+        private Set<String> areas;
+
         /**
          * The description of the gear that the Venue posses.
          */
@@ -158,6 +165,7 @@ public class Venue extends Model {
             albums = venue.get_albums().asSet(Album.DTO::new);
             posts = venue.get_posts().asSet(Post.DTO::new);
             ratings = venue.get_ratings().asSet(Rating.DTO::new);
+            areas = venue.get_areas().asSet();
             stageSetup = venue.get_stageSetup();
             size = venue.get_size();
         }

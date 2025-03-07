@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.experimental.FieldNameConstants;
 
 import java.time.Instant;
-import java.util.Collections;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -19,169 +19,112 @@ public class Album extends Model {
     /**
      * Items containing endpoints that are being used for getting the image/music file.
      */
-    private Seszt<Item> _items;
-
-    /**
-     * The id of the main author of the current Album.
-     * Is meant for if there is a Band, then the Band is the first mention
-     * or if there is an image, then multiple people might be on the image,
-     * but there will then be only one who made the upload.
-     */
-    private UUID _authorId;
+    private Seszt<Media> _media;
 
     /**
      * Will translate a transport object of this object into a construct of this object.
      * @param album The transport object to be transformed.
      */
     public Album(Album.DTO album) {
-        super(album);
-        _items = new Seszt<>();
-        convert(album.getItems());
-        _authorId = album.getAuthorId();
-    }
-
-    /**
-     * Will translate some transport objects of this object into a construct of this object.
-     * @param dtos The transport objects to be transformed.
-     * @return The current object of AlbumItems.
-     */
-    private Seszt<Item> convert(Item.DTO[] dtos) {
-        for (Item.DTO item : dtos)
-            _items.add(new Item(item));
-
-        return _items;
+        this(
+                album.getId(),
+                album.getTitle(),
+                Seszt.copy(album.getMedia(), Media::new),
+                album.getTimestamp()
+        );
     }
 
     /**
      * A constructor with all the values of an Album.
      * @param id The primary id that identifies this unique Object.
      * @param title The title of the Album.
-     * @param items The items contained on this Album.
-     * @param authorId The creator of the Album.
+     * @param media The items contained on this Album.
      * @param timestamp The date this Album was created.
      */
     public Album(
             UUID id,
             String title,
-            Seszt<Item> items,
-            UUID authorId,
+            Seszt<Media> media,
             Instant timestamp
     ) {
         super(id, title, timestamp);
-        _items = items;
-        _authorId = authorId;
+        _media = media;
     }
 
     /**
      * This constructor can be used to generate a new Album.
      * The timestamp will be for now.
      * @param title The title of the Album.
-     * @param authorId The creator of the Album.
      */
-    public Album(
-            String title,
-            UUID authorId
-    ) {
-        this(title, new Seszt<>(), authorId);
+    public Album(String title) {
+        this(title, new Seszt<>());
     }
 
     /**
      * This constructor can be used to generate a new Album.
      * The timestamp will be for now.
      * @param title The title of the Album.
-     * @param items The items contained on this Album.
-     * @param authorId The creator of the Album.
+     * @param media The items contained on this Album.
      */
     public Album(
             String title,
-            Seszt<Item> items,
-            UUID authorId
+            Seszt<Media> media
     ) {
         super(title);
-        _items = items;
-        _authorId = authorId;
+        _media = media;
     }
 
     /**
      * Will add an item to the Album.
-     * @param item The item that will be added to the Album.
+     * @param media The item that will be added to the Album.
      * @return All the endpoints of the item.
      */
-    public Seszt<Item> add(Item item) {
-        return add(new Seszt<>(item));
+    public Seszt<Media> add(Media media) {
+        return add(new Seszt<>(media));
     }
 
     /**
      * Will add items to the Album.
      * If the item is music and the author is not an Artist or Band, it will not be added.
-     * @param items Items of the contents of the Album.
+     * @param media Items of the contents of the Album.
      * @return All the items of the Album.
      */
-    public Seszt<Item> add(Item[] items) {
-        return add(new Seszt<>(items));
+    public Seszt<Media> add(Media[] media) {
+        return add(new Seszt<>(media));
     }
 
     /**
      * Will add items to the Album.
      * If the item is music and the author is not an Artist or Band, it will not be added.
-     * @param items Items of the contents of the Album.
+     * @param media Items of the contents of the Album.
      * @return All the items of the Album.
      */
-    public Seszt<Item> add(Seszt<Item> items) {
-        _items.addAll(items);
-        return _items;
-    }
-
-    /**
-     * Will add an item to the items of the Album.
-     * Will identify by the endpoint, so endpoints can not be set...
-     * @param item The item that should be replaced with its common id in items.
-     * @return All the items.
-     */
-    public Seszt<Item> set(Item item) {
-        return set(new Seszt<>(new Item[]{item}));
-    }
-
-    /**
-     * Will set an item of the Album.
-     * Will identify by the endpoint, so endpoints can not be set...
-     * @param items The Items that will be replaced with its common endpoint in items.
-     * @return All the items.
-     */
-    public Seszt<Item> set(Seszt<Item> items) {
-        for (Item item : items) {
-            for (int i = 1; i <= _items.size(); i++) {
-                if (_items.Get(i).get_endpoint().equals(item.get_endpoint())) {
-                    _items.set(i,item);
-                    break;
-                }
-            }
-        }
-
-        return _items;
+    public Seszt<Media> add(Seszt<Media> media) {
+        _media.addAll(media);
+        return _media;
     }
 
     /**
      * Will remove an item of the Album.
-     * @param item The item that should be removed from the Album.
+     * @param media The item that should be removed from the Album.
      * @return All the items of this Album.
      */
-    public Seszt<Item> remove(Item item) { return remove(new Item[]{item}); }
+    public Seszt<Media> remove(Media media) { return remove(new Media[]{media}); }
 
     /**
      * Will remove some items of the Album.
-     * @param items The items that should be removed from the Album.
+     * @param media The items that should be removed from the Album.
      * @return All the items of this Album.
      */
-    public Seszt<Item> remove(Liszt<Item> items) { return remove(items.get_data()); }
+    public Seszt<Media> remove(Liszt<Media> media) { return remove(media.get_data()); }
 
     /**
      * Will remove some items of the Album.
-     * @param items The items that should be removed from the Album.
+     * @param media The items that should be removed from the Album.
      * @return All the items of this Album.
      */
-    public Seszt<Item> remove(Item[] items) {
-        return _items.remove(items);
+    public Seszt<Media> remove(Media[] media) {
+        return _media.remove(media);
     }
 
     @Override
@@ -205,10 +148,7 @@ public class Album extends Model {
      * Has a link to the endpoint of the file source.
      */
     @Getter @FieldNameConstants
-    public static class Item extends Model {
-
-        /** Categories the tagged people, who have participated on the item of the album. */
-        private Seszt<UUID> _tags;
+    public static class Media extends Model {
 
         /** The endpoint for a URL, that is used to get the file of the item. */
         private String _endpoint;
@@ -221,98 +161,26 @@ public class Album extends Model {
 
         /**
          * Will translate a transport object of this object into a construct of this object.
-         * @param albumItem The transport object to be transformed.
+         * @param item The transport object to be transformed.
          */
-        public Item(DTO albumItem) {
-            super(albumItem);
-            _endpoint = albumItem.getEndpoint();
-            _kind = Kind.valueOf(albumItem.getKind().toString());
-            _tags = new Seszt<>();
-            convert(albumItem.getTags());
+        public Media(DTO item) {
+            this(
+                    item.getTitle(),
+                    item.getEndpoint(),
+                    item.getKind(),
+                    item.getTimestamp()
+            );
         }
 
-        /**
-         * Will translate some transport objects of this object into a construct of this object.
-         * @param dtos The transport objects to be transformed.
-         * @return The current object of tags.
-         */
-        private Seszt<UUID> convert(UUID[] dtos) {
-            Collections.addAll(_tags, dtos);
-
-            return _tags;
-        }
-
-        /**
-         * Constructor with all values.
-         * @param title The title of the item.
-         * @param endpoint The endpoint location for the file.
-         * @param kind Determines if this is music or an image.
-         * @param tags The people joined at this item.
-         * @param history The Events for this object.
-         * @param timestamp The date this item is posted.
-         */
-        public Item(
+        public Media(
                 String title,
                 String endpoint,
                 Kind kind,
-                Seszt<UUID> tags,
                 Instant timestamp
         ) {
             super(title, timestamp);
             _endpoint = endpoint;
             _kind = kind;
-            _tags = tags;
-        }
-
-        /**
-         * For creating a new AlbumItem.
-         * Timestamp will be of now.
-         * @param title The title of the item.
-         * @param endpoint The endpoint location for the file.
-         * @param kind Determines if this is music or an image.
-         * @param tags The people joined at this item.
-         */
-        public Item(String title, String endpoint, Kind kind, Seszt<UUID> tags) {
-            super(title);
-            _endpoint = endpoint;
-            _kind = kind;
-            _tags = tags;
-        }
-
-        /**
-         * Will add a User as a tag to the item.
-         * @param tag The User that will be added as a tag.
-         * @return All the tags of the item.
-         */
-        public Seszt<UUID> add(UUID tag) {
-            return add(new UUID[]{tag});
-        }
-
-        /**
-         * Will add some Users as tags to the item.
-         * @param tags The Users that will be added as tags.
-         * @return All the tags of the item.
-         */
-        public Seszt<UUID> add(UUID[] tags) {
-            return _tags.Add(tags);
-        }
-
-        /**
-         * Removes a tagged User of the item.
-         * @param tag The User that will be removed as a tag.
-         * @return All the tags of the item.
-         */
-        public Seszt<UUID> remove(UUID tag) {
-            return remove(new UUID[]{tag});
-        }
-
-        /**
-         * Removes some tagged Users of the item.
-         * @param tags The Users that will be removed as tags.
-         * @return All the tags of the item.
-         */
-        public Seszt<UUID> remove(UUID[] tags) {
-            return _tags.remove(tags);
         }
 
         @Override
@@ -339,9 +207,6 @@ public class Album extends Model {
         @Getter
         public static class DTO extends ModelDTO {
 
-            /** Categories the tagged people, who have participated on the item of the album. */
-            private UUID[] tags;
-
             /** The endpoint for a URL, that is used to get the file of the item. */
             private String endpoint;
 
@@ -349,28 +214,24 @@ public class Album extends Model {
              * This is an Enum.
              * The Album might either be a MUSIC or IMAGE Album.
              */
-            private DTO.Kind kind;
+            private Kind kind;
 
             /**
              * Converts into this DTO Object.
-             * @param item The Object to be converted.
+             * @param media The Object to be converted.
              */
-            public DTO(Item item) {
-                super(item);
-                endpoint = item.get_endpoint();
-                kind = DTO.Kind.valueOf(item.get_kind().toString());
-
-                tags = new UUID[item.get_tags().size()];
-                for (int i = 0; i < tags.length; i++)
-                    tags[i] = item.get_tags().get(i);
+            public DTO(Media media) {
+                super(media);
+                endpoint = media.get_endpoint();
+                kind = Kind.valueOf(media.get_kind().toString());
             }
-
-            /** An enum that will describe the type of Album. */
-            public enum Kind { IMAGE, MUSIC }
         }
 
         /** An enum that will describe the type of Album. */
-        public enum Kind { IMAGE,MUSIC }
+        public enum Kind {
+            IMAGE,
+            MUSIC
+        }
     }
 
 
@@ -385,15 +246,7 @@ public class Album extends Model {
         /**
          * These endpoints are being used for getting the image/music file.
          */
-        private Item.DTO[] items;
-
-        /**
-         * The main author of the current Album.
-         * Is meant for if there is a Band, then the Band is the first mention
-         * or if there is an image, then multiple people might be on the image,
-         * but there will then be only one who made the upload.
-         */
-        private UUID authorId;
+        private Set<Media.DTO> media;
 
         /**
          * Converts into this DTO Object.
@@ -401,10 +254,7 @@ public class Album extends Model {
          */
         public DTO(Album album) {
             super(album);
-            items = new Item.DTO[album.get_items().size()];
-            for (int i = 0; i < items.length; i++)
-                items[i] = new Item.DTO(album.get_items().Get(i+1));
-            authorId = album.get_authorId();
+            media = album.get_media().asSet(Media.DTO::new);
         }
     }
 }

@@ -1,10 +1,14 @@
 package laustrup.bandwichpersistence.core.models;
 
+import laustrup.bandwichpersistence.core.utilities.collections.sets.Seszt;
 import lombok.Getter;
 import lombok.experimental.FieldNameConstants;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.Set;
+
+import static laustrup.bandwichpersistence.core.utilities.collections.sets.Seszt.copy;
 
 /**
  * Contains the fundaments for tickets and their options available.
@@ -12,12 +16,6 @@ import java.time.Instant;
 @Getter
 @FieldNameConstants
 public abstract class TicketBase {
-
-    /**
-     * In case that this string is null, then it is a standing event.
-     * Otherwise, it is the seat number.
-     */
-    protected String _seat;
 
     /**
      * The amount of money that the ticket costs.
@@ -29,6 +27,11 @@ public abstract class TicketBase {
      */
     protected String _valuta;
 
+
+    private boolean _sitting;
+
+    private Seszt<String> _areas;
+
     protected Instant _timestamp;
 
     /**
@@ -37,22 +40,25 @@ public abstract class TicketBase {
      */
     public TicketBase(TicketBase.DTO ticket) {
         this(
-                ticket.getSeat(),
                 ticket.getPrice(),
                 ticket.getValuta(),
+                ticket.isSitting(),
+                copy(ticket.getAreas(), area -> area),
                 ticket.getTimestamp()
         );
     }
 
     public TicketBase(
-            String seat,
             BigDecimal price,
             String valuta,
+            boolean isSitting,
+            Seszt<String> areas,
             Instant timestamp
     ) {
-        _seat = seat;
         _price = price;
         _valuta = valuta;
+        _sitting = isSitting;
+        _areas = areas;
         _timestamp = timestamp;
     }
 
@@ -66,11 +72,6 @@ public abstract class TicketBase {
     public abstract static class DTO {
 
         /**
-         * Is it a ticket for sitting or standing?
-         */
-        protected String seat;
-
-        /**
          * The amount of money that the ticket costs.
          */
         protected BigDecimal price;
@@ -80,6 +81,10 @@ public abstract class TicketBase {
          */
         protected String valuta;
 
+        private boolean isSitting;
+
+        private Set<String> areas;
+
         protected Instant timestamp;
 
         /**
@@ -87,9 +92,10 @@ public abstract class TicketBase {
          * @param ticket The Object to be converted.
          */
         public DTO(TicketBase ticket) {
-            seat = ticket.get_seat();
             price = ticket.get_price();
             valuta = ticket.get_valuta();
+            isSitting = ticket.is_sitting();
+            areas = ticket.get_areas().asSet();
             timestamp = ticket.get_timestamp();
         }
     }

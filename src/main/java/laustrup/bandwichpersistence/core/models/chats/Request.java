@@ -20,7 +20,9 @@ public class Request {
     /**
      * The User that needs to approve the Event.
      */
-    private BusinessUser _user;
+    private BusinessUser _receiver;
+
+    private BusinessUser _sender;
 
     /**
      * The Event that has been requested for.
@@ -66,7 +68,8 @@ public class Request {
      */
     public Request(DTO request) {
         this(
-                fromBusinessUser(request.getUser()),
+                fromBusinessUser(request.getReceiver()),
+                fromBusinessUser(request.getSender()),
                 new Event(request.getEvent()),
                 request.getApproved(),
                 request.getTimestamp()
@@ -74,15 +77,17 @@ public class Request {
     }
 
     public Request(
-            BusinessUser user,
+            BusinessUser receiver,
+            BusinessUser sender,
             Event event,
             Instant approved,
             Instant timestamp
     ) {
-        if (user == null || event == null)
+        if (receiver == null || event == null)
             throw new IllegalArgumentException("User and event are both required for Request with timestamp: " + timestamp);
 
-        _user = user;
+        _receiver = receiver;
+        _sender = sender;
         _event = event;
         _approved = approved;
         _timestamp = timestamp;
@@ -110,7 +115,7 @@ public class Request {
     }
 
     public UUID get_userId() {
-        return _user.get_id();
+        return _receiver.get_id();
     }
 
     public UUID get_eventId() {
@@ -122,7 +127,9 @@ public class Request {
     public static class DTO {
 
         /** The User that needs to approve the Event. */
-        private BusinessUser.BusinessUserDTO user;
+        private BusinessUser.BusinessUserDTO receiver;
+
+        private BusinessUser.BusinessUserDTO sender;
 
         /** The Event that has been requested for. */
         private Event.DTO event;
@@ -137,7 +144,8 @@ public class Request {
          * @param request The Object to be converted.
          */
         public DTO(Request request) {
-            user = fromBusinessUser(request.get_user());
+            receiver = fromBusinessUser(request.get_receiver());
+            sender = fromBusinessUser(request.get_sender());
             event = new Event.DTO(request.get_event());
             approved = request.get_approved();
             timestamp = request.get_timestamp();

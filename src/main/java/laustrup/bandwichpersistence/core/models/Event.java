@@ -141,7 +141,6 @@ public class Event extends Model {
     /**
      * An Album of images, that can be used to promote this Event.
      */
-    @Setter
     private Seszt<Album> _albums;
 
     private History _history;
@@ -314,7 +313,7 @@ public class Event extends Model {
      */
     private Seszt<Request> removeRequests(Band performer) {
         for (int i = 1; i <= _requests.size(); i++) {
-            if (_requests.Get(i).get_user().get_id() == performer.get_id()) {
+            if (_requests.Get(i).get_receiver().get_id() == performer.get_id()) {
                 _requests.Remove(i);
                 break;
             }
@@ -378,7 +377,7 @@ public class Event extends Model {
      */
     public boolean venueHasApproved() {
         for (Request request : _requests)
-            if (request.get_user().getClass() == Organisation.Employee.class && request.isApproved())
+            if (request.get_receiver().getClass() == Organisation.Employee.class && request.isApproved())
                 return true;
         return false;
     }

@@ -7,17 +7,22 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.FieldNameConstants;
-
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
+
+import static laustrup.bandwichpersistence.core.services.ModelService.defineToString;
+import static laustrup.bandwichpersistence.core.utilities.collections.sets.Seszt.copy;
 
 /**
  * Contains information that people need in order to contact the User.
  */
 @Getter @FieldNameConstants
-public class ContactInfo extends Model {
+public class ContactInfo {
+
+    private UUID _id;
 
     /**
      * The email that the User wants to be contacted through outside the application.
@@ -46,26 +51,17 @@ public class ContactInfo extends Model {
      * @param contactInfo The transport object to be transformed.
      */
     public ContactInfo(DTO contactInfo) {
-        super(contactInfo);
-        _email = contactInfo.getEmail();
-        _address = new Address(contactInfo.getAddress());
-        _country = new Country(contactInfo.getCountry());
-
-        for (Phone.DTO phone : contactInfo.getPhones())
-            _phones.add(new Phone(phone));
+        this(
+                contactInfo.getId(),
+                contactInfo.getEmail(),
+                copy(contactInfo.getPhones(), Phone::new),
+                new Address(contactInfo.getAddress()),
+                new Country(contactInfo.getCountry())
+        );
     }
 
-    /**
-     * Generates a timestamp of now.
-     * @param id The primary id that identifies this unique Object.
-     * @param email The email that the User wants to be contacted through outside the application.
-     * @param phones A Phone object that is used to have information about how to contact the User through Phone.
-     * @param address An Address object with info about the location of the User.
-     * @param country A Country object for the information of which Country the User is living in.
-     */
     public ContactInfo(UUID id, String email, Seszt<Phone> phones, Address address, Country country) {
         _id = id;
-        _title = "Contact-info: " + id;
         _email = email;
         _phones = phones;
         _address = address;
@@ -83,12 +79,10 @@ public class ContactInfo extends Model {
      */
     public ContactInfo(UUID id, String email, Seszt<Phone> phones, Address address, Country country, Instant timestamp) {
         _id = id;
-        _title = "Contact-info: " + id;
         _email = email;
         _phones = phones;
         _address = address;
         _country = country;
-        _timestamp = timestamp;
     }
 
     /**
@@ -103,6 +97,7 @@ public class ContactInfo extends Model {
     public String toString() {
         return defineToString(
             getClass().getSimpleName(),
+            get_id(),
             new String[] {
                 Model.Fields._id,
                 Fields._email,
@@ -115,7 +110,7 @@ public class ContactInfo extends Model {
                 get_email(),
                 get_address().toString(),
                 get_phones().toString(),
-                _country.toString()
+                get_country().toString()
             }
         );
     }
@@ -136,10 +131,12 @@ public class ContactInfo extends Model {
          */
         private String _floor;
 
+        private String _municipality;
+
         /**
          * Some digits describing the city.
          */
-        private String _postal;
+        private String _zip;
 
         /**
          * The city of the postal.
@@ -151,23 +148,27 @@ public class ContactInfo extends Model {
          * @param address The Object to be converted.
          */
         public Address(DTO address) {
-            _street = address.getStreet();
-            _floor = address.getFloor();
-            _postal = address.getPostal();
-            _city = address.getCity();
+            this(
+                    address.getStreet(),
+                    address.getFloor(),
+                    address.getMunicipality(),
+                    address.getPostal(),
+                    address.getCity()
+            );
         }
 
         /**
          * A constructor with all the values of this Object.
          * @param street The street and street number.
          * @param floor The floor, if in an apartment, also include left or right.
-         * @param postal Some digits describing the city.
-         * @param city The city of the postal.
+         * @param zip Some digits describing the city.
+         * @param city The city of the zip.
          */
-        public Address(String street, String floor, String postal, String city) {
+        public Address(String street, String floor, String municipality, String zip, String city) {
             _street = street;
             _floor = floor;
-            _postal = postal;
+            _municipality = municipality;
+            _zip = zip;
             _city = city;
         }
 
@@ -176,7 +177,8 @@ public class ContactInfo extends Model {
             return String.join(", ", Arrays.stream(new String[] {
                     get_street(),
                     get_floor(),
-                    get_postal(),
+                    get_municipality(),
+                    get_zip(),
                     get_city()
             }).filter(Objects::nonNull).toList());
         }
@@ -195,6 +197,8 @@ public class ContactInfo extends Model {
             /** The floor, if in an apartment, also include left or right. */
             private String floor;
 
+            private String municipality;
+
             /** Some digits describing the city. */
             private String postal;
 
@@ -208,7 +212,8 @@ public class ContactInfo extends Model {
             public DTO(Address address) {
                 street = address.get_street();
                 floor = address.get_floor();
-                postal = address.get_postal();
+                municipality = address.get_municipality();
+                postal = address.get_zip();
                 city = address.get_city();
             }
         }
@@ -229,7 +234,7 @@ public class ContactInfo extends Model {
         /**
          * The value of the first few digits of a phone number.
          */
-        private int _firstPhoneNumberDigits;
+        private int _code;
 
         /**
          * Will translate a transport object of this object into a construct of this object.
@@ -237,7 +242,7 @@ public class ContactInfo extends Model {
          */
         public Country(Country.DTO country) {
             _title = country.getTitle();
-            _firstPhoneNumberDigits = country.getFirstPhoneNumberDigits();
+            _code = country.getCode();
         }
 
         /**
@@ -247,7 +252,7 @@ public class ContactInfo extends Model {
          */
         public Country(String title, int firstPhoneNumberDigits) {
             _title = title;
-            _firstPhoneNumberDigits = firstPhoneNumberDigits;
+            _code = firstPhoneNumberDigits;
         }
 
         /**
@@ -262,7 +267,7 @@ public class ContactInfo extends Model {
             private String title;
 
             /** The value of the first few digits of a phone number. */
-            private int firstPhoneNumberDigits;
+            private int code;
 
             /**
              * Converts into this DTO Object.
@@ -270,7 +275,7 @@ public class ContactInfo extends Model {
              */
             public DTO(Country country) {
                 title = country.get_title();
-                firstPhoneNumberDigits = country.get_firstPhoneNumberDigits();
+                code = country.get_code();
             }
         }
     }
@@ -298,14 +303,19 @@ public class ContactInfo extends Model {
          */
         private boolean _mobile;
 
+        private boolean _business;
+
         /**
          * Will translate a transport object of this object into a construct of this object.
          * @param phone The transport object to be transformed.
          */
         public Phone(DTO phone) {
-            _country = new Country(phone.getCountry());
-            _numbers = phone.getNumbers();
-            _mobile = phone.isMobile();
+            this(
+                    new Country(phone.getCountry()),
+                    phone.getNumbers(),
+                    phone.isMobile(),
+                    phone.isBusiness()
+            );
         }
 
         /**
@@ -314,10 +324,11 @@ public class ContactInfo extends Model {
          * @param numbers The contact numbers for the Phone.
          * @param mobile True if the number is for a mobile.
          */
-        public Phone(Country country, long numbers, boolean mobile) {
+        public Phone(Country country, long numbers, boolean mobile, boolean business) {
             _country = country;
             _numbers = numbers;
             _mobile = mobile;
+            _business = business;
         }
 
         /**
@@ -337,6 +348,8 @@ public class ContactInfo extends Model {
             /** True if the number is for a mobile. */
             private boolean mobile;
 
+            private boolean business;
+
             /**
              * Converts into this DTO Object.
              * @param phone The Object to be converted.
@@ -345,6 +358,7 @@ public class ContactInfo extends Model {
                 country = new ContactInfo.Country.DTO(phone.get_country());
                 numbers = phone.get_numbers();
                 mobile = phone.is_mobile();
+                business = phone.is_business();
             }
         }
     }
@@ -356,13 +370,15 @@ public class ContactInfo extends Model {
      * Doesn't have any logic.
      */
     @Getter @Setter
-    public static class DTO extends ModelDTO {
+    public static class DTO {
+
+        private UUID id;
 
         /** The email that the User wants to be contacted through outside the application. */
         private String email;
 
         /** A Phone object that is used to have information about how to contact the User through Phone. */
-        private Phone.DTO[] phones;
+        private Set<Phone.DTO> phones;
 
         /** An Address object with info about the location of the User. */
         private Address.DTO address;
@@ -375,14 +391,12 @@ public class ContactInfo extends Model {
          * @param contactInfo The Object to be converted.
          */
         public DTO(ContactInfo contactInfo) {
-            super(contactInfo);
+
             email = contactInfo.get_email();
             address = new Address.DTO(contactInfo.get_address());
             country = new Country.DTO(contactInfo.get_country());
 
-            phones = new Phone.DTO[contactInfo.get_phones().size()];
-            for (int i = 0; i < phones.length; i++)
-                phones[i] = new Phone.DTO(contactInfo.get_phones().get(i));
+            phones = contactInfo.get_phones().asSet(Phone.DTO::new);
         }
     }
 }

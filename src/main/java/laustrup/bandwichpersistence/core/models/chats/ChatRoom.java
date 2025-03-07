@@ -1,10 +1,9 @@
 package laustrup.bandwichpersistence.core.models.chats;
 
 import laustrup.bandwichpersistence.core.models.BusinessUser;
-import laustrup.bandwichpersistence.core.models.History;
+import laustrup.bandwichpersistence.core.models.chats.messages.Message;
 import laustrup.bandwichpersistence.core.services.UserService;
 import laustrup.bandwichpersistence.core.models.Model;
-import laustrup.bandwichpersistence.core.models.chats.messages.Mail;
 import laustrup.bandwichpersistence.core.models.User;
 import laustrup.bandwichpersistence.core.utilities.collections.sets.Seszt;
 import lombok.Getter;
@@ -27,7 +26,7 @@ public class ChatRoom extends Model {
     /**
      * All the Mails that has been sent will be stored here.
      */
-    private Seszt<Mail> _mails;
+    private Seszt<Message> _messages;
 
     /**
      * The Users, except the responsible, that can write with each other.
@@ -40,7 +39,7 @@ public class ChatRoom extends Model {
      */
     public ChatRoom(ChatRoom.DTO chatRoom) {
         super(chatRoom);
-        _mails = new Seszt<>();
+        _messages = new Seszt<>();
         convert(chatRoom.getMails());
         convert(chatRoom.getChatters());
     }
@@ -49,10 +48,10 @@ public class ChatRoom extends Model {
      * Converts a Data Transport Object into Mails.
      * @param mails The Data Transport Object that will be converted.
      */
-    private void convert(Mail.DTO[] mails) {
-        _mails = new Seszt<>();
-        for (Mail.DTO mail : mails)
-            _mails.add(new Mail(mail));
+    private void convert(Message.DTO[] mails) {
+        _messages = new Seszt<>();
+        for (Message.DTO mail : mails)
+            _messages.add(new Message(mail));
     }
 
     /**
@@ -69,33 +68,33 @@ public class ChatRoom extends Model {
      * Containing all attributes of this object.
      * @param id The primary id.
      * @param title The title of the ChatRoom, if it is null or empty, it will be the usernames of the chatters.
-     * @param mails The Mails with relations to this ChatRoom.
+     * @param messages The Mails with relations to this ChatRoom.
      * @param chatters The chatters that are members of this ChatRoom.
      * @param timestamp The time this ChatRoom was created.
      */
     public ChatRoom(
             UUID id,
             String title,
-            Seszt<Mail> mails,
+            Seszt<Message> messages,
             Seszt<User> chatters,
             Instant timestamp
     ) {
         super(id, title, timestamp);
         _chatters = chatters;
         _title = determineChatRoomTitle(_title);
-        _mails = mails;
+        _messages = messages;
     }
 
     /**
      * Will generate a new ChatRoom.
      * Timestamp will be of now.
      * @param title The title of the ChatRoom, if it is null or empty, it will be the usernames of the chatters.
-     * @param mails The Mails with relations to this ChatRoom.
+     * @param messages The Mails with relations to this ChatRoom.
      * @param chatters The chatters that are members of this ChatRoom.
      */
-    public ChatRoom(String title, Seszt<Mail> mails, Seszt<User> chatters) {
+    public ChatRoom(String title, Seszt<Message> messages, Seszt<User> chatters) {
         super(title);
-        _mails = mails;
+        _messages = messages;
         _chatters = chatters;
     }
 
@@ -130,25 +129,25 @@ public class ChatRoom extends Model {
     /**
      * Adds a Mail to the ChatRoom, if the author of the Mail is a chatter of the ChatRoom.
      * If the responsible haven't answered yet, it will check if it now is answered.
-     * @param mail A Mail object, that is wished to be added.
+     * @param message A Mail object, that is wished to be added.
      * @return All the Mails of this ChatRoom.
      */
-    public Seszt<Mail> add(Mail mail) { return add(new Mail[]{mail}); }
+    public Seszt<Message> add(Message message) { return add(new Message[]{message}); }
 
     /**
      * Adds Mails to the ChatRoom, if the author of the Mails is a chatter of the ChatRoom.
      * If the responsible haven't answered yet, it will check if it now is answered.
-     * @param mails Mail objects, that is wished to be added.
+     * @param messages Mail objects, that is wished to be added.
      * @return All the Mails of this ChatRoom.
      */
-    public Seszt<Mail> add(Mail[] mails) {
-        ifExists(mails, () -> {
-            for (Mail mail : mails)
-                if (exists(mail.get_author()))
-                    _mails.add(mail);
+    public Seszt<Message> add(Message[] messages) {
+        ifExists(messages, () -> {
+            for (Message message : messages)
+                if (exists(message.get_author()))
+                    _messages.add(message);
         });
 
-        return _mails;
+        return _messages;
     }
 
     /**
@@ -198,18 +197,18 @@ public class ChatRoom extends Model {
 
     /**
      * Will remove a Mail from the ChatRoom.
-     * @param mail The Mail object that is wished to be removed.
+     * @param message The Mail object that is wished to be removed.
      * @return All the Mails of this ChatRoom.
      */
-    public Seszt<Mail> remove(Mail mail) {
-        for (int i = 1; i <= _mails.size(); i++) {
-            if (_mails.Get(i).get_id() == mail.get_id()) {
-                _mails.remove(_mails.Get(i));
+    public Seszt<Message> remove(Message message) {
+        for (int i = 1; i <= _messages.size(); i++) {
+            if (_messages.Get(i).get_id() == message.get_id()) {
+                _messages.remove(_messages.Get(i));
                 break;
             }
         }
 
-        return _mails;
+        return _messages;
     }
 
     /**
@@ -230,14 +229,14 @@ public class ChatRoom extends Model {
 
     /**
      * Edits a Mail of the ChatRoom.
-     * @param mail The Mail that is an updated version of a previous Mail, which will be updated.
+     * @param message The Mail that is an updated version of a previous Mail, which will be updated.
      * @return True if it will be edited correctly.
      */
-    public boolean edit(Mail mail) {
-        for (int i = 1; i <= _mails.size(); i++) {
-            if (_mails.Get(i).get_id() == mail.get_id()) {
-                _mails.set(i, mail);
-                return mail == _mails.get(i);
+    public boolean edit(Message message) {
+        for (int i = 1; i <= _messages.size(); i++) {
+            if (_messages.Get(i).get_id() == message.get_id()) {
+                _messages.set(i, message);
+                return message == _messages.get(i);
             }
         }
 
@@ -308,7 +307,7 @@ public class ChatRoom extends Model {
     public static class DTO extends ModelDTO {
 
         /** All the Mails that has been sent will be stored here. */
-        private Mail.DTO[] mails;
+        private Message.DTO[] mails;
 
         /** The Users, except the responsible, that can write with each other. */
         private UserDTO[] chatters;
@@ -319,9 +318,9 @@ public class ChatRoom extends Model {
          */
         public DTO(ChatRoom chatRoom) {
             super(chatRoom);
-            mails = new Mail.DTO[chatRoom.get_mails().size()];
+            mails = new Message.DTO[chatRoom.get_messages().size()];
             for (int i = 0; i < mails.length; i++)
-                mails[i] = new Mail.DTO(chatRoom.get_mails().get(i));
+                mails[i] = new Message.DTO(chatRoom.get_messages().get(i));
             chatters = new User.UserDTO[chatRoom.get_chatters().size()];
             for (int i = 0; i < chatters.length; i++)
                 chatters[i] = UserService.from(chatRoom.get_chatters().get(i));

@@ -1,137 +1,92 @@
 package laustrup.bandwichpersistence.core.models.chats.messages;
 
 import laustrup.bandwichpersistence.core.models.Model;
+import laustrup.bandwichpersistence.core.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.core.models.User;
-import laustrup.bandwichpersistence.core.services.UserService;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 
 import java.time.Instant;
 import java.util.UUID;
 
-import static laustrup.bandwichpersistence.core.models.User.UserDTO;
-
 /**
- * An abstract class that contains common attributes for Messages.
+ * A Message that are sent in a ChatRoom.
  */
 @Getter @FieldNameConstants
-public abstract class Message extends Model {
+public class Message extends MessageBase {
 
     /**
-     * The User that wrote the Message.
+     * The ChatRoom that this message has been sent in.
      */
-    @Getter
-    protected User _author;
+    private ChatRoom _chatRoom;
 
     /**
-     * The content of the written Message.
+     * Will translate a transport object of this object into a construct of this object.
+     * @param mail The transport object to be transformed.
      */
-    @Setter
-    protected String _content;
+    public Message(DTO mail) {
+        super(mail);
+        _chatRoom = new ChatRoom(mail.getChatRoom());
+    }
 
     /**
-     * If null it has not been sent, otherwise it has at the time it has.
+     * A constructor with all the values of this Object.
+     * @param id The primary id that identifies this unique Object.
+     * @param chatRoom The ChatRoom that this message has been sent in.
+     * @param author The User that wrote the Message.
+     * @param content The content of the written Message.
+     * @param isSent True if the Message is sent.
+     * @param isEdited A Plato object, that will be true if the Message has been edited.
+     *                 Undefined if it hasn't been yet and not sent, but false if it is sent and also not edited.
+     * @param history The Events for this object.
+     * @param timestamp Specifies the time this entity was created.
      */
-    @Setter
-    protected Instant _sent;
+    public Message(
+            UUID id,
+            ChatRoom chatRoom,
+            User author,
+            String content,
+            Instant isSent,
+            boolean isEdited,
+            Instant isRead,
+            Instant timestamp
+    ) {
+        super(id, author, content, isSent, isEdited, isRead, timestamp);
+        _chatRoom = chatRoom;
+    }
 
-    /**
-     * Can be null in case that it have never been edited, otherwise it will be the time that it was edited.
-     */
-    protected boolean _edited;
-
-    protected Instant _read;
-
-    /**
-     * Converts a Data Transport Object into this object.
-     * @param message The Data Transport Object that will be converted.
-     */
-    public Message(DTO message) {
-        this(
-                message.getId(),
-                UserService.from(message.getAuthor()),
-                message.getContent(),
-                message.getSent(),
-                message.isEdited(),
-                message.getRead(),
-                message.getTimestamp()
+    @Override
+    public String toString() {
+        return defineToString(
+            getClass().getSimpleName(),
+            new String[] {
+                Model.Fields._id,
+                MessageBase.Fields._author,
+                Fields._chatRoom,
+                MessageBase.Fields._content,
+                MessageBase.Fields._sent,
+                Model.Fields._timestamp
+            }, new String[] {
+                String.valueOf(_id),
+                _author != null ? _author.toString() : null,
+                _chatRoom != null ? _chatRoom.toString() : null,
+                _content,
+                String.valueOf(_sent),
+                String.valueOf(_timestamp)
+            }
         );
     }
 
-    public Message(
-            UUID id,
-            User author,
-            String content,
-            Instant sent,
-            boolean isEdited,
-            Instant read,
-            Instant timestamp
-    ) {
-        super(id, "Message-"+id, timestamp);
-        _author = author;
-        _content = content;
-        _sent = sent;
-        _edited = isEdited;
-        _read = read;
-    }
-
     /**
-     * Will tell if the Message is sent, by whether the time is sent was null.
-     * @return True if sent is null.
-     */
-    public boolean isSent() {
-        return _sent != null;
-    }
-
-    /**
-     * Simply checks if the date it has been edited is null.
-     * @return True if it has never been edited.
-     */
-    public boolean isEdited() {
-        return _sent == null;
-    }
-
-    /**
-     * Will edit the content and also set edited to true, if it is sent.
-     * @param content The updated content, that is wished to be replaced with the old content.
-     * @return The content of the Message.
-     */
-    public String edit(String content) {
-        _content = content;
-        if (_sent != null)
-            _edited = true;
-
-        return _content;
-    }
-
-    /**
-     * An abstract class that contains common attributes for Messages.
+     * The Data Transfer Object.
+     * Is meant to be used as having common fields and be the body of Requests and Responses.
+     * Doesn't have any logic.
      */
     @Getter
-    protected abstract static class DTO extends ModelDTO {
+    public static class DTO extends MessageBase.DTO {
 
-        /**
-         * The User that wrote the Message.
-         */
-        protected UserDTO author;
-
-        /**
-         * The content of the written Message.
-         */
-        protected String content;
-
-        /**
-         * If null it has not been sent, otherwise it has at the time it has.
-         */
-        protected Instant sent;
-
-        /**
-         * Can be null in case that it have never been edited, otherwise it will be the time that it was edited.
-         */
-        protected boolean isEdited;
-
-        protected Instant read;
+        /** The ChatRoom that this message exists in. */
+        private ChatRoom.DTO chatRoom;
 
         /**
          * Converts into this DTO Object.
@@ -139,11 +94,7 @@ public abstract class Message extends Model {
          */
         public DTO(Message message) {
             super(message);
-            author = UserService.from(message.get_author());
-            content = message.get_content();
-            sent = message.get_sent();
-            isEdited = message.isEdited();
-            read = message.get_read();
+            chatRoom = new ChatRoom.DTO(message.get_chatRoom());
         }
     }
 }

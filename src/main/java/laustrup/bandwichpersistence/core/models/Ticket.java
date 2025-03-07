@@ -21,9 +21,11 @@ import static laustrup.bandwichpersistence.core.utilities.collections.sets.Seszt
 @FieldNameConstants
 public class Ticket extends TicketBase {
 
-    protected UUID _userId;
+    private UUID _userId;
 
-    protected UUID _eventId;
+    private UUID _eventId;
+
+    private String _seat;
 
     /**
      * Indicates the time that the participant has arrived to the event.
@@ -49,6 +51,8 @@ public class Ticket extends TicketBase {
                 ticket.getPrice(),
                 ticket.getValuta(),
                 ticket.getArrived(),
+                ticket.isSitting(),
+                copy(ticket.getAreas(), area -> area),
                 ticket.getOptionId(),
                 ticket.getTimestamp()
         );
@@ -61,15 +65,19 @@ public class Ticket extends TicketBase {
             BigDecimal price,
             String valuta,
             LocalDateTime arrived,
+            boolean isSitting,
+            Seszt<String> areas,
             UUID optionId,
             Instant timestamp
     ) {
         super(
-                seat,
                 price,
                 valuta,
+                isSitting,
+                areas,
                 timestamp
         );
+        _seat = seat;
         _userId = userId;
         _eventId = eventId;
         _arrived = arrived;
@@ -86,7 +94,6 @@ public class Ticket extends TicketBase {
                         "userId",
                         "eventId",
                         TicketBase.Fields._price,
-                        TicketBase.Fields._seat,
                         Ticket.Fields._arrived,
                         Model.Fields._timestamp
                 },
@@ -94,7 +101,6 @@ public class Ticket extends TicketBase {
                         String.valueOf(_userId),
                         String.valueOf(_eventId),
                         String.valueOf(get_price()),
-                        get_seat(),
                         String.valueOf(get_arrived()),
                         String.valueOf(_timestamp)
                 }
@@ -108,6 +114,8 @@ public class Ticket extends TicketBase {
         private UUID userId;
 
         private UUID eventId;
+
+        private String seat;
 
         /**
          * Indicates the time that the participant has arrived to the event.
@@ -126,6 +134,7 @@ public class Ticket extends TicketBase {
          */
         public DTO(Ticket ticket) {
             super(ticket);
+            seat = ticket.get_seat();
             userId = ticket.get_userId();
             eventId = ticket.get_eventId();
             arrived = ticket.get_arrived();
@@ -161,9 +170,10 @@ public class Ticket extends TicketBase {
                     ticketOption.getEventId(),
                     ticketOption.getVenueId(),
                     ticketOption.getTitle(),
-                    ticketOption.getSeat(),
                     ticketOption.getPrice(),
                     ticketOption.getValuta(),
+                    ticketOption.isSitting(),
+                    copy(ticketOption.getAreas(),area -> area),
                     ticketOption.getTimestamp()
             );
         }
@@ -173,15 +183,17 @@ public class Ticket extends TicketBase {
                 UUID eventId,
                 UUID venueId,
                 String title,
-                String seat,
                 BigDecimal price,
                 String valuta,
+                boolean sitting,
+                Seszt<String> areas,
                 Instant timestamp
         ) {
             super(
-                    seat,
                     price,
                     valuta,
+                    sitting,
+                    areas,
                     timestamp
             );
             _id = id;
@@ -190,14 +202,16 @@ public class Ticket extends TicketBase {
             _title = title;
         }
 
-        public Ticket toTicket(UUID userId) {
+        public Ticket toTicket(UUID userId, String seat) {
             return new Ticket(
                     userId,
                     get_eventId(),
-                    get_seat(),
+                    seat,
                     get_price(),
                     get_valuta(),
                     null,
+                    is_sitting(),
+                    get_areas(),
                     get_id(),
                     get_timestamp()
             );
@@ -212,14 +226,12 @@ public class Ticket extends TicketBase {
                             Model.Fields._id,
                             Model.Fields._title,
                             TicketBase.Fields._price,
-                            TicketBase.Fields._seat,
                             Model.Fields._timestamp
                     },
                     new String[]{
                             String.valueOf(_id),
                             get_title(),
                             String.valueOf(get_price()),
-                            get_seat(),
                             String.valueOf(_timestamp)
                     }
             );
@@ -275,9 +287,10 @@ public class Ticket extends TicketBase {
                 this(
                         copy(template.getEventIds(), id -> id),
                         template.getTitle(),
-                        template.getSeat(),
                         template.getPrice(),
                         template.getValuta(),
+                        template.isSitting(),
+                        copy(template.getAreas(), id -> id),
                         template.getTimestamp()
                 );
             }
@@ -285,12 +298,13 @@ public class Ticket extends TicketBase {
             public Template(
                     Seszt<UUID> eventIds,
                     String title,
-                    String seat,
                     BigDecimal price,
                     String valuta,
+                    boolean isSitting,
+                    Seszt<String> areas,
                     Instant timestamp
             ) {
-                super(seat, price, valuta, timestamp);
+                super(price, valuta, isSitting, areas, timestamp);
                 _eventIds = eventIds;
                 _title = title;
             }

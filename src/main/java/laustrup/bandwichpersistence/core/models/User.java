@@ -9,10 +9,8 @@ import lombok.experimental.FieldNameConstants;
 
 import java.time.Instant;
 import java.time.ZoneId;
-import java.util.Arrays;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * An abstract class, which is meant to be extended to a user type of object.

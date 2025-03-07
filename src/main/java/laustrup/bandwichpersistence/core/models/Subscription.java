@@ -1,10 +1,10 @@
 package laustrup.bandwichpersistence.core.models;
 
+import laustrup.bandwichpersistence.core.services.ModelService;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 
-import java.time.Instant;
 import java.util.UUID;
 
 /**
@@ -12,7 +12,9 @@ import java.util.UUID;
  * Only Artists and Bands can have a paying subscription.
  */
 @Getter @FieldNameConstants
-public class Subscription extends Model {
+public class Subscription {
+
+    private UUID _id;
 
     /**
      * An enum that determines what kind of status, the situation of the Subscription is in.
@@ -27,28 +29,26 @@ public class Subscription extends Model {
      * @param subscription The transport object to be transformed.
      */
     public Subscription(DTO subscription) {
-        super(subscription);
-        _status = Status.valueOf(subscription.getStatus().toString());
-        _kind = subscription.getKind();
+        this(
+                subscription.getId(),
+                subscription.getStatus(),
+                subscription.getKind()
+        );
     }
 
     /**
      * A constructor with all fields.
      * @param id The id the defines this specific Subscription, is the same as the User of this Subscription.
      * @param status An enum that determines what kind of status, the situation of the Subscription is in.
-     * @param timestamp The time this object was created.
      */
     public Subscription(
             UUID id,
             Status status,
-            Kind kind,
-            Instant timestamp
+            Kind kind
     ) {
         _id = id;
-        _title = "Subscription: " + id;
         _status = status;
         _kind = kind;
-        _timestamp = timestamp;
     }
 
     /**
@@ -57,25 +57,22 @@ public class Subscription extends Model {
      * @param status An enum that determines what kind of status, the situation of the Subscription is in.
      */
     public Subscription(Status status, Kind kind) {
-        _title = "New-Subscription";
         _status = status;
         _kind = kind;
-        _timestamp = Instant.now();
     }
 
     @Override
     public String toString() {
-        return defineToString(
+        return ModelService.defineToString(
                 getClass().getSimpleName(),
+                get_id(),
                 new String[] {
                         Model.Fields._id,
-                        Fields._status,
-                        Model.Fields._timestamp
+                        Fields._status
                 },
                 new String[] {
                         String.valueOf(get_id()),
                         get_status() != null ? get_status().name() : null,
-                        String.valueOf(get_timestamp())
                 }
         );
     }
@@ -103,7 +100,9 @@ public class Subscription extends Model {
      * Doesn't have any logic.
      */
     @Getter @Setter
-    public static class DTO extends ModelDTO {
+    public static class DTO {
+
+        private UUID id;
 
         /**
          * An enum that determines what kind of status, the situation of the Subscription is in.
@@ -113,7 +112,7 @@ public class Subscription extends Model {
         private Subscription.Kind kind;
 
         public DTO(Subscription subscription) {
-            super(subscription);
+            id = subscription.get_id();
             status = Subscription.Status.valueOf(subscription.get_status().toString());
             kind = subscription.get_kind();
         }

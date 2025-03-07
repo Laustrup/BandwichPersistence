@@ -15,7 +15,7 @@ import static laustrup.bandwichpersistence.core.services.ModelService.from;
  * A kind of post that can be posted at any Model Object.
  */
 @Getter @FieldNameConstants
-public class Post extends Message {
+public class Post extends MessageBase {
 
     /**
      * The Model receiver that are having the Bulletin posted at its dashboard.
@@ -51,9 +51,9 @@ public class Post extends Message {
             getClass().getSimpleName(),
             new String[]{
                 Model.Fields._id,
-                Message.Fields._content,
-                Message.Fields._sent,
-                Message.Fields._edited,
+                MessageBase.Fields._content,
+                MessageBase.Fields._sent,
+                MessageBase.Fields._edited,
                 Model.Fields._timestamp
             },
             new String[]{
@@ -72,7 +72,7 @@ public class Post extends Message {
      * Doesn't have any logic.
      */
     @Getter
-    public static class DTO extends Message.DTO {
+    public static class DTO extends MessageBase.DTO {
 
         /**
          * The Model that are receiving this Bulletin.
