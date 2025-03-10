@@ -4,7 +4,6 @@ import laustrup.bandwichpersistence.core.libraries.PathLibrary;
 import laustrup.bandwichpersistence.core.persistence.DatabaseParameter;
 import laustrup.bandwichpersistence.core.persistence.Scriptorian;
 import laustrup.bandwichpersistence.core.services.FileService;
-import laustrup.bandwichpersistence.core.services.persistence.JDBCService;
 import laustrup.bandwichpersistence.core.scriptorian.repositories.ScriptorianRepository;
 import laustrup.bandwichpersistence.core.utilities.collections.sets.Seszt;
 
@@ -27,6 +26,8 @@ import java.util.logging.Logger;
 
 import static laustrup.bandwichpersistence.core.persistence.queries.ScriptorianQueries.Parameter;
 import static laustrup.bandwichpersistence.core.managers.ManagerService.databaseInteraction;
+import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.build;
+import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.get;
 
 public class ScriptorianManager {
 
@@ -178,7 +179,7 @@ public class ScriptorianManager {
     }
 
     private static Seszt<Scriptorian.Scriptory> buildScriptories(ResultSet resultSet) {
-        return new Seszt<>(JDBCService.build(
+        return new Seszt<>(build(
                 resultSet,
                 () -> {
                     try {
@@ -187,15 +188,15 @@ public class ScriptorianManager {
                                 resultSet.getString(Scriptorian.Scriptory.DatabaseColumns.file_name.name()),
                                 resultSet.getString(Scriptorian.Scriptory.DatabaseColumns.error_message.name()),
                                 resultSet.getString(Scriptorian.Scriptory.DatabaseColumns.content.name()),
-                                JDBCService.get(
+                                get(
                                         resultSet.getTimestamp(Scriptorian.Scriptory.DatabaseColumns.versionstamp.name()),
                                         Timestamp::toInstant
                                 ),
-                                JDBCService.get(
+                                get(
                                         resultSet.getTimestamp(Scriptorian.Scriptory.DatabaseColumns.successstamp.name()),
                                         Timestamp::toInstant
                                 ),
-                                JDBCService.get(
+                                get(
                                         resultSet.getTimestamp(Scriptorian.Scriptory.DatabaseColumns.timestamp.name()),
                                         Timestamp::toInstant
                                 )
