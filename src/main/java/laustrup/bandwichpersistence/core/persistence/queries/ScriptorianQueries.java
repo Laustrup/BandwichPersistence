@@ -9,15 +9,16 @@ public class ScriptorianQueries {
 
     public static final Query createTableIfNotExists = new Query(/*language=MySQL*/ """
     create table if not exists scriptories(
-        title varchar(64) not null,
-        file_name varchar(128) not null,
-        error_message longtext,
-        content longtext not null,
+        title varchar(128) not null,
+        file_name varchar(256) not null,
+        error_message mediumtext,
+        content mediumtext not null,
         versionstamp datetime not null,
         successstamp datetime,
         timestamp datetime not null default now(),
 
-        primary key (file_name)
+        constraint PK_scriptories
+            primary key (file_name)
     );
     """);
 

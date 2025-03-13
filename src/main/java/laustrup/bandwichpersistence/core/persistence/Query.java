@@ -10,8 +10,7 @@ import java.util.List;
 @Getter
 public class Query {
 
-    @Setter
-    private String _script;
+    private final String _script;
 
     private List<Parameter> _parameters;
 
@@ -63,19 +62,6 @@ public class Query {
 
     public static String formatIndexedKey(String parameter, int index) {
         return String.format("%s_%s", parameter, index).replace(" ", "") + " ";
-    }
-
-    void prepareTransaction() {
-        boolean insertSemicolon = !_script
-                .replace(" ", "")
-                .replace("\n", "")
-                .endsWith(";");
-
-        _script = /*language=mysql*/
-                "\nstart transaction;\n\n" +
-                _script +
-                (insertSemicolon ? ";" : "") +
-                "\ncommit;";
     }
 
     @Getter

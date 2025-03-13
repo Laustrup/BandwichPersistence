@@ -1,38 +1,37 @@
 package laustrup.bandwichpersistence.core.scriptorian.repositories;
 
-import laustrup.bandwichpersistence.core.persistence.DatabaseManager;
 import laustrup.bandwichpersistence.core.persistence.DatabaseParameter;
 import laustrup.bandwichpersistence.core.persistence.Query;
 import laustrup.bandwichpersistence.core.persistence.queries.ScriptorianQueries;
 import laustrup.bandwichpersistence.core.utilities.collections.sets.Seszt;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
+
+import static laustrup.bandwichpersistence.core.persistence.DatabaseManager.*;
 
 public class ScriptorianRepository {
 
     public static void createDefaultSchemaIfNotExists() {
-        DatabaseManager.create(ScriptorianQueries.createTableIfNotExists);
+        create(ScriptorianQueries.createTableIfNotExists);
     }
 
     public static ResultSet findScriptoriesWithoutSuccess() {
-        return DatabaseManager.read(ScriptorianQueries.findScriptoriesWithoutSuccess);
+        return read(ScriptorianQueries.findScriptoriesWithoutSuccess);
     }
 
     public static ResultSet findAllScriptories() {
-        return DatabaseManager.read(ScriptorianQueries.findAllScriptories);
+        return read(ScriptorianQueries.findAllScriptories);
     }
 
-    public static void putScriptory(Seszt<DatabaseParameter> parameters) {
-        DatabaseManager.create(ScriptorianQueries.insertIntoScriptories, parameters.stream());
+    public static void putScriptory(Seszt<DatabaseParameter> parameters) throws SQLException {
+        execute(ScriptorianQueries.insertIntoScriptories, Action.MIGRATION, parameters.stream());
     }
 
     public static void executeScript(String content) {
         try {
-            DatabaseManager.execute(
+            execute(
                     new Query(content),
-                    DatabaseManager.Action.CUD
+                    Action.MIGRATION
             );
         } catch (SQLException e) {
             System.err.println(e.getMessage());

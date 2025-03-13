@@ -2,7 +2,7 @@ package laustrup.bandwichpersistence.core.scriptorian.managers;
 
 import laustrup.bandwichpersistence.core.libraries.PathLibrary;
 import laustrup.bandwichpersistence.core.persistence.DatabaseParameter;
-import laustrup.bandwichpersistence.core.persistence.Scriptorian;
+import laustrup.bandwichpersistence.core.scriptorian.Scriptorian;
 import laustrup.bandwichpersistence.core.services.FileService;
 import laustrup.bandwichpersistence.core.scriptorian.repositories.ScriptorianRepository;
 import laustrup.bandwichpersistence.core.utilities.collections.sets.Seszt;
@@ -13,92 +13,128 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static java.lang.Integer.parseInt;
+import static java.nio.file.Files.readAttributes;
 import static laustrup.bandwichpersistence.core.persistence.queries.ScriptorianQueries.Parameter;
 import static laustrup.bandwichpersistence.core.managers.ManagerService.databaseInteraction;
-import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.build;
-import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.get;
+import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
 
 public class ScriptorianManager {
 
     private static final Logger _logger = Logger.getLogger(ScriptorianManager.class.getSimpleName());
 
-    private static final char _splitter = '_';
+    private static final char _splitter = ' ';
+
+    private static final char _replacement = '_';
 
     private static final String _dateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 
+    private static final ZoneId _zoneId = ZoneId.of("GMT");
+
     public static void onStartup() {
-        _logger.log(
-                Level.INFO,
-                "Scriptorian started"
-        );
+        try {
+            _logger.log(
+                    Level.INFO,
+                    "Scriptorian started"
+            );
 
-        Instant now = Instant.now();
-        Seszt<File> scripts = namingConvention(now);
+            Instant now = Instant.now();
+            Seszt<File> scripts = prepareScripts(now);
 
-        databaseInteraction(() -> {
-            ScriptorianRepository.createDefaultSchemaIfNotExists();
-            Seszt<Scriptorian.Scriptory> scriptoriesWithoutSuccess = scriptoriesWithoutSuccess();
-            if (!scriptoriesWithoutSuccess.isEmpty())
-                throw new IllegalStateException(String.format("""
-                        %nThere is a conflict with scriptories, please resolve it.
-                        
-                        conflict to resolve is:
-                        %s
-                        
-                        It can either be done by deleting the row with successstamp of null, which will make it run again on next startup or by setting it to now(), which will ignore the script on startup.
-                        """,
-                        scriptoriesWithoutSuccess.getFirst().get_errorMessage()
-                ));
+            databaseInteraction(() -> {
+                ScriptorianRepository.createDefaultSchemaIfNotExists();
+                Seszt<Scriptorian.Scriptory> scriptoriesWithoutSuccess = scriptoriesWithoutSuccess();
+                if (!scriptoriesWithoutSuccess.isEmpty())
+                    throw new IllegalStateException(String.format("""
+                            %nThere is a conflict with scriptories, please resolve it.
+                            
+                            conflict to resolve is:
+                            %s
+                            
+                            It can either be done by deleting the row with successstamp of null, which will make it run again on next startup or by setting it to now(), which will ignore the script on startup.
+                            """,
+                            scriptoriesWithoutSuccess.getFirst().get_errorMessage()
+                    ));
 
-            String currentFileName = "";
-            File currentFile = null;
+                String currentFileName = "";
+                File currentFile;
 
-            try {
-                for (File file : findScriptsNotRecorded(scripts, buildScriptories(ScriptorianRepository.findAllScriptories()))) {
-                    currentFile = file;
-                    currentFileName = file.getName();
+                Seszt<File> scriptsNotRecorded = findScriptsNotRecorded(scripts, buildScriptories(ScriptorianRepository.findAllScriptories()));
 
-                    ScriptorianRepository.executeScript(FileService.getContent(file));
-                    ScriptorianRepository.putScriptory(generateParameters(currentFile, null, now));
+                try {
+                    for (File file : scriptsNotRecorded) {
+                        currentFile = file;
+                        currentFileName = file.getName();
+                        String errorMessage = null;
 
+                        try {
+                            ScriptorianRepository.executeScript(FileService.getContent(file));
+                        } catch (RuntimeException exception) {
+                            String logMessage = String.format("Couldn't execute migration sql file \"%s\"", currentFileName);
+                            _logger.log(
+                                    Level.WARNING,
+                                    logMessage,
+                                    exception.getMessage()
+                            );
+                            errorMessage = logMessage + "\n" + exception.getMessage();
+                        }
+
+                        ScriptorianRepository.putScriptory(generateParameters(currentFile, errorMessage, now));
+
+
+                        if (errorMessage != null)
+                            break;
+
+                        _logger.log(
+                                Level.INFO,
+                                String.format("Successfully migrated file \"%s\"!", currentFileName)
+                        );
+                    }
+                } catch (Exception exception) {
                     _logger.log(
-                            Level.INFO,
-                            String.format("Successfully migrated file \"%s\"!", currentFileName)
+                            Level.WARNING,
+                            String.format(
+                                    "Conflict not relevant to sql of migration file \"%s\".\n\n%s",
+                                    currentFileName,
+                                    exception.getMessage()
+                            )
                     );
+                    System.exit(5);
                 }
-            } catch (Exception exception) {
-                ScriptorianRepository.putScriptory(generateParameters(currentFile, exception.getMessage(), now));
-
-                _logger.log(
-                        Level.WARNING,
-                        String.format("Conflict with file \"%s\"", currentFileName),
-                        exception.getMessage()
-                );
-                System.exit(5);
-            }
-        });
+            });
+        } catch (Exception exception) {
+            _logger.warning("Exception occurred in Scriptorian.\n" + exception.getMessage() + "\n");
+            exception.printStackTrace();
+            System.exit(-2);
+        }
     }
 
-    private static Seszt<File> namingConvention(Instant now) {
+    private static Seszt<File> prepareScripts(Instant now) {
         StringBuilder filesRenamed = new StringBuilder();
 
         Seszt<File> scripts = getScripts();
 
         scripts.forEach(script -> {
             if (!fileNamedAccepted(script.getName())) {
-                filesRenamed.append("\n").append(script.getName());
-                rename(script, now);
+                filesRenamed.append("\n").append(script.getName());;
+                try {
+                    if (!validateName(script))
+                        rename(script, readAttributes(script.toPath(), BasicFileAttributes.class), now);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
             }
         });
 
@@ -107,7 +143,16 @@ public class ScriptorianManager {
         if (filesHasBeenRenamed)
             _logger.log(Level.INFO, "Renamed " + filesRenamed);
 
-        return filesHasBeenRenamed ? getScripts() : scripts;
+        return getScripts();
+    }
+
+    private static boolean validateName(File file) {
+        try {
+            define(file);
+        } catch (IllegalArgumentException exception) {
+            return false;
+        }
+        return true;
     }
 
     private static Seszt<File> getScripts() {
@@ -127,17 +172,16 @@ public class ScriptorianManager {
         return chars.length > 20 && chars[0] == 'V' && chars[20] == _splitter;
     }
 
-    private static void rename(File file, Instant now) {
+    private static void rename(File file, BasicFileAttributes attributes, Instant now) {
         try {
             Files.move(
                     file.toPath(),
                     Paths.get(PathLibrary.get_migrationDirectoryFullPath() + String.format(
-                            "V%s%s%s",
-                            LocalDateTime.ofInstant(now, ZoneId.of("GMT"))
-                                    .truncatedTo(ChronoUnit.SECONDS)
-                                    .format(DateTimeFormatter.ofPattern(_dateTimeFormat.replace(":", "-"))),
+                            "V%sC%s%s%s",
+                            fileDateTime(now),
+                            fileDateTime(attributes.creationTime().toInstant()),
                             _splitter,
-                            file.getName()
+                            cleanFileName(file.getName())
                     )),
                     StandardCopyOption.REPLACE_EXISTING
             );
@@ -151,16 +195,79 @@ public class ScriptorianManager {
         }
     }
 
+    private static String fileDateTime(Instant instant) {
+        return LocalDateTime.ofInstant(instant, _zoneId)
+                .truncatedTo(ChronoUnit.SECONDS)
+                .format(DateTimeFormatter.ofPattern(
+                        _dateTimeFormat
+                                .replace(":", "-")
+                                .replace(" ", "'T'")
+                ));
+    }
+
+    private static String cleanFileName(String fileName) {
+        return fileName.replace(_splitter, _replacement);
+    }
+
     private static Seszt<Scriptorian.Scriptory> scriptoriesWithoutSuccess() {
         return buildScriptories(ScriptorianRepository.findScriptoriesWithoutSuccess());
     }
 
-    private static Seszt<File> findScriptsNotRecorded(Seszt<File> scripts,Seszt<Scriptorian.Scriptory> scriptories) {
+    private static Seszt<File> findScriptsNotRecorded(Seszt<File> scripts, Seszt<Scriptorian.Scriptory> scriptories) {
         Seszt<String> fileNames = new Seszt<>(scriptories.stream()
                 .map(Scriptorian.Scriptory::get_fileName));
 
         return new Seszt<>(scripts.stream()
-                .filter(script -> !fileNames.contains(script.getName())));
+                .filter(script -> fileNames.isEmpty() || !fileNames.contains(script.getName()))
+                .sorted((previous, current) -> {
+                    BasicFileAttributes
+                            previousAttributes,
+                            currentAttributes;
+
+                    try {
+                        previousAttributes = readAttributes(previous.toPath(), BasicFileAttributes.class);
+                        currentAttributes = readAttributes(current.toPath(), BasicFileAttributes.class);
+                        int comparison = define(previous).get_versionstamp().compareTo(define(current).get_versionstamp());
+
+                        return comparison == 0
+                                ? previousAttributes.creationTime().compareTo(currentAttributes.creationTime())
+                                : comparison;
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }));
+    }
+
+    private static Scriptorian.Scriptory define(File file) throws IllegalArgumentException {
+        String[] split = file.getName().split(String.valueOf(_splitter));
+        String[] attributes = Arrays.stream(split[0].split("[VC]"))
+                .filter(attribute -> !attribute.isEmpty())
+                .toArray(String[]::new);
+        String[] versionstampAttributes = attributes[0].split("[-T]");
+
+        if (!(
+                attributes.length == 2 &&
+                split.length <= 2 &&
+                versionstampAttributes.length == 6
+        ))
+            throw new IllegalArgumentException();
+
+        return new Scriptorian.Scriptory(
+                split[1],
+                file.getName(),
+                null,
+                FileService.getContent(file),
+                LocalDateTime.of(
+                        parseInt(versionstampAttributes[0]),
+                        parseInt(versionstampAttributes[1]),
+                        parseInt(versionstampAttributes[2]),
+                        parseInt(versionstampAttributes[3]),
+                        parseInt(versionstampAttributes[4]),
+                        parseInt(versionstampAttributes[5])
+                ).toInstant(ZoneOffset.of("Z")),
+                null,
+                null
+        );
     }
 
     private static Seszt<DatabaseParameter> generateParameters(File file, String errorMessage, Instant versionstamp) {
