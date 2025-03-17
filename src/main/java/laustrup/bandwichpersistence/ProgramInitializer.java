@@ -20,6 +20,7 @@ public class ProgramInitializer {
 
     public static boolean startup(String[] args) throws IllegalArgumentException {
         Map<String, String> arguments = argumentsToMap(args);
+//        displayLogo();
         displayArguments(arguments);
 
         try {
@@ -87,6 +88,22 @@ public class ProgramInitializer {
         })
                 .filter(data -> data[1] != null)
                 .collect(Collectors.toMap(data -> data[0], data -> data[1]));
+    }
+
+    private static void displayLogo() {
+        System.out.println("""
+                +-------------------------+
+                |  _________  _________   |
+                | /         \\/         \\  |
+                | |                     | |
+                | |_____________________| |
+                |      __       __    __  
+                |     /  \\     |  \\  /  |
+                |    / __ \\    |   \\/   |
+                |   / /__\\ \\   |        |
+                |  / /----\\ \\  | |\\  /
+                | /_/      \\_\\ |_| \\/
+                """);
     }
 
     private static void displayArguments(Map<String, String> arguments) {
