@@ -4,41 +4,42 @@ import laustrup.bandwichpersistence.core.libraries.DatabaseLibrary;
 import laustrup.bandwichpersistence.core.libraries.SecurityLibrary;
 import laustrup.bandwichpersistence.core.persistence.SQL;
 
-import java.util.Arrays;
-import java.util.Objects;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ProgramInitializer {
 
     private static final Logger _logger = Logger.getLogger(ProgramInitializer.class.getSimpleName());
 
-    private static String[] _arguments;
+    private static final String _password = "the password";
 
-    public static boolean startup(String[] arguments) throws IllegalArgumentException {
-        _arguments = arguments;
+    private static final Scanner _scanner = new Scanner(System.in);
+
+    public static boolean startup(String[] args) throws IllegalArgumentException {
+        Map<String, String> arguments = argumentsToMap(args);
+        displayArguments(arguments);
 
         try {
-            SecurityLibrary.setup(
-                    findArgument(SecurityLibrary.CommandOption.GIBBERISH.get_title(), true)
-            );
+            SecurityLibrary.setup(arguments.get(SecurityLibrary.CommandOption.GIBBERISH.get_title()));
 
-            String port = findArgument(DatabaseLibrary.CommandOption.DATABASE_PORT.get_title(), false);
+            String port = arguments.get(DatabaseLibrary.CommandOption.DATABASE_PORT.get_title());
 
             DatabaseLibrary.setup(
-                SQL.valueOf(findArgument(DatabaseLibrary.CommandOption.SQL.get_title(), true)),
-                findArgument(DatabaseLibrary.CommandOption.DATABASE_TARGET.get_title(), false),
+                SQL.valueOf(arguments.get(DatabaseLibrary.CommandOption.SQL.get_title())),
+                arguments.get(DatabaseLibrary.CommandOption.DATABASE_TARGET.get_title()),
                 port != null
                         ? Integer.valueOf(
                                 Objects.requireNonNull(
-                                        findArgument(DatabaseLibrary.CommandOption.DATABASE_PORT.get_title(),
-                                        false)
+                                        arguments.get(DatabaseLibrary.CommandOption.DATABASE_PORT.get_title())
                                 )
                         ) : null,
-                findArgument(DatabaseLibrary.CommandOption.DATABASE_SCHEMA.get_title(), false),
-                findArgument(DatabaseLibrary.CommandOption.DATABASE_USER.get_title(), true),
-                findArgument(DatabaseLibrary.CommandOption.DATABASE_PASSWORD.get_title(), false),
-                arguments
+                arguments.get(DatabaseLibrary.CommandOption.DATABASE_SCHEMA.get_title()),
+                arguments.get(DatabaseLibrary.CommandOption.DATABASE_USER.get_title()),
+                arguments.get(DatabaseLibrary.CommandOption.DATABASE_PASSWORD.get_title()),
+                args
             );
 
             return true;
@@ -53,9 +54,53 @@ public class ProgramInitializer {
         }
     }
 
-    private static String findArgument(String command, boolean isNecessary) {
+    private static Map<String, String> argumentsToMap(String[] arguments) {
+        return Stream.of(new String[][]{
+                {
+                        SecurityLibrary.CommandOption.GIBBERISH.get_title(),
+                        findArgument(SecurityLibrary.CommandOption.GIBBERISH.get_title(), arguments, true)
+                },
+                {
+                        DatabaseLibrary.CommandOption.DATABASE_PORT.get_title(),
+                        findArgument(DatabaseLibrary.CommandOption.DATABASE_PORT.get_title(), arguments, false)
+                },
+                {
+                        DatabaseLibrary.CommandOption.SQL.get_title(),
+                        findArgument(DatabaseLibrary.CommandOption.SQL.get_title(), arguments, true)
+                },
+                {
+                        DatabaseLibrary.CommandOption.DATABASE_TARGET.get_title(),
+                        findArgument(DatabaseLibrary.CommandOption.DATABASE_TARGET.get_title(), arguments,  false)
+                },
+                {
+                        DatabaseLibrary.CommandOption.DATABASE_SCHEMA.get_title(),
+                        findArgument(DatabaseLibrary.CommandOption.DATABASE_SCHEMA.get_title(), arguments, false)
+                },
+                {
+                        DatabaseLibrary.CommandOption.DATABASE_USER.get_title(),
+                        findArgument(DatabaseLibrary.CommandOption.DATABASE_USER.get_title(), arguments, true)
+                },
+                {
+                        DatabaseLibrary.CommandOption.DATABASE_PASSWORD.get_title(),
+                        findArgument(DatabaseLibrary.CommandOption.DATABASE_PASSWORD.get_title(), arguments, false)
+                }
+        })
+                .filter(data -> data[1] != null)
+                .collect(Collectors.toMap(data -> data[0], data -> data[1]));
+    }
+
+    private static void displayArguments(Map<String, String> arguments) {
+        System.out.println("Arguments:\n");
+        arguments.forEach((key, value) -> System.out.println("\t" + key + ": " + value));
+        System.out.println("\nTo continue, enter " + _password + "\n");
+
+        while (!_scanner.nextLine().equals(_password))
+            System.out.println("\tThat's not " + _password + "!\n");
+    }
+
+    private static String findArgument(String command, String[] arguments, boolean isNecessary) {
         try {
-            String sentence = Arrays.stream(_arguments).toList().stream().filter(argument ->
+            String sentence = Arrays.stream(arguments).toList().stream().filter(argument ->
                     argument.contains("=")
                             &&
                     argument.split("=")[0].equals(command)
