@@ -1,6 +1,7 @@
 package laustrup.bandwichpersistence.core.libraries;
 
 import laustrup.bandwichpersistence.core.services.PasswordService;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 public class SecurityLibrary {
@@ -58,14 +59,12 @@ public class SecurityLibrary {
         return true;
     }
 
-    @Getter
+    @Getter @AllArgsConstructor
     public enum CommandOption {
-        GIBBERISH("gibberish");
+        GIBBERISH("gibberish", false);
 
         private final String _title;
 
-        CommandOption(String title) {
-            _title = title;
-        }
+        private final boolean _flag;
     }
 }

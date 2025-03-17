@@ -75,6 +75,8 @@ public class DatabaseLibrary {
     ) {
         if (_isConfigured)
             throw new IllegalStateException("Database library is already configured");
+        if (schema == null)
+            throw new IllegalArgumentException("Database must have a schema");
         
         _sql = sql;
         _driver = _sql == null ? null : switch (_sql) {
@@ -83,7 +85,7 @@ public class DatabaseLibrary {
         };
         _target = Objects.requireNonNullElse(target, "localhost");
         _port = Objects.requireNonNullElse(port, 3306);
-        _schema = Objects.requireNonNullElse(schema, "bandwich");
+        _schema = schema;
         _user = user;
         _password = password;
         _properties = properties;
@@ -127,21 +129,19 @@ public class DatabaseLibrary {
                 .collect(Collectors.joining());
     }
     
-    @Getter
+    @Getter @AllArgsConstructor
     public enum CommandOption {
-        SQL("sql"),
-        DATABASE_TARGET("databaseTarget"),
-        DATABASE_PORT("databasePort"),
-        DATABASE_SCHEMA("databaseSchema"),
-        DATABASE_USER("databaseUser"),
-        DATABASE_PASSWORD("databasePassword"),
-        DISALLOW_MULTIPLE_QUERIES("disAllowMultiQueries");
+        SQL("sql", false),
+        DATABASE_TARGET("databaseTarget", false),
+        DATABASE_PORT("databasePort", false),
+        DATABASE_SCHEMA("databaseSchema", false),
+        DATABASE_USER("databaseUser", false),
+        DATABASE_PASSWORD("databasePassword", false),
+        DISALLOW_MULTIPLE_QUERIES("disAllowMultiQueries", false);
 
         private final String _title;
 
-        CommandOption(String title) {
-            _title = title;
-        }
+        private final boolean _flag;
     }
 
     @Getter

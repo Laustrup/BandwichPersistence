@@ -18,15 +18,15 @@ public class ProgramInitializer {
 
     private static final Scanner _scanner = new Scanner(System.in);
 
-    public static boolean startup(String[] args) throws IllegalArgumentException {
+    public static boolean startup(String[] args, String defaultSchema) throws IllegalArgumentException {
         Map<String, String> arguments = argumentsToMap(args);
-//        displayLogo();
         displayArguments(arguments);
 
         try {
             SecurityLibrary.setup(arguments.get(SecurityLibrary.CommandOption.GIBBERISH.get_title()));
 
             String port = arguments.get(DatabaseLibrary.CommandOption.DATABASE_PORT.get_title());
+            String databaseSchema = arguments.get(DatabaseLibrary.CommandOption.DATABASE_SCHEMA.get_title());
 
             DatabaseLibrary.setup(
                 SQL.valueOf(arguments.get(DatabaseLibrary.CommandOption.SQL.get_title())),
@@ -37,7 +37,7 @@ public class ProgramInitializer {
                                         arguments.get(DatabaseLibrary.CommandOption.DATABASE_PORT.get_title())
                                 )
                         ) : null,
-                arguments.get(DatabaseLibrary.CommandOption.DATABASE_SCHEMA.get_title()),
+                databaseSchema != null ? databaseSchema : defaultSchema,
                 arguments.get(DatabaseLibrary.CommandOption.DATABASE_USER.get_title()),
                 arguments.get(DatabaseLibrary.CommandOption.DATABASE_PASSWORD.get_title()),
                 args
@@ -45,11 +45,8 @@ public class ProgramInitializer {
 
             return true;
         } catch (Exception e) {
-            _logger.log(
-                    Level.CONFIG,
-                    "Had trouble initializing!",
-                    e
-            );
+            System.err.println("\n\tHad trouble initializing!\n\n" + e.getMessage());
+            e.getStackTrace();
 
             return false;
         }
@@ -59,68 +56,60 @@ public class ProgramInitializer {
         return Stream.of(new String[][]{
                 {
                         SecurityLibrary.CommandOption.GIBBERISH.get_title(),
-                        findArgument(SecurityLibrary.CommandOption.GIBBERISH.get_title(), arguments, true)
+                        findArgument(SecurityLibrary.CommandOption.GIBBERISH.get_title(), arguments, false, true)
                 },
                 {
                         DatabaseLibrary.CommandOption.DATABASE_PORT.get_title(),
-                        findArgument(DatabaseLibrary.CommandOption.DATABASE_PORT.get_title(), arguments, false)
+                        findArgument(DatabaseLibrary.CommandOption.DATABASE_PORT.get_title(), arguments, false, false)
                 },
                 {
                         DatabaseLibrary.CommandOption.SQL.get_title(),
-                        findArgument(DatabaseLibrary.CommandOption.SQL.get_title(), arguments, true)
+                        findArgument(DatabaseLibrary.CommandOption.SQL.get_title(), arguments, false, true)
                 },
                 {
                         DatabaseLibrary.CommandOption.DATABASE_TARGET.get_title(),
-                        findArgument(DatabaseLibrary.CommandOption.DATABASE_TARGET.get_title(), arguments,  false)
+                        findArgument(DatabaseLibrary.CommandOption.DATABASE_TARGET.get_title(), arguments, false, false)
                 },
                 {
                         DatabaseLibrary.CommandOption.DATABASE_SCHEMA.get_title(),
-                        findArgument(DatabaseLibrary.CommandOption.DATABASE_SCHEMA.get_title(), arguments, false)
+                        findArgument(DatabaseLibrary.CommandOption.DATABASE_SCHEMA.get_title(), arguments, false, false)
                 },
                 {
                         DatabaseLibrary.CommandOption.DATABASE_USER.get_title(),
-                        findArgument(DatabaseLibrary.CommandOption.DATABASE_USER.get_title(), arguments, true)
+                        findArgument(DatabaseLibrary.CommandOption.DATABASE_USER.get_title(), arguments, false, true)
                 },
                 {
                         DatabaseLibrary.CommandOption.DATABASE_PASSWORD.get_title(),
-                        findArgument(DatabaseLibrary.CommandOption.DATABASE_PASSWORD.get_title(), arguments, false)
+                        findArgument(DatabaseLibrary.CommandOption.DATABASE_PASSWORD.get_title(), arguments, false, false)
+                },
+                {
+                        Program.CommandOption.SKIP_CONFIRMATION.get_title(),
+                        findArgument(Program.CommandOption.SKIP_CONFIRMATION.get_title(), arguments, true, false)
                 }
         })
                 .filter(data -> data[1] != null)
                 .collect(Collectors.toMap(data -> data[0], data -> data[1]));
     }
 
-    private static void displayLogo() {
-        System.out.println("""
-                +-------------------------+
-                |  _________  _________   |
-                | /         \\/         \\  |
-                | |                     | |
-                | |_____________________| |
-                |      __       __    __  
-                |     /  \\     |  \\  /  |
-                |    / __ \\    |   \\/   |
-                |   / /__\\ \\   |        |
-                |  / /----\\ \\  | |\\  /
-                | /_/      \\_\\ |_| \\/
-                """);
-    }
-
     private static void displayArguments(Map<String, String> arguments) {
         System.out.println("Arguments:\n");
         arguments.forEach((key, value) -> System.out.println("\t" + key + ": " + value));
-        System.out.println("\nTo continue, enter " + _password + "\n");
 
-        while (!_scanner.nextLine().equals(_password))
-            System.out.println("\tThat's not " + _password + "!\n");
+        if (arguments.get(Program.CommandOption.SKIP_CONFIRMATION.get_title()) == null) {
+            System.out.println("\nTo continue, enter " + _password + "\n");
+
+            while (!_scanner.nextLine().equals(_password))
+                System.out.println("\tThat's not " + _password + "!\n");
+        }
     }
 
-    private static String findArgument(String command, String[] arguments, boolean isNecessary) {
+    private static String findArgument(String command, String[] arguments, boolean isFlag, boolean isNecessary) {
         try {
-            String sentence = Arrays.stream(arguments).toList().stream().filter(argument ->
-                    argument.contains("=")
-                            &&
-                    argument.split("=")[0].equals(command)
+            String sentence = Arrays.stream(arguments).toList().stream().filter(argument -> (
+                            argument.contains("=")
+                                    &&
+                            argument.split("=")[0].equals(command)
+                    ) || (isFlag && argument.equals(command))
             )
                     .findFirst()
                     .orElseGet(() -> {
@@ -133,7 +122,12 @@ public class ProgramInitializer {
                             return null;
                     });
 
-            return sentence == null ? null : sentence.split("=")[1];
+            return sentence == null
+                    ? null
+                    : (isFlag
+                            ? sentence
+                            : sentence.split("=")[1]
+                    );
         } catch (Exception e) {
             return null;
         }
