@@ -111,7 +111,7 @@ public class Band extends Model {
      * Is meant to be used as having common fields and be the body of Requests and Responses.
      * Doesn't have any logic.
      */
-    @Getter @Setter
+    @Getter @Setter @FieldNameConstants
     public static class DTO extends ModelDTO {
 
 

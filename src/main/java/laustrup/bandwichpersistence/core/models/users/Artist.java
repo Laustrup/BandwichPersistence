@@ -202,4 +202,40 @@ public class Artist extends BusinessUser {
             runner = artist.get_runner();
         }
     }
+
+    @Getter
+    public static class Membership {
+
+        private Band _band;
+
+        private Artist.Membership.Association _association;
+
+        public Membership(Artist.Membership.DTO membership) {
+            _band = new Band(membership.getMember());
+            _association = membership.getAssociation();
+        }
+
+        public Membership(Band band, Artist.Membership.Association association) {
+            _band = band;
+            _association = association;
+        }
+
+        public enum Association {
+            SESSION,
+            OWNER
+        }
+
+        @Getter @FieldNameConstants
+        public static class DTO {
+
+            private Band.DTO member;
+
+            private Artist.Membership.Association association;
+
+            public DTO(Artist.Membership membership) {
+                member = new Band.DTO(membership.get_band());
+                association = membership.get_association();
+            }
+        }
+    }
 }

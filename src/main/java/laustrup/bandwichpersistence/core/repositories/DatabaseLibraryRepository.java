@@ -1,4 +1,4 @@
-package laustrup.bandwichpersistence.core.services.persistence.repositories;
+package laustrup.bandwichpersistence.core.repositories;
 
 import laustrup.bandwichpersistence.core.libraries.DatabaseLibrary;
 import laustrup.bandwichpersistence.core.persistence.DatabaseManager;

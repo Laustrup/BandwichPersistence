@@ -1,5 +1,6 @@
 package laustrup.bandwichpersistence.core.utilities.collections.lists;
 
+import laustrup.bandwichpersistence.core.persistence.Query;
 import laustrup.bandwichpersistence.core.utilities.collections.ICollection;
 import laustrup.bandwichpersistence.core.utilities.console.Printer;
 
@@ -23,7 +24,13 @@ import java.util.stream.Stream;
 public class Liszt<E> extends laustrup.bandwichpersistence.core.utilities.collections.Collection<E> implements ILiszt<E>, List<E>, ICollection<E> {
 
     /** Creates the Liszt with empty data and a hash type of map. */
-    public Liszt() { this(false); }
+    public Liszt() {
+        this(false);
+    }
+
+    public Liszt(Stream<E> stream) {
+        this((E[]) stream.toArray());
+    }
 
     /**
      * Creates the Liszt with empty data.

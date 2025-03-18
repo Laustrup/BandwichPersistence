@@ -5,6 +5,7 @@ import laustrup.bandwichpersistence.core.models.chats.Request;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
 import laustrup.bandwichpersistence.core.utilities.collections.sets.Seszt;
 import lombok.Getter;
+import lombok.experimental.FieldNameConstants;
 
 import java.time.Instant;
 import java.util.HashSet;
@@ -67,7 +68,7 @@ public class Organisation extends Model {
         _employees = employees;
     }
 
-    @Getter
+    @Getter @FieldNameConstants
     public static class DTO extends ModelDTO {
 
         private Set<Request.DTO> requests;
@@ -157,7 +158,7 @@ public class Organisation extends Model {
             LEADER
         }
 
-        @Getter
+        @Getter @FieldNameConstants
         public static class DTO extends BusinessUserDTO {
 
             private Set<Role> roles;

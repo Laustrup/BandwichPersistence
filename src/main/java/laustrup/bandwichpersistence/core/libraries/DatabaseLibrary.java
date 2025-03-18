@@ -2,7 +2,7 @@ package laustrup.bandwichpersistence.core.libraries;
 
 import laustrup.bandwichpersistence.core.persistence.SQL;
 import laustrup.bandwichpersistence.core.managers.ManagerService;
-import laustrup.bandwichpersistence.core.services.persistence.repositories.DatabaseLibraryRepository;
+import laustrup.bandwichpersistence.core.repositories.DatabaseLibraryRepository;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;

@@ -22,7 +22,7 @@ public class JDBCService {
                 ts.add(supplier.get());
             }
         } catch (Exception exception) {
-            System.out.println(exception.getMessage());
+            System.err.println(exception.getMessage());
         }
 
         return ts.stream();
@@ -37,7 +37,11 @@ public class JDBCService {
             String... columnTitle
     ) {
         for (int i = 0; i < columnTitle.length; i++)
-            columnTitle[i] = specifyColumn(Arrays.stream(columnTitle).filter(Objects::nonNull).findFirst().get());
+            columnTitle[i] = toDatabaseColumn(specifyColumn(Arrays.stream(columnTitle)
+                    .filter(Objects::nonNull)
+                    .findFirst()
+                    .orElseThrow()
+            ));
 
         return ifColumnExists(function, columnTitle);
     }
@@ -105,6 +109,22 @@ public class JDBCService {
     public static Integer getInteger(ResultSet resultSet, String column) {
         try {
             return resultSet.getInt(column);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static Long getLong(ResultSet resultSet, String column) {
+        try {
+            return resultSet.getLong(column);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static Boolean getBoolean(ResultSet resultSet, String column) {
+        try {
+            return resultSet.getBoolean(column);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -178,5 +198,16 @@ public class JDBCService {
             if (primary != null && breaker.apply(primary))
                 return true;
         return false;
+    }
+
+    public static String toDatabaseColumn(String field) {
+        StringBuilder databaseColumn = new StringBuilder();
+
+        for (char c : field.toCharArray())
+            databaseColumn
+                    .append(Character.isUpperCase(c) ? '_' : "")
+                    .append(Character.toLowerCase(c));
+
+        return databaseColumn.toString();
     }
 }

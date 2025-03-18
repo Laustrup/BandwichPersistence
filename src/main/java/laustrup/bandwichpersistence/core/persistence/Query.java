@@ -1,18 +1,18 @@
 package laustrup.bandwichpersistence.core.persistence;
 
 import lombok.Getter;
-import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Getter
 public class Query {
 
     private final String _script;
 
-    private List<Parameter> _parameters;
+    private Stream<Parameter> _parameters;
 
     @Getter
     private static final char _identifier = '€';
@@ -21,11 +21,11 @@ public class Query {
     private static final char _endExpression = ' ';
 
     public Query(String script) {
-        this(script, new ArrayList<>());
+        this(script, Stream.empty());
     }
 
     public Query(String script, Parameter parameter) {
-        this(script, List.of(parameter));
+        this(script, Stream.of(parameter));
     }
 
     public Query(Collection<Query> queries) {
@@ -37,8 +37,8 @@ public class Query {
         );
     }
 
-    public Query(String script, List<Parameter> parameters) {
-        _script = String.format(script, parameters.stream().map(Parameter::get_key).toArray());
+    public Query(String script, Stream<Parameter> parameters) {
+        _script = String.format(script, parameters.map(Parameter::get_key).toArray());
         _parameters = parameters;
     }
 

@@ -151,7 +151,7 @@ public abstract class Model {
      * When it is created through a constructor, that doesn't ask for a DateTime.
      * It will use the DateTime of now.
      */
-    @Getter
+    @Getter @FieldNameConstants
     public abstract static class ModelDTO {
 
         /**

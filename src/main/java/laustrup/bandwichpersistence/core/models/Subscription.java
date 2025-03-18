@@ -24,6 +24,8 @@ public class Subscription {
 
     private Kind _kind;
 
+    private UserType _userType;
+
     /**
      * Will translate a transport object of this object into a construct of this object.
      * @param subscription The transport object to be transformed.
@@ -32,7 +34,8 @@ public class Subscription {
         this(
                 subscription.getId(),
                 subscription.getStatus(),
-                subscription.getKind()
+                subscription.getKind(),
+                subscription.getUserType()
         );
     }
 
@@ -44,11 +47,13 @@ public class Subscription {
     public Subscription(
             UUID id,
             Status status,
-            Kind kind
+            Kind kind,
+            UserType userType
     ) {
         _id = id;
         _status = status;
         _kind = kind;
+        _userType = userType;
     }
 
     /**
@@ -56,9 +61,13 @@ public class Subscription {
      * Timestamp will be now.
      * @param status An enum that determines what kind of status, the situation of the Subscription is in.
      */
-    public Subscription(Status status, Kind kind) {
-        _status = status;
-        _kind = kind;
+    public Subscription(Status status, Kind kind, UserType userType) {
+        this(
+                null,
+                status,
+                kind,
+                userType
+        );
     }
 
     @Override
@@ -94,12 +103,18 @@ public class Subscription {
         FREE
     }
 
+    public enum UserType {
+        ARTIST,
+        ORGANISATION_EMPLOYEE,
+        PARTICIPANT
+    }
+
     /**
      * The Data Transfer Object.
      * Is meant to be used as having common fields and be the body of Requests and Responses.
      * Doesn't have any logic.
      */
-    @Getter @Setter
+    @Getter @Setter @FieldNameConstants
     public static class DTO {
 
         private UUID id;
@@ -111,10 +126,13 @@ public class Subscription {
 
         private Subscription.Kind kind;
 
+        private UserType userType;
+
         public DTO(Subscription subscription) {
             id = subscription.get_id();
             status = Subscription.Status.valueOf(subscription.get_status().toString());
             kind = subscription.get_kind();
+            userType = subscription.get_userType();
         }
     }
 }

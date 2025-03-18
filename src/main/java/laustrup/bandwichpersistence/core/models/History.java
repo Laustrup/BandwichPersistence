@@ -118,8 +118,8 @@ public class History {
 
     @Getter @AllArgsConstructor
     public enum JoinTableDetails {
-        USER("user_stories", "user_id"),
-        BOOKING("booking_stories", "booking_id");
+        ARTIST("artist_history", "artist_id"),
+        ORGANISATION_EMPLOYEE("organisation_employee_history", "organisation_employee_id");
 
         private String _table;
 

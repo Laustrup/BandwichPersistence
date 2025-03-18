@@ -165,6 +165,7 @@ public class Album extends Model {
          */
         public Media(DTO item) {
             this(
+                    item.getId(),
                     item.getTitle(),
                     item.getEndpoint(),
                     item.getKind(),
@@ -173,6 +174,7 @@ public class Album extends Model {
         }
 
         public Media(
+                UUID id,
                 String title,
                 String endpoint,
                 Kind kind,
@@ -204,7 +206,7 @@ public class Album extends Model {
          * Is meant to be used as having common fields and be the body of Requests and Responses.
          * Doesn't have any logic.
          */
-        @Getter
+        @Getter @FieldNameConstants
         public static class DTO extends ModelDTO {
 
             /** The endpoint for a URL, that is used to get the file of the item. */

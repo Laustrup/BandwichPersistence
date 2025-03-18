@@ -9,6 +9,9 @@ import laustrup.bandwichpersistence.core.models.users.Participant;
 public class UserService {
 
     public static User.UserDTO from(User user) {
+        if (user == null)
+            return null;
+
         return user.getClass() == Artist.class
                 ? new Artist.DTO((Artist) user)
                 : (user.getClass() == Participant.class
@@ -18,6 +21,9 @@ public class UserService {
     }
 
     public static User from(User.UserDTO user) {
+        if (user == null)
+            return null;
+
         return user.getClass() == Artist.DTO.class
                 ? new Artist((Artist.DTO) user)
                 : (user.getClass() == Participant.DTO.class

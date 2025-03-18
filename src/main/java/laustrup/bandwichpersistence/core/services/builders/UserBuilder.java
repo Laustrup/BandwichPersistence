@@ -1,17 +1,15 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
-import laustrup.bandwichpersistence.ProgramInitializer;
 import laustrup.bandwichpersistence.core.models.*;
-import laustrup.bandwichpersistence.core.persistence.DatabaseTable;
+import laustrup.bandwichpersistence.core.models.users.ContactInfo;
+import laustrup.bandwichpersistence.core.services.UserService;
 import laustrup.bandwichpersistence.core.services.persistence.JDBCService;
+import laustrup.bandwichpersistence.core.utilities.collections.sets.Seszt;
 
 import java.sql.ResultSet;
-import java.sql.Timestamp;
-import java.time.Instant;
-import java.time.ZoneId;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
@@ -19,169 +17,186 @@ import static laustrup.bandwichpersistence.core.services.persistence.JDBCService
 
 public class UserBuilder {
 
-    public static Logger _logger = Logger.getLogger(ProgramInitializer.class.getSimpleName());
+    private static final Logger _logger = Logger.getLogger(UserBuilder.class.getSimpleName());
 
-//    public static Stream<Login> buildLogins(ResultSet resultSet) {
-//        List<Login> logins = new ArrayList<>();
-//
-//        JDBCService.build(
-//                resultSet,
-//                () -> logins.add(new Login(
-//                        get(
-//                                column -> getString(resultSet, column),
-//                                DatabaseTable.USER.get_title(),
-//                                User.DatabaseColumns.password.name()
-//                        ),
-//                        null,
-//                        new User.DTO(build(resultSet))
-//                ))
-//        );
-//
-//        return logins.stream();
-//    }
+    public static Stream<Login> buildLogins(ResultSet resultSet) {
+        List<Login> logins = new ArrayList<>();
 
-//    public static User build(ResultSet resultSet) {
-//        AtomicReference<UUID> userId = new AtomicReference<>();
-//        AtomicReference<String> password = new AtomicReference<>();
-//        AtomicReference<User.ContactInfo> contactInfo = new AtomicReference<>();
-//        AtomicReference<Instant> timestamp = new AtomicReference<>();
-//        AtomicReference<ZoneId> zoneId = new AtomicReference<>();
-//        Set<User.Authority> authorities = new HashSet<>();
-////        Map<UUID, User.ContactInfo.Address> addresses = new HashMap<>();
-//        Map<UUID, History.Story> stories = new HashMap<>();
-//
-//        try {
-//            JDBCService.build(
-//                    resultSet,
-//                    () -> {
-//                        zoneId.set(ZoneId.of(get(
-//                                column -> getString(resultSet, column),
-//                                User.DatabaseColumns.zone_id.name()
-//                        )));
-//                        userId.set(get(
-//                                column -> getUUID(resultSet, column),
-//                                Model.DatabaseColumn.id.name()
-//                        ));
-//                        password.set(get(
-//                                column -> getString(resultSet, column),
-//                                User.DatabaseColumns.password.name()
-//                        ));
-//                        authorities.add(User.Authority.valueOf(get(
-//                                column -> getString(resultSet, column),
-//                                User.DatabaseColumns.authority.name()
-//                        )));
-//
-//                        putIfAbsent(
-//                                stories,
-//                                get(
-//                                        column -> getUUID(resultSet, column),
-//                                        History.Story.DatabaseColumn.story_id.name()
-//                                ), HistoryBuilder.buildStory(resultSet)
-//                        );
-//
-//                        //TODO
-////                        putIfAbsent(
-////                                addresses,
-////                                get(
-////                                        column -> getUUID(resultSet, column),
-////                                        User.ContactInfo.Address.DatabaseColumn.id.name()
-////                                ),
-////                                buildAddress(resultSet, stories)
-////                        );
-//
-//                        contactInfo.set(new User.ContactInfo(
-//                                get(
-//                                        column -> getString(resultSet, column),
-//                                        User.ContactInfo.DatabaseColumn.name.name()
-//                                ),
-//                                get(
-//                                        column -> getString(resultSet, column),
-//                                        User.ContactInfo.DatabaseColumn.email.name()
-//                                ),
-//                                addresses.values().stream().toList()
-//                        ));
-//                        timestamp.set(get(
-//                                column -> getTimestamp(resultSet, column, Timestamp::toInstant),
-//                                Model.DatabaseColumn.timestamp.name()
-//                        ));
-//                    },
-//                    primary -> !get(
-//                            column -> getUUID(resultSet, column),
-//                            Model.DatabaseColumn.id.name()
-//                    ).equals(userId.get()),
-//                    userId.get()
-//            );
-//
-//            return new User(
-//                    userId.get(),
-//                    password.get(),
-//                    contactInfo.get(),
-//                    zoneId.get(),
-//                    authorities,
-//                    new ArrayList<>(HistoryBuilder.getStoriesOfOwner(stories, userId.get()).toList()),
-//                    timestamp.get()
-//            );
-//        } catch (Exception e) {
-//            _logger.log(
-//                    Level.WARNING,
-//                    String.format(
-//                            "Couldn't build user with id \"%s\"",
-//                            userId.get() != null
-//                                    ? userId.toString()
-//                                    : "UNKNOWN"
-//                    ),
-//                    e
-//            );
-//
-//            return null;
-//        }
-//    }
+        JDBCService.build(
+                resultSet,
+                () -> logins.add(new Login(
+                        get(
+                                column -> getString(resultSet, column),
+                                Login.Fields.password
+                        ),
+                        UserService.from(Objects.requireNonNull(build(resultSet)))
+                ))
+        );
 
-//    public static User.ContactInfo.Address buildAddress(ResultSet resultSet, Map<UUID, History.Story> stories) {
-//        UUID id = get(
-//                column -> getUUID(resultSet, column),
-//                DatabaseTable.ADDRESS.get_title(),
-//                User.ContactInfo.Address.DatabaseColumn.id.name()
-//        );
-//
-//        return new User.ContactInfo.Address(
-//                id,
-//                get(
-//                        column -> getString(resultSet, column),
-//                        DatabaseTable.ADDRESS.get_title(),
-//                        User.ContactInfo.Address.DatabaseColumn.street.name()
-//                ),
-//                get(
-//                        column -> getString(resultSet, column),
-//                        DatabaseTable.ADDRESS.get_title(),
-//                        User.ContactInfo.Address.DatabaseColumn.number.name()
-//                ),
-//                get(
-//                        column -> getString(resultSet, column),
-//                        DatabaseTable.ADDRESS.get_title(),
-//                        User.ContactInfo.Address.DatabaseColumn.floor.name()
-//                ),
-//                get(
-//                        column -> getString(resultSet, column),
-//                        DatabaseTable.ADDRESS.get_title(),
-//                        User.ContactInfo.Address.DatabaseColumn.postal_code.name()
-//                ),
-//                get(
-//                        column -> getString(resultSet, column),
-//                        DatabaseTable.ADDRESS.get_title(),
-//                        User.ContactInfo.Address.DatabaseColumn.city.name()
-//                ),
-//                get(
-//                        column -> getString(resultSet, column),
-//                        DatabaseTable.ADDRESS.get_title(),
-//                        User.ContactInfo.Address.DatabaseColumn.country.name()
-//                ),
-//                get(
-//
-//                        column -> getTimestamp(resultSet, column, Timestamp::toInstant),
-//                        DatabaseTable.ADDRESS.get_title(),
-//                        User.ContactInfo.Address.DatabaseColumn.timestamp.name()
-//                )
-//        );
-//    }
+        _logger.info("Successfully built logins");
+
+        return logins.stream();
+    }
+
+    public static User build(ResultSet resultSet) {
+        Subscription.UserType userType;
+
+        try {
+            if (resultSet.next())
+                userType = Subscription.UserType.valueOf(getString(
+                        resultSet,
+                        Subscription.DTO.Fields.userType
+                ));
+            else
+                return null;
+
+            resultSet.previous();
+        } catch (SQLException e) {
+            _logger.warning("Couldn't find user type when building user!\n" + e.getMessage());
+            return null;
+        }
+
+        return switch (userType) {
+            case ARTIST -> ArtistBuilder.build(resultSet);
+            case ORGANISATION_EMPLOYEE -> OrganisationBuilder.buildEmployee(resultSet);
+            default -> throw new IllegalStateException();
+        };
+    }
+
+    public static Subscription buildSubscription(ResultSet resultSet) {
+        AtomicReference<UUID> id = new AtomicReference<>();
+        AtomicReference<Subscription.Status> status = new AtomicReference<>();
+        AtomicReference< Subscription.Kind> kind = new AtomicReference<>();
+        AtomicReference< Subscription.UserType> userType = new AtomicReference<>();
+
+        try {
+            JDBCService.build(
+                    resultSet,
+                    () -> {
+                        id.set(get(
+                                column -> getUUID(resultSet, column),
+                                Subscription.DTO.Fields.id
+                        ));
+                        status.set(get(
+                                column -> Subscription.Status.valueOf(getString(resultSet, column)),
+                                Subscription.DTO.Fields.status
+                        ));
+                        kind.set(get(
+                                column -> Subscription.Kind.valueOf(getString(resultSet, column)),
+                                Subscription.DTO.Fields.kind
+                        ));
+                        userType.set(get(
+                                column -> Subscription.UserType.valueOf(getString(resultSet, column)),
+                                Subscription.DTO.Fields.userType
+                        ));
+                    },
+                    primary -> !get(
+                            column -> getUUID(resultSet, column),
+                            Model.ModelDTO.Fields.id
+                    ).equals(primary),
+                    id.get()
+            );
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return new Subscription(
+                id.get(),
+                status.get(),
+                kind.get(),
+                userType.get()
+        );
+    }
+
+    public static ContactInfo buildContactInfo(ResultSet resultSet) {
+        AtomicReference<UUID> id = new AtomicReference<>();
+        AtomicReference<String> email = new AtomicReference<>();
+        Seszt<ContactInfo.Phone> phones = new Seszt<>();
+        AtomicReference<ContactInfo.Address> address = new AtomicReference<>();
+        AtomicReference<ContactInfo.Country> country = new AtomicReference<>();
+
+        try {
+            JDBCService.build(
+                    resultSet,
+                    () -> {
+                        id.set(get(
+                                column -> getUUID(resultSet, column),
+                                Model.ModelDTO.Fields.id
+                        ));
+                        email.set(get(
+                                column -> getString(resultSet, column),
+                                ContactInfo.DTO.Fields.email
+                        ));
+                        phones.add(buildPhone(resultSet));
+                        address.set(buildAddress(resultSet));
+                        country.set(buildCountry(resultSet));
+                    },
+                    primary -> !get(
+                            column -> getUUID(resultSet, column),
+                            Model.ModelDTO.Fields.id
+                    ).equals(primary),
+                    id.get()
+            );
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return new ContactInfo(
+                id.get(),
+                email.get(),
+                phones,
+                address.get(),
+                country.get()
+        );
+    }
+
+    public static ContactInfo.Phone buildPhone(ResultSet resultSet) {
+        AtomicReference<ContactInfo.Country> country = new AtomicReference<>();
+        AtomicReference<Long> numbers = new AtomicReference<>();
+        AtomicReference<Boolean> mobile = new AtomicReference<>();
+        AtomicReference<Boolean> business = new AtomicReference<>();
+
+        try {
+            JDBCService.build(
+                    resultSet,
+                    () -> {
+                        country.set(buildCountry(resultSet));
+                        numbers.set(get(
+                                column -> getLong(resultSet, column),
+                                ContactInfo.Phone.DTO.Fields.numbers
+                        ));
+                        mobile.set(get(
+                                column -> getBoolean(resultSet, column),
+                                ContactInfo.Phone.DTO.Fields.mobile
+                        ));
+                        business.set(get(
+                                column -> getBoolean(resultSet, column),
+                                ContactInfo.Phone.DTO.Fields.business
+                        ));
+                    },
+                    primary -> !get(
+                            column -> getLong(resultSet, column),
+                            Model.ModelDTO.Fields.id
+                    ).equals(primary),
+                    numbers.get()
+            );
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return new ContactInfo.Phone(
+                country.get(),
+                numbers.get(),
+                mobile.get(),
+                business.get()
+        );
+    }
+
+    public static ContactInfo.Address buildAddress(ResultSet resultSet) {
+
+    }
+
+    public static ContactInfo.Country buildCountry(ResultSet resultSet) {
+
+    }
 }
