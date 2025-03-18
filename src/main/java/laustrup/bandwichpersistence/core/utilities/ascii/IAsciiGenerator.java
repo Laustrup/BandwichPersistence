@@ -1,8 +1,8 @@
-package laustrup.bandwichpersistence.core.utilities.ansi;
+package laustrup.bandwichpersistence.core.utilities.ascii;
 
 import java.util.stream.Stream;
 
-public interface IAnsiGenerator {
+public interface IAsciiGenerator {
 
     Stream<String> a(boolean uppercase);
     Stream<String> n(boolean uppercase);
