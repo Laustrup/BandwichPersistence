@@ -1,10 +1,12 @@
 package laustrup.bandwichpersistence;
 
 import laustrup.bandwichpersistence.core.utilities.ascii.AsciiArtist;
-import laustrup.bandwichpersistence.core.utilities.collections.Collection;
 import laustrup.bandwichpersistence.core.utilities.collections.lists.Liszt;
+import laustrup.bandwichpersistence.core.utilities.collections.Collection;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Stream;
 
 public class Logo implements ILogo {
@@ -46,7 +48,7 @@ public class Logo implements ILogo {
             _wall
     )));
 
-    private final Stream<String> _frameInnerEdge = Stream.of(
+    private final Liszt<String> _frameInnerEdge = Liszt.of(
             String.format(
                     "%s".repeat(5),
                     _wall,
@@ -76,13 +78,13 @@ public class Logo implements ILogo {
     @Override
     public void print(Stream<String> additionalLines) {
         Stream.Builder<String> print = Stream.builder();
-        Liszt<String> body = new Liszt<>(framing(body()));
-        Liszt<String> lines = new Liszt<>(additionalLines);
+        List<String> body = new ArrayList<>(framing(body()).toList());
+        List<List<String>> lines = Stream.of(additionalLines).map(Stream::toList).toList();
 
-        for (int i = 1; i <= body.size(); i++) {
-            String bodyPart = body.Get(i);
-            print.accept(bodyPart + (i <= lines.size() ? " " + lines.Get(i) : ""));
-        }
+//        for (int i = 0; i <= body.size(); i++) {
+//            String bodyPart = body.get(i);
+//            print.accept(bodyPart + (i <= lines.size() - 1 ? " " + lines.get(i) : ""));
+//        }
 
         body.forEach(System.out::println);
     }
@@ -127,44 +129,47 @@ public class Logo implements ILogo {
         Stream.Builder<String> builder = Stream.builder();
 
         bBun().forEach(builder);
-        and().forEach(builder);
-        wic().forEach(builder);
+//        and().forEach(builder);
+//        wic().forEach(builder);
         hButton().forEach(builder);
 
         return builder.build();
     }
 
-    public Stream<String> and() {
-        return putLettersInRow(
-                Liszt.of(Stream.of(_artist.a(true))),
-                Liszt.of(Stream.of(_artist.n(true))),
-                Liszt.of(Stream.of(_artist.d(true)))
-        );
-    }
+//    public Stream<String> and() {
+//        return putLettersInRow(
+//                Liszt.of(Stream.of(_artist.a(true))),
+//                Liszt.of(Stream.of(_artist.n(true))),
+//                Liszt.of(Stream.of(_artist.d(true)))
+//        );
+//    }
+//
+//    public Stream<String> wic() {
+//        return putLettersInRow(
+//                Liszt.of(Stream.of(_artist.w(true))),
+//                Liszt.of(Stream.of(_artist.i(true))),
+//                Liszt.of(Stream.of(_artist.c(true)))
+//        );
+//    }
 
-    public Stream<String> wic() {
-        return putLettersInRow(
-                Liszt.of(Stream.of(_artist.w(true))),
-                Liszt.of(Stream.of(_artist.i(true))),
-                Liszt.of(Stream.of(_artist.c(true)))
-        );
-    }
-
-    private Stream<String> putLettersInRow(Collection<Stream<String>>... letters) {
-        Stream.Builder<String> builder = Stream.builder();
-
-        for (int i = 0; i < _letterHeight; i++) {
-            int index = i;
-            builder.accept(
-                    String.format(
-                            "%s".repeat(letters.length - 1),
-                            Arrays.stream(letters).map(letter -> letter.get_data()[index])
-                    )
-            );
-        }
-
-        return builder.build();
-    }
+//    private Stream<String> putLettersInRow(Collection<Stream<String>>... collection) {
+//        Stream.Builder<String> builder = Stream.builder();
+//
+//        for (int i = 0; i < _letterHeight; i++) {
+//            Stream.Builder<String> lines = Stream.builder();
+//
+//            int row = 1;
+//            for (int j = 0; j <= collection.length; j++) {
+//                var test = collection[j].get_data()[row - 1];
+//                lines.accept(test.toString());
+//                row *= _letterHeight;
+//            }
+//
+//            lines.build().forEach(builder);
+//        }
+//
+//        return builder.build();
+//    }
 
     public Stream<String> bBun() {
         return Stream.of(

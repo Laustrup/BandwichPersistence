@@ -49,28 +49,6 @@ public class JDBCService {
         return String.join(".", columnTitle);
     }
 
-    public static <T> List<T> getCollection(
-            String idColumn,
-            Function<ResultSet, T> function
-    ) throws SQLException {
-        List<T> ts = new ArrayList<>();
-        UUID id = getUUID(idColumn);
-
-        if (id == null)
-            return ts;
-
-        do {
-            UUID currentId = getUUID(idColumn);
-
-            if (currentId == null || !currentId.equals(id))
-                return ts;
-
-            ts.add(function.apply(_resultSet));
-        } while (_resultSet.next());
-
-        return ts;
-    }
-
     public static <T> T ifColumnExists(
             Function<String, T> function,
             String... columns

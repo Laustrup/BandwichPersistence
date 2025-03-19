@@ -77,7 +77,7 @@ public class EventBuilder {
                         requests.add(RequestBuilder.build(resultset));
                         posts.add(PostBuilder.build(resultset));
                         albums.add(AlbumBuilder.build(resultset));
-                        history.get().get_stories().add(HistoryBuilder.buildStory(resultset));
+                        history.get().get_stories().add(HistoryBuilder.buildStory(resultset, history.get()));
                         timestamp.set(getInstant(Model.ModelDTO.Fields.timestamp));
                     },
                     id.get()

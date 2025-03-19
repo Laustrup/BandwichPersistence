@@ -3,15 +3,16 @@ package laustrup.bandwichpersistence.core.services.builders;
 import laustrup.bandwichpersistence.core.models.History;
 import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.services.persistence.JDBCService;
+import laustrup.bandwichpersistence.core.utilities.collections.sets.Seszt;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.Map;
+import java.time.Instant;
+
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Logger;
-import java.util.stream.Stream;
 
 import static laustrup.bandwichpersistence.core.services.builders.BuilderService.printError;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
@@ -23,14 +24,32 @@ public class HistoryBuilder {
     public static History.Story buildStory(ResultSet resultSet, History history) {
         AtomicReference<UUID> id = new AtomicReference<>();
 
+        if (history != null && history.get_stories().stream().anyMatch(story -> story.get_id().equals(id.get()))) {
+            Optional<History.Story> storyFound = history.get_stories().stream()
+                    .filter(story -> story.get_id().equals(id.get()))
+                    .findFirst();
+
+            storyFound.ifPresent(story ->
+                    story.get_details().add(getString(history.get_storyTable().get_table().toLowerCase() + ".content"))
+            );
+
+            if (storyFound.isPresent()) {
+                return storyFound.get();
+            }
+        }
+
         try {
             AtomicReference<String> title = new AtomicReference<>();
+            AtomicReference<String> detail = new AtomicReference<>();
+            AtomicReference<Instant> timestamp = new AtomicReference<>();
 
             JDBCService.build(
                     resultSet,
                     () -> {
                         id.set(getUUID(Model.ModelDTO.Fields.id));
                         title.set(getString(Model.ModelDTO.Fields.title));
+                        detail.set(getString(history.get_storyTable().get_table().toLowerCase() + ".content"));
+                        timestamp.set(getInstant(Model.ModelDTO.Fields.timestamp));
                     },
                     id.get()
             );
@@ -38,14 +57,8 @@ public class HistoryBuilder {
             return new History.Story(
                     id.get(),
                     title.get(),
-                    getCollection(
-                            resultSet,
-                            History.Story.DatabaseColumn.story_id.name(),
-                            set -> getString(History.Story.DatabaseColumn.content.name())
-                    ),
-                    get(
-                            column -> getTimestamp(column, Timestamp::toInstant)
-                    )
+                    new Seszt<>(detail.get()),
+                    timestamp.get()
             );
         } catch (SQLException exception) {
             printError(
@@ -56,14 +69,5 @@ public class HistoryBuilder {
             );
             return null;
         }
-    }
-
-    public static Stream<History.Story> getStoriesOfOwner(Map<UUID, History.Story> collection, UUID ownerId) {
-        return collection.values().stream()
-                .filter(story ->
-                        story != null &&
-                        story.get_ownerId() != null &&
-                        story.get_ownerId().equals(ownerId)
-                );
     }
 }

@@ -50,19 +50,6 @@ public class HistoryQueries {
         );
     }
 
-    public static Query insertIntoJoinTableQuery(String table, String key, String keyValue, int index) {
-        return new Query(
-                JoinTableScriptService.insertIntoJoinTable(table, new JoinTableScriptService.Inputs(
-                        List.of(key, History.Story.DatabaseColumn.story_id.name()),
-                        true
-                )),
-                List.of(
-                        new Query.Parameter(index, keyValue),
-                        new Query.Parameter("@story_id")
-                )
-        );
-    }
-
     @Getter
     public enum Parameter {
         STORY_ID("story_id"),

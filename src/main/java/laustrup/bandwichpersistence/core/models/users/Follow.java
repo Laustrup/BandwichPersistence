@@ -1,6 +1,7 @@
 package laustrup.bandwichpersistence.core.models.users;
 
 import lombok.Getter;
+import lombok.experimental.FieldNameConstants;
 
 import java.util.UUID;
 
@@ -25,7 +26,7 @@ public class Follow {
         _followedId = followedId;
     }
 
-    @Getter
+    @Getter @FieldNameConstants
     public static class DTO {
 
         private boolean notify;

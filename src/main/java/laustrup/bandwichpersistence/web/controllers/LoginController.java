@@ -17,6 +17,6 @@ public class LoginController {
     public ResponseEntity<User> login(
             @RequestBody Login login
     ) {
-        return respond(() -> LoginManager.getUser(login));
+        return respond(() -> LoginManager.getResponse(login));
     }
 }

@@ -74,7 +74,7 @@ public class VenueBuilder {
                 organisations,
                 albums,
                 address.get(),
-                stageSetup.get()
+                stageSetup.get(),
                 posts,
                 ratings,
                 areas,

@@ -61,22 +61,23 @@ public class History {
         public Story(
                 UUID id,
                 String title,
-                List<String> details,
+                Seszt<String> details,
                 Instant timestamp
         ) {
+
             _id = id;
             _title = title;
-            _details = new Seszt<>(details.stream());
+            _details = details;
             _timestamp = timestamp;
         }
 
         public Story(String title) {
-            this(title, new ArrayList<>());
+            this(title, new Seszt<>());
         }
 
         public Story(
                 String title,
-                List<String> details
+                Seszt<String> details
         ) {
             this(
                 null,

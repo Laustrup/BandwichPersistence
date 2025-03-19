@@ -5,6 +5,7 @@ import laustrup.bandwichpersistence.core.services.persistence.queries.FormatQuer
 import lombok.Getter;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 public class UserQueries {
 
@@ -49,7 +50,7 @@ public class UserQueries {
                     and
                 users.password = %s
             """,
-            List.of(
+            Stream.of(
                     new Query.Parameter(Parameter.CONTACT_INFO_EMAIL.get_key()),
                     new Query.Parameter(Parameter.USER_PASSWORD.get_key())
             )
@@ -73,13 +74,13 @@ public class UserQueries {
                     """,
                     _userId
             ),
-            List.of(
+            Stream.of(
                     new Query.Parameter(Parameter.CONTACT_INFO_NAME.get_key()),
                     new Query.Parameter(Parameter.CONTACT_INFO_EMAIL.get_key()),
                     new Query.Parameter(Parameter.CONTACT_INFO_NAME.get_key()),
                     new Query.Parameter(Parameter.CONTACT_INFO_EMAIL.get_key())
             )
-            );
+    );
 
     public static Query upsertAddressQuery(int index) {
         return new Query(
@@ -115,7 +116,7 @@ public class UserQueries {
                         """,
                         _userId
                 ),
-            List.of(
+            Stream.of(
                     new Query.Parameter(index, Parameter.ADDRESS_ID.get_key()),
                     new Query.Parameter(index, Parameter.ADDRESS_STREET.get_key()),
                     new Query.Parameter(index, Parameter.ADDRESS_NUMBER.get_key()),
@@ -154,7 +155,7 @@ public class UserQueries {
                     _userId,
                     _userId
             ),
-            List.of(
+            Stream.of(
                     new Query.Parameter(Parameter.USER_ID.get_key()),
                     new Query.Parameter(Parameter.USER_PASSWORD.get_key()),
                     new Query.Parameter(Parameter.ZONE_ID.get_key()),

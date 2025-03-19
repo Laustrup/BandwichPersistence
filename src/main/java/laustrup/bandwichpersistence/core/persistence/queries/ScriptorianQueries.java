@@ -45,7 +45,6 @@ public class ScriptorianQueries {
             ),
             Arrays.stream(Parameter.values())
                     .map(parameter -> new Query.Parameter(parameter.get_key()))
-                    .toList()
     );
 
     @Getter

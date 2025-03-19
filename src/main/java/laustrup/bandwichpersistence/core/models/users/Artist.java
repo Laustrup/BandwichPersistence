@@ -19,7 +19,7 @@ public class Artist extends BusinessUser {
     /**
      * The Bands that the Artist is a member of.
      */
-    private Seszt<Band.Membership> _bandMemberships;
+    private Seszt<Membership> _bandMemberships;
 
     /**
      * The Requests requested for this Artist.
@@ -57,7 +57,7 @@ public class Artist extends BusinessUser {
                 new Seszt<>(artist.getAuthorities().stream()),
                 new Seszt<>(artist.getChatRooms().stream().map(ChatRoom::new)),
                 new Seszt<>(artist.getParticipations().stream().map(Participation::new)),
-                new Seszt<>(artist.getBandMemberships().stream().map(Band.Membership::new)),
+                new Seszt<>(artist.getBandMemberships().stream().map(Artist.Membership::new)),
                 new Seszt<>(artist.getGigs().stream().map(Event.Gig::new)),
                 artist.getRunner(),
                 new Seszt<>(artist.getFollows().stream().map(Follow::new)),
@@ -80,7 +80,7 @@ public class Artist extends BusinessUser {
             Seszt<Authority> authorities,
             Seszt<ChatRoom> chatRooms,
             Seszt<Participation> participations,
-            Seszt<Band.Membership> bandMemberships,
+            Seszt<Membership> bandMemberships,
             Seszt<Event.Gig> gigs,
             String runner,
             Seszt<Follow> follows,
@@ -154,13 +154,13 @@ public class Artist extends BusinessUser {
      * Is meant to be used as having common fields and be the body of Requests and Responses.
      * Doesn't have any logic.
      */
-    @Getter @Setter
+    @Getter @Setter @FieldNameConstants
     public static class DTO extends BusinessUserDTO {
 
         /**
          * The Bands that the Artist is a member of.
          */
-        private Set<Band.Membership.DTO> bandMemberships;
+        private Set<Artist.Membership.DTO> bandMemberships;
 
         /**
          * The Requests requested for this Artist.
@@ -193,7 +193,7 @@ public class Artist extends BusinessUser {
          */
         public DTO(Artist artist) {
             super(artist);
-            bandMemberships = artist.get_bandMemberships().stream().map(Band.Membership.DTO::new).collect(Collectors.toSet());
+            bandMemberships = artist.get_bandMemberships().stream().map(Artist.Membership.DTO::new).collect(Collectors.toSet());
             requests = artist.get_requests().stream().map(Request.DTO::new).collect(Collectors.toSet());
             gigs = artist.get_gigs().stream().map(Event.Gig.DTO::new).collect(Collectors.toSet());
             follows = artist.get_follows().stream().map(Follow.DTO::new).collect(Collectors.toSet());

@@ -124,7 +124,7 @@ public class OrganisationBuilder {
                                 User.UserDTO.Fields.authorities
                         )));
                         chatRooms.add(ChatRoomBuilder.build(resultset));
-                        history.get().get_stories().add(HistoryBuilder.buildStory(resultset));
+                        history.get().get_stories().add(HistoryBuilder.buildStory(resultset, history.get()));
                         timestamp.set(get(
                                 column -> getTimestamp(column, Timestamp::toInstant),
                                 Model.ModelDTO.Fields.timestamp

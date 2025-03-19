@@ -4,6 +4,7 @@ import laustrup.bandwichpersistence.core.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
 import laustrup.bandwichpersistence.core.utilities.collections.sets.Seszt;
 import lombok.Getter;
+import lombok.experimental.FieldNameConstants;
 
 import java.time.Instant;
 import java.util.Arrays;
@@ -51,7 +52,7 @@ public abstract class BusinessUser extends User {
         _chatRooms = chatRooms;
     }
 
-    @Getter
+    @Getter @FieldNameConstants
     public abstract static class BusinessUserDTO extends UserDTO {
 
         private Set<ChatRoom.DTO> chatRooms;

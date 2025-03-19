@@ -1,6 +1,7 @@
 package laustrup.bandwichpersistence.core.utilities.collections;
 
 import laustrup.bandwichpersistence.core.utilities.Utility;
+import laustrup.bandwichpersistence.core.utilities.collections.lists.Liszt;
 import laustrup.bandwichpersistence.core.utilities.console.Printer;
 import lombok.Getter;
 
@@ -218,6 +219,10 @@ public abstract class Collection<E> extends Utility<E> implements java.util.Coll
 
     public Set<E> toSet() {
         return new HashSet<>(_map.values());
+    }
+
+    public Liszt<E> toLiszt() {
+        return Liszt.of(get_data());
     }
 
     @Override
