@@ -118,8 +118,10 @@ public class ContactInfo {
     /**
      * Contains values that determines address attributes.
      */
-    @Setter @Getter @FieldNameConstants
+    @Setter @Getter
     public static class Address {
+
+        private UUID _id;
 
         /**
          * The street and street number.
@@ -149,22 +151,17 @@ public class ContactInfo {
          */
         public Address(DTO address) {
             this(
+                    address.getId(),
                     address.getStreet(),
                     address.getFloor(),
                     address.getMunicipality(),
-                    address.getPostal(),
+                    address.getZip(),
                     address.getCity()
             );
         }
 
-        /**
-         * A constructor with all the values of this Object.
-         * @param street The street and street number.
-         * @param floor The floor, if in an apartment, also include left or right.
-         * @param zip Some digits describing the city.
-         * @param city The city of the zip.
-         */
-        public Address(String street, String floor, String municipality, String zip, String city) {
+        public Address(UUID id, String street, String floor, String municipality, String zip, String city) {
+            _id = id;
             _street = street;
             _floor = floor;
             _municipality = municipality;
@@ -188,8 +185,10 @@ public class ContactInfo {
          * Is meant to be used as having common fields and be the body of Requests and Responses.
          * Doesn't have any logic.
          */
-        @Getter @Setter
+        @Getter @FieldNameConstants
         public static class DTO {
+
+            private UUID id;
 
             /** The street and street number. */
             private String street;
@@ -200,7 +199,7 @@ public class ContactInfo {
             private String municipality;
 
             /** Some digits describing the city. */
-            private String postal;
+            private String zip;
 
             /** The city of the postal. */
             private String city;
@@ -210,10 +209,11 @@ public class ContactInfo {
              * @param address The Object to be converted.
              */
             public DTO(Address address) {
+                id = address.get_id();
                 street = address.get_street();
                 floor = address.get_floor();
                 municipality = address.get_municipality();
-                postal = address.get_zip();
+                zip = address.get_zip();
                 city = address.get_city();
             }
         }
@@ -223,8 +223,9 @@ public class ContactInfo {
      * An object with information about a curtain Country.
      */
     @Getter @ToString
-    @FieldNameConstants
     public static class Country {
+
+        private UUID _id;
 
         /**
          * The name of the Country.
@@ -241,18 +242,17 @@ public class ContactInfo {
          * @param country The transport object to be transformed.
          */
         public Country(Country.DTO country) {
-            _title = country.getTitle();
-            _code = country.getCode();
+            this(
+                    country.getId(),
+                    country.getTitle(),
+                    country.getCode()
+            );
         }
 
-        /**
-         The primary id that identifies this unique Object.
-         * @param title The name of the Country.
-         * @param firstPhoneNumberDigits The value of the first few digits of a phone number.
-         */
-        public Country(String title, int firstPhoneNumberDigits) {
+        public Country(UUID id, String title, int code) {
+            _id = id;
             _title = title;
-            _code = firstPhoneNumberDigits;
+            _code = code;
         }
 
         /**
@@ -260,8 +260,10 @@ public class ContactInfo {
          * Is meant to be used as having common fields and be the body of Requests and Responses.
          * Doesn't have any logic.
          */
-        @Getter @Setter
+        @Getter @Setter @FieldNameConstants
         public static class DTO {
+
+            private UUID id;
 
             /** The name of the Country. */
             private String title;
@@ -274,6 +276,7 @@ public class ContactInfo {
              * @param country The Object to be converted.
              */
             public DTO(Country country) {
+                id = country.get_id();
                 title = country.get_title();
                 code = country.get_code();
             }
@@ -346,9 +349,9 @@ public class ContactInfo {
             private long numbers;
 
             /** True if the number is for a mobile. */
-            private boolean mobile;
+            private boolean isMobile;
 
-            private boolean business;
+            private boolean isBusiness;
 
             /**
              * Converts into this DTO Object.
@@ -357,8 +360,8 @@ public class ContactInfo {
             public DTO(Phone phone) {
                 country = new ContactInfo.Country.DTO(phone.get_country());
                 numbers = phone.get_numbers();
-                mobile = phone.is_mobile();
-                business = phone.is_business();
+                isMobile = phone.is_mobile();
+                isBusiness = phone.is_business();
             }
         }
     }

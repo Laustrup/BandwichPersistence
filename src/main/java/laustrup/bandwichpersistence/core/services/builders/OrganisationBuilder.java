@@ -17,7 +17,6 @@ import java.util.logging.Logger;
 
 import static laustrup.bandwichpersistence.core.services.builders.UserBuilder.*;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
-import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.getString;
 
 public class OrganisationBuilder {
 
@@ -39,14 +38,8 @@ public class OrganisationBuilder {
             JDBCService.build(
                     resultSet,
                     () -> {
-                        id.set(get(
-                                column -> getUUID(resultSet, column),
-                                Model.ModelDTO.Fields.id
-                        ));
-                        title.set(get(
-                                column -> getString(resultSet, column),
-                                Model.ModelDTO.Fields.title
-                        ));
+                        id.set(getUUID(Model.ModelDTO.Fields.id));
+                        title.set(getString(Model.ModelDTO.Fields.title));
                         events.add(EventBuilder.build(resultSet));
                         venues.add(VenueBuilder.build(resultSet));
                         requests.add(RequestBuilder.build(resultSet));
@@ -54,13 +47,10 @@ public class OrganisationBuilder {
                         chatRoomTemplates.add(ChatRoomBuilder.buildTemplate(resultSet));
                         albums.add(AlbumBuilder.build(resultSet));
                         employees.add(buildEmployee(resultSet));
-                        timestamp.set(get(
-                                column -> getTimestamp(resultSet, column, Timestamp::toInstant),
-                                Model.ModelDTO.Fields.timestamp
-                        ));
+                        timestamp.set(getInstant(Model.ModelDTO.Fields.timestamp));
                     },
                     primary -> !get(
-                            column -> getUUID(resultSet, column),
+                            JDBCService::getUUID,
                             Model.ModelDTO.Fields.id
                     ).equals(primary),
                     id.get()
@@ -104,44 +94,44 @@ public class OrganisationBuilder {
                     resultset,
                     () -> {
                         id.set(get(
-                                column -> getUUID(resultset, column),
+                                JDBCService::getUUID,
                                 Model.ModelDTO.Fields.id
                         ));
                         username.set(get(
-                                column -> getString(resultset, column),
+                                JDBCService::getString,
                                 User.UserDTO.Fields.username
                         ));
                         firstName.set(get(
-                                column -> getString(resultset, column),
+                                JDBCService::getString,
                                 User.UserDTO.Fields.username
                         ));
                         lastName.set(get(
-                                column -> getString(resultset, column),
+                                JDBCService::getString,
                                 User.UserDTO.Fields.lastName
                         ));
                         description.set(get(
-                                column -> getString(resultset, column),
+                                JDBCService::getString,
                                 User.UserDTO.Fields.description
                         ));
                         contactInfo.set(buildContactInfo(resultset));
                         subscription.set(buildSubscription(resultset));
                         roles.add(Organisation.Employee.Role.valueOf(get(
-                                column -> getString(resultset, column),
+                                JDBCService::getString,
                                 Organisation.Employee.DTO.Fields.roles
                         )));
                         authorities.add(User.Authority.valueOf(get(
-                                column -> getString(resultset, column),
+                                JDBCService::getString,
                                 User.UserDTO.Fields.authorities
                         )));
                         chatRooms.add(ChatRoomBuilder.build(resultset));
                         history.get().get_stories().add(HistoryBuilder.buildStory(resultset));
                         timestamp.set(get(
-                                column -> getTimestamp(resultset, column, Timestamp::toInstant),
+                                column -> getTimestamp(column, Timestamp::toInstant),
                                 Model.ModelDTO.Fields.timestamp
                         ));
                     },
                     primary -> !get(
-                            column -> getUUID(resultset, column),
+                            JDBCService::getUUID,
                             Model.ModelDTO.Fields.id
                     ).equals(primary),
                     id.get()

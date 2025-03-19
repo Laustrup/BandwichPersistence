@@ -108,8 +108,8 @@ public abstract class MessageBase extends Model {
     /**
      * An abstract class that contains common attributes for Messages.
      */
-    @Getter
-    protected abstract static class DTO extends ModelDTO {
+    @Getter @FieldNameConstants
+    public abstract static class DTO extends ModelDTO {
 
         /**
          * The User that wrote the Message.

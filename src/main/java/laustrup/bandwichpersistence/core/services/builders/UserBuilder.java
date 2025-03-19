@@ -26,7 +26,7 @@ public class UserBuilder {
                 resultSet,
                 () -> logins.add(new Login(
                         get(
-                                column -> getString(resultSet, column),
+                                JDBCService::getString,
                                 Login.Fields.password
                         ),
                         UserService.from(Objects.requireNonNull(build(resultSet)))
@@ -39,26 +39,16 @@ public class UserBuilder {
     }
 
     public static User build(ResultSet resultSet) {
-        Subscription.UserType userType;
-
-        try {
-            if (resultSet.next())
-                userType = Subscription.UserType.valueOf(getString(
-                        resultSet,
+        return switch (getFromNextRow(
+                resultSet,
+                () -> Subscription.UserType.valueOf(getString(
                         Subscription.DTO.Fields.userType
-                ));
-            else
-                return null;
-
-            resultSet.previous();
-        } catch (SQLException e) {
-            _logger.warning("Couldn't find user type when building user!\n" + e.getMessage());
-            return null;
-        }
-
-        return switch (userType) {
+                )),
+                exception -> _logger.warning("Couldn't find user type when building user!\n" + exception.getMessage())
+        )) {
             case ARTIST -> ArtistBuilder.build(resultSet);
             case ORGANISATION_EMPLOYEE -> OrganisationBuilder.buildEmployee(resultSet);
+            case null -> null;
             default -> throw new IllegalStateException();
         };
     }
@@ -73,25 +63,13 @@ public class UserBuilder {
             JDBCService.build(
                     resultSet,
                     () -> {
-                        id.set(get(
-                                column -> getUUID(resultSet, column),
-                                Subscription.DTO.Fields.id
-                        ));
-                        status.set(get(
-                                column -> Subscription.Status.valueOf(getString(resultSet, column)),
-                                Subscription.DTO.Fields.status
-                        ));
-                        kind.set(get(
-                                column -> Subscription.Kind.valueOf(getString(resultSet, column)),
-                                Subscription.DTO.Fields.kind
-                        ));
-                        userType.set(get(
-                                column -> Subscription.UserType.valueOf(getString(resultSet, column)),
-                                Subscription.DTO.Fields.userType
-                        ));
+                        id.set(getUUID(Subscription.DTO.Fields.id));
+                        status.set(Subscription.Status.valueOf(getString(Subscription.DTO.Fields.status)));
+                        kind.set(Subscription.Kind.valueOf(getString(Subscription.DTO.Fields.kind)));
+                        userType.set(Subscription.UserType.valueOf(getString(Subscription.DTO.Fields.userType)));
                     },
                     primary -> !get(
-                            column -> getUUID(resultSet, column),
+                            JDBCService::getUUID,
                             Model.ModelDTO.Fields.id
                     ).equals(primary),
                     id.get()
@@ -119,20 +97,14 @@ public class UserBuilder {
             JDBCService.build(
                     resultSet,
                     () -> {
-                        id.set(get(
-                                column -> getUUID(resultSet, column),
-                                Model.ModelDTO.Fields.id
-                        ));
-                        email.set(get(
-                                column -> getString(resultSet, column),
-                                ContactInfo.DTO.Fields.email
-                        ));
+                        id.set(getUUID(Model.ModelDTO.Fields.id));
+                        email.set(getString(ContactInfo.DTO.Fields.email));
                         phones.add(buildPhone(resultSet));
                         address.set(buildAddress(resultSet));
                         country.set(buildCountry(resultSet));
                     },
                     primary -> !get(
-                            column -> getUUID(resultSet, column),
+                            JDBCService::getUUID,
                             Model.ModelDTO.Fields.id
                     ).equals(primary),
                     id.get()
@@ -161,23 +133,11 @@ public class UserBuilder {
                     resultSet,
                     () -> {
                         country.set(buildCountry(resultSet));
-                        numbers.set(get(
-                                column -> getLong(resultSet, column),
-                                ContactInfo.Phone.DTO.Fields.numbers
-                        ));
-                        mobile.set(get(
-                                column -> getBoolean(resultSet, column),
-                                ContactInfo.Phone.DTO.Fields.mobile
-                        ));
-                        business.set(get(
-                                column -> getBoolean(resultSet, column),
-                                ContactInfo.Phone.DTO.Fields.business
-                        ));
+                        numbers.set(getLong(ContactInfo.Phone.DTO.Fields.numbers));
+                        mobile.set(getBoolean(ContactInfo.Phone.DTO.Fields.isMobile));
+                        business.set(getBoolean(ContactInfo.Phone.DTO.Fields.isBusiness));
                     },
-                    primary -> !get(
-                            column -> getLong(resultSet, column),
-                            Model.ModelDTO.Fields.id
-                    ).equals(primary),
+                    primary -> !getLong(Model.ModelDTO.Fields.id).equals(primary),
                     numbers.get()
             );
         } catch (SQLException e) {
@@ -193,10 +153,65 @@ public class UserBuilder {
     }
 
     public static ContactInfo.Address buildAddress(ResultSet resultSet) {
+        AtomicReference<UUID> id = new AtomicReference<>();
 
+        AtomicReference<String>
+                street = new AtomicReference<>(),
+                floor = new AtomicReference<>(),
+                municipality = new AtomicReference<>(),
+                zip = new AtomicReference<>(),
+                city = new AtomicReference<>();
+
+        try {
+            JDBCService.build(
+                    resultSet,
+                    () -> {
+                        id.set(getUUID(Model.ModelDTO.Fields.id));
+                        street.set(getString(ContactInfo.Address.DTO.Fields.street));
+                        floor.set(getString(ContactInfo.Address.DTO.Fields.floor));
+                        municipality.set(getString(ContactInfo.Address.DTO.Fields.municipality));
+                        zip.set(getString(ContactInfo.Address.DTO.Fields.zip));
+                        city.set(getString(ContactInfo.Address.DTO.Fields.city));
+                    },
+                    id.get()
+            );
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return new ContactInfo.Address(
+                id.get(),
+                street.get(),
+                floor.get(),
+                municipality.get(),
+                zip.get(),
+                city.get()
+        );
     }
 
     public static ContactInfo.Country buildCountry(ResultSet resultSet) {
+        AtomicReference<UUID> id = new AtomicReference<>();
+        AtomicReference<String> title = new AtomicReference<>();
+        AtomicReference<Integer> code = new AtomicReference<>();
 
+        try {
+            JDBCService.build(
+                    resultSet,
+                    () -> {
+                        id.set(getUUID(ContactInfo.Country.DTO.Fields.id));
+                        title.set(getString(ContactInfo.Country.DTO.Fields.title));
+                        code.set(getInteger(ContactInfo.Country.DTO.Fields.code));
+                    },
+                    id.get()
+            );
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return new ContactInfo.Country(
+                id.get(),
+                title.get(),
+                code.get()
+        );
     }
 }

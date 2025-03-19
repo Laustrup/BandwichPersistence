@@ -5,6 +5,7 @@ import laustrup.bandwichpersistence.core.utilities.Utility;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.FieldNameConstants;
 
 import java.util.Optional;
 import java.util.Random;
@@ -16,7 +17,7 @@ import java.util.Random;
  * Uses an enum for identifying those values.
  * Can also be null, since it's a class object.
  */
-@ToString
+@ToString @FieldNameConstants
 public class NotBoolean extends Utility implements IPlato {
 
     /**
@@ -72,10 +73,19 @@ public class NotBoolean extends Utility implements IPlato {
     public boolean get_truth() { return _truth && (_argument == Argument.TRUE || _argument == Argument.ABOVE_HALF); }
 
     /** Sets the argument to undefined */
-    public NotBoolean() { this(Argument.UNDEFINED); }
-    public NotBoolean(Argument argument) {
-        set_argument(argument);
+    public NotBoolean() {
+        this(Argument.UNDEFINED);
     }
+
+    public NotBoolean(Argument argument) {
+        this(argument, null);
+    }
+
+    public NotBoolean(Argument argument, String message) {
+        set_argument(argument);
+        _message = message;
+    }
+
     public NotBoolean(boolean isTrue) {
         set_argument(isTrue);
     }

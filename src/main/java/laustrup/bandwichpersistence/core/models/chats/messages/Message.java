@@ -82,7 +82,7 @@ public class Message extends MessageBase {
      * Is meant to be used as having common fields and be the body of Requests and Responses.
      * Doesn't have any logic.
      */
-    @Getter
+    @Getter @FieldNameConstants
     public static class DTO extends MessageBase.DTO {
 
         /** The ChatRoom that this message exists in. */

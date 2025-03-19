@@ -19,6 +19,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static laustrup.bandwichpersistence.core.services.builders.BuilderService.printError;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
 
 public class ArtistBuilder {
@@ -27,33 +28,39 @@ public class ArtistBuilder {
 
     public static Artist build(ResultSet resultSet) {
         AtomicReference<UUID> id = new AtomicReference<>();
-        String username,
-        String firstName,
-        String lastName,
-        String description,
-        ContactInfo contactInfo,
-        Seszt<Album> albums,
-        Subscription subscription,
-        Seszt<User.Authority> authorities,
-        Seszt<ChatRoom> chatRooms,
-        Seszt<User.Participation> participations,
+        AtomicReference<String>
+                username = new AtomicReference<>(),
+                firstName = new AtomicReference<>(),
+                lastName = new AtomicReference<>(),
+                description = new AtomicReference<>();
+        AtomicReference<ContactInfo> contactInfo = new AtomicReference<>();
+        Seszt<Album> albums = new Seszt<>();
+        AtomicReference<Subscription> subscription = new AtomicReference<>();
+        Seszt<User.Authority> authorities = new Seszt<>();
+        Seszt<ChatRoom> chatRooms = new Seszt<>();
+        Seszt<User.Participation> participations = new Seszt<>();
         Seszt<Band.Membership> memberships = new Seszt<>();
-        Seszt<Event.Gig> gigs,
-        String runner,
-        Seszt<Follow> follows,
-        Seszt<Request> requests,
-        Seszt<Rating> ratings,
-        History history,
-        Instant timestamp
+        Seszt<Event.Gig> gigs = new Seszt<>();
+        AtomicReference<String> runner = new AtomicReference<>();
+        Seszt<Follow> follows = new Seszt<>();
+        Seszt<Request> requests = new Seszt<>();
+        Seszt<Rating> ratings = new Seszt<>();
+        AtomicReference<History> history = new AtomicReference<>();
+        AtomicReference<Instant> timestamp = new AtomicReference<>();
 
         try {
             JDBCService.build(
                     resultSet,
                     () -> {
-                        id.set(get(
-                                column -> getUUID(resultSet, column),
-                                Model.ModelDTO.Fields.id
-                        ));
+                        id.set(getUUID(Model.ModelDTO.Fields.id));
+                        username.set(getString(Artist.DTO.Fields.username));
+                        firstName.set(getString(Artist.DTO.Fields.firstName));
+                        lastName.set(getString(Artist.DTO.Fields.lastName));
+                        description.set(getString(Artist.DTO.Fields.description));
+                        contactInfo.set(UserBuilder.buildContactInfo(resultSet));
+                        albums.add(AlbumBuilder.build(resultSet));
+                        subscription.set();
+                        authorities.add()
                         memberships.add(new Artist.Membership(
                                 BandBuilder.build(resultSet),
                                 get(
@@ -61,32 +68,24 @@ public class ArtistBuilder {
                                         Artist.Membership.DTO.Fields.association
                                 )
                         ));
-                        subscription.set(UserBuilder.buildSubscription(resultSet).get_object());
-
                     },
                     primary -> !get(
-                            column -> getUUID(resultSet, column),
+                            JDBCService::getUUID,
                             Model.ModelDTO.Fields.id
                     ).equals(userId.get()),
                     userId.get()
             );
-        } catch (SQLException e) {
-            _logger.log(
-                    Level.WARNING,
-                    String.format(
-                            "Couldn't build Artist with id %s, message is:\n\n%s",
-                            userId.get(),
-                            e.getMessage()
-                    ),
-                    e
+        } catch (SQLException exception) {
+            printError(
+                    AlbumBuilder.class,
+                    id.get(),
+                    exception,
+                    _logger
             );
         }
 
-        return new Response<>(
-                new Artist(
-                        id.get(),
-                ),
-                httpStatus
+        return new Artist(
+               id.get(),
         );
     }
 }

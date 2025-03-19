@@ -13,6 +13,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static laustrup.bandwichpersistence.core.services.builders.BuilderService.printError;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
 
 public class AlbumBuilder {
@@ -30,34 +31,31 @@ public class AlbumBuilder {
                     resultset,
                     () -> {
                         id.set(get(
-                                column -> getUUID(resultset, column),
+                                JDBCService::getUUID,
                                 Model.ModelDTO.Fields.id
                         ));
                         title.set(get(
-                                column -> getString(resultset, column),
+                                JDBCService::getString,
                                 Band.DTO.Fields.name
                         ));
                         media.add(buildMedia(resultset));
                         timestamp.set(get(
-                                column -> getTimestamp(resultset, column, Timestamp::toInstant),
+                                column -> getTimestamp(column, Timestamp::toInstant),
                                 Model.ModelDTO.Fields.timestamp
                         ));
                     },
                     primary -> !get(
-                            column -> getUUID(resultset, column),
+                            JDBCService::getUUID,
                             Model.ModelDTO.Fields.id
                     ).equals(primary),
                     id.get()
             );
-        } catch (SQLException e) {
-            _logger.log(
-                    Level.WARNING,
-                    String.format(
-                            "Couldn't build Album with id %s, message is:\n\n%s",
-                            id.get(),
-                            e.getMessage()
-                    ),
-                    e
+        } catch (SQLException exception) {
+            printError(
+                    AlbumBuilder.class,
+                    id.get(),
+                    exception,
+                    _logger
             );
         }
 
@@ -82,41 +80,38 @@ public class AlbumBuilder {
                     resultset,
                     () -> {
                         id.set(get(
-                                column -> getUUID(resultset, column),
+                                JDBCService::getUUID,
                                 Model.ModelDTO.Fields.id
                         ));
                         title.set(get(
-                                column -> getString(resultset, column),
+                                JDBCService::getString,
                                 Model.ModelDTO.Fields.title
                         ));
                         endpoint.set(get(
-                                column -> getString(resultset, column),
+                                JDBCService::getString,
                                 Album.Media.DTO.Fields.endpoint
                         ));
                         kind.set(Album.Media.Kind.valueOf(get(
-                                column -> getString(resultset, column),
+                                JDBCService::getString,
                                 Album.Media.DTO.Fields.kind
                         )));
                         timestamp.set(get(
-                                column -> getTimestamp(resultset, column, Timestamp::toInstant),
+                                column -> getTimestamp(column, Timestamp::toInstant),
                                 Model.ModelDTO.Fields.timestamp
                         ));
                     },
                     primary -> !get(
-                            column -> getUUID(resultset, column),
+                            JDBCService::getUUID,
                             Model.ModelDTO.Fields.id
                     ).equals(primary),
                     id.get()
             );
-        } catch (SQLException e) {
-            _logger.log(
-                    Level.WARNING,
-                    String.format(
-                            "Couldn't build Album with id %s, message is:\n\n%s",
-                            id.get(),
-                            e.getMessage()
-                    ),
-                    e
+        } catch (SQLException exception) {
+            printError(
+                    AlbumBuilder.class,
+                    id.get(),
+                    exception,
+                    _logger
             );
         }
 

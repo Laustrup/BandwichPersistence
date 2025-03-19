@@ -1,11 +1,13 @@
 package laustrup.bandwichpersistence.core.services.persistence;
 
+import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.persistence.Query;
 import laustrup.bandwichpersistence.core.utilities.collections.lists.Liszt;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -14,18 +16,15 @@ import java.util.stream.Stream;
 
 public class JDBCService {
 
-    public static <T> Stream<T> build(ResultSet resultSet, Supplier<T> supplier) {
-        Liszt<T> ts = new Liszt<>();
+    private static ResultSet _resultSet;
 
-        try {
-            while (resultSet.next()) {
-                ts.add(supplier.get());
-            }
-        } catch (Exception exception) {
-            System.err.println(exception.getMessage());
-        }
+    private static Integer _currentRow = null;
 
-        return ts.stream();
+    public static Instant getInstant(String column) {
+        return get(
+                name -> getTimestamp(name, Timestamp::toInstant),
+                column
+        );
     }
 
     public static <T> T get(Timestamp timestamp, Function<Timestamp, T> function) {
@@ -51,24 +50,23 @@ public class JDBCService {
     }
 
     public static <T> List<T> getCollection(
-            ResultSet resultSet,
             String idColumn,
             Function<ResultSet, T> function
     ) throws SQLException {
         List<T> ts = new ArrayList<>();
-        UUID id = getUUID(resultSet, idColumn);
+        UUID id = getUUID(idColumn);
 
         if (id == null)
             return ts;
 
         do {
-            UUID currentId = getUUID(resultSet, idColumn);
+            UUID currentId = getUUID(idColumn);
 
             if (currentId == null || !currentId.equals(id))
                 return ts;
 
-            ts.add(function.apply(resultSet));
-        } while (resultSet.next());
+            ts.add(function.apply(_resultSet));
+        } while (_resultSet.next());
 
         return ts;
     }
@@ -88,17 +86,17 @@ public class JDBCService {
         return null;
     }
 
-    public static String getString(ResultSet resultSet, String column) {
+    public static String getString(String column) {
         try {
-            return resultSet.getString(column);
+            return _resultSet.getString(column);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static UUID getUUID(ResultSet resultSet, String column) {
+    public static UUID getUUID(String column) {
         try {
-            String value = resultSet.getString(column);
+            String value = _resultSet.getString(column);
 
             return value == null ? null : UUID.fromString(value);
         } catch (SQLException e) {
@@ -106,36 +104,70 @@ public class JDBCService {
         }
     }
 
-    public static Integer getInteger(ResultSet resultSet, String column) {
+    public static Integer getInteger(String column) {
         try {
-            return resultSet.getInt(column);
+            return _resultSet.getInt(column);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static Long getLong(ResultSet resultSet, String column) {
+    public static Long getLong(String column) {
         try {
-            return resultSet.getLong(column);
+            return _resultSet.getLong(column);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static Boolean getBoolean(ResultSet resultSet, String column) {
+    public static Boolean getBoolean(String column) {
         try {
-            return resultSet.getBoolean(column);
+            return _resultSet.getBoolean(column);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public static <T> T getTimestamp(ResultSet resultSet, String column, Function<Timestamp, T> function) {
+    public static <T> T getTimestamp(String column, Function<Timestamp, T> function) {
         try {
-            return get(resultSet.getTimestamp(column), function);
+            return get(_resultSet.getTimestamp(column), function);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static <T> T getFromNextRow(
+            ResultSet resultSet,
+            Supplier<T> supply,
+            Consumer<SQLException> logging
+    ) {
+        T type = null;
+
+        try {
+            if (resultSet.next())
+                type = supply.get();
+
+            resultSet.previous();
+        } catch (SQLException exception) {
+            logging.accept(exception);
+        }
+
+        return type;
+    }
+
+    public static <T> Stream<T> build(ResultSet resultSet, Supplier<T> supplier) {
+        _resultSet = resultSet;
+        Liszt<T> ts = new Liszt<>();
+
+        try {
+            while (_resultSet.next()) {
+                ts.add(supplier.get());
+            }
+        } catch (Exception exception) {
+            System.err.println(exception.getMessage());
+        }
+
+        return ts.stream();
     }
 
     public static <T> void build(
@@ -152,9 +184,51 @@ public class JDBCService {
                     breaker,
                     primaries
             );
-        } catch (SQLException e) {
-            exception.accept(e);
+        } catch (SQLException sqlException) {
+            exception.accept(sqlException);
         }
+    }
+
+    public static void build(
+            ResultSet resultSet,
+            Runnable runnable,
+            UUID primary
+    ) throws SQLException {
+        build(
+                resultSet,
+                runnable,
+                id -> !get(
+                        JDBCService::getUUID,
+                        Model.ModelDTO.Fields.id
+                ).equals(id),
+                primary
+        );
+    }
+
+    public static <T> void build(
+            ResultSet resultSet,
+            Runnable runnable,
+            Function<T, Boolean> breaker,
+            T... primaries
+    ) throws SQLException {
+        _resultSet = resultSet;
+        boolean allowNextRow = false;
+        if (_currentRow == null) {
+            allowNextRow = true;
+            _resultSet.next();
+            _currentRow = _resultSet.getRow();
+        }
+
+        do {
+            if (isDoneBuilding(breaker, primaries)) {
+                if (allowNextRow)
+                    resultSet.previous();
+                break;
+            }
+            runnable.run();
+        } while (allowNextRow && _resultSet.next());
+
+        _currentRow = null;
     }
 
     public static <K, V> void putIfAbsent(
@@ -164,21 +238,6 @@ public class JDBCService {
     ) {
         if (key != null)
             map.putIfAbsent(key, value);
-    }
-
-    public static <T> void build(
-            ResultSet resultSet,
-            Runnable runnable,
-            Function<T, Boolean> breaker,
-            T... primaries
-    ) throws SQLException {
-        while (resultSet.next()) {
-            if (isDoneBuilding(breaker, primaries)) {
-                resultSet.previous();
-                break;
-            }
-            runnable.run();
-        }
     }
 
     public static <T> List<Query> prepareQueries(Collection<T> collection, Function<Integer, Query> function) {
@@ -203,7 +262,7 @@ public class JDBCService {
     public static String toDatabaseColumn(String field) {
         StringBuilder databaseColumn = new StringBuilder();
 
-        for (char c : field.toCharArray())
+        for (char c : field.replace("_", " ").toCharArray())
             databaseColumn
                     .append(Character.isUpperCase(c) ? '_' : "")
                     .append(Character.toLowerCase(c));

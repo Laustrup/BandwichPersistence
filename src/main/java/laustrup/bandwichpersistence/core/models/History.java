@@ -107,19 +107,13 @@ public class History {
                 timestamp = story.get_timestamp();
             }
         }
-
-        public enum DatabaseColumn {
-            story_id,
-            title,
-            content
-        }
-
     }
 
     @Getter @AllArgsConstructor
     public enum JoinTableDetails {
         ARTIST("artist_history", "artist_id"),
-        ORGANISATION_EMPLOYEE("organisation_employee_history", "organisation_employee_id");
+        ORGANISATION_EMPLOYEE("organisation_employee_history", "organisation_employee_id"),
+        EVENT("event_history", "event_id"),;
 
         private String _table;
 

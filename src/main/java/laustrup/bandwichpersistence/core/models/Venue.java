@@ -123,7 +123,7 @@ public class Venue extends Model {
      * Is meant to be used as having common fields and be the body of Requests and Responses.
      * Doesn't have any logic.
      */
-    @Getter @Setter
+    @Getter @Setter @FieldNameConstants
     public static class DTO extends ModelDTO {
 
         /**
@@ -199,7 +199,7 @@ public class Venue extends Model {
             _organisation = organisation;
         }
 
-        @Getter
+        @Getter @FieldNameConstants
         public static class DTO extends laustrup.bandwichpersistence.core.models.Rating.DTO {
 
             private Organisation.DTO organisation;

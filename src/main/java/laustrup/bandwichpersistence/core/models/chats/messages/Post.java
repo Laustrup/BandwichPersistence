@@ -14,7 +14,7 @@ import static laustrup.bandwichpersistence.core.services.ModelService.from;
 /**
  * A kind of post that can be posted at any Model Object.
  */
-@Getter @FieldNameConstants
+@Getter
 public class Post extends MessageBase {
 
     /**
@@ -71,7 +71,7 @@ public class Post extends MessageBase {
      * Is meant to be used as having common fields and be the body of Requests and Responses.
      * Doesn't have any logic.
      */
-    @Getter
+    @Getter @FieldNameConstants
     public static class DTO extends MessageBase.DTO {
 
         /**

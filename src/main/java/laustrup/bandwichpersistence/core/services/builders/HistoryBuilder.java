@@ -2,59 +2,67 @@ package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.History;
 import laustrup.bandwichpersistence.core.models.Model;
+import laustrup.bandwichpersistence.core.services.persistence.JDBCService;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 
+import static laustrup.bandwichpersistence.core.services.builders.BuilderService.printError;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
 
 public class HistoryBuilder {
 
-    public static History.Story buildStory(ResultSet resultSet) {
+    private static final Logger _logger = Logger.getLogger(HistoryBuilder.class.getSimpleName());
+
+    public static History.Story buildStory(ResultSet resultSet, History history) {
+        AtomicReference<UUID> id = new AtomicReference<>();
+
         try {
-            if (get(
-                    column -> getUUID(resultSet, column),
-                    History.Story.DatabaseColumn.story_id.name()
-            ) == null)
-                return null;
+            AtomicReference<String> title = new AtomicReference<>();
+
+            JDBCService.build(
+                    resultSet,
+                    () -> {
+                        id.set(getUUID(Model.ModelDTO.Fields.id));
+                        title.set(getString(Model.ModelDTO.Fields.title));
+                    },
+                    id.get()
+            );
 
             return new History.Story(
-                    get(
-                            column -> getUUID(resultSet, column),
-                            Model.DatabaseColumn.id.name()
-                    ),
-                    get(
-                            column -> getString(resultSet, column),
-                            History.Story.DatabaseColumn.title.name()
-                    ),
+                    id.get(),
+                    title.get(),
                     getCollection(
                             resultSet,
                             History.Story.DatabaseColumn.story_id.name(),
-                            set -> get(
-                                    column -> getString(resultSet, column),
-                                    History.Story.DatabaseColumn.content.name()
-                            )
+                            set -> getString(History.Story.DatabaseColumn.content.name())
                     ),
                     get(
-                            column -> getTimestamp(resultSet, column, Timestamp::toInstant)
+                            column -> getTimestamp(column, Timestamp::toInstant)
                     )
             );
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        } catch (SQLException exception) {
+            printError(
+                    AlbumBuilder.class,
+                    id.get(),
+                    exception,
+                    _logger
+            );
+            return null;
         }
     }
 
     public static Stream<History.Story> getStoriesOfOwner(Map<UUID, History.Story> collection, UUID ownerId) {
         return collection.values().stream()
                 .filter(story ->
-                        story != null
-                                &&
-                        story.get_ownerId() != null
-                                &&
+                        story != null &&
+                        story.get_ownerId() != null &&
                         story.get_ownerId().equals(ownerId)
                 );
     }

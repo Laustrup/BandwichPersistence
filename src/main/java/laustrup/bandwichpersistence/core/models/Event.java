@@ -9,6 +9,7 @@ import laustrup.bandwichpersistence.core.utilities.parameters.NotBoolean;
 import laustrup.bandwichpersistence.core.models.chats.Request;
 import laustrup.bandwichpersistence.core.models.chats.messages.Post;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
@@ -566,7 +567,7 @@ public class Event extends Model {
      * Is meant to be used as having common fields and be the body of Requests and Responses.
      * Doesn't have any logic.
      */
-    @Getter
+    @Getter @FieldNameConstants
     public static class DTO extends ModelDTO {
 
         private ZoneId zoneId;

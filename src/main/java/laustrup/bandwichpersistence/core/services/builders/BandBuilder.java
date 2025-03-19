@@ -7,18 +7,18 @@ import laustrup.bandwichpersistence.core.utilities.collections.sets.Seszt;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static laustrup.bandwichpersistence.core.services.builders.BuilderService.printError;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
 
 public class BandBuilder {
 
-    private static final Logger _logger = Logger.getLogger(AlbumBuilder.class.getSimpleName());
+    private static final Logger _logger = Logger.getLogger(BandBuilder.class.getSimpleName());
 
     public static Band build(ResultSet resultset) {
         AtomicReference<UUID> id = new AtomicReference<>();
@@ -38,48 +38,29 @@ public class BandBuilder {
             JDBCService.build(
                     resultset,
                     () -> {
-                        id.set(get(
-                                column -> getUUID(resultset, column),
-                                Model.ModelDTO.Fields.id
-                        ));
-                        name.set(get(
-                                column -> getString(resultset, column),
-                                Band.DTO.Fields.name
-                        ));
-                        description.set(get(
-                                column -> getString(resultset, column),
-                                Band.DTO.Fields.description
-                        ));
-                        albums.add(AlbumBuilder.build(resultset)
-                        );
-                        events.add(EventBuilder.build(resultset)
-                        );
-                        posts.add(PostBuilder.build(resultset)
-                        );
-                        fans.add(UserBuilder.build(resultset)
-                        );
-                        subscription.set(SubscriptionBuilder.build(resultset)
-                        );
-                        timestamp.set(get(
-                                column -> getTimestamp(resultset, column, Timestamp::toInstant),
-                                Model.ModelDTO.Fields.timestamp
-                        ));
-                        runner.set(get(
-                                column -> getString(resultset, column),
-                                Band.DTO.Fields.runner
-                        ));
-                        
-                    }
-            )
-        } catch (SQLException e) {
-            _logger.log(
-                    Level.WARNING,
-                    String.format(
-                            "Couldn't build Band with id %s, message is:\n\n%s",
-                            id.get(),
-                            e.getMessage()
-                    ),
-                    e
+                        id.set(getUUID(Model.ModelDTO.Fields.id));
+                        name.set(getString(Band.DTO.Fields.name));
+                        description.set(getString(Band.DTO.Fields.description));
+                        albums.add(AlbumBuilder.build(resultset));
+                        events.add(EventBuilder.build(resultset));
+                        posts.add(PostBuilder.build(resultset));
+                        fans.add(UserBuilder.build(resultset));
+                        subscription.set(UserBuilder.buildSubscription(resultset));
+                        timestamp.set(getInstant(Model.ModelDTO.Fields.timestamp));
+                        runner.set(getString(Band.DTO.Fields.runner));
+                    },
+                    primary -> !get(
+                            JDBCService::getUUID,
+                            Model.ModelDTO.Fields.id
+                    ).equals(primary),
+                    id.get()
+            );
+        } catch (SQLException exception) {
+            printError(
+                    AlbumBuilder.class,
+                    id.get(),
+                    exception,
+                    _logger
             );
         }
 
@@ -89,11 +70,11 @@ public class BandBuilder {
                 description.get(),
                 albums,
                 events,
-                posts,
-                fans,
                 subscription.get(),
-                timestamp.get(),
-                runner.get()
+                posts,
+                runner.get(),
+                fans,
+                timestamp.get()
         );
     }
 }
