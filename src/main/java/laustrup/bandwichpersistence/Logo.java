@@ -12,7 +12,10 @@ public class Logo implements ILogo {
     private final int
             _innerWidth = 16,
             _frameWidth = _innerWidth + 10,
-            _letterHeight = 7;
+            _letterHeight = 7,
+            _singleLetterWidth = 11,
+            _letterRowWidth = _singleLetterWidth * 3,
+            _letterRowHeight = 7;
 
     private final AsciiArtist _artist = new AsciiArtist();
 
@@ -165,25 +168,25 @@ public class Logo implements ILogo {
 
     public Stream<String> bBun() {
         return Stream.of(
-        "    ___    ___  ",
-                "  /;::B__B:::B  ",
-                " /;:;_:::;_:::B ",
-                "(;::| B::| B:::B",
-                "|::::BB:::BB:::B",
-                "|::::::::::::::B",
-                "+-------------' "
+         "    __________     __________    ",
+                "   / BBBBBBBB A   / BBBBBBBBBB   ",
+                "  / BBB    BBB A_/ BBB      BBB  ",
+                " / BBB       BBBBBBBB        BBB ",
+                "| BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB|",
+                "| BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB|",
+                "|_______________________________|"
         );
     }
 
     public Stream<String> hButton() {
         return Stream.of(
-         "+HHHHHHHHHHHHHHH",
-                "|::::::::::::::H",
-                "+-----+::+-----H",
-                "      |::H      ",
-                "+-----+::HHHHHHH",
-                "|::::::::::::::H",
-                "+-------------' "
+         " _______________________________ ",
+                "|  HHHHHHHHHHHHHHHHHHHHHHHHHHHHH|",
+                "|_____________ HHH _____________|",
+                "              |HHH|              ",
+                " _____________|HHH|_____________ ",
+                "|  HHHHHHHHHHHHHHHHHHHHHHHHHHHHH|",
+                "|_______________________________|"
         );
     }
 }
