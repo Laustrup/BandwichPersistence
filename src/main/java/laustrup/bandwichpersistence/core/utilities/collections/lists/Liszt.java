@@ -1,8 +1,9 @@
 package laustrup.bandwichpersistence.core.utilities.collections.lists;
 
-import laustrup.bandwichpersistence.core.persistence.Query;
+import jdk.jshell.spi.ExecutionControl;
 import laustrup.bandwichpersistence.core.utilities.collections.ICollection;
 import laustrup.bandwichpersistence.core.utilities.console.Printer;
+import lombok.SneakyThrows;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -351,13 +352,10 @@ public class Liszt<E> extends laustrup.bandwichpersistence.core.utilities.collec
         return _data[index-1];
     }
 
-    public E Get(String key) {
-        return _map.get(key);
-    }
-
+    @SneakyThrows
     @Override
     public void add(int index, E element) {
-
+        throw new ExecutionControl.NotImplementedException("The add operation is not supported");
     }
 
     public int IndexOf(E element) {
@@ -407,6 +405,13 @@ public class Liszt<E> extends laustrup.bandwichpersistence.core.utilities.collec
         return subList;
     }
 
+    public static <M> Liszt<M> of(Stream<M> elements) {
+        return new Liszt<>(elements);
+    }
+
+    public static <M> Liszt<M> of(M... elements) {
+        return new Liszt<>(elements);
+    }
 
     @Override
     public Spliterator<E> spliterator() {

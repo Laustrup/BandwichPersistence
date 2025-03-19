@@ -196,6 +196,10 @@ public abstract class Collection<E> extends Utility<E> implements java.util.Coll
         return null;
     }
 
+    public E Get(String key) {
+        return _map.get(key);
+    }
+
     /**
      * Converting Objects into the element type and suppresses warning of cast.
      * @param objects The Objects that will become element type.

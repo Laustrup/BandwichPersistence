@@ -6,12 +6,36 @@ public class AsciiGenerator implements IAsciiGenerator {
 
     @Override
     public Stream<String> a(boolean uppercase) {
-        return Stream.empty();
+        return build(
+                Stream.of(
+                 " /AAAAAAA ",
+                        "/ AA_   AA",
+                        "| AA A  AA",
+                        "| AAAAAAAA",
+                        "| AA__  AA",
+                        "| AA  | AA",
+                        "|__/  |__/"
+                ),
+                Stream.of(),
+                uppercase
+        );
     }
 
     @Override
     public Stream<String> n(boolean uppercase) {
-        return Stream.empty();
+        return build(
+                Stream.of(
+                 "/NNN  /NNNN",
+                        "| NNN |  NN",
+                        "| NNNN|  NN",
+                        "| NNANN  NN",
+                        "| NN ANN NN",
+                        "| NN  ANNNN",
+                        "|__/   A__/"
+                ),
+                Stream.of(),
+                uppercase
+        );
     }
 
     @Override
@@ -37,5 +61,9 @@ public class AsciiGenerator implements IAsciiGenerator {
     @Override
     public Stream<String> h(boolean uppercase) {
         return Stream.empty();
+    }
+
+    private Stream<String> build(Stream<String> uppercase, Stream<String> lowercase, boolean isUppercase) {
+        return isUppercase ? uppercase : lowercase;
     }
 }

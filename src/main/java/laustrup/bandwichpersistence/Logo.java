@@ -1,15 +1,18 @@
 package laustrup.bandwichpersistence;
 
 import laustrup.bandwichpersistence.core.utilities.ascii.AsciiArtist;
+import laustrup.bandwichpersistence.core.utilities.collections.Collection;
 import laustrup.bandwichpersistence.core.utilities.collections.lists.Liszt;
 
+import java.util.Arrays;
 import java.util.stream.Stream;
 
 public class Logo implements ILogo {
 
     private final int
             _innerWidth = 16,
-            _frameWidth = _innerWidth + 10;
+            _frameWidth = _innerWidth + 10,
+            _letterHeight = 7;
 
     private final AsciiArtist _artist = new AsciiArtist();
 
@@ -129,28 +132,40 @@ public class Logo implements ILogo {
     }
 
     public Stream<String> and() {
-        Stream.Builder<String> builder = Stream.builder();
-
-        _artist.a(true).forEach(builder);
-        _artist.n(true).forEach(builder);
-        _artist.d(true).forEach(builder);
-
-        return builder.build();
+        return putLettersInRow(
+                Liszt.of(Stream.of(_artist.a(true))),
+                Liszt.of(Stream.of(_artist.n(true))),
+                Liszt.of(Stream.of(_artist.d(true)))
+        );
     }
 
     public Stream<String> wic() {
+        return putLettersInRow(
+                Liszt.of(Stream.of(_artist.w(true))),
+                Liszt.of(Stream.of(_artist.i(true))),
+                Liszt.of(Stream.of(_artist.c(true)))
+        );
+    }
+
+    private Stream<String> putLettersInRow(Collection<Stream<String>>... letters) {
         Stream.Builder<String> builder = Stream.builder();
 
-        _artist.w(true).forEach(builder);
-        _artist.i(true).forEach(builder);
-        _artist.c(true).forEach(builder);
+        for (int i = 0; i < _letterHeight; i++) {
+            int index = i;
+            builder.accept(
+                    String.format(
+                            "%s".repeat(letters.length - 1),
+                            Arrays.stream(letters).map(letter -> letter.get_data()[index])
+                    )
+            );
+        }
 
         return builder.build();
     }
 
     public Stream<String> bBun() {
         return Stream.of(
-        "   ___    ___   ",
+        "    ___    ___  ",
                 "  /;::B__B:::B  ",
                 " /;:;_:::;_:::B ",
                 "(;::| B::| B:::B",
@@ -164,9 +179,9 @@ public class Logo implements ILogo {
         return Stream.of(
          "+HHHHHHHHHHHHHHH",
                 "|::::::::::::::H",
-                "+-----+:+------H",
-                "      |:H       ",
-                "+-----+:HHHHHHHH",
+                "+-----+::+-----H",
+                "      |::H      ",
+                "+-----+::HHHHHHH",
                 "|::::::::::::::H",
                 "+-------------' "
         );

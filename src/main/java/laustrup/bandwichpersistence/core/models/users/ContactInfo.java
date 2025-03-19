@@ -391,7 +391,6 @@ public class ContactInfo {
          * @param contactInfo The Object to be converted.
          */
         public DTO(ContactInfo contactInfo) {
-
             email = contactInfo.get_email();
             address = new Address.DTO(contactInfo.get_address());
             country = new Country.DTO(contactInfo.get_country());
