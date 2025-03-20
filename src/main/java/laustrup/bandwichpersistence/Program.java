@@ -3,6 +3,7 @@ package laustrup.bandwichpersistence;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.boot.SpringApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 
 import java.util.Map;
 import java.util.Scanner;
@@ -41,10 +42,7 @@ public class Program {
                 System.out.println("\tThat's not " + _password + "!\n");
         }
 
-        if (ProgramInitializer.startup(arguments, args, defaultSchema))
-            SpringApplication.run(applicationClass, args);
-        else
-            System.exit(-1);
+        running(applicationClass, arguments, args, defaultSchema);
     }
 
     private static Stream<String> argumentDisplay(Map<String, String> arguments) {
@@ -56,6 +54,34 @@ public class Program {
         return builder.build();
     }
 
+    private static void running(
+            Class<?> applicationClass,
+            Map<String, String> arguments,
+            String[] args,
+            String defaultSchema
+    ) {
+        Input input;
+        boolean startApplication = ProgramInitializer.startup(arguments, args, defaultSchema);
+
+        if (startApplication)
+            do {
+                input = null;
+                ConfigurableApplicationContext context = SpringApplication.run(applicationClass, args);
+
+                while (input == null)
+                    try {
+                        input = Input.valueOf(_scanner.nextLine().toUpperCase());
+                    } catch (Exception ignored) {
+                        System.out.println("Command not recognized!");
+                    }
+                if (input.equals(Input.RESTART))
+                    SpringApplication.exit(context);
+            } while (input != Input.EXIT);
+
+        System.out.println("Will now exit... Good bye");
+        System.exit(-1);
+    }
+
     @Getter @AllArgsConstructor
     public enum CommandOption {
         SKIP_CONFIRMATION("skipConfirmation", true);
@@ -63,5 +89,13 @@ public class Program {
         private final String _title;
 
         private final boolean _flag;
+    }
+
+    @Getter @AllArgsConstructor
+    public enum Input {
+        RESTART("restart"),
+        EXIT("exit");
+
+        private final String _key;
     }
 }
