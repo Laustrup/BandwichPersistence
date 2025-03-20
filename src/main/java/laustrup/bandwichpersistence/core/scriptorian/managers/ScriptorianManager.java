@@ -127,14 +127,13 @@ public class ScriptorianManager {
         Seszt<File> scripts = getScripts();
 
         scripts.forEach(script -> {
-            if (!fileNamedAccepted(script.getName())) {
-                filesRenamed.append("\n").append(script.getName());;
-                try {
-                    if (!validateName(script))
-                        rename(script, readAttributes(script.toPath(), BasicFileAttributes.class), now);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
+            try {
+                if (!validateName(script)) {
+                    filesRenamed.append("\n").append(script.getName());
+                    rename(script, readAttributes(script.toPath(), BasicFileAttributes.class), now);
                 }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         });
 
@@ -164,12 +163,6 @@ public class ScriptorianManager {
         }
 
         return null;
-    }
-
-    private static boolean fileNamedAccepted(String fileName) {
-        char[] chars = fileName.toCharArray();
-
-        return chars.length > 20 && chars[0] == 'V' && chars[20] == _splitter;
     }
 
     private static void rename(File file, BasicFileAttributes attributes, Instant now) {

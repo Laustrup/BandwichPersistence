@@ -9,7 +9,6 @@ public class BandwichPersistenceApplication {
         Program.start(
                 BandwichPersistenceApplication.class,
                 "bandwich",
-                Logo.get_instance(),
                 args
         );
     }

@@ -7,7 +7,6 @@ import org.springframework.context.ConfigurableApplicationContext;
 
 import java.util.Map;
 import java.util.Scanner;
-import java.util.stream.Stream;
 
 import static laustrup.bandwichpersistence.ProgramInitializer.argumentsToMap;
 
@@ -17,41 +16,29 @@ public class Program {
 
     private static final Scanner _scanner = new Scanner(System.in);
 
-    public static void start(Class<?> applicationClass, String defaultSchema, String... args) {
-        start(applicationClass, defaultSchema, null, args);
-    }
-
     public static void start(
             Class<?> applicationClass,
             String defaultSchema,
-            ILogo logo,
             String... args
     ) {
         Map<String, String> arguments = argumentsToMap(args);
-        Stream<String> argumentsForDisplay = argumentDisplay(arguments);
-
-        if (logo != null)
-            logo.print(argumentsForDisplay);
-        else
-            argumentsForDisplay.forEach(System.out::println);
+        displayArguments(arguments);
 
         if (arguments.get(Program.CommandOption.SKIP_CONFIRMATION.get_title()) == null) {
             System.out.println("\nTo continue, enter " + _password + "\n");
 
             while (!_scanner.nextLine().equals(_password))
-                System.out.println("\tThat's not " + _password + "!\n");
+                System.out.println("\n\tThat's not " + _password + "!\n");
         }
+
+        System.out.println("\n\tSpring Boot will now start application\n");
 
         running(applicationClass, arguments, args, defaultSchema);
     }
 
-    private static Stream<String> argumentDisplay(Map<String, String> arguments) {
-        Stream.Builder<String> builder = Stream.builder();
-
-        builder.accept("Arguments:\n");
-        arguments.forEach((key, value) -> builder.accept("\t" + key + ": " + value));
-
-        return builder.build();
+    private static void displayArguments(Map<String, String> arguments) {
+        System.out.println("Arguments:\n");
+        arguments.forEach((key, value) -> System.out.println(key + ": " + value));
     }
 
     private static void running(
@@ -67,18 +54,21 @@ public class Program {
             do {
                 input = null;
                 ConfigurableApplicationContext context = SpringApplication.run(applicationClass, args);
+                System.out.println("\n\tApplication started!\n\nNow you can enter restart to restart Spring Boot or exit to exit program.\n");
 
                 while (input == null)
                     try {
+                        System.out.println();
                         input = Input.valueOf(_scanner.nextLine().toUpperCase());
+                        System.out.println();
                     } catch (Exception ignored) {
-                        System.out.println("Command not recognized!");
+                        System.out.println("\n\tCommand not recognized!");
                     }
                 if (input.equals(Input.RESTART))
                     SpringApplication.exit(context);
             } while (input != Input.EXIT);
 
-        System.out.println("Will now exit... Good bye");
+        System.out.println("\n\tWill now exit... Good bye\n\n");
         System.exit(-1);
     }
 
