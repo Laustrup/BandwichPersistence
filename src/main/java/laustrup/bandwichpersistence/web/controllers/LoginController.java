@@ -1,6 +1,6 @@
 package laustrup.bandwichpersistence.web.controllers;
 
-import laustrup.bandwichpersistence.core.managers.LoginManager;
+import laustrup.bandwichpersistence.core.managers.UserDetailsManager;
 import laustrup.bandwichpersistence.core.models.Login;
 import laustrup.bandwichpersistence.core.models.User;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +17,6 @@ public class LoginController {
     public ResponseEntity<User> login(
             @RequestBody Login login
     ) {
-        return respond(() -> LoginManager.getResponse(login));
+        return respond(() -> UserDetailsManager.getUser(login));
     }
 }

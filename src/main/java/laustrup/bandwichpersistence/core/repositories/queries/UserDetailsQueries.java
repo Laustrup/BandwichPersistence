@@ -5,9 +5,9 @@ import lombok.Getter;
 
 import java.util.stream.Stream;
 
-public class LoginQuery {
+public class UserDetailsQueries {
 
-    public static Query selectAll = new Query(/*language=mysql*/ """
+    private static final String _selectAll = /*language=mysql*/ """
             select
                 *
             from
@@ -20,6 +20,9 @@ public class LoginQuery {
                         on band_memberships.band_id = bands.id
                     left join organisation_employees
                         on contact_info.id = organisation_employees.contact_info_id
+            """;
+
+    public static Query selectAllForLogin = new Query(/*language=mysql*/ _selectAll + """
             where
                 contact_info.email = %s and
                 (artists.password = %s || organisation_employees.password = %s)
@@ -30,6 +33,8 @@ public class LoginQuery {
                     new Query.Parameter(Parameter.PASSWORD.get_key())
             )
     );
+
+    public static Query selectAllForLogins = new Query(_selectAll);
 
     @Getter
     public enum Parameter {
