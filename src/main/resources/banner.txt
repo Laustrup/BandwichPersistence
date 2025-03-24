@@ -3,29 +3,29 @@
 |:::::::::::::::::::::::::::::::::::::::::::::|
 |::._______________________________________.::|
 |::|      ___________     ___________      |::|
-|::|     / BBBBBBBBB A   / BBBBBBBBBBA     |::|
-|::|    / BBB/    ABB A_/ BB/     ABBBA    |::|
-|::|   / BBB/      ABBBBBBB/       ABBBA   |::|
-|::|  | BBB/________ABBBBB/_________ABBB|  |::|
+|::|     / BBBBBBBBB \   / BBBBBBBBBB\     |::|
+|::|    / BBB/    \BB \_/ BB/     \BBB\    |::|
+|::|   / BBB/      \BBBBBBB/       \BBB\   |::|
+|::|  | BBB/________\BBBBB/_________\BBB|  |::|
 |::|  | BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB|  |::|
 |::|  | BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB|  |::|
 |::|  |_________________________________|  |::|
 |::|     ______    ___   ____  _______     |::|
-|::|    /AAAAAAA  /NNN  /NNNN | DDDDDDDD   |::|
-|::|   / AA__  AA | NNN |  NN | DD___  DD  |::|
-|::|   | AA  | AA | NNNN|  NN | DD   A DD  |::|
-|::|   | AAAAAAAA | NNANN  NN | DD    |DD  |::|
-|::|   | AA__  AA | NN ANN NN | DD    |DD  |::|
-|::|   | AA  | AA | NN  ANNNN | DDDDDDDD/  |::|
-|::|   |__/  |__/ |__/   A__/ |________/   |::|
+|::|    /AAAAAA\  /NNN  /NNNN | DDDDDDDD   |::|
+|::|   / AA__  A\ | NNN |  NN | DD___  DD  |::|
+|::|   | AA  | AA | NNNN|  NN | DD   \ DD  |::|
+|::|   | AAAAAAAA | NN\NN  NN | DD    |DD  |::|
+|::|   | AA__  AA | NN \NN NN | DD    |DD  |::|
+|::|   | AA  | AA | NN  \NNNN | DDDDDDDD/  |::|
+|::|   |__/  |__/ |__/   \__/ |________/   |::|
 |::|    __  __  _  _________     ______    |::|
-|::|  / WW  WW  W |  IIIIIII|  / CCCCCCA   |::|
+|::|  / WW  WW  W |  IIIIIII|  / CCCCCC\   |::|
 |::|  | WW  WW  W |___ II___| | CC-----_)  |::|
 |::|  | WW W  W W     |II     | CC         |::|
 |::|  | WWWW  WWW     |II     | CC         |::|
 |::|  |  WW    WW  ___|II___  | CC    ,_   |::|
-|::|   A   /A   / |  IIIIIII| |  CCCCCC )  |::|
-|::|    A_/  A_/  |_________|  A_______/   |::|
+|::|   \   /\   / |  IIIIIII| |  CCCCCC )  |::|
+|::|    \_/  \_/  |_________|  \_______/   |::|
 |::|   _________________________________   |::|
 |::|  |  HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH|  |::|
 |::|  |_______________  HH _____________|  |::|
