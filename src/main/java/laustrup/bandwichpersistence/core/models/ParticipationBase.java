@@ -40,22 +40,38 @@ public abstract class ParticipationBase {
         /**
          * Ticket is bought if needed and they have it in their calendar.
          */
-        ACCEPTED,
+        JOINING,
+        /**
+         * Considering joining event.
+         */
         INTERESTED,
-        CANCELED,
+        /**
+         * Does not join event.
+         */
+        DENIED,
+        /**
+         * Has been invited to event, has not decided yet.
+         */
         INVITED
     }
 
     @Getter
-    public static class DTO {
+    public abstract static class DTO {
 
         protected Type type;
 
         protected Instant timestamp;
 
+        public DTO(Type type, Instant timestamp) {
+            this.type = type;
+            this.timestamp = timestamp;
+        }
+
         public DTO(ParticipationBase participation) {
-            type = participation.get_type();
-            timestamp = participation.get_timestamp();
+            this(
+                    participation.get_type(),
+                    participation.get_timestamp()
+            );
         }
     }
 }

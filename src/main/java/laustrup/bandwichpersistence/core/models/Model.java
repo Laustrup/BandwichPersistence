@@ -1,5 +1,7 @@
 package laustrup.bandwichpersistence.core.models;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import laustrup.bandwichpersistence.core.services.ModelService;
 import laustrup.bandwichpersistence.core.utilities.collections.Collection;
 import lombok.Getter;
@@ -180,6 +182,28 @@ public abstract class Model {
          */
         @Setter
         protected Situation situation;
+
+        public ModelDTO(
+                UUID id,
+                String title,
+                Situation situation,
+                Instant timestamp
+        ) {
+            this.id = id;
+            this.title = title;
+            this.situation = situation;
+            this.timestamp = timestamp;
+        }
+
+        public ModelDTO(
+                UUID id,
+                String title,
+                Instant timestamp
+        ) {
+            this.id = id;
+            this.title = title;
+            this.timestamp = timestamp;
+        }
 
         public ModelDTO(Model model) {
             id = model.get_id();

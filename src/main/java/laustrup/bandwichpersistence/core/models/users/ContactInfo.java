@@ -1,5 +1,7 @@
 package laustrup.bandwichpersistence.core.models.users;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import laustrup.bandwichpersistence.core.models.Model;
 
 import laustrup.bandwichpersistence.core.utilities.collections.sets.Seszt;
@@ -204,17 +206,36 @@ public class ContactInfo {
             /** The city of the postal. */
             private String city;
 
+            @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
+            public DTO(
+                    @JsonProperty UUID id,
+                    @JsonProperty String street,
+                    @JsonProperty String floor,
+                    @JsonProperty String municipality,
+                    @JsonProperty String zip,
+                    @JsonProperty String city
+            ) {
+                this.id = id;
+                this.street = street;
+                this.floor = floor;
+                this.municipality = municipality;
+                this.zip = zip;
+                this.city = city;
+            }
+
             /**
              * Converts into this DTO Object.
              * @param address The Object to be converted.
              */
             public DTO(Address address) {
-                id = address.get_id();
-                street = address.get_street();
-                floor = address.get_floor();
-                municipality = address.get_municipality();
-                zip = address.get_zip();
-                city = address.get_city();
+                this(
+                        address.get_id(),
+                        address.get_street(),
+                        address.get_floor(),
+                        address.get_municipality(),
+                        address.get_zip(),
+                        address.get_city()
+                );
             }
         }
     }
@@ -271,14 +292,27 @@ public class ContactInfo {
             /** The value of the first few digits of a phone number. */
             private int code;
 
+            @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
+            public DTO(
+                    @JsonProperty UUID id,
+                    @JsonProperty String title,
+                    @JsonProperty int code
+            ) {
+                this.id = id;
+                this.title = title;
+                this.code = code;
+            }
+
             /**
              * Converts into this DTO Object.
              * @param country The Object to be converted.
              */
             public DTO(Country country) {
-                id = country.get_id();
-                title = country.get_title();
-                code = country.get_code();
+                this(
+                        country.get_id(),
+                        country.get_title(),
+                        country.get_code()
+                );
             }
         }
     }
@@ -353,15 +387,30 @@ public class ContactInfo {
 
             private boolean isBusiness;
 
+            @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
+            public DTO(
+                    @JsonProperty Country.DTO country,
+                    @JsonProperty long numbers,
+                    @JsonProperty boolean isMobile,
+                    @JsonProperty boolean isBusiness
+            ) {
+                this.country = country;
+                this.numbers = numbers;
+                this.isMobile = isMobile;
+                this.isBusiness = isBusiness;
+            }
+
             /**
              * Converts into this DTO Object.
              * @param phone The Object to be converted.
              */
             public DTO(Phone phone) {
-                country = new ContactInfo.Country.DTO(phone.get_country());
-                numbers = phone.get_numbers();
-                isMobile = phone.is_mobile();
-                isBusiness = phone.is_business();
+                this(
+                        new ContactInfo.Country.DTO(phone.get_country()),
+                        phone.get_numbers(),
+                        phone.is_mobile(),
+                        phone.is_business()
+                );
             }
         }
     }
@@ -389,16 +438,33 @@ public class ContactInfo {
         /** A Country object for the information of which Country the User is living in. */
         private Country.DTO country;
 
+        @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
+        public DTO(
+                @JsonProperty UUID id,
+                @JsonProperty String email,
+                @JsonProperty Set<Phone.DTO> phones,
+                @JsonProperty Address.DTO address,
+                @JsonProperty Country.DTO country
+        ) {
+            this.id = id;
+            this.email = email;
+            this.phones = phones;
+            this.address = address;
+            this.country = country;
+        }
+
         /**
          * Converts into this DTO Object.
          * @param contactInfo The Object to be converted.
          */
         public DTO(ContactInfo contactInfo) {
-            email = contactInfo.get_email();
-            address = new Address.DTO(contactInfo.get_address());
-            country = new Country.DTO(contactInfo.get_country());
-
-            phones = contactInfo.get_phones().asSet(Phone.DTO::new);
+            this(
+                    contactInfo.get_id(),
+                    contactInfo.get_email(),
+                    contactInfo.get_phones().asSet(Phone.DTO::new),
+                    new Address.DTO(contactInfo.get_address()),
+                    new Country.DTO(contactInfo.get_country())
+            );
         }
     }
 }

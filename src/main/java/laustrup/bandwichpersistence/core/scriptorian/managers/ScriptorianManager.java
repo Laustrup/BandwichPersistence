@@ -14,7 +14,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.nio.file.attribute.FileTime;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -22,6 +21,7 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -91,11 +91,11 @@ public class ScriptorianManager {
                             errorMessage = logMessage + "\n" + exception.getMessage();
                         }
 
-                        ScriptorianRepository.putScriptory(generateParameters(currentFile, errorMessage, now));
+                        ScriptorianRepository.putScriptory(generateParameters(currentFile, errorMessage));
 
-
-                        if (errorMessage != null)
-                            break;
+                        if (errorMessage != null) {
+                            System.exit(6);
+                        }
 
                         _logger.log(
                                 Level.INFO,
@@ -213,30 +213,25 @@ public class ScriptorianManager {
         return new Seszt<>(scripts.stream()
                 .filter(script -> fileNames.isEmpty() || !fileNames.contains(script.getName()))
                 .sorted((previous, current) -> {
-                    BasicFileAttributes
-                            previousAttributes,
-                            currentAttributes;
+                    Scriptorian.Scriptory
+                            previousScriptory = define(previous),
+                            currentScriptory = define(current);
 
-                    try {
-                        previousAttributes = readAttributes(previous.toPath(), BasicFileAttributes.class);
-                        currentAttributes = readAttributes(current.toPath(), BasicFileAttributes.class);
-                        int comparison = define(previous).get_versionstamp().compareTo(define(current).get_versionstamp());
+                    int comparison = previousScriptory.get_versionstamp().compareTo(currentScriptory.get_versionstamp());
 
-                        return comparison == 0
-                                ? previousAttributes.creationTime().compareTo(currentAttributes.creationTime())
-                                : comparison;
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
+                    return comparison == 0
+                            ? previousScriptory.get_createdstamp().compareTo(currentScriptory.get_createdstamp())
+                            : comparison;
                 }));
     }
 
     private static Scriptorian.Scriptory define(File file) throws IllegalArgumentException {
-        String[] split = file.getName().split(String.valueOf(_splitter));
-        String[] attributes = Arrays.stream(split[0].split("[VC]"))
-                .filter(attribute -> !attribute.isEmpty())
-                .toArray(String[]::new);
-        String[] versionstampAttributes = attributes[0].split("[-T]");
+        String[] split = file.getName().split(String.valueOf(_splitter)),
+                attributes = Arrays.stream(split[0].split("[VC]"))
+                        .filter(attribute -> !attribute.isEmpty())
+                        .toArray(String[]::new),
+                versionstampAttributes = attributes[0].split("[-T]"),
+                createdstampAttributes = attributes[1].split("[-T]");
 
         if (!(
                 attributes.length == 2 &&
@@ -245,32 +240,41 @@ public class ScriptorianManager {
         ))
             throw new IllegalArgumentException();
 
+        Function<String[], Instant> createStamp = timeAttributes -> LocalDateTime.of(
+                parseInt(timeAttributes[0]),
+                parseInt(timeAttributes[1]),
+                parseInt(timeAttributes[2]),
+                parseInt(timeAttributes[3]),
+                parseInt(timeAttributes[4]),
+                parseInt(timeAttributes[5])
+        ).toInstant(ZoneOffset.of("Z"));
+
         return new Scriptorian.Scriptory(
                 split[1],
                 file.getName(),
                 null,
                 FileService.getContent(file),
-                LocalDateTime.of(
-                        parseInt(versionstampAttributes[0]),
-                        parseInt(versionstampAttributes[1]),
-                        parseInt(versionstampAttributes[2]),
-                        parseInt(versionstampAttributes[3]),
-                        parseInt(versionstampAttributes[4]),
-                        parseInt(versionstampAttributes[5])
-                ).toInstant(ZoneOffset.of("Z")),
+                createStamp.apply(versionstampAttributes),
                 null,
+                createStamp.apply(createdstampAttributes),
                 null
         );
     }
 
-    private static Seszt<DatabaseParameter> generateParameters(File file, String errorMessage, Instant versionstamp) {
-        return file == null ? null : new Seszt<>(
+    private static Seszt<DatabaseParameter> generateParameters(File file, String errorMessage) {
+        if (file == null)
+            return null;
+
+        Scriptorian.Scriptory scriptory = define(file);
+
+        return new Seszt<>(
                 new DatabaseParameter(Parameter.TITLE.get_key(), file.getName().split(String.valueOf(_splitter))[1]),
                 new DatabaseParameter(Parameter.FILE_NAME.get_key(), file.getName()),
                 new DatabaseParameter(Parameter.ERROR_MESSAGE.get_key(), errorMessage),
                 new DatabaseParameter(Parameter.CONTENT.get_key(), FileService.getContent(file)),
-                new DatabaseParameter(Parameter.VERSIONSTAMP.get_key(), versionstamp),
-                new DatabaseParameter(Parameter.SUCCESSSTAMP.get_key(), errorMessage == null ? Instant.now() : null)
+                new DatabaseParameter(Parameter.VERSIONSTAMP.get_key(), scriptory.get_versionstamp()),
+                new DatabaseParameter(Parameter.SUCCESSSTAMP.get_key(), errorMessage == null ? Instant.now() : null),
+                new DatabaseParameter(Parameter.CREATEDSTAMP.get_key(), scriptory.get_createdstamp())
         );
     }
 
@@ -284,22 +288,14 @@ public class ScriptorianManager {
                 () -> {
                     try {
                         return new Scriptorian.Scriptory(
-                                resultSet.getString(Scriptorian.Scriptory.DatabaseColumns.title.name()),
-                                resultSet.getString(Scriptorian.Scriptory.DatabaseColumns.file_name.name()),
-                                resultSet.getString(Scriptorian.Scriptory.DatabaseColumns.error_message.name()),
-                                resultSet.getString(Scriptorian.Scriptory.DatabaseColumns.content.name()),
-                                get(
-                                        resultSet.getTimestamp(Scriptorian.Scriptory.DatabaseColumns.versionstamp.name()),
-                                        Timestamp::toInstant
-                                ),
-                                get(
-                                        resultSet.getTimestamp(Scriptorian.Scriptory.DatabaseColumns.successstamp.name()),
-                                        Timestamp::toInstant
-                                ),
-                                get(
-                                        resultSet.getTimestamp(Scriptorian.Scriptory.DatabaseColumns.timestamp.name()),
-                                        Timestamp::toInstant
-                                )
+                                resultSet.getString(Scriptorian.Scriptory.Fields._title),
+                                resultSet.getString(Scriptorian.Scriptory.Fields._fileName),
+                                resultSet.getString(Scriptorian.Scriptory.Fields._errorMessage),
+                                resultSet.getString(Scriptorian.Scriptory.Fields._content),
+                                getInstant(Scriptorian.Scriptory.Fields._versionstamp),
+                                getInstant(Scriptorian.Scriptory.Fields._successstamp),
+                                getInstant(Scriptorian.Scriptory.Fields._createdstamp),
+                                getInstant(Scriptorian.Scriptory.Fields._timestamp)
                         );
                     } catch (SQLException exception) {
                         throw new RuntimeException(exception);

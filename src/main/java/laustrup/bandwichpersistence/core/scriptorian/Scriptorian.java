@@ -3,6 +3,7 @@ package laustrup.bandwichpersistence.core.scriptorian;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.FieldNameConstants;
 
 import java.time.Instant;
 import java.util.List;
@@ -12,7 +13,7 @@ public class Scriptorian {
 
     private List<Scriptory> _scriptories;
 
-    @Getter @AllArgsConstructor
+    @Getter @AllArgsConstructor @FieldNameConstants
     public static class Scriptory {
 
         private String _title;
@@ -34,22 +35,17 @@ public class Scriptorian {
         private Instant _successstamp;
 
         /**
+         * The creation of the file.
+         */
+        private Instant _createdstamp;
+
+        /**
          * When the file first ran.
          */
         private Instant _timestamp;
 
         public boolean is_success() {
             return _successstamp != null;
-        }
-
-        public enum DatabaseColumns {
-            title,
-            file_name,
-            error_message,
-            content,
-            versionstamp,
-            successstamp,
-            timestamp
         }
     }
 }

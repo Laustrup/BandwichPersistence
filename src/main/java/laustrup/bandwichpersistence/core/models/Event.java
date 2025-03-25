@@ -1,5 +1,7 @@
 package laustrup.bandwichpersistence.core.models;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import laustrup.bandwichpersistence.core.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.core.models.users.Participant;
 import laustrup.bandwichpersistence.core.utilities.collections.lists.Liszt;
@@ -9,7 +11,6 @@ import laustrup.bandwichpersistence.core.utilities.parameters.NotBoolean;
 import laustrup.bandwichpersistence.core.models.chats.Request;
 import laustrup.bandwichpersistence.core.models.chats.messages.Post;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
@@ -592,12 +593,6 @@ public class Event extends Model {
         private Instant end;
 
         /**
-         * The amount of time it will take the gigs in total.
-         * Is being calculated automatically.
-         */
-        private long length;
-
-        /**
          * The description of the Event, that can be edited by Performers or Venue
          * */
         private String description;
@@ -680,35 +675,91 @@ public class Event extends Model {
 
         private History history;
 
+        @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
+        public DTO(
+                @JsonProperty UUID id,
+                @JsonProperty String title,
+                @JsonProperty Instant openDoors,
+                @JsonProperty Instant start,
+                @JsonProperty Instant end,
+                @JsonProperty String description,
+                @JsonProperty NotBoolean.Argument isCharity,
+                @JsonProperty Instant isPublic,
+                @JsonProperty Instant isCancelled,
+                @JsonProperty Instant isSoldOut,
+                @JsonProperty ContactInfo.Address.DTO location,
+                @JsonProperty Set<Ticket.Option.DTO> ticketOptions,
+                @JsonProperty Set<Ticket.DTO> tickets,
+                @JsonProperty ContactInfo.DTO contactInfo,
+                @JsonProperty Set<Gig.DTO> gigs,
+                @JsonProperty Set<Organisation.DTO> organisations,
+                @JsonProperty ChatRoom.DTO chatRoom,
+                @JsonProperty Venue.DTO venue,
+                @JsonProperty Set<Request.DTO> requests,
+                @JsonProperty Set<Participation.DTO> participations,
+                @JsonProperty Set<Post.DTO> posts,
+                @JsonProperty Set<Album.DTO> albums,
+                @JsonProperty ZoneId zoneId,
+                @JsonProperty History history,
+                @JsonProperty Instant timestamp
+        ) {
+            super(id, title, timestamp);
+            this.openDoors = openDoors;
+            this.start = start;
+            this.end = end;
+            this.description = description;
+            this.isCharity = isCharity;
+            this.isPublic = isPublic;
+            this.isCancelled = isCancelled;
+            this.isSoldOut = isSoldOut;
+            this.location = location;
+            this.ticketOptions = ticketOptions;
+            this.tickets = tickets;
+            this.contactInfo = contactInfo;
+            this.gigs = gigs;
+            this.organisations = organisations;
+            this.chatRoom = chatRoom;
+            this.venue = venue;
+            this.requests = requests;
+            this.participations = participations;
+            this.posts = posts;
+            this.albums = albums;
+            this.zoneId = zoneId;
+            this.history = history;
+        }
+
         /**
          * Converts into this DTO Object.
          * @param event The Object to be converted.
          */
         public DTO(Event event) {
-            super(event);
-            description = event.get_description();
-            gigs = Seszt.copy(event.get_gigs(), Gig.DTO::new);
-            organisations = toSet(event.get_organisations(), Organisation.DTO::new);
-            chatRoom = new ChatRoom.DTO(event.get_chatRoom());
-            openDoors = event.get_openDoors();
-            start = event.get_start();
-            end = event.get_end();
-            length = event.get_duration();
-            isCharity = NotBoolean.ofNullable(event.get_charity()).get_argument();
-            isPublic = event.get_public();
-            isCancelled = event.get_cancelled();
-            isSoldOut = event.get_soldOut();
-            ticketOptions = toSet(event.get_ticketOptions(), Ticket.Option.DTO::new);
-            tickets = toSet(event.get_tickets(), Ticket.DTO::new);
-            contactInfo = new ContactInfo.DTO(event.get_contactInfo());
-            venue = new Venue.DTO(event.get_venue());
-            location = new ContactInfo.Address.DTO(event.get_location());
-            zoneId = event.get_zoneId();
-            requests = toSet(event.get_requests(), Request.DTO::new);
-            participations = toSet(event.get_participations(), Participation.DTO::new);
-            posts = toSet(event.get_posts(), Post.DTO::new);
-            albums = toSet(event.get_albums(), Album.DTO::new);
-            history = event.get_history();
+            this(
+                    event.get_id(),
+                    event.get_title(),
+                    event.get_openDoors(),
+                    event.get_start(),
+                    event.get_end(),
+                    event.get_description(),
+                    NotBoolean.ofNullable(event.get_charity()).get_argument(),
+                    event.get_public(),
+                    event.get_cancelled(),
+                    event.get_soldOut(),
+                    new ContactInfo.Address.DTO(event.get_location()),
+                    toSet(event.get_ticketOptions(), Ticket.Option.DTO::new),
+                    toSet(event.get_tickets(), Ticket.DTO::new),
+                    new ContactInfo.DTO(event.get_contactInfo()),
+                    Seszt.copy(event.get_gigs(), Gig.DTO::new),
+                    toSet(event.get_organisations(), Organisation.DTO::new),
+                    new ChatRoom.DTO(event.get_chatRoom()),
+                    new Venue.DTO(event.get_venue()),
+                    toSet(event.get_requests(), Request.DTO::new),
+                    toSet(event.get_participations(), Participation.DTO::new),
+                    toSet(event.get_posts(), Post.DTO::new),
+                    toSet(event.get_albums(), Album.DTO::new),
+                    event.get_zoneId(),
+                    event.get_history(),
+                    event.get_timestamp()
+            );
         }
     }
 

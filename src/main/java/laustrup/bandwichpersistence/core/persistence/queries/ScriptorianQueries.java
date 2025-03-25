@@ -15,6 +15,7 @@ public class ScriptorianQueries {
         content mediumtext not null,
         versionstamp datetime not null,
         successstamp datetime,
+        createdstamp datetime,
         timestamp datetime not null default now(),
 
         constraint PK_scriptories
@@ -38,7 +39,8 @@ public class ScriptorianQueries {
                         error_message,
                         content,
                         versionstamp,
-                        successstamp
+                        successstamp,
+                        createdstamp
                     ) values %s;
                     """,
                     Query.valuesInsertCollection(Parameter.values().length)
@@ -54,7 +56,8 @@ public class ScriptorianQueries {
         ERROR_MESSAGE("scriptorian_error_message"),
         CONTENT("scriptorian_content"),
         VERSIONSTAMP("scriptorian_versionstamp"),
-        SUCCESSSTAMP("scriptorian_successstamp");
+        SUCCESSSTAMP("scriptorian_successstamp"),
+        CREATEDSTAMP("scriptorian_createdstamp");
 
         private final String _key;
 
