@@ -71,6 +71,9 @@ All properties marked with * is required.
 #### Runtime
 When the application is running, there is commands available:
 
+* ###### Inject
+  Runs the script located in Scriptorian's injections directory, which is meant to generate developer data.
+
 * ###### Restart
   Will simply restart the application from the beginning with the application startup.
 

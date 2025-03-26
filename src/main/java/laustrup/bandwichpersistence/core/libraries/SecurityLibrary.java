@@ -16,7 +16,7 @@ public class SecurityLibrary {
     @Getter
     private static String _gibberish;
 
-    public static final char passwordEncodingCharacter = '€';
+    public static final char passwordEncodingCharacter = '£';
 
     public static final String gibberishRules = """
             1. Each index must be between a -> f either in upper or lowercase

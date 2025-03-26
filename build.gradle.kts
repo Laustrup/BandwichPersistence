@@ -11,10 +11,6 @@ repositories {
     maven {
         url = uri("https://repo.maven.apache.org/maven2/")
     }
-
-    maven {
-        url = uri("https://maven.pkg.github.com/laustrup/bandwich-models")
-    }
 }
 
 dependencies {

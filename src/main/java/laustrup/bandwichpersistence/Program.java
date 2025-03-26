@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Scanner;
 
 import static laustrup.bandwichpersistence.ProgramInitializer.argumentsToMap;
+import static laustrup.bandwichpersistence.core.scriptorian.managers.ScriptorianManager.runInjections;
 
 public class Program {
 
@@ -54,9 +55,21 @@ public class Program {
             do {
                 input = null;
                 ConfigurableApplicationContext context = SpringApplication.run(applicationClass, args);
-                System.out.println("\n\tApplication started!\n\nNow you can enter restart to restart Spring Boot or exit to exit program.\n");
+                System.out.println("""
+                    
+                        Application started!
+                    
+                    Now you can type
+                    
+                    * restart: Restarts Spring Boot, but program keeps running
+                    * inject: With generate some data for developers, if any sqls are specified
+                    * exit: Simply shuts down the whole application
+                    
+                    """);
 
-                while (input == null)
+                while (input == null) {
+                    boolean doRestart = false;
+
                     try {
                         System.out.println();
                         input = Input.valueOf(_scanner.nextLine().toUpperCase());
@@ -64,8 +77,20 @@ public class Program {
                     } catch (Exception ignored) {
                         System.out.println("\n\tCommand not recognized!");
                     }
-                if (input.equals(Input.RESTART))
-                    SpringApplication.exit(context);
+                    switch (input) {
+                        case RESTART: {
+                            SpringApplication.exit(context);
+                            doRestart = true;
+                            break;
+                        } case INJECT: {
+                            runInjections();
+                            break;
+                        }
+                    }
+
+                    if (doRestart)
+                        break;
+                }
             } while (input != Input.EXIT);
 
         System.out.println("\n\tWill now exit... Good bye\n\n");
@@ -84,7 +109,8 @@ public class Program {
     @Getter @AllArgsConstructor
     public enum Input {
         RESTART("restart"),
-        EXIT("exit");
+        EXIT("exit"),
+        INJECT("inject");
 
         private final String _key;
     }

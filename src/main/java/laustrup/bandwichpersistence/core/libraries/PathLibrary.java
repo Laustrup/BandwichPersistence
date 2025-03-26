@@ -17,6 +17,12 @@ public class PathLibrary {
     @Getter
     private static final String _migrationDirectoryFullPath = get_rootPath() + get_migrationDirectoryPath();
 
+    @Getter
+    private static final String _injectionDirectoryPath = "/src/main/resources/database/scriptorian/injections/";
+
+    @Getter
+    private static final String _injectionDirectoryFullPath = get_rootPath() + get_injectionDirectoryPath();
+
     private static String findSpringBootDirectory() {
         String rootPath = PathService.getRootPath();
         String directory = "/API";

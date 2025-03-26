@@ -39,4 +39,10 @@ build/
 
 ### Build ###
 /out/artifacts/BandwichPersistence_jar/BandwichPersistence.jar
+
+### Custom ###
+# Build #
 /.gradle/
+
+# Database #
+/src/main/resources/database/sqls/clear_database.sql

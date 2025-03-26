@@ -23,7 +23,7 @@ public class JDBCService {
     public static Instant getInstant(String column) {
         return get(
                 name -> getTimestamp(name, Timestamp::toInstant),
-                column
+                toDatabaseColumn(column)
         );
     }
 
@@ -55,7 +55,7 @@ public class JDBCService {
     ) {
         for (String column : columns) {
             try {
-                T t = function.apply(column);
+                T t = function.apply(toDatabaseColumn(column));
                 if (t != null)
                     return t;
             } catch (Exception ignored) {}
@@ -66,7 +66,7 @@ public class JDBCService {
 
     public static String getString(String column) {
         try {
-            return _resultSet.getString(column);
+            return _resultSet.getString(toDatabaseColumn(column));
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -74,7 +74,7 @@ public class JDBCService {
 
     public static UUID getUUID(String column) {
         try {
-            String value = _resultSet.getString(column);
+            String value = _resultSet.getString(toDatabaseColumn(column));
 
             return value == null ? null : UUID.fromString(value);
         } catch (SQLException e) {
@@ -84,7 +84,7 @@ public class JDBCService {
 
     public static Integer getInteger(String column) {
         try {
-            return _resultSet.getInt(column);
+            return _resultSet.getInt(toDatabaseColumn(column));
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -92,7 +92,7 @@ public class JDBCService {
 
     public static Long getLong(String column) {
         try {
-            return _resultSet.getLong(column);
+            return _resultSet.getLong(toDatabaseColumn(column));
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -100,7 +100,7 @@ public class JDBCService {
 
     public static Boolean getBoolean(String column) {
         try {
-            return _resultSet.getBoolean(column);
+            return _resultSet.getBoolean(toDatabaseColumn(column));
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -108,7 +108,7 @@ public class JDBCService {
 
     public static <T> T getTimestamp(String column, Function<Timestamp, T> function) {
         try {
-            return get(_resultSet.getTimestamp(column), function);
+            return get(_resultSet.getTimestamp(toDatabaseColumn(column)), function);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -244,6 +244,9 @@ public class JDBCService {
             databaseColumn
                     .append(Character.isUpperCase(c) ? '_' : "")
                     .append(Character.toLowerCase(c));
+
+        if (databaseColumn.charAt(0) == ' ')
+            databaseColumn.deleteCharAt(0);
 
         return databaseColumn.toString();
     }
