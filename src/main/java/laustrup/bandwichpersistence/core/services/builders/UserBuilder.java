@@ -123,7 +123,7 @@ public class UserBuilder {
     }
 
     public static ContactInfo.Phone buildPhone(ResultSet resultSet) {
-        AtomicReference<ContactInfo.Country> country = new AtomicReference<>();
+        AtomicReference<Integer> firstDigits = new AtomicReference<>();
         AtomicReference<Long> numbers = new AtomicReference<>();
         AtomicReference<Boolean> mobile = new AtomicReference<>();
         AtomicReference<Boolean> business = new AtomicReference<>();
@@ -132,7 +132,7 @@ public class UserBuilder {
             JDBCService.build(
                     resultSet,
                     () -> {
-                        country.set(buildCountry(resultSet));
+                        firstDigits.set(getInteger(ContactInfo.Phone.DTO.Fields.countryDigits));
                         numbers.set(getLong(ContactInfo.Phone.DTO.Fields.numbers));
                         mobile.set(getBoolean(ContactInfo.Phone.DTO.Fields.isMobile));
                         business.set(getBoolean(ContactInfo.Phone.DTO.Fields.isBusiness));
@@ -145,7 +145,7 @@ public class UserBuilder {
         }
 
         return new ContactInfo.Phone(
-                country.get(),
+                firstDigits.get(),
                 numbers.get(),
                 mobile.get(),
                 business.get()
@@ -192,7 +192,7 @@ public class UserBuilder {
     public static ContactInfo.Country buildCountry(ResultSet resultSet) {
         AtomicReference<UUID> id = new AtomicReference<>();
         AtomicReference<String> title = new AtomicReference<>();
-        AtomicReference<Integer> code = new AtomicReference<>();
+        AtomicReference<String> code = new AtomicReference<>();
 
         try {
             JDBCService.build(
@@ -200,7 +200,7 @@ public class UserBuilder {
                     () -> {
                         id.set(getUUID(ContactInfo.Country.DTO.Fields.id));
                         title.set(getString(ContactInfo.Country.DTO.Fields.title));
-                        code.set(getInteger(ContactInfo.Country.DTO.Fields.code));
+                        code.set(getString(ContactInfo.Country.DTO.Fields.code));
                     },
                     id.get()
             );

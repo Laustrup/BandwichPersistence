@@ -7,41 +7,41 @@ set
     @password = '$2y$05$Ad01b.9//2.NKwsL/6y/HeWk3TgdMDve4ThnFPKt.5FMfP2GHbRke£Ad0',
 
     -- Iværksted
-    @address_id_vaerkstedsvej = bin_to_uuid(uuid()),
-    @contact_info_id_ivaerksted = bin_to_uuid(uuid()),
+    @address_id_vaerkstedsvej = unhex(md5(uuid())),
+    @contact_info_id_ivaerksted = unhex(md5(uuid())),
     
-    @subscription_id_ivaerksted_jens = bin_to_uuid(uuid()),
-    @subscription_id_ivaerksted_birthe = bin_to_uuid(uuid()),
+    @subscription_id_ivaerksted_jens = unhex(md5(uuid())),
+    @subscription_id_ivaerksted_birthe = unhex(md5(uuid())),
 
     -- Arena
-    @address_id_arenavej = bin_to_uuid(uuid()),
-    @contact_info_id_arena = bin_to_uuid(uuid()),
+    @address_id_arenavej = unhex(md5(uuid())),
+    @contact_info_id_arena = unhex(md5(uuid())),
     
-    @subscription_id_arena_john = bin_to_uuid(uuid()),
-    @subscription_id_arena_james = bin_to_uuid(uuid()),
-    @subscription_id_arena_joanna = bin_to_uuid(uuid()),
-    @subscription_id_arena_susanne = bin_to_uuid(uuid()),
-    @subscription_id_arena_hans = bin_to_uuid(uuid()),
+    @subscription_id_arena_john = unhex(md5(uuid())),
+    @subscription_id_arena_james = unhex(md5(uuid())),
+    @subscription_id_arena_joanna = unhex(md5(uuid())),
+    @subscription_id_arena_susanne = unhex(md5(uuid())),
+    @subscription_id_arena_hans = unhex(md5(uuid())),
     
     -- Plural Place
-    @address_id_jensenvej = bin_to_uuid(uuid()),
+    @address_id_jensenvej = unhex(md5(uuid())),
         -- Twogether
-        @contact_info_id_twogether = bin_to_uuid(uuid()),
+        @contact_info_id_twogether = unhex(md5(uuid())),
 
-        @subscription_id_twogether_jimmy = bin_to_uuid(uuid()),
-        @subscription_id_twogether_hanne = bin_to_uuid(uuid()),
-        @subscription_id_twogether_xi = bin_to_uuid(uuid()),
+        @subscription_id_twogether_jimmy = unhex(md5(uuid())),
+        @subscription_id_twogether_hanne = unhex(md5(uuid())),
+        @subscription_id_twogether_xi = unhex(md5(uuid())),
         
         -- Jamsters
-        @contact_info_id_jamsters = bin_to_uuid(uuid()),
+        @contact_info_id_jamsters = unhex(md5(uuid())),
 
-        @subscription_id_jamsters_tue = bin_to_uuid(uuid()),
+        @subscription_id_jamsters_tue = unhex(md5(uuid())),
 
     -- Denmark
-    @country_id_denmark = bin_to_uuid(uuid()),
+    @country_id_denmark = unhex(md5(uuid())),
 
     -- Sweden
-    @country_id_sweden = bin_to_uuid(uuid())
+    @country_id_sweden = unhex(md5(uuid()))
 ;
 
 insert into addresses(id, street, floor, municipality, zip, city) values (
@@ -99,31 +99,31 @@ insert into contact_info(id, address_id, country_id, email) values (
     'contact@jamsters.dk'
 );
 
-insert into phones(id, country_id, contact_info_id, numbers, is_mobile, is_business) values (
-    bin_to_uuid(uuid()),
-    @country_id_denmark,
+insert into phones(id, contact_info_id, country_digits, numbers, is_mobile, is_business) values (
+    unhex(md5(uuid())),
     @contact_info_id_ivaerksted,
+    45,
     12345678,
     true,
     false
 ), (
-    bin_to_uuid(uuid()),
-    @country_id_denmark,
+    unhex(md5(uuid())),
     @contact_info_id_arena,
+    45,
     87654321,
     false,
     true
 ), (
-    bin_to_uuid(uuid()),
-    @country_id_denmark,
+    unhex(md5(uuid())),
     @contact_info_id_twogether,
+    45,
     76543210,
     true,
     false
 ), (
-    bin_to_uuid(uuid()),
-    @country_id_sweden,
+    unhex(md5(uuid())),
     @contact_info_id_jamsters,
+    46,
     01234567,
     false,
     false
@@ -187,21 +187,21 @@ insert into subscriptions(id, status, kind, user_type) VALUES (
 );
 
 insert into venues(id, address_id, title, description, stage_setup, size) values (
-    bin_to_uuid(uuid()),
+    unhex(md5(uuid())),
     @address_id_vaerkstedsvej,
     'Iværkstedet',
     'This is a smaller venue',
     'The stage is very tiny and has only room for top 5 band members',
     54
 ), (
-    bin_to_uuid(uuid()),
+    unhex(md5(uuid())),
     @address_id_arenavej,
     'Arena',
     'A big venue',
     'Big place for up 500 musicians, there is the necessarily gear for sound crew and backstage available',
     2000
 ), (
-    bin_to_uuid(uuid()),
+    unhex(md5(uuid())),
     @address_id_jensenvej,
     'Plural Place',
     'A special venue, that is meant for plural amount of organisations',
@@ -210,19 +210,19 @@ insert into venues(id, address_id, title, description, stage_setup, size) values
 );
 
 insert into organisations(id, contact_info_id, title) values (
-    bin_to_uuid(uuid()),
+    unhex(md5(uuid())),
     @contact_info_id_ivaerksted,
     'Iværksted'
 ), (
-    bin_to_uuid(uuid()),
+    unhex(md5(uuid())),
     @contact_info_id_arena,
     'Arena'
 ), (
-    bin_to_uuid(uuid()),
+    unhex(md5(uuid())),
     @contact_info_id_twogether,
     'Twogether'
 ), (
-    bin_to_uuid(uuid()),
+    unhex(md5(uuid())),
     @contact_info_id_jamsters,
     'Jamsters'
 );
@@ -237,7 +237,7 @@ insert into organisation_employees(
     last_name,
     description
 ) values (
-    bin_to_uuid(uuid()),
+    unhex(md5(uuid())),
     @subscription_id_ivaerksted_jens,
     @contact_info_id_ivaerksted,
     @password,
@@ -246,7 +246,7 @@ insert into organisation_employees(
     'Jensen',
     'Jeg hedder Jens'
 ), (
-    bin_to_uuid(uuid()),
+    unhex(md5(uuid())),
     @subscription_id_ivaerksted_birthe,
     @contact_info_id_ivaerksted,
     @password,
@@ -255,7 +255,7 @@ insert into organisation_employees(
     'Berthelsen',
     'Jeg hedder Birthe'
 ), (
-    bin_to_uuid(uuid()),
+    unhex(md5(uuid())),
     @subscription_id_arena_hans,
     @contact_info_id_arena,
     @password,
@@ -264,7 +264,7 @@ insert into organisation_employees(
     'Hansen',
     'Jeg hedder Hans'
 ), (
-    bin_to_uuid(uuid()),
+    unhex(md5(uuid())),
     @subscription_id_arena_susanne,
     @contact_info_id_arena,
     @password,
@@ -273,7 +273,7 @@ insert into organisation_employees(
     'Simonsen',
     'Jeg hedder Susanne'
 ), (
-    bin_to_uuid(uuid()),
+    unhex(md5(uuid())),
     @subscription_id_arena_joanna,
     @contact_info_id_arena,
     @password,
@@ -282,7 +282,7 @@ insert into organisation_employees(
     'Johansen',
     'Jeg hedder Joanna'
 ), (
-    bin_to_uuid(uuid()),
+    unhex(md5(uuid())),
     @subscription_id_arena_john,
     @contact_info_id_arena,
     @password,
@@ -291,7 +291,7 @@ insert into organisation_employees(
     'Johnson',
     'Jeg hedder John'
 ), (
-    bin_to_uuid(uuid()),
+    unhex(md5(uuid())),
     @subscription_id_arena_james,
     @contact_info_id_arena,
     @password,
@@ -300,7 +300,7 @@ insert into organisation_employees(
     'Jamerson',
     'Jeg hedder James'
 ), (
-    bin_to_uuid(uuid()),
+    unhex(md5(uuid())),
     @subscription_id_twogether_xi,
     @contact_info_id_twogether,
     @password,
@@ -309,7 +309,7 @@ insert into organisation_employees(
     'Xang',
     'Jeg hedder Xi'
 ), (
-    bin_to_uuid(uuid()),
+    unhex(md5(uuid())),
     @subscription_id_twogether_jimmy,
     @contact_info_id_twogether,
     @password,
@@ -318,7 +318,7 @@ insert into organisation_employees(
     'Jensen',
     'Jeg hedder Jimmy'
 ), (
-    bin_to_uuid(uuid()),
+    unhex(md5(uuid())),
     @subscription_id_twogether_hanne,
     @contact_info_id_twogether,
     @password,
@@ -327,7 +327,7 @@ insert into organisation_employees(
     'Hansen',
     'Jeg hedder Hanne'
 ), (
-    bin_to_uuid(uuid()),
+    unhex(md5(uuid())),
     @subscription_id_jamsters_tue,
     @contact_info_id_jamsters,
     @password,

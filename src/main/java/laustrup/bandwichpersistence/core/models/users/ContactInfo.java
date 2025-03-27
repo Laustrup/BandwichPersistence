@@ -256,7 +256,7 @@ public class ContactInfo {
         /**
          * The value of the first few digits of a phone number.
          */
-        private int _code;
+        private String _code;
 
         /**
          * Will translate a transport object of this object into a construct of this object.
@@ -270,7 +270,7 @@ public class ContactInfo {
             );
         }
 
-        public Country(UUID id, String title, int code) {
+        public Country(UUID id, String title, String code) {
             _id = id;
             _title = title;
             _code = code;
@@ -290,13 +290,13 @@ public class ContactInfo {
             private String title;
 
             /** The value of the first few digits of a phone number. */
-            private int code;
+            private String code;
 
             @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
             public DTO(
                     @JsonProperty UUID id,
                     @JsonProperty String title,
-                    @JsonProperty int code
+                    @JsonProperty String code
             ) {
                 this.id = id;
                 this.title = title;
@@ -327,7 +327,7 @@ public class ContactInfo {
          * A country object, that represents the nationality of this PhoneNumber.
          */
         @Setter
-        private Country _country;
+        private int _countryDigits;
 
         /**
          * The contact numbers for the Phone.
@@ -348,21 +348,15 @@ public class ContactInfo {
          */
         public Phone(DTO phone) {
             this(
-                    new Country(phone.getCountry()),
+                    phone.getCountryDigits(),
                     phone.getNumbers(),
                     phone.isMobile(),
                     phone.isBusiness()
             );
         }
 
-        /**
-         * The primary id that identifies this unique Object.
-         * @param country A country object, that represents the nationality of this PhoneNumber.
-         * @param numbers The contact numbers for the Phone.
-         * @param mobile True if the number is for a mobile.
-         */
-        public Phone(Country country, long numbers, boolean mobile, boolean business) {
-            _country = country;
+        public Phone(int countryDigits, long numbers, boolean mobile, boolean business) {
+            _countryDigits = countryDigits;
             _numbers = numbers;
             _mobile = mobile;
             _business = business;
@@ -377,7 +371,7 @@ public class ContactInfo {
         public static class DTO {
 
             /** A country object, that represents the nationality of this PhoneNumber. */
-            private Country.DTO country;
+            private int countryDigits;
 
             /** The contact numbers for the Phone. */
             private long numbers;
@@ -389,12 +383,12 @@ public class ContactInfo {
 
             @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
             public DTO(
-                    @JsonProperty Country.DTO country,
+                    @JsonProperty int countryDigits,
                     @JsonProperty long numbers,
                     @JsonProperty boolean isMobile,
                     @JsonProperty boolean isBusiness
             ) {
-                this.country = country;
+                this.countryDigits = countryDigits;
                 this.numbers = numbers;
                 this.isMobile = isMobile;
                 this.isBusiness = isBusiness;
@@ -406,7 +400,7 @@ public class ContactInfo {
              */
             public DTO(Phone phone) {
                 this(
-                        new ContactInfo.Country.DTO(phone.get_country()),
+                        phone.get_countryDigits(),
                         phone.get_numbers(),
                         phone.is_mobile(),
                         phone.is_business()

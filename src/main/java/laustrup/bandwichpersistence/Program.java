@@ -64,7 +64,6 @@ public class Program {
                     * restart: Restarts Spring Boot, but program keeps running
                     * inject: With generate some data for developers, if any sqls are specified
                     * exit: Simply shuts down the whole application
-                    
                     """);
 
                 while (input == null) {
@@ -77,6 +76,7 @@ public class Program {
                     } catch (Exception ignored) {
                         System.out.println("\n\tCommand not recognized!");
                     }
+
                     switch (input) {
                         case RESTART: {
                             SpringApplication.exit(context);
@@ -84,6 +84,7 @@ public class Program {
                             break;
                         } case INJECT: {
                             runInjections();
+                            input = null;
                             break;
                         }
                     }
@@ -93,7 +94,7 @@ public class Program {
                 }
             } while (input != Input.EXIT);
 
-        System.out.println("\n\tWill now exit... Good bye\n\n");
+        System.out.println("\n\tWill now exit... Goodbye\n\n");
         System.exit(-1);
     }
 

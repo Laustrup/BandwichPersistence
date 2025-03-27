@@ -19,7 +19,7 @@ public class SecurityLibrary {
     public static final char passwordEncodingCharacter = '£';
 
     public static final String gibberishRules = """
-            1. Each index must be between a -> f either in upper or lowercase
+            1. Each index must be between 1 -> f either in upper or lowercase
             """;
 
     public static void setup(
