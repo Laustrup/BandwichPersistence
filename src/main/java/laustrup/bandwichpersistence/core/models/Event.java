@@ -910,6 +910,24 @@ public class Event extends Model {
             /** The end of the Gig, where the act will end. */
             private Instant end;
 
+            @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
+            public DTO(
+                    @JsonProperty UUID id,
+                    @JsonProperty String title,
+                    @JsonProperty Situation situation,
+                    @JsonProperty Instant timestamp,
+                    @JsonProperty Event.DTO event,
+                    @JsonProperty Set<Band.DTO> act,
+                    @JsonProperty Instant start,
+                    @JsonProperty Instant end
+            ) {
+                super(id, title, situation, timestamp);
+                this.event = event;
+                this.act = act;
+                this.start = start;
+                this.end = end;
+            }
+
             /**
              * Converts into this DTO Object.
              * @param gig The Object to be converted.
@@ -991,6 +1009,16 @@ public class Event extends Model {
 
             /** The Participant of the participation. */
             private Participant.DTO participant;
+
+            @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
+            public DTO(
+                    @JsonProperty Type type,
+                    @JsonProperty Instant timestamp,
+                    @JsonProperty Participant.DTO participant
+            ) {
+                super(type, timestamp);
+                this.participant = participant;
+            }
 
             /**
              * Converts into this DTO Object.

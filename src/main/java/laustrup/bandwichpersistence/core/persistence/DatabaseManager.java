@@ -32,6 +32,15 @@ public class DatabaseManager {
         return preparedStatement != null ? results(preparedStatement) : null;
     }
 
+    public static ResultSet read(Query query, DatabaseParameter parameter) {
+        try {
+            return read(query, Stream.of(parameter)).getResultSet();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+
+        }
+    }
+
     public static PreparedStatement read(Query query, Stream<DatabaseParameter> databaseParameters) {
         return handle(query, Action.READ, databaseParameters);
     }
@@ -212,10 +221,13 @@ public class DatabaseManager {
                 ));
             }
 
-            preparedStatement = Objects.requireNonNull(DatabaseGate.getConnection(url)).prepareStatement(
-                    script,
-                    Statement.RETURN_GENERATED_KEYS
-            );
+            preparedStatement = Objects
+                    .requireNonNull(DatabaseGate.getConnection(url))
+                    .prepareStatement(
+                            script,
+                            ResultSet.TYPE_SCROLL_INSENSITIVE,
+                            ResultSet.CONCUR_READ_ONLY
+                    );
 
             for (Integer key : databaseParametersByIndex.keySet()) {
                 DatabaseParameter parameter = databaseParametersByIndex.get(key);

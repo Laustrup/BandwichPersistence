@@ -1,5 +1,7 @@
 package laustrup.bandwichpersistence.core.models;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import laustrup.bandwichpersistence.core.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.core.models.chats.Request;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
@@ -85,6 +87,29 @@ public class Organisation extends Model {
 
         private Set<Employee.DTO> employees;
 
+        @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
+        public DTO(
+                @JsonProperty UUID id,
+                @JsonProperty String title,
+                @JsonProperty Instant timestamp,
+                @JsonProperty Set<Request.DTO> requests,
+                @JsonProperty ContactInfo.DTO contactInfo,
+                @JsonProperty Set<Event.DTO> events,
+                @JsonProperty Set<Venue.DTO> venues,
+                @JsonProperty Set<ChatRoom.Template.DTO> chatRoomTemplates,
+                @JsonProperty Set<Album.DTO> albums,
+                @JsonProperty Set<Employee.DTO> employees
+        ) {
+            super(id, title, timestamp);
+            this.requests = requests;
+            this.contactInfo = contactInfo;
+            this.events = events;
+            this.venues = venues;
+            this.chatRoomTemplates = chatRoomTemplates;
+            this.albums = albums;
+            this.employees = employees;
+        }
+
         public DTO(Organisation organisation) {
             super(organisation);
             requests = organisation.get_requests().asSet(Request.DTO::new);
@@ -162,6 +187,39 @@ public class Organisation extends Model {
         public static class DTO extends BusinessUserDTO {
 
             private Set<Role> roles;
+
+            @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
+            public DTO(
+                    @JsonProperty UUID id,
+                    @JsonProperty String username,
+                    @JsonProperty String firstName,
+                    @JsonProperty String lastName,
+                    @JsonProperty String description,
+                    @JsonProperty ContactInfo.DTO contactInfo,
+                    @JsonProperty Set<Participation.DTO> participations,
+                    @JsonProperty Subscription.DTO subscription,
+                    @JsonProperty Set<ChatRoom.DTO> chatRooms,
+                    @JsonProperty Set<Authority> authorities,
+                    @JsonProperty History history,
+                    @JsonProperty Instant timestamp,
+                    @JsonProperty Set<Role> roles
+            ) {
+                super(
+                        id,
+                        username,
+                        firstName,
+                        lastName,
+                        description,
+                        contactInfo,
+                        participations,
+                        subscription,
+                        chatRooms,
+                        authorities,
+                        history,
+                        timestamp
+                );
+                this.roles = roles;
+            }
 
             public DTO(Organisation.Employee employee) {
                 super(employee);

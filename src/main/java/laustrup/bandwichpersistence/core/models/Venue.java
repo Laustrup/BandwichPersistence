@@ -1,5 +1,7 @@
 package laustrup.bandwichpersistence.core.models;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
 import laustrup.bandwichpersistence.core.models.chats.messages.Post;
 import laustrup.bandwichpersistence.core.utilities.collections.sets.Seszt;
@@ -152,6 +154,33 @@ public class Venue extends Model {
          * The size of the stage and room, that Events can be held at.
          */
         private int size;
+
+        @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
+        public DTO(
+                @JsonProperty UUID id,
+                @JsonProperty String title,
+                @JsonProperty Instant timestamp,
+                @JsonProperty ContactInfo.Address.DTO location,
+                @JsonProperty String description,
+                @JsonProperty Set<Organisation.DTO> organisations,
+                @JsonProperty Set<Album.DTO> albums,
+                @JsonProperty Set<Post.DTO> posts,
+                @JsonProperty Set<Rating.DTO> ratings,
+                @JsonProperty Set<String> areas,
+                @JsonProperty String stageSetup,
+                @JsonProperty int size
+        ) {
+            super(id, title, timestamp);
+            this.location = location;
+            this.description = description;
+            this.organisations = organisations;
+            this.albums = albums;
+            this.posts = posts;
+            this.ratings = ratings;
+            this.areas = areas;
+            this.stageSetup = stageSetup;
+            this.size = size;
+        }
 
         /**
          * Converts into this DTO Object.

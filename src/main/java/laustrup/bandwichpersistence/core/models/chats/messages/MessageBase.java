@@ -133,6 +133,24 @@ public abstract class MessageBase extends Model {
 
         protected Instant read;
 
+        public DTO(
+                UUID id,
+                String title,
+                Instant timestamp,
+                UserDTO author,
+                String content,
+                Instant sent,
+                boolean isEdited,
+                Instant read
+        ) {
+            super(id, title, timestamp);
+            this.author = author;
+            this.content = content;
+            this.sent = sent;
+            this.isEdited = isEdited;
+            this.read = read;
+        }
+
         /**
          * Converts into this DTO Object.
          * @param message The Object to be converted.

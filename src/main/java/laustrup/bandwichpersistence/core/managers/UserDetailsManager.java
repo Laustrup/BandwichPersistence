@@ -8,16 +8,16 @@ import laustrup.bandwichpersistence.core.services.builders.UserBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.function.Function;
-import java.util.stream.Stream;
-
 import static laustrup.bandwichpersistence.core.managers.ManagerService.databaseInteraction;
 
 public class UserDetailsManager {
 
-    public static Stream<UserDetails> getUserDetails() {
-        return databaseInteraction(() -> UserBuilder.buildLogins(UserDetailsRepository.getUserDetails()))
-                .map(Function.identity());
+    public static UserDetails getUserDetails(String email) {
+        return databaseInteraction(() ->
+                UserBuilder.buildLogins(UserDetailsRepository.getUserDetailsByEmail(email))
+                        .findFirst()
+                        .orElse(null)
+        );
     }
 
     public static Response<User> getUser(Login login) {

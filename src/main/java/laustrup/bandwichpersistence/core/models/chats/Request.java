@@ -1,5 +1,7 @@
 package laustrup.bandwichpersistence.core.models.chats;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import laustrup.bandwichpersistence.core.models.*;
 import laustrup.bandwichpersistence.core.services.ModelService;
 import lombok.Getter;
@@ -138,6 +140,21 @@ public class Request {
         private Instant approved;
 
         private Instant timestamp;
+
+        @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
+        public DTO(
+                @JsonProperty BusinessUser.BusinessUserDTO receiver,
+                @JsonProperty BusinessUser.BusinessUserDTO sender,
+                @JsonProperty Event.DTO event,
+                @JsonProperty Instant approved,
+                @JsonProperty Instant timestamp
+        ) {
+            this.receiver = receiver;
+            this.sender = sender;
+            this.event = event;
+            this.approved = approved;
+            this.timestamp = timestamp;
+        }
 
         /**
          * Converts into this DTO Object.

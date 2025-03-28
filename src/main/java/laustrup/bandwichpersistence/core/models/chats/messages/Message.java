@@ -29,18 +29,6 @@ public class Message extends MessageBase {
         _chatRoom = new ChatRoom(mail.getChatRoom());
     }
 
-    /**
-     * A constructor with all the values of this Object.
-     * @param id The primary id that identifies this unique Object.
-     * @param chatRoom The ChatRoom that this message has been sent in.
-     * @param author The User that wrote the Message.
-     * @param content The content of the written Message.
-     * @param isSent True if the Message is sent.
-     * @param isEdited A Plato object, that will be true if the Message has been edited.
-     *                 Undefined if it hasn't been yet and not sent, but false if it is sent and also not edited.
-     * @param history The Events for this object.
-     * @param timestamp Specifies the time this entity was created.
-     */
     public Message(
             UUID id,
             ChatRoom chatRoom,

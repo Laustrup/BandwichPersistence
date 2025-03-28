@@ -87,16 +87,32 @@ public abstract class TicketBase {
 
         protected Instant timestamp;
 
+        public DTO(
+                BigDecimal price,
+                String valuta,
+                boolean isSitting,
+                Set<String> areas,
+                Instant timestamp
+        ) {
+            this.price = price;
+            this.valuta = valuta;
+            this.isSitting = isSitting;
+            this.areas = areas;
+            this.timestamp = timestamp;
+        }
+
         /**
          * Converts into this DTO Object.
          * @param ticket The Object to be converted.
          */
         public DTO(TicketBase ticket) {
-            price = ticket.get_price();
-            valuta = ticket.get_valuta();
-            isSitting = ticket.is_sitting();
-            areas = ticket.get_areas().asSet();
-            timestamp = ticket.get_timestamp();
+            this(
+                    ticket.get_price(),
+                    ticket.get_valuta(),
+                    ticket.is_sitting(),
+                    ticket.get_areas().asSet(),
+                    ticket.get_timestamp()
+            );
         }
     }
 }

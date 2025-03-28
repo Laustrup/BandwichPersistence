@@ -1,5 +1,7 @@
 package laustrup.bandwichpersistence.core.models;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import laustrup.bandwichpersistence.core.services.ModelService;
 import lombok.Getter;
 import lombok.Setter;
@@ -128,11 +130,26 @@ public class Subscription {
 
         private UserType userType;
 
+        @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
+        public DTO(
+                @JsonProperty UUID id,
+                @JsonProperty Status status,
+                @JsonProperty Kind kind,
+                @JsonProperty UserType userType
+        ) {
+            this.id = id;
+            this.status = status;
+            this.kind = kind;
+            this.userType = userType;
+        }
+
         public DTO(Subscription subscription) {
-            id = subscription.get_id();
-            status = Subscription.Status.valueOf(subscription.get_status().toString());
-            kind = subscription.get_kind();
-            userType = subscription.get_userType();
+            this(
+                    subscription.get_id(),
+                    Subscription.Status.valueOf(subscription.get_status().toString()),
+                    subscription.get_kind(),
+                    subscription.get_userType()
+            );
         }
     }
 }

@@ -12,6 +12,12 @@ public class UserDetailsQueries {
                 *
             from
                 contact_info
+                    inner join phones
+                        on phones.contact_info_id = contact_info.id
+                    inner join addresses
+                        on addresses.id = contact_info.address_id
+                    inner join countries
+                        on countries.id = contact_info.country_id
                     left join artists
                         on contact_info.id = artists.contact_info_id
                     left join band_memberships
@@ -20,6 +26,8 @@ public class UserDetailsQueries {
                         on band_memberships.band_id = bands.id
                     left join organisation_employees
                         on contact_info.id = organisation_employees.contact_info_id
+                    inner join subscriptions
+                        on artists.subscription_id = subscriptions.id || organisation_employees.subscription_id = subscriptions.id
             """;
 
     public static Query selectAllForLogin = new Query(/*language=mysql*/ _selectAll + """
@@ -35,6 +43,12 @@ public class UserDetailsQueries {
     );
 
     public static Query selectAllForLogins = new Query(_selectAll);
+
+    public static Query selectAUserDetails = new Query(/*language=mysql*/ _selectAll + """
+            where contact_info.email = %s
+            """,
+            new Query.Parameter(Parameter.CONTACT_INFO_EMAIL.get_key())
+    );
 
     @Getter
     public enum Parameter {

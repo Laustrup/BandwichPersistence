@@ -12,20 +12,16 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 public class JDBCService {
 
+    private static final Logger _logger = Logger.getLogger(JDBCService.class.getName());
+
     private static ResultSet _resultSet;
 
     private static Integer _currentRow = null;
-
-    public static Instant getInstant(String column) {
-        return get(
-                name -> getTimestamp(name, Timestamp::toInstant),
-                toDatabaseColumn(column)
-        );
-    }
 
     public static <T> T get(Timestamp timestamp, Function<Timestamp, T> function) {
         return timestamp == null ? null : function.apply(timestamp);
@@ -74,11 +70,9 @@ public class JDBCService {
 
     public static UUID getUUID(String column) {
         try {
-            String value = _resultSet.getString(toDatabaseColumn(column));
-
-            return value == null ? null : UUID.fromString(value);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+            return UUID.nameUUIDFromBytes(_resultSet.getBytes(column));
+        } catch (SQLException exception) {
+            throw new RuntimeException(exception);
         }
     }
 
@@ -114,6 +108,13 @@ public class JDBCService {
         }
     }
 
+    public static Instant getInstant(String column) {
+        return get(
+                name -> getTimestamp(name, Timestamp::toInstant),
+                toDatabaseColumn(column)
+        );
+    }
+
     public static <T> T getFromNextRow(
             ResultSet resultSet,
             Supplier<T> supply,
@@ -138,11 +139,10 @@ public class JDBCService {
         Liszt<T> ts = new Liszt<>();
 
         try {
-            while (_resultSet.next()) {
+            while (_resultSet.next())
                 ts.add(supplier.get());
-            }
         } catch (Exception exception) {
-            System.err.println(exception.getMessage());
+            _logger.warning(exception.getMessage());
         }
 
         return ts.stream();
@@ -206,7 +206,8 @@ public class JDBCService {
             runnable.run();
         } while (allowNextRow && _resultSet.next());
 
-        _currentRow = null;
+        if (allowNextRow)
+            _currentRow = null;
     }
 
     public static <K, V> void putIfAbsent(

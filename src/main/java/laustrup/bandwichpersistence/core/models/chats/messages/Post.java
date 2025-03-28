@@ -1,5 +1,7 @@
 package laustrup.bandwichpersistence.core.models.chats.messages;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.models.User;
 import laustrup.bandwichpersistence.core.services.ModelService;
@@ -78,6 +80,22 @@ public class Post extends MessageBase {
          * The Model that are receiving this Bulletin.
          */
         public ModelDTO receiver;
+
+        @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
+        public DTO(
+                @JsonProperty UUID id,
+                @JsonProperty String title,
+                @JsonProperty Instant timestamp,
+                @JsonProperty User.UserDTO author,
+                @JsonProperty String content,
+                @JsonProperty Instant sent,
+                @JsonProperty boolean isEdited,
+                @JsonProperty Instant read,
+                @JsonProperty ModelDTO receiver
+        ) {
+            super(id, title, timestamp, author, content, sent, isEdited, read);
+            this.receiver = receiver;
+        }
 
         /**
          * Converts into this DTO Object.

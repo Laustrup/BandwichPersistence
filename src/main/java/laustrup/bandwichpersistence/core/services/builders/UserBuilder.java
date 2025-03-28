@@ -25,10 +25,7 @@ public class UserBuilder {
         JDBCService.build(
                 resultSet,
                 () -> logins.add(new Login(
-                        get(
-                                JDBCService::getString,
-                                Login.Fields.password
-                        ),
+                        get(JDBCService::getString, Login.Fields.password),
                         UserService.from(Objects.requireNonNull(build(resultSet)))
                 ))
         );
@@ -56,8 +53,8 @@ public class UserBuilder {
     public static Subscription buildSubscription(ResultSet resultSet) {
         AtomicReference<UUID> id = new AtomicReference<>();
         AtomicReference<Subscription.Status> status = new AtomicReference<>();
-        AtomicReference< Subscription.Kind> kind = new AtomicReference<>();
-        AtomicReference< Subscription.UserType> userType = new AtomicReference<>();
+        AtomicReference<Subscription.Kind> kind = new AtomicReference<>();
+        AtomicReference<Subscription.UserType> userType = new AtomicReference<>();
 
         try {
             JDBCService.build(

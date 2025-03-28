@@ -1,5 +1,7 @@
 package laustrup.bandwichpersistence.core.models;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import laustrup.bandwichpersistence.core.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
 import laustrup.bandwichpersistence.core.utilities.collections.sets.Seszt;
@@ -56,6 +58,37 @@ public abstract class BusinessUser extends User {
     public abstract static class BusinessUserDTO extends UserDTO {
 
         private Set<ChatRoom.DTO> chatRooms;
+
+        @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
+        public BusinessUserDTO(
+                @JsonProperty UUID id,
+                @JsonProperty String username,
+                @JsonProperty String firstName,
+                @JsonProperty String lastName,
+                @JsonProperty String description,
+                @JsonProperty ContactInfo.DTO contactInfo,
+                @JsonProperty Set<Participation.DTO> participations,
+                @JsonProperty Subscription.DTO subscription,
+                @JsonProperty Set<ChatRoom.DTO> chatRooms,
+                @JsonProperty Set<Authority> authorities,
+                @JsonProperty History history,
+                @JsonProperty Instant timestamp
+        ) {
+            super(
+                    id,
+                    username,
+                    firstName,
+                    lastName,
+                    description,
+                    contactInfo,
+                    participations,
+                    subscription,
+                    authorities,
+                    history,
+                    timestamp
+            );
+            this.chatRooms = chatRooms;
+        }
 
         public BusinessUserDTO(BusinessUser businessUser) {
             super(businessUser);

@@ -1,6 +1,9 @@
 package laustrup.bandwichpersistence.core.models.chats;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import laustrup.bandwichpersistence.core.models.BusinessUser;
+import laustrup.bandwichpersistence.core.models.Situation;
 import laustrup.bandwichpersistence.core.models.chats.messages.Message;
 import laustrup.bandwichpersistence.core.services.UserService;
 import laustrup.bandwichpersistence.core.models.Model;
@@ -39,29 +42,8 @@ public class ChatRoom extends Model {
      */
     public ChatRoom(ChatRoom.DTO chatRoom) {
         super(chatRoom);
-        _messages = new Seszt<>();
-        convert(chatRoom.getMails());
-        convert(chatRoom.getChatters());
-    }
-
-    /**
-     * Converts a Data Transport Object into Mails.
-     * @param mails The Data Transport Object that will be converted.
-     */
-    private void convert(Message.DTO[] mails) {
-        _messages = new Seszt<>();
-        for (Message.DTO mail : mails)
-            _messages.add(new Message(mail));
-    }
-
-    /**
-     * Converts a Data Transport Object into Chatters.
-     * @param chatters The Data Transport Object that will be converted.
-     */
-    private void convert(UserDTO[] chatters) {
-        _chatters = new Seszt<>();
-        for (UserDTO chatter : chatters)
-            _chatters.add(UserService.from(chatter));
+        _messages = Seszt.copy(chatRoom.getMails(), Message::new);
+        _chatters = Seszt.copy(chatRoom.getChatters(), UserService::from);
     }
 
     /**
@@ -289,6 +271,17 @@ public class ChatRoom extends Model {
 
             private Set<BusinessUser.BusinessUserDTO> chatters;
 
+            @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
+            public DTO(
+                    @JsonProperty UUID id,
+                    @JsonProperty String title,
+                    @JsonProperty Instant timestamp,
+                    @JsonProperty Set<BusinessUser.BusinessUserDTO> chatters
+            ) {
+                super(id, title, timestamp);
+                this.chatters = chatters;
+            }
+
             public DTO(Template settings) {
                 super(settings);
                 chatters = settings.get_chatters().stream()
@@ -307,10 +300,24 @@ public class ChatRoom extends Model {
     public static class DTO extends ModelDTO {
 
         /** All the Mails that has been sent will be stored here. */
-        private Message.DTO[] mails;
+        private Set<Message.DTO> mails;
 
         /** The Users, except the responsible, that can write with each other. */
-        private UserDTO[] chatters;
+        private Set<UserDTO> chatters;
+
+        @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
+        public DTO(
+                @JsonProperty UUID id,
+                @JsonProperty String title,
+                @JsonProperty Situation situation,
+                @JsonProperty Instant timestamp,
+                @JsonProperty Set<Message.DTO> mails,
+                @JsonProperty Set<UserDTO> chatters
+        ) {
+            super(id, title, situation, timestamp);
+            this.mails = mails;
+            this.chatters = chatters;
+        }
 
         /**
          * Converts into this DTO Object.
@@ -318,12 +325,8 @@ public class ChatRoom extends Model {
          */
         public DTO(ChatRoom chatRoom) {
             super(chatRoom);
-            mails = new Message.DTO[chatRoom.get_messages().size()];
-            for (int i = 0; i < mails.length; i++)
-                mails[i] = new Message.DTO(chatRoom.get_messages().get(i));
-            chatters = new User.UserDTO[chatRoom.get_chatters().size()];
-            for (int i = 0; i < chatters.length; i++)
-                chatters[i] = UserService.from(chatRoom.get_chatters().get(i));
+            mails = chatRoom.get_messages().asSet(Message.DTO::new);
+            chatters = chatRoom.get_chatters().asSet(UserService::from);
         }
     }
 }

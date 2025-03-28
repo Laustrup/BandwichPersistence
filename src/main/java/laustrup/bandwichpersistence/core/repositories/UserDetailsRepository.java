@@ -16,6 +16,13 @@ public class UserDetailsRepository {
         return DatabaseManager.read(UserDetailsQueries.selectAllForLogins);
     }
 
+    public static ResultSet getUserDetailsByEmail(String email) {
+        return DatabaseManager.read(
+                UserDetailsQueries.selectAUserDetails,
+                new DatabaseParameter(Parameter.CONTACT_INFO_EMAIL.get_key(), email)
+        );
+    }
+
     public static ResultSet getUser(Login login) {
         try {
             return DatabaseManager.read(

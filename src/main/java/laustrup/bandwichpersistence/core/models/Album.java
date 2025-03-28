@@ -1,5 +1,7 @@
 package laustrup.bandwichpersistence.core.models;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import laustrup.bandwichpersistence.core.utilities.collections.lists.Liszt;
 import laustrup.bandwichpersistence.core.utilities.collections.sets.Seszt;
 import lombok.Getter;
@@ -218,6 +220,19 @@ public class Album extends Model {
              */
             private Kind kind;
 
+            @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
+            public DTO(
+                    @JsonProperty UUID id,
+                    @JsonProperty String title,
+                    @JsonProperty Instant timestamp,
+                    @JsonProperty String endpoint,
+                    @JsonProperty Kind kind
+            ) {
+                super(id, title, timestamp);
+                this.endpoint = endpoint;
+                this.kind = kind;
+            }
+
             /**
              * Converts into this DTO Object.
              * @param media The Object to be converted.
@@ -249,6 +264,17 @@ public class Album extends Model {
          * These endpoints are being used for getting the image/music file.
          */
         private Set<Media.DTO> media;
+
+        @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
+        public DTO(
+                @JsonProperty UUID id,
+                @JsonProperty String title,
+                @JsonProperty Instant timestamp,
+                @JsonProperty Set<Media.DTO> media
+        ) {
+            super(id, title, timestamp);
+            this.media = media;
+        }
 
         /**
          * Converts into this DTO Object.

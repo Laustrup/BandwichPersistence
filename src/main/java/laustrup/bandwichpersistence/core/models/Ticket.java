@@ -1,5 +1,7 @@
 package laustrup.bandwichpersistence.core.models;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import laustrup.bandwichpersistence.core.utilities.collections.sets.Seszt;
 import lombok.Getter;
 import lombok.Setter;
@@ -127,6 +129,27 @@ public class Ticket extends TicketBase {
          * The option that this ticket was created from.
          */
         private UUID optionId;
+
+        @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
+        public DTO(
+                @JsonProperty BigDecimal price,
+                @JsonProperty String valuta,
+                @JsonProperty boolean isSitting,
+                @JsonProperty Set<String> areas,
+                @JsonProperty Instant timestamp,
+                @JsonProperty UUID userId,
+                @JsonProperty UUID eventId,
+                @JsonProperty String seat,
+                @JsonProperty LocalDateTime arrived,
+                @JsonProperty UUID optionId
+        ) {
+            super(price, valuta, isSitting, areas, timestamp);
+            this.userId = userId;
+            this.eventId = eventId;
+            this.seat = seat;
+            this.arrived = arrived;
+            this.optionId = optionId;
+        }
 
         /**
          * Converts into this DTO Object.
@@ -260,6 +283,31 @@ public class Ticket extends TicketBase {
 
 
             private String title;
+
+            @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
+            public DTO(
+                    @JsonProperty BigDecimal price,
+                    @JsonProperty String valuta,
+                    @JsonProperty boolean isSitting,
+                    @JsonProperty Seszt<String> areas,
+                    @JsonProperty UUID id,
+                    @JsonProperty UUID eventId,
+                    @JsonProperty UUID venueId,
+                    @JsonProperty String title,
+                    @JsonProperty Instant timestamp
+            ) {
+                super(
+                        price,
+                        valuta,
+                        isSitting,
+                        areas,
+                        timestamp
+                );
+                this.id = id;
+                this.eventId = eventId;
+                this.venueId = venueId;
+                this.title = title;
+            }
 
             /**
              * Converts into this DTO Object.
