@@ -1,6 +1,7 @@
 package laustrup.bandwichpersistence.core.models.chats;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import laustrup.bandwichpersistence.core.models.BusinessUser;
 import laustrup.bandwichpersistence.core.models.Situation;
@@ -266,8 +267,8 @@ public class ChatRoom extends Model {
             _chatters = chatters;
         }
 
-        @Getter
-        public static class DTO extends ModelDTO {
+    @Getter @FieldNameConstants @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class DTO extends ModelDTO {
 
             private Set<BusinessUser.BusinessUserDTO> chatters;
 

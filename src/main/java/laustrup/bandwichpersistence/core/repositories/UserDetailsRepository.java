@@ -30,7 +30,7 @@ public class UserDetailsRepository {
                     Stream.of(
                             new DatabaseParameter(
                                     Parameter.CONTACT_INFO_EMAIL.get_key(),
-                                    login.getUser().getContactInfo().getEmail()
+                                    login.getUsername()
                             ),
                             new DatabaseParameter(
                                     Parameter.PASSWORD.get_key(),

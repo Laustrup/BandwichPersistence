@@ -1,5 +1,6 @@
 package laustrup.bandwichpersistence.core.models.users;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.experimental.FieldNameConstants;
 
@@ -26,7 +27,7 @@ public class Follow {
         _followedId = followedId;
     }
 
-    @Getter @FieldNameConstants
+    @Getter @FieldNameConstants @JsonIgnoreProperties(ignoreUnknown = true)
     public static class DTO {
 
         private boolean notify;

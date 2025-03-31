@@ -1,5 +1,6 @@
 package laustrup.bandwichpersistence.core.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
@@ -114,7 +115,7 @@ public class Rating {
      * Is meant to be used as having common fields and be the body of Requests and Responses.
      * Doesn't have any logic.
      */
-    @Getter @Setter @FieldNameConstants
+    @Getter @Setter@FieldNameConstants @JsonIgnoreProperties(ignoreUnknown = true)
     public static class DTO {
 
         private UUID appointedId, reviewerId;

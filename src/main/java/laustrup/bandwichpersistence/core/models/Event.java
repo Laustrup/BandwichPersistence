@@ -1,6 +1,7 @@
 package laustrup.bandwichpersistence.core.models;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import laustrup.bandwichpersistence.core.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.core.models.users.Participant;
@@ -568,7 +569,7 @@ public class Event extends Model {
      * Is meant to be used as having common fields and be the body of Requests and Responses.
      * Doesn't have any logic.
      */
-    @Getter @FieldNameConstants
+    @Getter @FieldNameConstants @JsonIgnoreProperties(ignoreUnknown = true)
     public static class DTO extends ModelDTO {
 
         private ZoneId zoneId;
@@ -895,7 +896,7 @@ public class Event extends Model {
          * Is meant to be used as having common fields and be the body of Requests and Responses.
          * Doesn't have any logic.
          */
-        @Getter
+        @Getter @FieldNameConstants @JsonIgnoreProperties(ignoreUnknown = true)
         public static class DTO extends ModelDTO {
 
             /** The Event of this Gig. */

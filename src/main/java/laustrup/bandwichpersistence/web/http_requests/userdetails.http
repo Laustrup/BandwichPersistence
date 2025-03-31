@@ -3,10 +3,6 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "password": "password",
-  "user": {
-    "contactInfo": {
-      "email": "contact@ivaerksted.dk"
-    }
-  }
+  "username": "test",
+  "password": "password"
 }

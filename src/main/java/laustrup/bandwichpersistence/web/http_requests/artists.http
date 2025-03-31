@@ -1,0 +1,10 @@
+POST http://localhost:8080/artist/upsert
+Content-Type: application/json
+Accept: application/json
+
+{
+  "username": "test",
+  "contactInfo": {
+    "email": "testmail"
+  }
+}

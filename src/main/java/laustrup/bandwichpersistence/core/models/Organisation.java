@@ -1,6 +1,7 @@
 package laustrup.bandwichpersistence.core.models;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import laustrup.bandwichpersistence.core.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.core.models.chats.Request;
@@ -70,7 +71,7 @@ public class Organisation extends Model {
         _employees = employees;
     }
 
-    @Getter @FieldNameConstants
+    @Getter @FieldNameConstants @JsonIgnoreProperties(ignoreUnknown = true)
     public static class DTO extends ModelDTO {
 
         private Set<Request.DTO> requests;

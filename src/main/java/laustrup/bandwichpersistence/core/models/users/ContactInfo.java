@@ -1,6 +1,7 @@
 package laustrup.bandwichpersistence.core.models.users;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import laustrup.bandwichpersistence.core.models.Model;
 
@@ -416,6 +417,7 @@ public class ContactInfo {
      * Doesn't have any logic.
      */
     @Getter @Setter @FieldNameConstants
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class DTO {
 
         private UUID id;
@@ -434,11 +436,11 @@ public class ContactInfo {
 
         @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
         public DTO(
-                @JsonProperty UUID id,
-                @JsonProperty String email,
-                @JsonProperty Set<Phone.DTO> phones,
-                @JsonProperty Address.DTO address,
-                @JsonProperty Country.DTO country
+                @JsonProperty(Fields.id) UUID id,
+                @JsonProperty(Fields.email) String email,
+                @JsonProperty(Fields.phones) Set<Phone.DTO> phones,
+                @JsonProperty(Fields.address) Address.DTO address,
+                @JsonProperty(Fields.country) Country.DTO country
         ) {
             this.id = id;
             this.email = email;

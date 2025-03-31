@@ -1,6 +1,7 @@
 package laustrup.bandwichpersistence.core.models;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import laustrup.bandwichpersistence.core.services.ModelService;
 import lombok.Getter;
@@ -116,7 +117,7 @@ public class Subscription {
      * Is meant to be used as having common fields and be the body of Requests and Responses.
      * Doesn't have any logic.
      */
-    @Getter @Setter @FieldNameConstants
+    @Getter @Setter @FieldNameConstants @JsonIgnoreProperties(ignoreUnknown = true)
     public static class DTO {
 
         private UUID id;

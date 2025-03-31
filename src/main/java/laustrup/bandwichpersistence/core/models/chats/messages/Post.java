@@ -1,6 +1,7 @@
 package laustrup.bandwichpersistence.core.models.chats.messages;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.models.User;
@@ -73,7 +74,7 @@ public class Post extends MessageBase {
      * Is meant to be used as having common fields and be the body of Requests and Responses.
      * Doesn't have any logic.
      */
-    @Getter @FieldNameConstants
+    @Getter @FieldNameConstants @JsonIgnoreProperties(ignoreUnknown = true)
     public static class DTO extends MessageBase.DTO {
 
         /**

@@ -59,20 +59,19 @@ public abstract class BusinessUser extends User {
 
         private Set<ChatRoom.DTO> chatRooms;
 
-        @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
         public BusinessUserDTO(
-                @JsonProperty UUID id,
-                @JsonProperty String username,
-                @JsonProperty String firstName,
-                @JsonProperty String lastName,
-                @JsonProperty String description,
-                @JsonProperty ContactInfo.DTO contactInfo,
-                @JsonProperty Set<Participation.DTO> participations,
-                @JsonProperty Subscription.DTO subscription,
-                @JsonProperty Set<ChatRoom.DTO> chatRooms,
-                @JsonProperty Set<Authority> authorities,
-                @JsonProperty History history,
-                @JsonProperty Instant timestamp
+                UUID id,
+                String username,
+                String firstName,
+                String lastName,
+                String description,
+                ContactInfo.DTO contactInfo,
+                Set<Participation.DTO> participations,
+                Subscription.DTO subscription,
+                Set<ChatRoom.DTO> chatRooms,
+                Set<Authority> authorities,
+                History history,
+                Instant timestamp
         ) {
             super(
                     id,

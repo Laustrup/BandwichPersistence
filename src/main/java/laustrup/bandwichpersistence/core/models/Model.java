@@ -1,7 +1,6 @@
 package laustrup.bandwichpersistence.core.models;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import laustrup.bandwichpersistence.core.services.ModelService;
 import laustrup.bandwichpersistence.core.utilities.collections.Collection;
 import lombok.Getter;
@@ -154,6 +153,7 @@ public abstract class Model {
      * It will use the DateTime of now.
      */
     @Getter @FieldNameConstants
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public abstract static class ModelDTO {
 
         /**

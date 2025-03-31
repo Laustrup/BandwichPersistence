@@ -1,8 +1,10 @@
 package laustrup.bandwichpersistence.core.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import laustrup.bandwichpersistence.core.utilities.collections.sets.Seszt;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.experimental.FieldNameConstants;
 
 import java.time.Instant;
 import java.util.*;
@@ -87,7 +89,8 @@ public class History {
             );
         }
 
-        @Getter
+        @Getter @FieldNameConstants
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static class DTO {
 
             private UUID id;

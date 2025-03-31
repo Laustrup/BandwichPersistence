@@ -25,8 +25,8 @@ public class UserBuilder {
         JDBCService.build(
                 resultSet,
                 () -> logins.add(new Login(
-                        get(JDBCService::getString, Login.Fields.password),
-                        UserService.from(Objects.requireNonNull(build(resultSet)))
+                        getString(Login.Fields.password),
+                        getString(ContactInfo.DTO.Fields.email)
                 ))
         );
 

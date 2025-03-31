@@ -1,5 +1,8 @@
 package laustrup.bandwichpersistence.core.models.users;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import laustrup.bandwichpersistence.core.models.*;
 import laustrup.bandwichpersistence.core.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.core.models.chats.Request;
@@ -155,6 +158,7 @@ public class Artist extends BusinessUser {
      * Doesn't have any logic.
      */
     @Getter @Setter @FieldNameConstants
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class DTO extends BusinessUserDTO {
 
         /**
@@ -186,6 +190,38 @@ public class Artist extends BusinessUser {
          */
         @Setter
         private String runner;
+
+        @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
+        public DTO(
+                @JsonProperty UUID id,
+                @JsonProperty String username,
+                @JsonProperty String firstName,
+                @JsonProperty String lastName,
+                @JsonProperty String description,
+                @JsonProperty ContactInfo.DTO contactInfo,
+                @JsonProperty Set<Participation.DTO> participations,
+                @JsonProperty Subscription.DTO subscription,
+                @JsonProperty Set<ChatRoom.DTO> chatRooms,
+                @JsonProperty Set<Authority> authorities,
+                @JsonProperty History history,
+                @JsonProperty Instant timestamp,
+                @JsonProperty Set<Membership.DTO> bandMemberships,
+                @JsonProperty Set<Request.DTO> requests,
+                @JsonProperty Set<Event.Gig.DTO> gigs,
+                @JsonProperty Set<Follow.DTO> follows,
+                @JsonProperty Set<Album.DTO> albums,
+                @JsonProperty Set<Rating.DTO> ratings,
+                @JsonProperty String runner
+        ) {
+            super(id, username, firstName, lastName, description, contactInfo, participations, subscription, chatRooms, authorities, history, timestamp);
+            this.bandMemberships = bandMemberships;
+            this.requests = requests;
+            this.gigs = gigs;
+            this.follows = follows;
+            this.albums = albums;
+            this.ratings = ratings;
+            this.runner = runner;
+        }
 
         /**
          * Converts into this DTO Object.

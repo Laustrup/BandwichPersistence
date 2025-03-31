@@ -1,6 +1,7 @@
 package laustrup.bandwichpersistence.core.models;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
 import laustrup.bandwichpersistence.core.models.chats.ChatRoom;
@@ -231,7 +232,7 @@ public abstract class User extends Model {
             return _event.get_id();
         }
 
-        @Getter
+        @Getter @FieldNameConstants @JsonIgnoreProperties(ignoreUnknown = true)
         public static class DTO extends ParticipationBase.DTO {
 
             private Event.DTO event;
@@ -262,6 +263,7 @@ public abstract class User extends Model {
      * Doesn't have any logic.
      */
     @Getter @Setter @FieldNameConstants
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public abstract static class UserDTO extends ModelDTO {
 
         /**
@@ -320,19 +322,18 @@ public abstract class User extends Model {
 
         protected History history;
 
-        @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
         public UserDTO(
-                @JsonProperty UUID id,
-                @JsonProperty String username,
-                @JsonProperty String firstName,
-                @JsonProperty String lastName,
-                @JsonProperty String description,
-                @JsonProperty ContactInfo.DTO contactInfo,
-                @JsonProperty Set<Participation.DTO> participations,
-                @JsonProperty Subscription.DTO subscription,
-                @JsonProperty Set<Authority> authorities,
-                @JsonProperty History history,
-                @JsonProperty Instant timestamp
+                UUID id,
+                String username,
+                String firstName,
+                String lastName,
+                String description,
+                ContactInfo.DTO contactInfo,
+                Set<Participation.DTO> participations,
+                Subscription.DTO subscription,
+                Set<Authority> authorities,
+                History history,
+                Instant timestamp
         ) {
             super(id, username + "-" + id, timestamp);
             this.username = username;

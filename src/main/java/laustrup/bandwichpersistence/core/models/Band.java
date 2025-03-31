@@ -1,5 +1,6 @@
 package laustrup.bandwichpersistence.core.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import laustrup.bandwichpersistence.core.models.users.Artist;
 import laustrup.bandwichpersistence.core.models.users.Participant;
 import laustrup.bandwichpersistence.core.services.UserService;
@@ -111,7 +112,7 @@ public class Band extends Model {
      * Is meant to be used as having common fields and be the body of Requests and Responses.
      * Doesn't have any logic.
      */
-    @Getter @Setter @FieldNameConstants
+@Getter @Setter@FieldNameConstants @JsonIgnoreProperties(ignoreUnknown = true)
     public static class DTO extends ModelDTO {
 
 
@@ -179,7 +180,7 @@ public class Band extends Model {
             OWNER
         }
 
-        @Getter
+        @Getter @FieldNameConstants @JsonIgnoreProperties(ignoreUnknown = true)
         public static class DTO {
 
             private Artist.DTO member;
