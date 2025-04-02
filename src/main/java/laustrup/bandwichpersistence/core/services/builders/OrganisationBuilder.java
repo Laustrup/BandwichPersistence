@@ -13,6 +13,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 import java.util.logging.Logger;
 
 import static laustrup.bandwichpersistence.core.services.builders.UserBuilder.*;
@@ -74,6 +75,10 @@ public class OrganisationBuilder {
     }
 
     public static Organisation.Employee buildEmployee(ResultSet resultset) {
+        Function<String, Field> createField = column -> Field.of(
+                Organisation.class.getSimpleName() + Organisation.Employee.class.getSimpleName() + "s",
+                column
+        );
         AtomicReference<UUID> id = new AtomicReference<>();
         AtomicReference<String>
                 username = new AtomicReference<>(),
@@ -93,42 +98,21 @@ public class OrganisationBuilder {
             JDBCService.build(
                     resultset,
                     () -> {
-                        id.set(get(
-                                JDBCService::getUUID,
-                                Model.ModelDTO.Fields.id
-                        ));
-                        username.set(get(
-                                JDBCService::getString,
-                                User.UserDTO.Fields.username
-                        ));
-                        firstName.set(get(
-                                JDBCService::getString,
-                                User.UserDTO.Fields.username
-                        ));
-                        lastName.set(get(
-                                JDBCService::getString,
-                                User.UserDTO.Fields.lastName
-                        ));
-                        description.set(get(
-                                JDBCService::getString,
-                                User.UserDTO.Fields.description
-                        ));
+                        id.set(get(createField.apply(Model.ModelDTO.Fields.id), UUID.class));
+                        set(username, createField.apply(User.UserDTO.Fields.firstName));
+                        set(firstName, createField.apply(User.UserDTO.Fields.firstName));
+                        set(lastName, createField.apply(User.UserDTO.Fields.lastName));
+                        set(description, createField.apply(User.UserDTO.Fields.description));
                         contactInfo.set(buildContactInfo(resultset));
                         subscription.set(buildSubscription(resultset));
-                        roles.add(Organisation.Employee.Role.valueOf(get(
-                                JDBCService::getString,
-                                Organisation.Employee.DTO.Fields.roles
-                        )));
-                        authorities.add(User.Authority.valueOf(get(
-                                JDBCService::getString,
-                                User.UserDTO.Fields.authorities
-                        )));
+                        add(roles, Field.of(
+                                Organisation.class.getSimpleName() + "Employments",
+                                Organisation.Employee.DTO.Fields.roles.replace("s", ""))
+                        );
+                        add(authorities, Field.of(User.UserDTO.Fields.authorities, "level"));
                         chatRooms.add(ChatRoomBuilder.build(resultset));
                         history.get().get_stories().add(HistoryBuilder.buildStory(resultset, history.get()));
-                        timestamp.set(get(
-                                column -> getTimestamp(column, Timestamp::toInstant),
-                                Model.ModelDTO.Fields.timestamp
-                        ));
+                        timestamp.set(getTimestamp(Model.ModelDTO.Fields.timestamp, Timestamp::toInstant));
                     },
                     primary -> !get(
                             JDBCService::getUUID,

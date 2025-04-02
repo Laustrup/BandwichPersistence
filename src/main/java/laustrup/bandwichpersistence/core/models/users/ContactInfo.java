@@ -11,10 +11,7 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.FieldNameConstants;
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static laustrup.bandwichpersistence.core.services.ModelService.defineToString;
 import static laustrup.bandwichpersistence.core.utilities.collections.sets.Seszt.copy;
@@ -154,12 +151,12 @@ public class ContactInfo {
          */
         public Address(DTO address) {
             this(
-                    address.getId(),
-                    address.getStreet(),
-                    address.getFloor(),
-                    address.getMunicipality(),
-                    address.getZip(),
-                    address.getCity()
+                    address == null ? null : address.getId(),
+                    address == null ? null : address.getStreet(),
+                    address == null ? null : address.getFloor(),
+                    address == null ? null : address.getMunicipality(),
+                    address == null ? null : address.getZip(),
+                    address == null ? null : address.getCity()
             );
         }
 

@@ -8,14 +8,14 @@ import java.sql.ResultSet;
 import java.util.logging.Logger;
 
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.get;
-import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.getFromNextRow;
+import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.peek;
 
 public class ModelBuilder {
 
     private static final Logger _logger = Logger.getLogger(ModelBuilder.class.getSimpleName());
 
     public static Model build(ResultSet resultSet) {
-        return switch (getFromNextRow(
+        return switch (peek(
                 resultSet,
                 () -> get(
                         JDBCService::getString,

@@ -2,7 +2,6 @@ package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.*;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
-import laustrup.bandwichpersistence.core.services.UserService;
 import laustrup.bandwichpersistence.core.services.persistence.JDBCService;
 import laustrup.bandwichpersistence.core.utilities.collections.sets.Seszt;
 
@@ -13,6 +12,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
+import static laustrup.bandwichpersistence.core.models.Subscription.UserType.valueOf;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
 
 public class UserBuilder {
@@ -30,23 +30,19 @@ public class UserBuilder {
                 ))
         );
 
-        _logger.info("Successfully built logins");
-
         return logins.stream();
     }
 
     public static User build(ResultSet resultSet) {
-        return switch (getFromNextRow(
+        return switch (peek(
                 resultSet,
-                () -> Subscription.UserType.valueOf(getString(
-                        Subscription.DTO.Fields.userType
-                )),
+                () -> valueOf(getString(Subscription.DTO.Fields.userType)),
                 exception -> _logger.warning("Couldn't find user type when building user!\n" + exception.getMessage())
         )) {
             case ARTIST -> ArtistBuilder.build(resultSet);
             case ORGANISATION_EMPLOYEE -> OrganisationBuilder.buildEmployee(resultSet);
             case null -> null;
-            default -> throw new IllegalStateException();
+            default -> throw new IllegalStateException("The type of User to build couldn't be found!");
         };
     }
 
@@ -63,7 +59,7 @@ public class UserBuilder {
                         id.set(getUUID(Subscription.DTO.Fields.id));
                         status.set(Subscription.Status.valueOf(getString(Subscription.DTO.Fields.status)));
                         kind.set(Subscription.Kind.valueOf(getString(Subscription.DTO.Fields.kind)));
-                        userType.set(Subscription.UserType.valueOf(getString(Subscription.DTO.Fields.userType)));
+                        userType.set(valueOf(getString(Subscription.DTO.Fields.userType)));
                     },
                     primary -> !get(
                             JDBCService::getUUID,

@@ -18,12 +18,12 @@ public class UserDetailsRepository {
 
     public static ResultSet getUserDetailsByEmail(String email) {
         return DatabaseManager.read(
-                UserDetailsQueries.selectAUserDetails,
+                UserDetailsQueries.selectAllForLogin,
                 new DatabaseParameter(Parameter.CONTACT_INFO_EMAIL.get_key(), email)
         );
     }
 
-    public static ResultSet getUser(Login login) {
+    public static ResultSet getUserByEmail(Login login) {
         try {
             return DatabaseManager.read(
                     UserDetailsQueries.selectAllForLogin,
@@ -31,10 +31,6 @@ public class UserDetailsRepository {
                             new DatabaseParameter(
                                     Parameter.CONTACT_INFO_EMAIL.get_key(),
                                     login.getUsername()
-                            ),
-                            new DatabaseParameter(
-                                    Parameter.PASSWORD.get_key(),
-                                    login.getPassword()
                             )
                     )
             ).getResultSet();

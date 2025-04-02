@@ -4,7 +4,6 @@ import laustrup.bandwichpersistence.core.libraries.PathLibrary;
 import laustrup.bandwichpersistence.core.persistence.DatabaseParameter;
 import laustrup.bandwichpersistence.core.scriptorian.Scriptorian;
 import laustrup.bandwichpersistence.core.services.FileService;
-import laustrup.bandwichpersistence.core.scriptorian.repositories.ScriptorianRepository;
 import laustrup.bandwichpersistence.core.utilities.collections.sets.Seszt;
 
 import java.io.File;

@@ -4,24 +4,32 @@
 
 set
     -- works with 123
-    @password = '$2y$05$Ad01b.9//2.NKwsL/6y/HeWk3TgdMDve4ThnFPKt.5FMfP2GHbRke£Ad0',
+    -- password = 'password'
+    @password = '$2y$05$Ad01b.9//2.NKwsL/6y/HeWk3TgdMDve4ThnFPKt.5FMfP2GHbRke£d01',
 
     -- Iværksted
     @address_id_vaerkstedsvej = unhex(md5(uuid())),
     @contact_info_id_ivaerksted = unhex(md5(uuid())),
     
     @subscription_id_ivaerksted_jens = unhex(md5(uuid())),
+        @contact_info_jens_ivaerksted = 'jens@ivaerkstedet.dk',
     @subscription_id_ivaerksted_birthe = unhex(md5(uuid())),
+        @contact_info_birthe_ivaerksted = 'birthe@ivaerkstedet.dk',
 
     -- Arena
     @address_id_arenavej = unhex(md5(uuid())),
     @contact_info_id_arena = unhex(md5(uuid())),
     
     @subscription_id_arena_john = unhex(md5(uuid())),
+        @contact_info_john_arena = 'john@arena.com',
     @subscription_id_arena_james = unhex(md5(uuid())),
+        @contact_info_james_arena = 'james@arena.com',
     @subscription_id_arena_joanna = unhex(md5(uuid())),
+        @contact_info_joanna_arena = 'joanna@arena.com',
     @subscription_id_arena_susanne = unhex(md5(uuid())),
+        @contact_info_susanne_arena = 'susanne@arena.com',
     @subscription_id_arena_hans = unhex(md5(uuid())),
+        @contact_info_hans_arena = 'hans@arena.com',
     
     -- Plural Place
     @address_id_jensenvej = unhex(md5(uuid())),
@@ -29,13 +37,17 @@ set
         @contact_info_id_twogether = unhex(md5(uuid())),
 
         @subscription_id_twogether_jimmy = unhex(md5(uuid())),
+            @contact_info_jimmy_twogether = 'jimmy@twogether.com',
         @subscription_id_twogether_hanne = unhex(md5(uuid())),
+            @contact_info_hanne_twogether = 'hanne@twogether.com',
         @subscription_id_twogether_xi = unhex(md5(uuid())),
+            @contact_info_xi_twogether = 'xi@twogether.com',
         
         -- Jamsters
         @contact_info_id_jamsters = unhex(md5(uuid())),
 
         @subscription_id_jamsters_tue = unhex(md5(uuid())),
+            @contact_info_tue_jamsters = 'tue@jamsters.dk',
 
     -- Denmark
     @country_id_denmark = unhex(md5(uuid())),
@@ -83,20 +95,75 @@ insert into contact_info(id, address_id, country_id, email) values (
     @country_id_denmark,
     'contact@ivaerkstedet.dk'
 ), (
+    unhex(md5(uuid())),
+    @address_id_vaerkstedsvej,
+    @country_id_denmark,
+    @contact_info_jens_ivaerksted
+), (
+    unhex(md5(uuid())),
+    @address_id_vaerkstedsvej,
+    @country_id_denmark,
+    @contact_info_birthe_ivaerksted
+), (
     @contact_info_id_arena,
     @address_id_arenavej,
     @country_id_denmark,
     'contact@arena.com'
+), (
+    unhex(md5(uuid())),
+    @address_id_arenavej,
+    @country_id_denmark,
+    @contact_info_hans_arena
+), (
+    unhex(md5(uuid())),
+    @address_id_arenavej,
+    @country_id_denmark,
+    @contact_info_james_arena
+), (
+    unhex(md5(uuid())),
+    @address_id_arenavej,
+    @country_id_denmark,
+    @contact_info_joanna_arena
+), (
+    unhex(md5(uuid())),
+    @address_id_arenavej,
+    @country_id_denmark,
+    @contact_info_john_arena
+), (
+    unhex(md5(uuid())),
+    @address_id_arenavej,
+    @country_id_denmark,
+    @contact_info_susanne_arena
 ), (
     @contact_info_id_twogether,
     @address_id_jensenvej,
     @country_id_denmark,
     'contact@twogether.com'
 ), (
+    unhex(md5(uuid())),
+    @address_id_jensenvej,
+    @country_id_denmark,
+    @contact_info_hanne_twogether
+), (
+    unhex(md5(uuid())),
+    @address_id_jensenvej,
+    @country_id_denmark,
+    @contact_info_jimmy_twogether
+), (
+    unhex(md5(uuid())),
+    @address_id_jensenvej,
+    @country_id_denmark,
+    @contact_info_xi_twogether
+), (
     @contact_info_id_jamsters,
     @address_id_jensenvej,
     @country_id_denmark,
     'contact@jamsters.dk'
+), (
+    unhex(md5(uuid())),
+    @address_id_jensenvej,
+    @country_id_denmark,
+    @contact_info_tue_jamsters
 );
 
 insert into phones(id, contact_info_id, country_digits, numbers, is_mobile, is_business) values (
@@ -239,7 +306,7 @@ insert into organisation_employees(
 ) values (
     unhex(md5(uuid())),
     @subscription_id_ivaerksted_jens,
-    @contact_info_id_ivaerksted,
+    (select id from contact_info where email = @contact_info_jens_ivaerksted limit 1),
     @password,
     'jens',
     'Jens',
@@ -248,7 +315,7 @@ insert into organisation_employees(
 ), (
     unhex(md5(uuid())),
     @subscription_id_ivaerksted_birthe,
-    @contact_info_id_ivaerksted,
+    (select id from contact_info where email = @contact_info_birthe_ivaerksted limit 1),
     @password,
     'birthe',
     'Birthe',
@@ -257,7 +324,7 @@ insert into organisation_employees(
 ), (
     unhex(md5(uuid())),
     @subscription_id_arena_hans,
-    @contact_info_id_arena,
+    (select id from contact_info where email = @contact_info_hans_arena limit 1),
     @password,
     'hans',
     'Hans',
@@ -266,7 +333,7 @@ insert into organisation_employees(
 ), (
     unhex(md5(uuid())),
     @subscription_id_arena_susanne,
-    @contact_info_id_arena,
+    (select id from contact_info where email = @contact_info_susanne_arena limit 1),
     @password,
     'susanne',
     'Susanne',
@@ -275,7 +342,7 @@ insert into organisation_employees(
 ), (
     unhex(md5(uuid())),
     @subscription_id_arena_joanna,
-    @contact_info_id_arena,
+    (select id from contact_info where email = @contact_info_joanna_arena limit 1),
     @password,
     'joanna',
     'Joanna Edel',
@@ -284,7 +351,7 @@ insert into organisation_employees(
 ), (
     unhex(md5(uuid())),
     @subscription_id_arena_john,
-    @contact_info_id_arena,
+    (select id from contact_info where email = @contact_info_john_arena limit 1),
     @password,
     'john',
     'John',
@@ -293,7 +360,7 @@ insert into organisation_employees(
 ), (
     unhex(md5(uuid())),
     @subscription_id_arena_james,
-    @contact_info_id_arena,
+    (select id from contact_info where email = @contact_info_james_arena limit 1),
     @password,
     'james',
     'James',
@@ -302,7 +369,7 @@ insert into organisation_employees(
 ), (
     unhex(md5(uuid())),
     @subscription_id_twogether_xi,
-    @contact_info_id_twogether,
+    (select id from contact_info where email = @contact_info_xi_twogether limit 1),
     @password,
     'xi',
     'Xi',
@@ -311,7 +378,7 @@ insert into organisation_employees(
 ), (
     unhex(md5(uuid())),
     @subscription_id_twogether_jimmy,
-    @contact_info_id_twogether,
+    (select id from contact_info where email = @contact_info_jimmy_twogether limit 1),
     @password,
     'jimmy',
     'Jimmy',
@@ -320,7 +387,7 @@ insert into organisation_employees(
 ), (
     unhex(md5(uuid())),
     @subscription_id_twogether_hanne,
-    @contact_info_id_twogether,
+    (select id from contact_info where email = @contact_info_hanne_twogether limit 1),
     @password,
     'hanne',
     'Hanne',
@@ -329,7 +396,7 @@ insert into organisation_employees(
 ), (
     unhex(md5(uuid())),
     @subscription_id_jamsters_tue,
-    @contact_info_id_jamsters,
+    (select id from contact_info where email = @contact_info_tue_jamsters limit 1),
     @password,
     'tue',
     'Tue',

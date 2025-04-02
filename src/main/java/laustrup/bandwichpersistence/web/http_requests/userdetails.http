@@ -3,6 +3,6 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "username": "test",
+  "username": "jens@ivaerkstedet.dk",
   "password": "password"
 }

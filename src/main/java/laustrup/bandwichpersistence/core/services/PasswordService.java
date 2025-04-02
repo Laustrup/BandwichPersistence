@@ -36,6 +36,7 @@ public class PasswordService {
             int offset = calculateOffset(SecurityLibrary.get_gibberish().charAt(i));
             password.replace(offset, offset + 1, String.valueOf(stash.toString().charAt(i)));
         }
+
         return password.toString();
     }
 

@@ -13,9 +13,9 @@ import java.util.logging.Logger;
 import static laustrup.bandwichpersistence.web.services.WebService.respond;
 
 @RestController
-public class LoginController {
+public class UserDetailsController {
 
-    private final Logger _logger = Logger.getLogger(LoginController.class.getName());
+    private final Logger _logger = Logger.getLogger(UserDetailsController.class.getName());
 
     @PostMapping("login")
     public ResponseEntity<User> login(@RequestBody Login login) {
