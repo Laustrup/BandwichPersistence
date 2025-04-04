@@ -224,6 +224,8 @@ public class JDBCService {
             logging.accept(exception);
         }
 
+        reset();
+
         return type;
     }
 
@@ -244,6 +246,8 @@ public class JDBCService {
             logging.accept(exception);
         }
 
+        reset();
+
         return type;
     }
 
@@ -257,6 +261,8 @@ public class JDBCService {
         } catch (Exception exception) {
             _logger.warning(exception.getMessage());
         }
+
+        reset();
 
         return ts.stream();
     }
@@ -303,24 +309,29 @@ public class JDBCService {
             T... primaries
     ) throws SQLException {
         _resultSet = resultSet;
-        boolean allowNextRow = false;
+        boolean isFirst = false;
         if (_currentRow == null) {
-            allowNextRow = true;
+            isFirst = true;
             _resultSet.next();
             _currentRow = _resultSet.getRow();
         }
 
-        do {
-            if (isDoneBuilding(breaker, primaries)) {
-                if (allowNextRow)
-                    moveBackwards(false);
-                break;
-            }
-            runnable.run();
-        } while (allowNextRow && _resultSet.next());
+        try {
+            do {
+                if (isDoneBuilding(breaker, primaries)) {
+                    if (isFirst)
+                        moveBackwards(false);
+                    break;
+                }
+                runnable.run();
+            } while (isFirst && _resultSet.next());
+        } catch (Exception exception) {
+            reset();
+            throw exception;
+        }
 
-        if (allowNextRow)
-            _currentRow = null;
+        if (isFirst)
+            reset();
     }
 
     public static <K, V> void putIfAbsent(
@@ -362,7 +373,8 @@ public class JDBCService {
         if (databaseColumn.charAt(0) == ' ' || databaseColumn.charAt(0) == '_')
             databaseColumn.deleteCharAt(0);
 
-        return databaseColumn.toString();
+        return databaseColumn.toString()
+                .replace("._", ".");
     }
 
     private static void moveBackwards(boolean toStart) throws SQLException {
@@ -370,6 +382,11 @@ public class JDBCService {
             do
                 _resultSet.previous();
             while (toStart && !_resultSet.isBeforeFirst());
+    }
+
+    private static void reset() {
+        _resultSet = null;
+        _currentRow = null;
     }
 
     @Getter

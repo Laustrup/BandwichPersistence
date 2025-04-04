@@ -40,6 +40,8 @@ public class UserDetailsQueries {
                         on artists.id = artist_chat_rooms.artist_id
                     left join chat_rooms
                         on artist_chat_rooms.chat_room_id = chat_rooms.id || organisation_employee_chat_rooms.chat_room_id = chat_rooms.id
+                    left join messages
+                        on chat_rooms.id = messages.chat_room_id
             """;
 
     public static Query selectAllForLogins = new Query(_selectAll);
@@ -52,8 +54,7 @@ public class UserDetailsQueries {
 
     @Getter
     public enum Parameter {
-        CONTACT_INFO_EMAIL("contact_info_email"),
-        PASSWORD("password");
+        CONTACT_INFO_EMAIL("contact_info_email");
 
         private final String _key;
 

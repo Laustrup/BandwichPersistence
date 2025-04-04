@@ -80,7 +80,7 @@ public class ChatRoomBuilder extends BuilderService {
                         JDBCService.build(
                                 resultSet,
                                 () -> {
-                                    id.set(getUUID(table.apply(Model.ModelDTO.Fields.id)));
+                                    set(id, table.apply(Model.ModelDTO.Fields.id));
                                     author.set(UserBuilder.build(resultSet));
                                     set(content, table.apply(MessageBase.Fields._content));
                                     set(isSent, table.apply(MessageBase.Fields._sent));

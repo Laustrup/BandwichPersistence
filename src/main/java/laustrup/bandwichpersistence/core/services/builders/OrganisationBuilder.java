@@ -101,7 +101,7 @@ public class OrganisationBuilder extends BuilderService {
                         JDBCService.build(
                                 resultset,
                                 () -> {
-                                    id.set(get(field.apply(Model.ModelDTO.Fields.id), UUID.class));
+                                    set(id, field.apply(Model.ModelDTO.Fields.id));
                                     set(username, field.apply(User.UserDTO.Fields.username));
                                     set(firstName, field.apply(User.UserDTO.Fields.firstName));
                                     set(lastName, field.apply(User.UserDTO.Fields.lastName));
