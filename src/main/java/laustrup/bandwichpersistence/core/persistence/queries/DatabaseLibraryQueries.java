@@ -1,6 +1,6 @@
 package laustrup.bandwichpersistence.core.persistence.queries;
 
-import laustrup.bandwichpersistence.core.persistence.Query;
+import laustrup.bandwichpersistence.core.persistence.models.Query;
 
 public class DatabaseLibraryQueries {
 

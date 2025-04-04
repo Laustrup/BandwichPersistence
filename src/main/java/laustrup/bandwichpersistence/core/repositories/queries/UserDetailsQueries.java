@@ -1,6 +1,6 @@
 package laustrup.bandwichpersistence.core.repositories.queries;
 
-import laustrup.bandwichpersistence.core.persistence.Query;
+import laustrup.bandwichpersistence.core.persistence.models.Query;
 import lombok.Getter;
 
 public class UserDetailsQueries {
@@ -34,6 +34,12 @@ public class UserDetailsQueries {
                         on authorities.id = artist_authorities.authority_id || organisation_employee_authorities.authority_id = authorities.id
                     left join subscriptions
                         on artists.subscription_id = subscriptions.id || organisation_employees.subscription_id = subscriptions.id
+                    left join organisation_employee_chat_rooms
+                        on organisation_employees.id = organisation_employee_chat_rooms.organisation_employee_id
+                    left join artist_chat_rooms
+                        on artists.id = artist_chat_rooms.artist_id
+                    left join chat_rooms
+                        on artist_chat_rooms.chat_room_id = chat_rooms.id || organisation_employee_chat_rooms.chat_room_id = chat_rooms.id
             """;
 
     public static Query selectAllForLogins = new Query(_selectAll);

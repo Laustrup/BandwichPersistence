@@ -16,10 +16,6 @@ import java.util.UUID;
 @Getter @FieldNameConstants
 public class Message extends MessageBase {
 
-    /**
-     * The ChatRoom that this message has been sent in.
-     */
-    private ChatRoom _chatRoom;
 
     /**
      * Will translate a transport object of this object into a construct of this object.
@@ -27,12 +23,10 @@ public class Message extends MessageBase {
      */
     public Message(DTO mail) {
         super(mail);
-        _chatRoom = new ChatRoom(mail.getChatRoom());
     }
 
     public Message(
             UUID id,
-            ChatRoom chatRoom,
             User author,
             String content,
             Instant isSent,
@@ -41,7 +35,6 @@ public class Message extends MessageBase {
             Instant timestamp
     ) {
         super(id, author, content, isSent, isEdited, isRead, timestamp);
-        _chatRoom = chatRoom;
     }
 
     @Override
@@ -51,14 +44,12 @@ public class Message extends MessageBase {
             new String[] {
                 Model.Fields._id,
                 MessageBase.Fields._author,
-                Fields._chatRoom,
                 MessageBase.Fields._content,
                 MessageBase.Fields._sent,
                 Model.Fields._timestamp
             }, new String[] {
                 String.valueOf(_id),
                 _author != null ? _author.toString() : null,
-                _chatRoom != null ? _chatRoom.toString() : null,
                 _content,
                 String.valueOf(_sent),
                 String.valueOf(_timestamp)
@@ -74,16 +65,12 @@ public class Message extends MessageBase {
     @Getter @FieldNameConstants @JsonIgnoreProperties(ignoreUnknown = true)
     public static class DTO extends MessageBase.DTO {
 
-        /** The ChatRoom that this message exists in. */
-        private ChatRoom.DTO chatRoom;
-
         /**
          * Converts into this DTO Object.
          * @param message The Object to be converted.
          */
         public DTO(Message message) {
             super(message);
-            chatRoom = new ChatRoom.DTO(message.get_chatRoom());
         }
     }
 }

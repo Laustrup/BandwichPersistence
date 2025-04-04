@@ -1,7 +1,7 @@
 package laustrup.bandwichpersistence.core.services.persistence;
 
 import laustrup.bandwichpersistence.core.models.Model;
-import laustrup.bandwichpersistence.core.persistence.Query;
+import laustrup.bandwichpersistence.core.persistence.models.Query;
 import laustrup.bandwichpersistence.core.utilities.collections.lists.Liszt;
 import lombok.Getter;
 
@@ -28,7 +28,11 @@ public class JDBCService {
     @SuppressWarnings("unchecked")
     public static <T> AtomicReference<T> set(AtomicReference<T> reference, Field field) {
         try {
-            return (AtomicReference<T>) reference.getAndSet((T) _resultSet.getObject(toDatabaseColumn(field.get_content())));
+            return (AtomicReference<T>) reference.getAndSet((T) (
+                    field.is_key()
+                            ? UUID.nameUUIDFromBytes(_resultSet.getBytes(toDatabaseColumn(field.get_content())))
+                            : _resultSet.getObject(toDatabaseColumn(field.get_content()))
+            ));
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -45,7 +49,9 @@ public class JDBCService {
     }
 
     public static <T> T get(Timestamp timestamp, Function<Timestamp, T> function) {
-        return timestamp == null ? null : function.apply(timestamp);
+        return timestamp == null
+                ? null
+                : function.apply(timestamp);
     }
 
     public static <T> T get(
@@ -127,6 +133,10 @@ public class JDBCService {
         });
     }
 
+    public static UUID getUUID(Field field) {
+        return getUUID(field.get_content());
+    }
+
     public static UUID getUUID(String column) {
         return perform(toDatabaseColumn(column), title -> {
             try {
@@ -175,6 +185,10 @@ public class JDBCService {
                 throw new RuntimeException(e);
             }
         });
+    }
+
+    public static Instant getInstant(Field field) {
+        return getInstant(field.get_content());
     }
 
     public static Instant getInstant(String column) {
@@ -361,9 +375,9 @@ public class JDBCService {
     @Getter
     public static class Field {
 
-        private String _table;
+        private final String _table;
 
-        private String _row;
+        private final String _row;
 
         public Field(String table, String row) {
             _table = table;
@@ -376,6 +390,10 @@ public class JDBCService {
 
         public String get_content() {
             return String.format("%s.%s", _table, _row);
+        }
+
+        public boolean is_key() {
+            return _row.contains(".id") || _row.contains("_id");
         }
     }
 }

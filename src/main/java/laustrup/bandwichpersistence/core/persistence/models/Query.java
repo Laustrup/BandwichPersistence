@@ -1,4 +1,4 @@
-package laustrup.bandwichpersistence.core.persistence;
+package laustrup.bandwichpersistence.core.persistence.models;
 
 import lombok.Getter;
 

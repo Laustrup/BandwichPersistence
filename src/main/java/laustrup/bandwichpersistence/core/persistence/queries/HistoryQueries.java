@@ -1,12 +1,8 @@
 package laustrup.bandwichpersistence.core.persistence.queries;
 
-import laustrup.bandwichpersistence.core.models.History;
-import laustrup.bandwichpersistence.core.persistence.Query;
+import laustrup.bandwichpersistence.core.persistence.models.Query;
 import laustrup.bandwichpersistence.core.services.persistence.queries.FormatQueryService;
-import laustrup.bandwichpersistence.core.services.persistence.queries.JoinTableScriptService;
 import lombok.Getter;
-
-import java.util.List;
 
 public class HistoryQueries {
 

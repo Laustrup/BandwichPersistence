@@ -1,5 +1,6 @@
 package laustrup.bandwichpersistence.core.persistence;
 
+import laustrup.bandwichpersistence.core.persistence.models.Query;
 import lombok.Getter;
 
 import java.util.List;

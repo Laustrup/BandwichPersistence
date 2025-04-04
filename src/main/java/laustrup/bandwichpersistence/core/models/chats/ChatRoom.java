@@ -252,7 +252,7 @@ public class ChatRoom extends Model {
             this(
                     settings.getId(),
                     settings.getTitle(),
-                    Seszt.copy(settings.getChatters(), chatter -> UserService.fromBusinessUser(chatter)),
+                    Seszt.copy(settings.getChatters(), UserService::fromBusinessUser),
                     settings.getTimestamp()
             );
         }

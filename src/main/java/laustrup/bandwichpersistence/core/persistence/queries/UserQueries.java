@@ -1,10 +1,9 @@
 package laustrup.bandwichpersistence.core.persistence.queries;
 
-import laustrup.bandwichpersistence.core.persistence.Query;
+import laustrup.bandwichpersistence.core.persistence.models.Query;
 import laustrup.bandwichpersistence.core.services.persistence.queries.FormatQueryService;
 import lombok.Getter;
 
-import java.util.List;
 import java.util.stream.Stream;
 
 public class UserQueries {

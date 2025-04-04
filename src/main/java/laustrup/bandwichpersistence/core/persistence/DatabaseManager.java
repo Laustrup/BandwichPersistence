@@ -2,11 +2,12 @@ package laustrup.bandwichpersistence.core.persistence;
 
 import laustrup.bandwichpersistence.ProgramInitializer;
 import laustrup.bandwichpersistence.core.libraries.DatabaseLibrary;
+import laustrup.bandwichpersistence.core.persistence.models.DatabaseResponse;
+import laustrup.bandwichpersistence.core.persistence.models.Query;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -17,51 +18,36 @@ public class DatabaseManager {
 
     private static final Logger _logger = Logger.getLogger(ProgramInitializer.class.getSimpleName());
 
-    public static ResultSet results(PreparedStatement preparedStatement) {
-        try {
-            return preparedStatement.getResultSet();
-        } catch (SQLException exception) {
-            _logger.warning("Could not get result set\n" + exception.getMessage());
-            throw new RuntimeException(exception);
-        }
+
+    public static DatabaseResponse read(Query query) {
+        return handle(query, Action.READ);
     }
 
-    public static ResultSet read(Query query) {
-        PreparedStatement preparedStatement = handle(query, Action.READ);
-
-        return preparedStatement != null ? results(preparedStatement) : null;
+    public static DatabaseResponse read(Query query, DatabaseParameter parameter) {
+        return read(query, Stream.of(parameter));
     }
 
-    public static ResultSet read(Query query, DatabaseParameter parameter) {
-        try {
-            return read(query, Stream.of(parameter)).getResultSet();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-
-        }
-    }
-
-    public static PreparedStatement read(Query query, Stream<DatabaseParameter> databaseParameters) {
+    public static DatabaseResponse read(Query query, Stream<DatabaseParameter> databaseParameters) {
         return handle(query, Action.READ, databaseParameters);
     }
 
-    public static PreparedStatement upsert(Query query) {
+    public static DatabaseResponse upsert(Query query) {
         return upsert(query, new ArrayList<>().stream().map(datum -> (DatabaseParameter) datum));
     }
 
-    public static PreparedStatement upsert(Query query, Stream<DatabaseParameter> parameters) {
+    public static DatabaseResponse upsert(Query query, Stream<DatabaseParameter> parameters) {
         return handle(query, Action.CUD, parameters);
     }
 
-    public static PreparedStatement create(Query query) {
+    public static DatabaseResponse create(Query query) {
         return handle(query, Action.CREATE);
     }
 
-    public static PreparedStatement create(Query query, Stream<DatabaseParameter> parameters) {
+    public static DatabaseResponse create(Query query, Stream<DatabaseParameter> parameters) {
         return handle(query, Action.CREATE, parameters);
     }
 
-    private static PreparedStatement handle(Query query, Action action) {
+    private static DatabaseResponse handle(Query query, Action action) {
         try {
             return execute(query, action);
         } catch (SQLException e) {
@@ -69,7 +55,7 @@ public class DatabaseManager {
         }
     }
 
-    private static PreparedStatement handle(
+    private static DatabaseResponse handle(
             Query query,
             Action action,
             Stream<DatabaseParameter> parameters
@@ -81,23 +67,23 @@ public class DatabaseManager {
         }
     }
 
-    public static PreparedStatement execute(Query query, Action action) throws SQLException {
+    public static DatabaseResponse execute(Query query, Action action) throws SQLException {
         return execute(query, action, Objects.requireNonNull(DatabaseLibrary.get_urlPath()));
     }
 
-    public static PreparedStatement execute(Query query, Action action, String url) throws SQLException {
+    public static DatabaseResponse execute(Query query, Action action, String url) throws SQLException {
         return execute(query, action, new ArrayList<>().stream().map(datum -> (DatabaseParameter) datum), url);
     }
 
-    public static PreparedStatement execute(Query query, Action action, Stream<DatabaseParameter> parameters) throws SQLException {
+    public static DatabaseResponse execute(Query query, Action action, Stream<DatabaseParameter> parameters) throws SQLException {
         return execute(query, action, parameters, Objects.requireNonNull(DatabaseLibrary.get_urlPath()));
     }
 
-    public static PreparedStatement execute(Query query, Action action, DatabaseParameter parameter) throws SQLException {
+    public static DatabaseResponse execute(Query query, Action action, DatabaseParameter parameter) throws SQLException {
         return execute(query, action, parameter, Objects.requireNonNull(DatabaseLibrary.get_urlPath()));
     }
 
-    public static PreparedStatement execute(
+    public static DatabaseResponse execute(
             Query query,
             Action action,
             DatabaseParameter parameter,
@@ -106,12 +92,13 @@ public class DatabaseManager {
         return execute(query, action, Stream.of(parameter), url);
     }
 
-    public static PreparedStatement execute(
+    public static DatabaseResponse execute(
             Query query,
             Action action,
             Stream<DatabaseParameter> parameters,
             String url
     ) throws SQLException {
+        Exception exception = null;
         PreparedStatement preparedStatement = null;
 
         try {
@@ -127,28 +114,15 @@ public class DatabaseManager {
                 case CREATE, UPDATE, DELETE, CUD -> preparedStatement.executeUpdate();
                 default -> preparedStatement.execute();
             }
-        } catch (Exception exception) {
-            _logger.log(
-                    Level.WARNING,
-                    String.format(
-                            """
-                            Couldn't execute query:
-                            %s
-                            
-                            With action: %s
-                            """,
-                            preparedStatement == null
-                                    ? query.get_script()
-                                    : preparedStatement.toString(),
-                            action
-                    ),
-                    exception
-            );
-
-            throw exception;
+        } catch (Exception e) {
+            exception = e;
         }
 
-        return preparedStatement;
+        return new DatabaseResponse(
+                preparedStatement,
+                query,
+                exception
+        );
     }
 
     private static String prepareTransaction(String sql) {

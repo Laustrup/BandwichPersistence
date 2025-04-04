@@ -1,7 +1,7 @@
 package laustrup.bandwichpersistence.core.scriptorian.repositories;
 
 import laustrup.bandwichpersistence.core.persistence.DatabaseParameter;
-import laustrup.bandwichpersistence.core.persistence.Query;
+import laustrup.bandwichpersistence.core.persistence.models.Query;
 import laustrup.bandwichpersistence.core.persistence.queries.ScriptorianQueries;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -16,11 +16,11 @@ public class ScriptorianRepository {
     }
 
     public static ResultSet findScriptoriesWithoutSuccess() {
-        return read(ScriptorianQueries.findScriptoriesWithoutSuccess);
+        return read(ScriptorianQueries.findScriptoriesWithoutSuccess).get_resultSet();
     }
 
     public static ResultSet findAllScriptories() {
-        return read(ScriptorianQueries.findAllScriptories);
+        return read(ScriptorianQueries.findAllScriptories).get_resultSet();
     }
 
     public static void putScriptory(Stream<DatabaseParameter> parameters) throws SQLException {
