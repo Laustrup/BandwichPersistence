@@ -85,8 +85,10 @@ public class ModelService {
                 value = new StringBuilder();
         String separator = "\\|";
 
-        Function<String, String> substring = splitting ->
-                store.substring(store.length() - 1 - splitting.length());
+        Function<String, String> substring = splitting -> {
+            int from = store.length() - splitting.length();
+            return store.toString().length() > from && from > 0 ? store.substring(from) : "";
+        };
 
         for (char character : toString.toCharArray()) {
             store.append(character);
@@ -95,7 +97,7 @@ public class ModelService {
             if (isValue && substring.apply(_toStringFieldSplitter).equals(_toStringFieldSplitter)) {
                 isValue = false;
                 value.append(separator);
-                if (isPlural)
+                if (!isPlural)
                     break;
             }
 
@@ -103,8 +105,17 @@ public class ModelService {
                 value.append(character);
         }
 
-        return Arrays.stream(value.substring(0, value.length() - 1).split(separator))
+
+        return Arrays.stream(idValues(value.toString()).split(separator))
                 .map(UUID::fromString);
+    }
+
+    private static String idValues(String value) {
+        return value
+                .substring(1, value.length() - 1)
+                .replace(",\n\\", "")
+                .replace("\n", "")
+                .replace("| ", "|");
     }
 
     public static boolean equals(Object object, Object other) {
