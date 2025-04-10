@@ -1,7 +1,7 @@
-package laustrup.bandwichpersistence.core.utilities.collections.sets;
+package laustrup.bandwichpersistence.core.utilities.collections;
 
-import laustrup.bandwichpersistence.core.utilities.collections.Collection;
-import laustrup.bandwichpersistence.core.utilities.collections.ICollection;
+import laustrup.bandwichpersistence.core.utilities.Coollection;
+import laustrup.bandwichpersistence.core.utilities.ICoollection;
 import laustrup.bandwichpersistence.core.utilities.console.Printer;
 
 import java.util.*;
@@ -22,7 +22,7 @@ import java.util.stream.Stream;
  * letter starts with 1 instead 0 in the parameters.
  * @param <E> The type of element that are wished to be used in this class.
  */
-public class Seszt<E> extends Collection<E> implements ISeszt<E>, Set<E>, ICollection<E> {
+public class Seszt<E> extends Coollection<E> implements ISeszt<E>, Set<E>, ICoollection<E> {
 
     /** Default constructor that will build the Seszt without containing any data and the map as linked. */
     public Seszt() {
@@ -30,8 +30,8 @@ public class Seszt<E> extends Collection<E> implements ISeszt<E>, Set<E>, IColle
     }
 
 
-    public Seszt(Collection<? extends E> collection) {
-        this(collection.get_data());
+    public Seszt(Coollection<? extends E> coollection) {
+        this(coollection.get_data());
     }
 
     public Seszt(Stream<? extends E> stream) {
@@ -127,13 +127,13 @@ public class Seszt<E> extends Collection<E> implements ISeszt<E>, Set<E>, IColle
     }
 
     @Override
-    public Seszt<E> Add(Collection<E> collection) {
-        add(collection.get_data());
+    public Seszt<E> Add(Coollection<E> coollection) {
+        add(coollection.get_data());
         return this;
     }
 
     @Override
-    public Seszt<E> set(Collection<E> originals, Collection<E> replacements) {
+    public Seszt<E> set(Coollection<E> originals, Coollection<E> replacements) {
         return set(originals.get_data(), replacements.get_data());
     }
 

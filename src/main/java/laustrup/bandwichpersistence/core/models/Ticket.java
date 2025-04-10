@@ -2,7 +2,7 @@ package laustrup.bandwichpersistence.core.models;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import laustrup.bandwichpersistence.core.utilities.collections.sets.Seszt;
+import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
@@ -14,7 +14,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import static laustrup.bandwichpersistence.core.services.ModelService.defineToString;
-import static laustrup.bandwichpersistence.core.utilities.collections.sets.Seszt.copy;
+import static laustrup.bandwichpersistence.core.utilities.collections.Seszt.copy;
 
 /**
  * The ticket that have been bought for an event from an option of the event.

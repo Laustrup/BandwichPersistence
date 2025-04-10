@@ -1,7 +1,7 @@
 package laustrup.bandwichpersistence.core.models.users;
 
 import laustrup.bandwichpersistence.core.models.*;
-import laustrup.bandwichpersistence.core.utilities.collections.sets.Seszt;
+import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;

@@ -1,7 +1,7 @@
 package laustrup.bandwichpersistence.core.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import laustrup.bandwichpersistence.core.utilities.collections.sets.Seszt;
+import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.experimental.FieldNameConstants;

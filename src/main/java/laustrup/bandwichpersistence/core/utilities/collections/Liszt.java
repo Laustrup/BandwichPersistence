@@ -1,7 +1,8 @@
-package laustrup.bandwichpersistence.core.utilities.collections.lists;
+package laustrup.bandwichpersistence.core.utilities.collections;
 
 import jdk.jshell.spi.ExecutionControl;
-import laustrup.bandwichpersistence.core.utilities.collections.ICollection;
+import laustrup.bandwichpersistence.core.utilities.Coollection;
+import laustrup.bandwichpersistence.core.utilities.ICoollection;
 import laustrup.bandwichpersistence.core.utilities.console.Printer;
 import lombok.SneakyThrows;
 
@@ -22,7 +23,7 @@ import java.util.stream.Stream;
  * letter starts with 1 instead 0 in the parameters.
  * @param <E> The type of element that are wished to be used in this class.
  */
-public class Liszt<E> extends laustrup.bandwichpersistence.core.utilities.collections.Collection<E> implements ILiszt<E>, List<E>, ICollection<E> {
+public class Liszt<E> extends Coollection<E> implements ILiszt<E>, List<E>, ICoollection<E> {
 
     /** Creates the Liszt with empty data and a hash type of map. */
     public Liszt() {
@@ -115,13 +116,13 @@ public class Liszt<E> extends laustrup.bandwichpersistence.core.utilities.collec
     }
 
     @Override
-    public Liszt<E> Add(laustrup.bandwichpersistence.core.utilities.collections.Collection<E> collection) {
-        add(collection.get_data());
+    public Liszt<E> Add(Coollection<E> coollection) {
+        add(coollection.get_data());
         return this;
     }
 
     @Override
-    public Liszt<E> set(laustrup.bandwichpersistence.core.utilities.collections.Collection<E> originals, laustrup.bandwichpersistence.core.utilities.collections.Collection<E> replacements) {
+    public Liszt<E> set(Coollection<E> originals, Coollection<E> replacements) {
         return set(originals.get_data(),replacements.get_data());
     }
 

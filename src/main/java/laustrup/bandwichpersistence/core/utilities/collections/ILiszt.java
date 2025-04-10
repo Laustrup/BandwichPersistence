@@ -1,6 +1,6 @@
-package laustrup.bandwichpersistence.core.utilities.collections.lists;
+package laustrup.bandwichpersistence.core.utilities.collections;
 
-import laustrup.bandwichpersistence.core.utilities.collections.Collection;
+import laustrup.bandwichpersistence.core.utilities.Coollection;
 
 /** Contains the unique features of a Liszt. */
 public interface ILiszt<E> {
@@ -24,10 +24,10 @@ public interface ILiszt<E> {
     /**
      * Adds multiple elements to the array data and the map data, making them available to be iterated through and used in map.
      * Filters out elements that are null.
-     * @param collection A collection of elements of generic E that will be added, this collection can either be a Liszt or Seszt.
+     * @param coollection A collection of elements of generic E that will be added, this collection can either be a Liszt or Seszt.
      * @return This Liszt<E> containing the added elements.
      */
-    Liszt<E> Add(Collection<E> collection);
+    Liszt<E> Add(Coollection<E> coollection);
 
     /**
      * Replaces the elements with the override of the specified elements.
@@ -36,7 +36,7 @@ public interface ILiszt<E> {
      * @param replacements The element that will become the replacement.
      * @return This Liszt<E> containing the updated elements.
      */
-    Liszt<E> set(Collection<E> originals, Collection<E> replacements);
+    Liszt<E> set(Coollection<E> originals, Coollection<E> replacements);
 
     /**
      * Replaces the element with the override with the specified element.

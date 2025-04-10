@@ -21,6 +21,8 @@ public class UserDetailsManager {
 
     private static final Logger _logger = Logger.getLogger(UserDetailsManager.class.getName());
 
+    private static final UserBuilder _userBuilder = new UserBuilder();
+
     public static UserDetails getUserDetails(String email) {
         return databaseInteraction(() ->
                 UserBuilder.buildLogins(UserDetailsRepository.getUserDetailsByEmail(email))
@@ -35,7 +37,7 @@ public class UserDetailsManager {
             HttpStatus status = HttpStatus.OK;
 
             try {
-                user = UserBuilder.build(passwordFits(
+                user = _userBuilder.build(passwordFits(
                         UserDetailsRepository.getUserByEmail(login),
                         login.getPassword()
                 ));

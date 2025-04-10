@@ -1,7 +1,7 @@
 package laustrup.bandwichpersistence.core.models;
 
 import laustrup.bandwichpersistence.core.services.UserService;
-import laustrup.bandwichpersistence.core.utilities.collections.lists.Liszt;
+import laustrup.bandwichpersistence.core.utilities.collections.Liszt;
 
 import lombok.Getter;
 import lombok.Setter;

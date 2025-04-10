@@ -1,6 +1,6 @@
 package laustrup.bandwichpersistence.core.models;
 
-import laustrup.bandwichpersistence.core.utilities.collections.sets.Seszt;
+import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
 import lombok.experimental.FieldNameConstants;
 
@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Set;
 
-import static laustrup.bandwichpersistence.core.utilities.collections.sets.Seszt.copy;
+import static laustrup.bandwichpersistence.core.utilities.collections.Seszt.copy;
 
 /**
  * Contains the fundaments for tickets and their options available.

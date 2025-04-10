@@ -1,7 +1,7 @@
-package laustrup.bandwichpersistence.core.utilities.collections;
+package laustrup.bandwichpersistence.core.utilities;
 
 /** Contains features that are used in all collection classes. */
-public interface ICollection<E> {
+public interface ICoollection<E> {
 
     /**
      * Adds some elements to the array data and the map data, making them available to be iterated through and used in map.

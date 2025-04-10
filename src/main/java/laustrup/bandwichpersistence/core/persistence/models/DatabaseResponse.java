@@ -34,7 +34,7 @@ public class DatabaseResponse {
         try {
             return _preparedStatement != null ? _preparedStatement.getResultSet() : null;
         } catch (SQLException e) {
-            _logger.warning("Couldn't get resultset!\n" + e.getMessage() + (
+            _logger.warning("Couldn't get resultSet!\n" + e.getMessage() + (
                     _exception != null
                             ? "\n\n\tIt also had the following error:\n" + _exception.getMessage()
                             : ""

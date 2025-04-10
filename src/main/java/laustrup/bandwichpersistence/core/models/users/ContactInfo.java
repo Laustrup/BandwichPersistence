@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import laustrup.bandwichpersistence.core.models.Model;
 
-import laustrup.bandwichpersistence.core.utilities.collections.sets.Seszt;
+import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -14,7 +14,7 @@ import java.time.Instant;
 import java.util.*;
 
 import static laustrup.bandwichpersistence.core.services.ModelService.defineToString;
-import static laustrup.bandwichpersistence.core.utilities.collections.sets.Seszt.copy;
+import static laustrup.bandwichpersistence.core.utilities.collections.Seszt.copy;
 
 /**
  * Contains information that people need in order to contact the User.

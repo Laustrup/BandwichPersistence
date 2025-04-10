@@ -1,7 +1,8 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
-import laustrup.bandwichpersistence.core.models.*;
-import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
+import laustrup.bandwichpersistence.core.models.Album;
+import laustrup.bandwichpersistence.core.models.Model;
+import laustrup.bandwichpersistence.core.services.persistence.JDBCService.Field;
 
 import java.sql.ResultSet;
 import java.time.Instant;
@@ -11,25 +12,25 @@ import java.util.function.Function;
 
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
 
-public class AlbumBuilder extends BuilderService<Album> {
+public class AlbumMediaBuilder extends BuilderService<Album.Media> {
 
-    private final AlbumMediaBuilder _albumMediaBuilder = new AlbumMediaBuilder();
-
-    public AlbumBuilder() {
-        super(Album.class, AlbumBuilder.class);
+    public AlbumMediaBuilder() {
+        super(Album.Media.class, AlbumMediaBuilder.class);
     }
 
     @Override
-    protected void completion(Album reference, Album object) {
-        combine(reference.get_media(), object.get_media());
+    protected void completion(Album.Media reference, Album.Media object) {
+
     }
 
     @Override
-    protected Function<Function<String, Field>, Album> logic(ResultSet resultSet) {
+    protected Function<Function<String, Field>, Album.Media> logic(ResultSet resultSet) {
         return table -> {
             AtomicReference<UUID> id = new AtomicReference<>();
-            AtomicReference<String> title = new AtomicReference<>();
-            Seszt<Album.Media> media = new Seszt<>();
+            AtomicReference<Album.Media.Kind> kind = new AtomicReference<>();
+            AtomicReference<String>
+                    title = new AtomicReference<>(),
+                    endpoint = new AtomicReference<>();
             AtomicReference<Instant> timestamp = new AtomicReference<>();
 
             interaction(
@@ -37,16 +38,18 @@ public class AlbumBuilder extends BuilderService<Album> {
                     () -> {
                         set(id, table.apply(Model.ModelDTO.Fields.id));
                         set(title, table.apply(Model.ModelDTO.Fields.title));
-                        combine(media, _albumMediaBuilder.build(resultSet));
+                        set(endpoint, table.apply(Album.Media.DTO.Fields.endpoint));
+                        set(kind, table.apply(Album.Media.DTO.Fields.kind));
                         timestamp.set(getInstant(Model.ModelDTO.Fields.timestamp));
                     },
                     id
             );
 
-            return new Album(
+            return new Album.Media(
                     id.get(),
                     title.get(),
-                    media,
+                    endpoint.get(),
+                    kind.get(),
                     timestamp.get()
             );
         };

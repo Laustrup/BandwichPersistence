@@ -1,7 +1,6 @@
-package laustrup.bandwichpersistence.core.utilities.collections;
+package laustrup.bandwichpersistence.core.utilities;
 
-import laustrup.bandwichpersistence.core.utilities.Utility;
-import laustrup.bandwichpersistence.core.utilities.collections.lists.Liszt;
+import laustrup.bandwichpersistence.core.utilities.collections.Liszt;
 import laustrup.bandwichpersistence.core.utilities.console.Printer;
 import lombok.Getter;
 
@@ -12,7 +11,7 @@ import java.util.function.Function;
  * A Utility that contains collections of data such as a Map and an array.
  * @param <E> The type of element that are wished to be used in this class.
  */
-public abstract class Collection<E> extends Utility<E> implements java.util.Collection<E> {
+public abstract class Coollection<E> extends Utility<E> implements java.util.Collection<E>, ICoollection<E> {
 
     /** Contains all the elements that are inside the Liszt. */
     @Getter
@@ -31,7 +30,7 @@ public abstract class Collection<E> extends Utility<E> implements java.util.Coll
      * Creates the Utility with empty data.
      * @param isLinked Decides if the map should be linked or hash type.
      */
-    protected Collection(boolean isLinked) {
+    protected Coollection(boolean isLinked) {
         _data = convert(new Object[0]);
         _destinationKeys = new String[0];
 

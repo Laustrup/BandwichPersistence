@@ -1,6 +1,6 @@
 package laustrup.bandwichpersistence.core.models;
 
-import laustrup.bandwichpersistence.core.utilities.collections.Collection;
+import laustrup.bandwichpersistence.core.utilities.Coollection;
 import lombok.Getter;
 
 @Getter
@@ -13,7 +13,7 @@ public class ToStringArgument {
         _value = value;
     }
 
-    public static String[][] convert(Collection<ToStringArgument> arguments) {
+    public static String[][] convert(Coollection<ToStringArgument> arguments) {
         String[][] content = new String[arguments.get_data().length][];
 
         for (int i = 0; i < arguments.get_data().length; i++) {

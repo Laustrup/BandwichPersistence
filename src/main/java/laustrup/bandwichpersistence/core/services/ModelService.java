@@ -3,18 +3,24 @@ package laustrup.bandwichpersistence.core.services;
 import laustrup.bandwichpersistence.core.models.Event;
 import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.models.User;
+import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import laustrup.bandwichpersistence.core.utilities.console.Printer;
 import lombok.Getter;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 public class ModelService {
 
     /** For the defineToString of how it should be split. */
     @Getter
     private static final String
-            _toStringFieldSplitter = ",\n \t",
-            _toStringKeyValueSplitter = ":\t";
+            _toStringFieldSplitter = ",\n\t",
+            _toStringKeyValueSplitter = ": ";
 
     public static Model from(Model.ModelDTO model) {
         return model.getClass() == Event.DTO.class
@@ -52,5 +58,60 @@ public class ModelService {
         }
 
         return title + "(\n \t" + content + "\n)";
+    }
+
+    public static UUID getId(Model model) {
+        return getId(model.toString());
+    }
+
+    public static Stream<UUID> getIds(Model model) {
+        return getIds(model.toString());
+    }
+
+    public static UUID getId(String toString) {
+        return handleGetIds(toString, false)
+                .findFirst()
+                .orElse(null);
+    }
+
+    public static Stream<UUID> getIds(String toString) {
+        return handleGetIds(toString, true);
+    }
+
+    public static Stream<UUID> handleGetIds(String toString, boolean isPlural) {
+        boolean isValue = false;
+        StringBuilder
+                store = new StringBuilder(),
+                value = new StringBuilder();
+        String separator = "\\|";
+
+        Function<String, String> substring = splitting ->
+                store.substring(store.length() - 1 - splitting.length());
+
+        for (char character : toString.toCharArray()) {
+            store.append(character);
+            if (!isValue && substring.apply(_toStringKeyValueSplitter).equals(_toStringKeyValueSplitter))
+                isValue = true;
+            if (isValue && substring.apply(_toStringFieldSplitter).equals(_toStringFieldSplitter)) {
+                isValue = false;
+                value.append(separator);
+                if (isPlural)
+                    break;
+            }
+
+            if (isValue)
+                value.append(character);
+        }
+
+        return Arrays.stream(value.substring(0, value.length() - 1).split(separator))
+                .map(UUID::fromString);
+    }
+
+    public static boolean equals(Object object, Object other) {
+        List<UUID>
+                objectIds = getIds(object.toString()).toList(),
+                otherIds = getIds(other.toString()).toList();
+
+        return objectIds.stream().allMatch(id -> otherIds.stream().anyMatch(id::equals));
     }
 }

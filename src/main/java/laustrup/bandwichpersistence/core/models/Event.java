@@ -5,8 +5,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import laustrup.bandwichpersistence.core.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.core.models.users.Participant;
-import laustrup.bandwichpersistence.core.utilities.collections.lists.Liszt;
-import laustrup.bandwichpersistence.core.utilities.collections.sets.Seszt;
+import laustrup.bandwichpersistence.core.utilities.collections.Liszt;
+import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import laustrup.bandwichpersistence.core.utilities.console.Printer;
 import laustrup.bandwichpersistence.core.utilities.parameters.NotBoolean;
 import laustrup.bandwichpersistence.core.models.chats.Request;
@@ -21,7 +21,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.util.*;
 
-import static laustrup.bandwichpersistence.core.utilities.collections.sets.Seszt.copy;
+import static laustrup.bandwichpersistence.core.utilities.collections.Seszt.copy;
 import static laustrup.bandwichpersistence.core.utilities.services.UtilityService.toSet;
 
 /**

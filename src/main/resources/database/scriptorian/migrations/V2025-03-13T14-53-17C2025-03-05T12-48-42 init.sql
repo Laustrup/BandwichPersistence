@@ -1035,7 +1035,7 @@ create table acts(
 create table artist_event_participations(
     artist_id binary(16) not null,
     event_id binary(16) not null,
-    type enum(
+    implementation enum(
         'ACCEPTED',
         'INTERESTED',
         'CANCELED',
@@ -1060,7 +1060,7 @@ create table artist_event_participations(
 create table organisation_employee_event_participations(
     organisation_employee_id binary(16) not null,
     event_id binary(16) not null,
-    type enum(
+    implementation enum(
         'ACCEPTED',
         'INTERESTED',
         'CANCELED',

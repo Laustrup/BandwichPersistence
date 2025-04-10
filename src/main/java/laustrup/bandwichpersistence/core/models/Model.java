@@ -2,7 +2,7 @@ package laustrup.bandwichpersistence.core.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import laustrup.bandwichpersistence.core.services.ModelService;
-import laustrup.bandwichpersistence.core.utilities.collections.Collection;
+import laustrup.bandwichpersistence.core.utilities.Coollection;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -118,7 +118,7 @@ public abstract class Model {
         _timestamp = Instant.now();
     }
 
-    protected String defineToString(String title, Collection<ToStringArgument> arguments) {
+    protected String defineToString(String title, Coollection<ToStringArgument> arguments) {
         return defineToString(title, ToStringArgument.convert(arguments));
     }
 

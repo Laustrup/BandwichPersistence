@@ -1,6 +1,6 @@
-package laustrup.bandwichpersistence.core.utilities.collections.sets;
+package laustrup.bandwichpersistence.core.utilities.collections;
 
-import laustrup.bandwichpersistence.core.utilities.collections.Collection;
+import laustrup.bandwichpersistence.core.utilities.Coollection;
 
 import java.util.Set;
 import java.util.function.Function;
@@ -30,10 +30,10 @@ public interface ISeszt<E> {
      * Adds elements to the array data and the map data, if they don't already share toStrings with other data,
      * making them available to be iterated through and used in map.
      * Filters out elements that are null.
-     * @param collection A collection of either Liszt or Seszt with some element data of generic E that will be added.
+     * @param coollection A collection of either Liszt or Seszt with some element data of generic E that will be added.
      * @return This Seszt<E> containing the added elements.
      */
-    Seszt<E> Add(Collection<E> collection);
+    Seszt<E> Add(Coollection<E> coollection);
 
     /**
      * Replaces the elements with the override of the specified elements.
@@ -42,7 +42,7 @@ public interface ISeszt<E> {
      * @param replacements The element that will become the replacement.
      * @return This Seszt<E> containing the updated elements.
      */
-    Seszt<E> set(Collection<E> originals, Collection<E> replacements);
+    Seszt<E> set(Coollection<E> originals, Coollection<E> replacements);
 
     /**
      * Replaces the element with the override with the specified element.

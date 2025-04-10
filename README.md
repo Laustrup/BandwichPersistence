@@ -1,6 +1,6 @@
 ## Bandwich
 
-Bandwich is a collection of projects, where venues and bands/artists can connect with each other,
+Bandwich is a coollection of projects, where venues and bands/artists can connect with each other,
 with the purposes of arranging gigs together with one and another.
 
 These gigs can be hosted as an event for a venue on Bandwich, this event can be published and promoted with Bandwich,

@@ -1,20 +1,37 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
+import laustrup.bandwichpersistence.core.services.ModelService;
+import laustrup.bandwichpersistence.core.services.persistence.JDBCService;
 import laustrup.bandwichpersistence.core.services.persistence.JDBCService.Field;
+import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.logging.Logger;
 
-class BuilderService {
+abstract class BuilderService<E> {
 
-    static void printError(Class<?> origin, AtomicReference<UUID> id, Exception exception, Logger logger) throws RuntimeException {
+    protected Class<E> _class;
+
+    protected final Logger _logger;
+
+    protected BuilderService(Class<E> element, Class<? extends BuilderService<E>> builder) {
+        _class = element;
+        _logger = Logger.getLogger(builder.getSimpleName());
+    }
+
+    static <M> void printError(Class<?> origin, AtomicReference<M> id, Exception exception, Logger logger) throws RuntimeException {
         printError(origin, id.get(), exception, logger);
     }
 
-    static void printError(Class<?> origin, UUID id, Exception exception, Logger logger) throws RuntimeException {
+    static <M> void printError(Class<?> origin, M id, Exception exception, Logger logger) throws RuntimeException {
         logger.warning(String.format(
                 "Could not build %s of %s:\n%s",
                 origin.getSimpleName(),
@@ -24,11 +41,23 @@ class BuilderService {
         throw new RuntimeException(exception);
     }
 
-    static <T> T handle(Class<T> clazz, Function<Function<String, Field>, T> action) {
+    protected <M> void printError(AtomicReference<M> id, Exception exception) throws RuntimeException {
+        printError(id.get(), exception);
+    }
+
+    protected <M> void printError(M id, Exception exception) throws RuntimeException {
+        printError(_class, id, exception, _logger);
+    }
+
+    protected E handle(Function<Function<String, Field>, E> action) {
+        return handle(toTableName(_class), action);
+    }
+
+    static <E> E handle(Class<E> clazz, Function<Function<String, Field>, E> action) {
         return handle(toTableName(clazz), action);
     }
 
-    static <T> T handle(String table, Function<Function<String, Field>, T> action) {
+    static <E> E handle(String table, Function<Function<String, Field>, E> action) {
         return action.apply(row -> Field.of(table, row));
     }
 
@@ -38,5 +67,74 @@ class BuilderService {
 
     static String toTableName(String table) {
         return table + "s";
+    }
+
+    public E build(ResultSet resultSet) {
+        return handle(logic(resultSet));
+    }
+
+    public void complete(AtomicReference<E> reference, ResultSet resultSet) {
+        this.complete(reference, this.build(resultSet));
+    }
+
+    public void complete(AtomicReference<E> reference, E object) {
+        if (reference.get() == null) {
+            reference.set(object);
+            return ;
+        }
+
+        completion(reference.get(), object);
+    }
+
+    protected abstract void completion(E reference, E object);
+
+    protected abstract Function<Function<String, Field>, E> logic(ResultSet resultSet);
+
+    protected <M> void combine(Seszt<M> collection, Seszt<M> entities) {
+        entities.forEach(entity -> combine(collection, entity));
+    }
+
+    protected <M> void combine(Seszt<M> collection, M entity) {
+        AtomicBoolean isIdentical = new AtomicBoolean(true);
+        AtomicInteger counter = new AtomicInteger(0);
+
+        collection.forEach(m -> {
+            if (ModelService.equals(m, entity)) {
+                collection.get_data()[counter.get()] = entity;
+                return ;
+            }
+            counter.incrementAndGet();
+        });
+
+        if (!isIdentical.get())
+            collection.add(entity);
+    }
+
+    protected void interaction(ResultSet resultSet, Runnable action, AtomicReference<UUID> id) {
+        interaction(resultSet, action, id.get());
+    }
+
+    protected void interaction(ResultSet resultSet, Runnable action, UUID id) {
+        try {
+            JDBCService.build(resultSet, action, id);
+        } catch (SQLException exception) {
+            printError(id, exception);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public <M> void interaction(ResultSet resultSet, Runnable action, Function<M, Boolean> breaker, M... id) {
+        try {
+            JDBCService.build(resultSet, action, breaker, id);
+        } catch (SQLException exception) {
+            printError(id, exception);
+        }
+    }
+
+    public <M> void interaction(ResultSet resultSet, Runnable action) {
+        JDBCService.build(resultSet, () -> {
+            action.run();
+            return null;
+        });
     }
 }

@@ -1,8 +1,7 @@
 package laustrup.bandwichpersistence.core.services.persistence;
 
 import laustrup.bandwichpersistence.core.models.Model;
-import laustrup.bandwichpersistence.core.persistence.models.Query;
-import laustrup.bandwichpersistence.core.utilities.collections.lists.Liszt;
+import laustrup.bandwichpersistence.core.utilities.collections.Liszt;
 import lombok.Getter;
 
 import java.sql.ResultSet;
@@ -54,10 +53,7 @@ public class JDBCService {
                 : function.apply(timestamp);
     }
 
-    public static <T> T get(
-            Function<String, T> function,
-            String... columnTitle
-    ) {
+    public static <T> T get(Function<String, T> function, String... columnTitle) {
         for (int i = 0; i < columnTitle.length; i++)
             columnTitle[i] = toDatabaseColumn(specifyColumn(Arrays.stream(columnTitle)
                     .filter(Objects::nonNull)
@@ -199,7 +195,7 @@ public class JDBCService {
     }
 
     /**
-     * Looks into the resultset to find a targeted information.
+     * Looks into the resultSet to find a targeted information.
      * Will go one line forward and then move all the way back.
      * @param resultSet The table of gathered results.
      * @param supply The algorithm to reach the target information.
@@ -207,11 +203,7 @@ public class JDBCService {
      * @return The target information.
      * @param <T> The target information type.
      */
-    public static <T> T peek(
-            ResultSet resultSet,
-            Supplier<T> supply,
-            Consumer<SQLException> logging
-    ) {
+    public static <T> T peek(ResultSet resultSet, Supplier<T> supply, Consumer<SQLException> logging) {
         T type = null;
         _resultSet = resultSet;
 
@@ -229,11 +221,7 @@ public class JDBCService {
         return type;
     }
 
-    public static <T> T peek(
-            ResultSet resultSet,
-            Function<ResultSet, T> action,
-            Consumer<SQLException> logging
-    ) {
+    public static <T> T peek(ResultSet resultSet, Function<ResultSet, T> action, Consumer<SQLException> logging) {
         T type = null;
         _resultSet = resultSet;
 
@@ -275,22 +263,17 @@ public class JDBCService {
             T... primaries
     ) {
         try {
-            build(
-                    resultSet,
-                    runnable,
-                    breaker,
-                    primaries
-            );
+            build(resultSet, runnable, breaker, primaries);
         } catch (SQLException sqlException) {
             exception.accept(sqlException);
         }
     }
 
-    public static void build(
-            ResultSet resultSet,
-            Runnable runnable,
-            UUID primary
-    ) throws SQLException {
+    public static void build(ResultSet resultSet, Runnable runnable, AtomicReference<UUID> primary) throws SQLException {
+        build(resultSet, runnable, primary.get());
+    }
+
+    public static void build(ResultSet resultSet, Runnable runnable, UUID primary) throws SQLException {
         build(
                 resultSet,
                 runnable,
@@ -308,7 +291,7 @@ public class JDBCService {
             Function<T, Boolean> breaker,
             T... primaries
     ) throws SQLException {
-        _resultSet = resultSet;
+        _resultSet = _resultSet == null ? resultSet : _resultSet;
         boolean isFirst = false;
         if (_currentRow == null) {
             isFirst = true;
@@ -332,27 +315,6 @@ public class JDBCService {
 
         if (isFirst)
             reset();
-    }
-
-    public static <K, V> void putIfAbsent(
-            Map<K, V> map,
-            K key,
-            V value
-    ) {
-        if (key != null)
-            map.putIfAbsent(key, value);
-    }
-
-    public static <T> List<Query> prepareQueries(Collection<T> collection, Function<Integer, Query> function) {
-        if (collection == null || collection.isEmpty())
-            return new ArrayList<>();
-
-        List<Query> queries = new ArrayList<>();
-
-        for (int i = 0; i < collection.size(); i++)
-            queries.add(function.apply(i));
-
-        return queries;
     }
 
     private static <T> boolean isDoneBuilding(Function<T, Boolean> breaker, T... primaries) {
