@@ -16,15 +16,15 @@ import static laustrup.bandwichpersistence.core.services.UserService.fromBusines
 /**
  * Determines if a User have approved to be a part of the Event.
  */
-@Getter @FieldNameConstants
+@Getter
 public class Request {
 
     /**
      * The User that needs to approve the Event.
      */
-    private BusinessUser _receiver;
+    private UUID _receiverId;
 
-    private BusinessUser _sender;
+    private UUID _senderId;
 
     /**
      * The Event that has been requested for.
@@ -70,8 +70,8 @@ public class Request {
      */
     public Request(DTO request) {
         this(
-                fromBusinessUser(request.getReceiver()),
-                fromBusinessUser(request.getSender()),
+                request.getReceiverId(),
+                request.getSenderId(),
                 new Event(request.getEvent()),
                 request.getApproved(),
                 request.getTimestamp()
@@ -79,8 +79,8 @@ public class Request {
     }
 
     public Request(
-            BusinessUser receiver,
-            BusinessUser sender,
+            UUID receiver,
+            UUID sender,
             Event event,
             Instant approved,
             Instant timestamp
@@ -88,8 +88,8 @@ public class Request {
         if (receiver == null || event == null)
             throw new IllegalArgumentException("User and event are both required for Request with timestamp: " + timestamp);
 
-        _receiver = receiver;
-        _sender = sender;
+        _receiverId = receiver;
+        _senderId = sender;
         _event = event;
         _approved = approved;
         _timestamp = timestamp;
@@ -99,25 +99,21 @@ public class Request {
     public String toString() {
         return ModelService.defineToString(
             getClass().getSimpleName(),
-            get_userId(),
+            get_receiverId(),
             get_eventId(),
             new String[]{
-                "userId",
+                "receiverId",
                 "eventId",
-                Fields._approved,
-                Model.Fields._timestamp
+                DTO.Fields.approved,
+                Model.ModelDTO.Fields.timestamp
             },
             new String[]{
-                String.valueOf(get_userId()),
-                String.valueOf(get_eventId()),
+                get_receiverId().toString(),
+                get_eventId().toString(),
                 _approved != null ? _approved.toString() : null,
                 String.valueOf(_timestamp)
             }
         );
-    }
-
-    public UUID get_userId() {
-        return _receiver.get_id();
     }
 
     public UUID get_eventId() {
@@ -125,13 +121,13 @@ public class Request {
     }
 
     /** Determines if a User have approved to be a part of the Event. */
-    @Getter
+    @Getter @FieldNameConstants
     public static class DTO {
 
         /** The User that needs to approve the Event. */
-        private BusinessUser.BusinessUserDTO receiver;
+        private UUID receiverId;
 
-        private BusinessUser.BusinessUserDTO sender;
+        private UUID senderId;
 
         /** The Event that has been requested for. */
         private Event.DTO event;
@@ -143,14 +139,14 @@ public class Request {
 
         @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
         public DTO(
-                @JsonProperty BusinessUser.BusinessUserDTO receiver,
-                @JsonProperty BusinessUser.BusinessUserDTO sender,
+                @JsonProperty UUID receiverId,
+                @JsonProperty UUID senderId,
                 @JsonProperty Event.DTO event,
                 @JsonProperty Instant approved,
                 @JsonProperty Instant timestamp
         ) {
-            this.receiver = receiver;
-            this.sender = sender;
+            this.receiverId = receiverId;
+            this.senderId = senderId;
             this.event = event;
             this.approved = approved;
             this.timestamp = timestamp;
@@ -161,8 +157,8 @@ public class Request {
          * @param request The Object to be converted.
          */
         public DTO(Request request) {
-            receiver = fromBusinessUser(request.get_receiver());
-            sender = fromBusinessUser(request.get_sender());
+            receiverId = request.get_receiverId();
+            senderId = request.get_senderId();
             event = new Event.DTO(request.get_event());
             approved = request.get_approved();
             timestamp = request.get_timestamp();

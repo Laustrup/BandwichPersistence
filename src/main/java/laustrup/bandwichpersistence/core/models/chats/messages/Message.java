@@ -1,11 +1,8 @@
 package laustrup.bandwichpersistence.core.models.chats.messages;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import laustrup.bandwichpersistence.core.models.Model;
-import laustrup.bandwichpersistence.core.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.core.models.User;
 import lombok.Getter;
-import lombok.experimental.FieldNameConstants;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -13,7 +10,7 @@ import java.util.UUID;
 /**
  * A Message that are sent in a ChatRoom.
  */
-@Getter @FieldNameConstants
+@Getter
 public class Message extends MessageBase {
 
 
@@ -62,7 +59,7 @@ public class Message extends MessageBase {
      * Is meant to be used as having common fields and be the body of Requests and Responses.
      * Doesn't have any logic.
      */
-    @Getter @FieldNameConstants @JsonIgnoreProperties(ignoreUnknown = true)
+    @Getter
     public static class DTO extends MessageBase.DTO {
 
         /**

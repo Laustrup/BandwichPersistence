@@ -32,6 +32,8 @@ public class ArtistBuilder extends BuilderService<Artist> {
 
     private final VenueRatingBuilder _venueRatingBuilder = new VenueRatingBuilder();
 
+    private final RequestBuilder _requestBuilder = new RequestBuilder();
+
     public ArtistBuilder() {
         super(Artist.class, ArtistBuilder.class);
     }
@@ -99,7 +101,7 @@ public class ArtistBuilder extends BuilderService<Artist> {
                                 getUUID(Follow.DTO.Fields.followerId),
                                 getUUID(Follow.DTO.Fields.followedId)
                         ));
-                        combine(requests, RequestBuilder.build(resultSet));
+                        combine(requests, _requestBuilder.build(resultSet));
                         combine(ratings, _venueRatingBuilder.build(resultSet));
                         combine(history.get().get_stories(), HistoryBuilder.buildStory(resultSet, history.get()));
                         timestamp.set(getInstant(Model.ModelDTO.Fields.timestamp));

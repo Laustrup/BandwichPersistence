@@ -316,7 +316,7 @@ public class Event extends Model {
      */
     private Seszt<Request> removeRequests(Band performer) {
         for (int i = 1; i <= _requests.size(); i++) {
-            if (_requests.Get(i).get_receiver().get_id() == performer.get_id()) {
+            if (_requests.Get(i).get_receiverId().equals(performer.get_id())) {
                 _requests.Remove(i);
                 break;
             }
@@ -365,24 +365,13 @@ public class Event extends Model {
             return null;
 
         for (Request local : _requests) {
-            if (local.get_userId().equals(request.get_userId())) {
+            if (local.get_receiverId().equals(request.get_receiverId())) {
                 local.set_approved(Instant.now());
                 return _requests;
             }
         }
 
         return null;
-    }
-
-    /**
-     * Checks if the Venue has approved the Request.
-     * @return True if the venue has approved.
-     */
-    public boolean venueHasApproved() {
-        for (Request request : _requests)
-            if (request.get_receiver().getClass() == Organisation.Employee.class && request.isApproved())
-                return true;
-        return false;
     }
 
     /**
@@ -490,7 +479,7 @@ public class Event extends Model {
             Request localRequest = _requests.Get(i);
 
             if (
-                localRequest.get_userId() == request.get_userId()
+                localRequest.get_receiverId().equals(request.get_receiverId())
                 && Objects.equals(localRequest.get_eventId(), request.get_eventId())
             ) {
                return _requests.Set(i, request).Get(i);

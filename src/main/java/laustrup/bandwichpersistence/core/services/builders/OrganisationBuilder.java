@@ -28,6 +28,8 @@ public class OrganisationBuilder extends BuilderService<Organisation> {
 
     private AlbumBuilder _albumBuilder = new AlbumBuilder();
 
+    private RequestBuilder _requestBuilder = new RequestBuilder();
+
     protected OrganisationBuilder() {
         super(Organisation.class, OrganisationBuilder.class);
     }
@@ -63,7 +65,7 @@ public class OrganisationBuilder extends BuilderService<Organisation> {
                         set(title, table.apply(getString(Model.ModelDTO.Fields.title)));
                         combine(events, _eventBuilder.build(resultSet));
                         combine(venues, _venueBuilder.build(resultSet));
-                        combine(requests, RequestBuilder.build(resultSet));
+                        combine(requests, _requestBuilder.build(resultSet));
                         _contactInfoBuilder.complete(contactInfo, resultSet);
                         combine(chatRoomTemplates, _chatRoomTemplateBuilder.build(resultSet));
                         combine(albums, _albumBuilder.build(resultSet));

@@ -35,6 +35,8 @@ public class EventBuilder extends BuilderService<Event> {
 
     private final PostBuilder _postBuilder = new PostBuilder();
 
+    private final RequestBuilder _requestBuilder = new RequestBuilder();
+
     protected EventBuilder() {
         super(Event.class, EventBuilder.class);
     }
@@ -101,7 +103,7 @@ public class EventBuilder extends BuilderService<Event> {
                         combine(organisations, _organisationBuilder.build(resultSet));
                         _chatRoomBuilder.complete(chatRoom, resultSet);
                         _venueBuilder.complete(venue, resultSet);
-                        combine(requests, RequestBuilder.build(resultSet));
+                        combine(requests, _requestBuilder.build(resultSet));
                         combine(posts, _postBuilder.build(resultSet));
                         combine(albums, _albumBuilder.build(resultSet));
                         history.get().get_stories().add(HistoryBuilder.buildStory(resultSet, history.get()));

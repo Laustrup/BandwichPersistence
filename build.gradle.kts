@@ -50,6 +50,20 @@ tasks.withType<Javadoc> {
     options.encoding = "UTF-8"
 }
 
+tasks.withType<Jar> {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+tasks.named<Test>("test") {
+    useJUnitPlatform()
+
+    maxHeapSize = "1G"
+
+    testLogging {
+        events("passed")
+    }
+}
+
 tasks.named<JavaExec>("bootRun") {
     standardInput = System.`in`
 }
