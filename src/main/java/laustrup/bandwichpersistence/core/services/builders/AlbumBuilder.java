@@ -18,8 +18,6 @@ public class AlbumBuilder extends BuilderService<Album> {
 
     private static AlbumBuilder _instance;
 
-    private final AlbumMediaBuilder _albumMediaBuilder = AlbumMediaBuilder.get_instance();
-
     public static AlbumBuilder get_instance() {
         if (_instance == null)
             _instance = new AlbumBuilder();
@@ -28,7 +26,7 @@ public class AlbumBuilder extends BuilderService<Album> {
     }
 
     private AlbumBuilder() {
-        super(_instance, _logger);
+        super(Album.class, _logger);
     }
 
     @Override
@@ -49,7 +47,7 @@ public class AlbumBuilder extends BuilderService<Album> {
                     () -> {
                         set(id, table.apply(Model.ModelDTO.Fields.id));
                         set(title, table.apply(Model.ModelDTO.Fields.title));
-                        combine(media, _albumMediaBuilder.build(resultSet));
+                        combine(media, AlbumMediaBuilder.get_instance().build(resultSet));
                         timestamp.set(getInstant(Model.ModelDTO.Fields.timestamp));
                     },
                     id

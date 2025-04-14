@@ -210,6 +210,8 @@ public class JDBCService {
         try {
             if (_resultSet.next())
                 type = supply.get();
+            else
+                throw new SQLException("No more rows when peeking");
 
             moveBackwards(true);
         } catch (SQLException exception) {
@@ -221,6 +223,15 @@ public class JDBCService {
         return type;
     }
 
+    /**
+     * Looks into the resultSet to find a targeted information.
+     * Will go one line forward and then move all the way back.
+     * @param resultSet The table of gathered results.
+     * @param action The algorithm to reach the target information.
+     * @param logging In case of a SQLException, how should this be logged?
+     * @return The target information.
+     * @param <T> The target information type.
+     */
     public static <T> T peek(ResultSet resultSet, Function<ResultSet, T> action, Consumer<SQLException> logging) {
         T type = null;
         _resultSet = resultSet;
@@ -228,6 +239,8 @@ public class JDBCService {
         try {
             if (_resultSet.next())
                 type = action.apply(_resultSet);
+            else
+                throw new SQLException("No more rows when peeking");
 
             moveBackwards(true);
         } catch (SQLException exception) {
@@ -340,10 +353,10 @@ public class JDBCService {
     }
 
     private static void moveBackwards(boolean toStart) throws SQLException {
-        if (!_resultSet.isClosed())
+        if (!_resultSet.isClosed() && _resultSet.getRow() > 0)
             do
                 _resultSet.previous();
-            while (toStart && !_resultSet.isBeforeFirst());
+            while (toStart && _resultSet.getRow() > 0 && !_resultSet.isBeforeFirst());
     }
 
     private static void reset() {

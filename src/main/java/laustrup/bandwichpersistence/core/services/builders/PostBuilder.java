@@ -20,10 +20,6 @@ public class PostBuilder extends BuilderService<Post> {
 
     private static PostBuilder _instance;
 
-    private final UserBuilder _userBuilder = UserBuilder.get_instance();
-
-    private final ModelBuilder _modelBuilder = ModelBuilder.get_instance();
-
     public static PostBuilder get_instance() {
         if (_instance == null)
             _instance = new PostBuilder();
@@ -32,7 +28,7 @@ public class PostBuilder extends BuilderService<Post> {
     }
 
     private PostBuilder() {
-        super(_instance, _logger);
+        super(Post.class, _logger);
     }
 
     @Override
@@ -57,8 +53,8 @@ public class PostBuilder extends BuilderService<Post> {
                     resultSet,
                     () -> {
                         set(id, table.apply(Model.ModelDTO.Fields.id));
-                        _userBuilder.complete(author, resultSet);
-                        _modelBuilder.complete(receiver, resultSet);
+                        UserBuilder.get_instance().complete(author, resultSet);
+                        ModelBuilder.get_instance().complete(receiver, resultSet);
                         set(content, table.apply(MessageBase.DTO.Fields.content));
                         set(isEdited, table.apply(MessageBase.DTO.Fields.isEdited));
                         set(isSent, table.apply(MessageBase.DTO.Fields.sent));

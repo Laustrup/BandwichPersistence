@@ -14,8 +14,6 @@ public class VenueRatingBuilder extends BuilderService<Venue.Rating> {
 
     private static VenueRatingBuilder _instance;
 
-    private static RatingBuilder.Service _ratingBuilderService = RatingBuilder.Service.get_instance();
-
     public static VenueRatingBuilder get_instance() {
         if (_instance == null)
             _instance = new VenueRatingBuilder();
@@ -24,7 +22,7 @@ public class VenueRatingBuilder extends BuilderService<Venue.Rating> {
     }
 
     private VenueRatingBuilder() {
-        super(_instance, _logger);
+        super(Venue.Rating.class, _logger);
     }
 
     @Override
@@ -34,7 +32,7 @@ public class VenueRatingBuilder extends BuilderService<Venue.Rating> {
 
     @Override
     protected Function<Function<String, Field>, Venue.Rating> logic(ResultSet resultSet) {
-        return table -> (Venue.Rating) _ratingBuilderService.generateLogic(
+        return table -> (Venue.Rating) RatingBuilder.Service.get_instance().generateLogic(
                 resultSet,
                 RatingBuilder.Service.Implementation.VENUE,
                 table

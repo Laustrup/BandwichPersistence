@@ -21,12 +21,6 @@ public class OrganisationEmployeeBuilder extends BuilderService<Organisation.Emp
 
     private static OrganisationEmployeeBuilder _instance;
 
-    private final ContactInfoBuilder _contactInfoBuilder = ContactInfoBuilder.get_instance();
-
-    private final SubscriptionBuilder _subscriptionBuilder = SubscriptionBuilder.get_instance();
-
-    private final ChatRoomBuilder _chatRoomBuilder = ChatRoomBuilder.get_instance();
-
     public static OrganisationEmployeeBuilder get_instance() {
         if (_instance == null)
             _instance = new OrganisationEmployeeBuilder();
@@ -35,7 +29,14 @@ public class OrganisationEmployeeBuilder extends BuilderService<Organisation.Emp
     }
 
     private OrganisationEmployeeBuilder() {
-        super(_instance, _logger);
+        super(
+                Organisation.Employee.class,
+                classToTableName(
+                        Organisation.class,
+                        Organisation.Employee.class
+                ),
+                _logger
+        );
     }
 
     @Override
@@ -72,14 +73,14 @@ public class OrganisationEmployeeBuilder extends BuilderService<Organisation.Emp
                         set(firstName, table.apply(User.UserDTO.Fields.firstName));
                         set(lastName, table.apply(User.UserDTO.Fields.lastName));
                         set(description, table.apply(User.UserDTO.Fields.description));
-                        _contactInfoBuilder.complete(contactInfo, resultSet);
-                        _subscriptionBuilder.complete(subscription, resultSet);
+                        ContactInfoBuilder.get_instance().complete(contactInfo, resultSet);
+                        SubscriptionBuilder.get_instance().complete(subscription, resultSet);
                         add(roles, Field.of(
                                 Organisation.class.getSimpleName() + "Employments",
                                 Organisation.Employee.DTO.Fields.roles.replace("s", ""))
                         );
                         add(authorities, Field.of(User.UserDTO.Fields.authorities, "level"));
-                        combine(chatRooms, _chatRoomBuilder.build(resultSet));
+                        combine(chatRooms, ChatRoomBuilder.get_instance().build(resultSet));
                         combine(history.get().get_stories(), HistoryBuilder.buildStory(resultSet, history.get()));
                         timestamp.set(getTimestamp(Model.ModelDTO.Fields.timestamp, Timestamp::toInstant));
                     },

@@ -20,16 +20,6 @@ public class VenueBuilder extends BuilderService<Venue> {
 
     private static VenueBuilder _instance;
 
-    private final OrganisationBuilder _organisationBuilder = OrganisationBuilder.get_instance();
-
-    private final AlbumBuilder _albumBuilder = AlbumBuilder.get_instance();
-
-    private final AddressBuilder _addressBuilder = AddressBuilder.get_instance();
-
-    private final PostBuilder _postBuilder = PostBuilder.get_instance();
-
-    private final VenueRatingBuilder _venueRatingBuilder = VenueRatingBuilder.get_instance();
-
     public static VenueBuilder get_instance() {
         if (_instance == null)
             _instance = new VenueBuilder();
@@ -38,7 +28,7 @@ public class VenueBuilder extends BuilderService<Venue> {
     }
 
     private VenueBuilder() {
-        super(_instance, _logger);
+        super(Venue.class, _logger);
     }
 
     @Override
@@ -75,11 +65,11 @@ public class VenueBuilder extends BuilderService<Venue> {
                         set(title, table.apply(Model.ModelDTO.Fields.title));
                         set(description, table.apply(Venue.DTO.Fields.description));
                         set(stageSetup, table.apply(Venue.DTO.Fields.stageSetup));
-                        combine(organisations, _organisationBuilder.build(resultSet));
-                        combine(albums, _albumBuilder.build(resultSet));
-                        _addressBuilder.complete(address, resultSet);
-                        combine(posts, _postBuilder.build(resultSet));
-                        combine(ratings, _venueRatingBuilder.build(resultSet));
+                        combine(organisations, OrganisationBuilder.get_instance().build(resultSet));
+                        combine(albums, AlbumBuilder.get_instance().build(resultSet));
+                        AddressBuilder.get_instance().complete(address, resultSet);
+                        combine(posts, PostBuilder.get_instance().build(resultSet));
+                        combine(ratings, VenueRatingBuilder.get_instance().build(resultSet));
                         combine(areas, getString(Venue.DTO.Fields.areas));
                         set(size, table.apply(Venue.DTO.Fields.size));
                         timestamp.set(getInstant(Model.ModelDTO.Fields.timestamp));

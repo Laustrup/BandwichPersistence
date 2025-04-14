@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.logging.Logger;
 
 import static laustrup.bandwichpersistence.web.services.WebService.respond;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @RestController
 public class UserDetailsController {
@@ -22,7 +23,7 @@ public class UserDetailsController {
         return respond(() -> UserDetailsManager.getUser(login));
     }
 
-    @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Instantiation exception for login!")
+    @ResponseStatus(value = BAD_REQUEST, reason = "Instantiation exception for login!")
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public void handleException(HttpMessageNotReadableException ex) {
         _logger.warning(ex.getMessage());

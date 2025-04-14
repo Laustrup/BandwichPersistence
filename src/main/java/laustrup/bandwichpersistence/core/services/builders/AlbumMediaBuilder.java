@@ -27,7 +27,7 @@ public class AlbumMediaBuilder extends BuilderService<Album.Media> {
     }
 
     private AlbumMediaBuilder() {
-        super(_instance, _logger);
+        super(Album.Media.class, _logger);
     }
 
     @Override

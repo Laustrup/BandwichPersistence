@@ -23,8 +23,6 @@ public class MessageBuilder extends BuilderService<Message> {
 
     private static MessageBuilder _instance;
 
-    private final UserBuilder _userBuilder = UserBuilder.get_instance();
-
     public static MessageBuilder get_instance() {
         if (_instance == null)
             _instance = new MessageBuilder();
@@ -33,7 +31,7 @@ public class MessageBuilder extends BuilderService<Message> {
     }
 
     private MessageBuilder() {
-        super(_instance, _logger);
+        super(Message.class, _logger);
     }
 
     @Override
@@ -57,7 +55,7 @@ public class MessageBuilder extends BuilderService<Message> {
                     resultSet,
                     () -> {
                         set(id, table.apply(Model.ModelDTO.Fields.id));
-                        _userBuilder.complete(author, resultSet);
+                        UserBuilder.get_instance().complete(author, resultSet);
                         set(content, table.apply(MessageBase.Fields._content));
                         set(isSent, table.apply(MessageBase.Fields._sent));
                         set(isRead, table.apply(MessageBase.Fields._read));

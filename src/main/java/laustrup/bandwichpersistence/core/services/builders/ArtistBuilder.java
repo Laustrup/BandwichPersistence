@@ -23,22 +23,6 @@ public class ArtistBuilder extends BuilderService<Artist> {
 
     private static ArtistBuilder _instance;
 
-    private final AlbumBuilder _albumBuilder = AlbumBuilder.get_instance();
-
-    private final BandBuilder _bandBuilder = BandBuilder.get_instance();
-
-    private final ChatRoomBuilder _chatRoomBuilder = ChatRoomBuilder.get_instance();
-
-    private final ContactInfoBuilder _contactInfoBuilder = ContactInfoBuilder.get_instance();
-
-    private final SubscriptionBuilder _subscriptionBuilder = SubscriptionBuilder.get_instance();
-
-    private final GigBuilder _gigBuilder = GigBuilder.get_instance();
-
-    private final VenueRatingBuilder _venueRatingBuilder = VenueRatingBuilder.get_instance();
-
-    private final RequestBuilder _requestBuilder = RequestBuilder.get_instance();
-
     public static ArtistBuilder get_instance() {
         if (_instance == null)
             _instance = new ArtistBuilder();
@@ -47,7 +31,7 @@ public class ArtistBuilder extends BuilderService<Artist> {
     }
 
     private ArtistBuilder() {
-        super(_instance, _logger);
+        super(Artist.class, _logger);
     }
 
     @Override
@@ -94,27 +78,27 @@ public class ArtistBuilder extends BuilderService<Artist> {
                         set(firstName, table.apply(User.UserDTO.Fields.firstName));
                         set(lastName, table.apply(User.UserDTO.Fields.lastName));
                         set(description, table.apply(User.UserDTO.Fields.description));
-                        _contactInfoBuilder.complete(contactInfo, resultSet);
-                        combine(albums, _albumBuilder.build(resultSet));
-                        _subscriptionBuilder.complete(subscription, resultSet);
+                        ContactInfoBuilder.get_instance().complete(contactInfo, resultSet);
+                        combine(albums, AlbumBuilder.get_instance().build(resultSet));
+                        SubscriptionBuilder.get_instance().complete(subscription, resultSet);
                         combine(authorities, User.Authority.valueOf(getString(User.UserDTO.Fields.authorities)));
-                        combine(chatRooms, _chatRoomBuilder.build(resultSet));
+                        combine(chatRooms, ChatRoomBuilder.get_instance().build(resultSet));
                         combine(
                                 memberships,
                                 new Artist.Membership(
-                                        _bandBuilder.build(resultSet),
+                                        BandBuilder.get_instance().build(resultSet),
                                         Artist.Membership.Association.valueOf(getString(Artist.Membership.DTO.Fields.association))
                                 )
                         );
-                        combine(gigs, _gigBuilder.build(resultSet));
+                        combine(gigs, GigBuilder.get_instance().build(resultSet));
                         set(runner, table.apply(Artist.DTO.Fields.runner));
                         combine(follows, new Follow(
                                 getBoolean(Follow.DTO.Fields.notify),
                                 getUUID(Follow.DTO.Fields.followerId),
                                 getUUID(Follow.DTO.Fields.followedId)
                         ));
-                        combine(requests, _requestBuilder.build(resultSet));
-                        combine(ratings, _venueRatingBuilder.build(resultSet));
+                        combine(requests, RequestBuilder.get_instance().build(resultSet));
+                        combine(ratings, VenueRatingBuilder.get_instance().build(resultSet));
                         combine(history.get().get_stories(), HistoryBuilder.buildStory(resultSet, history.get()));
                         timestamp.set(getInstant(Model.ModelDTO.Fields.timestamp));
                     },

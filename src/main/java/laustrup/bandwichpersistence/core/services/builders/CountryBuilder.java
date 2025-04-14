@@ -1,5 +1,6 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
+import laustrup.bandwichpersistence.core.models.Event;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
 
 import java.sql.ResultSet;
@@ -24,7 +25,7 @@ public class CountryBuilder extends BuilderService<ContactInfo.Country> {
     }
 
     private CountryBuilder() {
-        super(_instance, _logger);
+        super(ContactInfo.Country.class, _logger);
     }
 
     @Override

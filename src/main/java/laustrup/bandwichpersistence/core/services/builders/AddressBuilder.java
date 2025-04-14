@@ -25,7 +25,7 @@ public class AddressBuilder extends BuilderService<ContactInfo.Address> {
     }
 
     private AddressBuilder() {
-        super(_instance, _logger);
+        super(ContactInfo.Address.class, _logger);
     }
 
     @Override

@@ -19,16 +19,6 @@ public class BandBuilder extends BuilderService<Band> {
 
     private static BandBuilder _instance;
 
-    private final AlbumBuilder _albumBuilder = AlbumBuilder.get_instance();
-
-    private final EventBuilder _eventBuilder = EventBuilder.get_instance();
-
-    private final UserBuilder _userBuilder = UserBuilder.get_instance();
-
-    private final SubscriptionBuilder _subscriptionBuilder = SubscriptionBuilder.get_instance();
-
-    private final PostBuilder _postBuilder = PostBuilder.get_instance();
-
     public static BandBuilder get_instance() {
         if (_instance == null)
             _instance = new BandBuilder();
@@ -37,7 +27,7 @@ public class BandBuilder extends BuilderService<Band> {
     }
 
     private BandBuilder() {
-        super(_instance, _logger);
+        super(Band.class, _logger);
     }
 
     @Override
@@ -71,11 +61,11 @@ public class BandBuilder extends BuilderService<Band> {
                         set(name, table.apply(Band.DTO.Fields.name));
                         set(description, table.apply(Band.DTO.Fields.description));
                         set(runner, table.apply(Band.DTO.Fields.runner));
-                        combine(albums, _albumBuilder.build(resultSet));
-                        combine(events, _eventBuilder.build(resultSet));
-                        combine(posts, _postBuilder.build(resultSet));
-                        combine(fans, _userBuilder.build(resultSet));
-                        _subscriptionBuilder.complete(subscription, resultSet);
+                        combine(albums, AlbumBuilder.get_instance().build(resultSet));
+                        combine(events, EventBuilder.get_instance().build(resultSet));
+                        combine(posts, PostBuilder.get_instance().build(resultSet));
+                        combine(fans, UserBuilder.get_instance().build(resultSet));
+                        SubscriptionBuilder.get_instance().complete(subscription, resultSet);
                         timestamp.set(getInstant(Model.ModelDTO.Fields.timestamp));
                     },
                     id

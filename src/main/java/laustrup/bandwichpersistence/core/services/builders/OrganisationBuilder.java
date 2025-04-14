@@ -22,20 +22,6 @@ public class OrganisationBuilder extends BuilderService<Organisation> {
 
     private static OrganisationBuilder _instance;
 
-    private OrganisationEmployeeBuilder _employeeBuilder = OrganisationEmployeeBuilder.get_instance();
-
-    private EventBuilder _eventBuilder = EventBuilder.get_instance();
-
-    private VenueBuilder _venueBuilder = VenueBuilder.get_instance();
-
-    private ContactInfoBuilder _contactInfoBuilder = ContactInfoBuilder.get_instance();
-
-    private ChatRoomTemplateBuilder _chatRoomTemplateBuilder = ChatRoomTemplateBuilder.get_instance();
-
-    private AlbumBuilder _albumBuilder = AlbumBuilder.get_instance();
-
-    private RequestBuilder _requestBuilder = RequestBuilder.get_instance();
-
     public static OrganisationBuilder get_instance() {
         if (_instance == null)
             _instance = new OrganisationBuilder();
@@ -44,7 +30,7 @@ public class OrganisationBuilder extends BuilderService<Organisation> {
     }
 
     private OrganisationBuilder() {
-        super(_instance, _logger);
+        super(Organisation.class, _logger);
     }
 
     @Override
@@ -76,13 +62,13 @@ public class OrganisationBuilder extends BuilderService<Organisation> {
                     () -> {
                         set(id, table.apply(Model.ModelDTO.Fields.id));
                         set(title, table.apply(getString(Model.ModelDTO.Fields.title)));
-                        combine(events, _eventBuilder.build(resultSet));
-                        combine(venues, _venueBuilder.build(resultSet));
-                        combine(requests, _requestBuilder.build(resultSet));
-                        _contactInfoBuilder.complete(contactInfo, resultSet);
-                        combine(chatRoomTemplates, _chatRoomTemplateBuilder.build(resultSet));
-                        combine(albums, _albumBuilder.build(resultSet));
-                        combine(employees, _employeeBuilder.build(resultSet));
+                        combine(events, EventBuilder.get_instance().build(resultSet));
+                        combine(venues, VenueBuilder.get_instance().build(resultSet));
+                        combine(requests, RequestBuilder.get_instance().build(resultSet));
+                        ContactInfoBuilder.get_instance().complete(contactInfo, resultSet);
+                        combine(chatRoomTemplates, ChatRoomTemplateBuilder.get_instance().build(resultSet));
+                        combine(albums, AlbumBuilder.get_instance().build(resultSet));
+                        combine(employees, OrganisationEmployeeBuilder.get_instance().build(resultSet));
                         timestamp.set(getInstant(Model.ModelDTO.Fields.timestamp));
                     },
                     id

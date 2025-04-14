@@ -21,10 +21,6 @@ public class GigBuilder extends BuilderService<Event.Gig> {
 
     private static GigBuilder _instance;
 
-    private final EventBuilder _eventBuilder = EventBuilder.get_instance();
-
-    private final BandBuilder _bandBuilder = BandBuilder.get_instance();
-
     public static GigBuilder get_instance() {
         if (_instance == null)
             _instance = new GigBuilder();
@@ -33,7 +29,7 @@ public class GigBuilder extends BuilderService<Event.Gig> {
     }
 
     private GigBuilder() {
-        super(_instance, _logger);
+        super(Event.Gig.class, _logger);
     }
 
     @Override
@@ -42,7 +38,7 @@ public class GigBuilder extends BuilderService<Event.Gig> {
     }
 
     @Override
-    protected Function<Function<String, JDBCService.Field>, Event.Gig> logic(ResultSet resultSet) {
+    protected Function<Function<String, Field>, Event.Gig> logic(ResultSet resultSet) {
         return table -> {
             AtomicReference<UUID> id = new AtomicReference<>();
             AtomicReference<Event> event = new AtomicReference<>();
@@ -56,8 +52,8 @@ public class GigBuilder extends BuilderService<Event.Gig> {
                     resultSet,
                     () -> {
                         set(id, table.apply(Model.ModelDTO.Fields.id));
-                        _eventBuilder.complete(event, resultSet);
-                        combine(act, _bandBuilder.build(resultSet));
+                        EventBuilder.get_instance().complete(event, resultSet);
+                        combine(act, BandBuilder.get_instance().build(resultSet));
                         start.set(getInstant(Event.DTO.Fields.start));
                         end.set(getInstant(Event.DTO.Fields.end));
                         timestamp.set(getInstant(Model.ModelDTO.Fields.timestamp));

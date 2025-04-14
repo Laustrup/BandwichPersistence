@@ -23,8 +23,6 @@ public class RequestBuilder extends BuilderService<Request> {
 
     private static RequestBuilder _instance;
 
-    private final EventBuilder _eventBuilder = EventBuilder.get_instance();
-
     public static RequestBuilder get_instance() {
         if (_instance == null)
             _instance = new RequestBuilder();
@@ -33,7 +31,7 @@ public class RequestBuilder extends BuilderService<Request> {
     }
 
     private RequestBuilder() {
-        super(_instance, _logger);
+        super(Request.class, _logger);
     }
 
     @Override
@@ -57,7 +55,7 @@ public class RequestBuilder extends BuilderService<Request> {
                     () -> {
                         set(receiverId, table.apply(Model.ModelDTO.Fields.id));
                         set(senderId, table.apply(Model.ModelDTO.Fields.id));
-                        _eventBuilder.complete(event, resultSet);
+                        EventBuilder.get_instance().complete(event, resultSet);
                         approved.set(getInstant(Request.DTO.Fields.approved));
                         timestamp.set(getInstant(Request.DTO.Fields.timestamp));
                     },

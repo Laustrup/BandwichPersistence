@@ -21,8 +21,6 @@ public class UserDetailsManager {
 
     private static final Logger _logger = Logger.getLogger(UserDetailsManager.class.getName());
 
-    private static final UserBuilder _userBuilder = UserBuilder.get_instance();
-
     public static UserDetails getUserDetails(String email) {
         return databaseInteraction(() ->
                 UserBuilder.buildLogins(UserDetailsRepository.getUserDetailsByEmail(email))
@@ -37,7 +35,7 @@ public class UserDetailsManager {
             HttpStatus status = HttpStatus.OK;
 
             try {
-                user = _userBuilder.build(passwordFits(
+                user = UserBuilder.get_instance().build(passwordFits(
                         UserDetailsRepository.getUserByEmail(login),
                         login.getPassword()
                 ));
@@ -72,7 +70,10 @@ public class UserDetailsManager {
                                         ),
                                         String.class
                                 ),
-                        exception -> _logger.warning("Issue when checking for password fit:\n\n" + exception.getMessage())
+                        exception -> {
+                            _logger.warning("Issue when checking for password fit: " + exception.getMessage());
+                            throw new RuntimeException(exception);
+                        }
                 )
         ))
             return resultSet;

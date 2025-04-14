@@ -22,8 +22,6 @@ public class RatingBuilder extends BuilderService<Rating> {
 
     private static RatingBuilder _instance;
 
-    private final Service _service = Service.get_instance();
-
     public static RatingBuilder get_instance() {
         if (_instance == null)
             _instance = new RatingBuilder();
@@ -32,7 +30,7 @@ public class RatingBuilder extends BuilderService<Rating> {
     }
 
     private RatingBuilder() {
-        super(_instance, _logger);
+        super(Rating.class, _logger);
     }
 
     @Override
@@ -42,7 +40,7 @@ public class RatingBuilder extends BuilderService<Rating> {
 
     @Override
     protected Function<Function<String, JDBCService.Field>, Rating> logic(ResultSet resultSet) {
-        return table -> _service.generateLogic(resultSet, Service.Implementation.STANDARD, table);
+        return table -> Service.get_instance().generateLogic(resultSet, Service.Implementation.STANDARD, table);
     }
 
     public static class Service {
@@ -58,8 +56,6 @@ public class RatingBuilder extends BuilderService<Rating> {
 
         private Service() {
         }
-
-        private final OrganisationBuilder _organisationBuilder = OrganisationBuilder.get_instance();
 
         public Rating generateLogic(ResultSet resultSet, Implementation implementation, Function<String, Field> table) {
             AtomicReference<Integer> value = new AtomicReference<>();
@@ -79,7 +75,7 @@ public class RatingBuilder extends BuilderService<Rating> {
                             set(reviewerId, table.apply(Rating.DTO.Fields.reviewerId));
                             set(comment, table.apply(Rating.DTO.Fields.comment));
                             if (implementation == Implementation.VENUE)
-                                _organisationBuilder.complete(organisation, resultSet);
+                                OrganisationBuilder.get_instance().complete(organisation, resultSet);
                             timestamp.set(getInstant(Rating.DTO.Fields.timestamp));
                         },
                         primary -> !get(

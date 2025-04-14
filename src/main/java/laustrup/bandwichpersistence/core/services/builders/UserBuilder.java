@@ -20,10 +20,6 @@ public class UserBuilder extends BuilderService<User> {
 
     private static UserBuilder _instance;
 
-    private final ArtistBuilder _artistBuilder = ArtistBuilder.get_instance();
-
-    private final OrganisationEmployeeBuilder _organisationEmployeeBuilder = OrganisationEmployeeBuilder.get_instance();
-
     public static UserBuilder get_instance() {
         if (_instance == null)
             _instance = new UserBuilder();
@@ -32,7 +28,7 @@ public class UserBuilder extends BuilderService<User> {
     }
 
     private UserBuilder() {
-        super(_instance, _logger);
+        super(User.class, _logger);
     }
 
     public static Stream<Login> buildLogins(ResultSet resultSet) {
@@ -56,8 +52,8 @@ public class UserBuilder extends BuilderService<User> {
                 () -> valueOf(getString(Subscription.DTO.Fields.userType)),
                 exception -> _logger.warning("Couldn't find user type when building user!\n" + exception.getMessage())
         )) {
-            case ARTIST -> _artistBuilder.build(resultSet);
-            case ORGANISATION_EMPLOYEE -> _organisationEmployeeBuilder.build(resultSet);
+            case ARTIST -> ArtistBuilder.get_instance().build(resultSet);
+            case ORGANISATION_EMPLOYEE -> OrganisationEmployeeBuilder.get_instance().build(resultSet);
             case null -> null;
             default -> throw new IllegalStateException("The type of User to build couldn't be found!");
         };
@@ -66,8 +62,8 @@ public class UserBuilder extends BuilderService<User> {
     @Override
     protected void completion(User collective, User part) {
         switch (collective.get_subscription().get_userType()) {
-            case ARTIST -> _artistBuilder.completion((Artist) collective, (Artist) part);
-            case ORGANISATION_EMPLOYEE -> _organisationEmployeeBuilder.completion((Organisation.Employee) collective, (Organisation.Employee) part);
+            case ARTIST -> ArtistBuilder.get_instance().completion((Artist) collective, (Artist) part);
+            case ORGANISATION_EMPLOYEE -> OrganisationEmployeeBuilder.get_instance().completion((Organisation.Employee) collective, (Organisation.Employee) part);
             default -> throw new IllegalStateException("The type of User to build couldn't be found!");
         }
     }

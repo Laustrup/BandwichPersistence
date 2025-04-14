@@ -25,7 +25,7 @@ public class PhoneBuilder extends BuilderService<ContactInfo.Phone> {
     }
 
     private PhoneBuilder() {
-        super(_instance, _logger);
+        super(ContactInfo.Phone.class, _logger);
     }
 
     @Override

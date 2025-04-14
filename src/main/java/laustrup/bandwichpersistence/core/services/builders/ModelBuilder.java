@@ -23,10 +23,6 @@ public class ModelBuilder extends BuilderService<Model> {
 
     private static ModelBuilder _instance;
 
-    private final UserBuilder _userBuilder = UserBuilder.get_instance();
-
-    private final EventBuilder _eventBuilder = EventBuilder.get_instance();
-
     public static ModelBuilder get_instance() {
         if (_instance == null)
             _instance = new ModelBuilder();
@@ -35,15 +31,15 @@ public class ModelBuilder extends BuilderService<Model> {
     }
 
     private ModelBuilder() {
-        super(_instance, _logger);
+        super(Model.class, _logger);
     }
 
     @Override
     public Model build(ResultSet resultSet) {
         return determineKind(
                 getZoneId(resultSet),
-                () -> _userBuilder.build(resultSet),
-                () -> _eventBuilder.build(resultSet)
+                () -> UserBuilder.get_instance().build(resultSet),
+                () -> EventBuilder.get_instance().build(resultSet)
         );
     }
 
@@ -57,8 +53,8 @@ public class ModelBuilder extends BuilderService<Model> {
 
         determineKind(
                 zoneId == null ? null : zoneId.getId(),
-                () -> _userBuilder.completion((User) collective, (User) part),
-                () -> _eventBuilder.completion((Event) collective, (Event) part)
+                () -> UserBuilder.get_instance().completion((User) collective, (User) part),
+                () -> EventBuilder.get_instance().completion((Event) collective, (Event) part)
         );
     }
 

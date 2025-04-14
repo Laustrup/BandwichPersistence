@@ -24,28 +24,6 @@ public class EventBuilder extends BuilderService<Event> {
 
     private static EventBuilder _instance;
 
-    private final OrganisationBuilder _organisationBuilder = OrganisationBuilder.get_instance();
-
-    private final ChatRoomBuilder _chatRoomBuilder = ChatRoomBuilder.get_instance();
-
-    private final AlbumBuilder _albumBuilder = AlbumBuilder.get_instance();
-
-    private final GigBuilder _gigBuilder = GigBuilder.get_instance();
-
-    private final AddressBuilder _addressBuilder = AddressBuilder.get_instance();
-
-    private final ContactInfoBuilder _contactInfoBuilder = ContactInfoBuilder.get_instance();
-
-    private final VenueBuilder _venueBuilder = VenueBuilder.get_instance();
-
-    private final PostBuilder _postBuilder = PostBuilder.get_instance();
-
-    private final RequestBuilder _requestBuilder = RequestBuilder.get_instance();
-
-    private final TicketOptionBuilder _ticketOptionBuilder = TicketOptionBuilder.get_instance();
-
-    private final TicketBuilder _ticketBuilder = TicketBuilder.get_instance();
-
     public static EventBuilder get_instance() {
         if (_instance == null)
             _instance = new EventBuilder();
@@ -54,7 +32,7 @@ public class EventBuilder extends BuilderService<Event> {
     }
 
     private EventBuilder() {
-        super(_instance, _logger);
+        super(Event.class, _logger);
     }
 
     @Override
@@ -110,18 +88,18 @@ public class EventBuilder extends BuilderService<Event> {
                         set(isPublic, table.apply(Event.DTO.Fields.isPublic));
                         set(isCancelled, table.apply(Event.DTO.Fields.isCancelled));
                         set(isSoldOut, table.apply(Event.DTO.Fields.isSoldOut));
-                        _addressBuilder.complete(location, _addressBuilder.build(resultSet));
+                        AddressBuilder.get_instance().complete(location, AddressBuilder.get_instance().build(resultSet));
                         zoneId.set(ZoneId.of(getString(Event.DTO.Fields.zoneId)));
-                        combine(ticketOptions, _ticketOptionBuilder.build(resultSet));
-                        combine(tickets, _ticketBuilder.build(resultSet));
-                        _contactInfoBuilder.complete(contactInfo, resultSet);
-                        combine(gigs, _gigBuilder.build(resultSet));
-                        combine(organisations, _organisationBuilder.build(resultSet));
-                        _chatRoomBuilder.complete(chatRoom, resultSet);
-                        _venueBuilder.complete(venue, resultSet);
-                        combine(requests, _requestBuilder.build(resultSet));
-                        combine(posts, _postBuilder.build(resultSet));
-                        combine(albums, _albumBuilder.build(resultSet));
+                        combine(ticketOptions, TicketOptionBuilder.get_instance().build(resultSet));
+                        combine(tickets, TicketBuilder.get_instance().build(resultSet));
+                        ContactInfoBuilder.get_instance().complete(contactInfo, resultSet);
+                        combine(gigs, GigBuilder.get_instance().build(resultSet));
+                        combine(organisations, OrganisationBuilder.get_instance().build(resultSet));
+                        ChatRoomBuilder.get_instance().complete(chatRoom, resultSet);
+                        VenueBuilder.get_instance().complete(venue, resultSet);
+                        combine(requests, RequestBuilder.get_instance().build(resultSet));
+                        combine(posts, PostBuilder.get_instance().build(resultSet));
+                        combine(albums, AlbumBuilder.get_instance().build(resultSet));
                         history.get().get_stories().add(HistoryBuilder.buildStory(resultSet, history.get()));
                         timestamp.set(getInstant(Model.ModelDTO.Fields.timestamp));
                     },

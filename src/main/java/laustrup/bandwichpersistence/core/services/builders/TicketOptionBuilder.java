@@ -21,7 +21,7 @@ public class TicketOptionBuilder extends BuilderService<Ticket.Option> {
     }
 
     protected TicketOptionBuilder() {
-        super(_instance, _logger);
+        super(Ticket.Option.class, _logger);
     }
 
     @Override

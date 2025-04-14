@@ -7,6 +7,7 @@ import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -16,13 +17,30 @@ import java.util.logging.Logger;
 
 abstract class BuilderService<E> {
 
-    private final BuilderService<E> _instance;
+    private final Class<E> _class;
+
+    private final String _tableName;
 
     private final Logger _logger;
 
-    protected BuilderService(BuilderService<E> instance, Logger logger) {
-        _instance = instance;
+    protected BuilderService(Class<E> clazz, Logger logger) {
+        _class = clazz;
+        _tableName = toTableName(clazz);
         _logger = logger;
+    }
+
+    protected BuilderService(Class<E> clazz, String tableName, Logger logger) {
+        _class = clazz;
+        _tableName = toTableName(tableName);
+        _logger = logger;
+    }
+
+    protected static String classToTableName(Class<?>... classes) {
+        return classToTableName(Arrays.stream(classes).map(Class::getSimpleName).toArray(String[]::new));
+    }
+
+    protected static String classToTableName(String... titles) {
+        return String.join("", titles);
     }
 
     static <M> void printError(Class<?> origin, AtomicReference<M> id, Exception exception, Logger logger) throws RuntimeException {
@@ -30,9 +48,13 @@ abstract class BuilderService<E> {
     }
 
     static <M> void printError(Class<?> origin, M id, Exception exception, Logger logger) throws RuntimeException {
+        printError(origin.getSimpleName(), id, exception, logger);
+    }
+
+    static <M> void printError(String _simpleClassName, M id, Exception exception, Logger logger) {
         logger.warning(String.format(
                 "Could not build %s of %s:\n%s",
-                origin.getSimpleName(),
+                _simpleClassName,
                 id,
                 exception.getMessage()
         ));
@@ -44,15 +66,11 @@ abstract class BuilderService<E> {
     }
 
     protected <M> void printError(M id, Exception exception) throws RuntimeException {
-        printError(_instance.getClass(), id, exception, _logger);
+        printError(_class.getSimpleName(), id, exception, _logger);
     }
 
     protected E handle(Function<Function<String, Field>, E> action) {
-        return handle(toTableName(_instance.getClass()), action);
-    }
-
-    static <E> E handle(Class<E> clazz, Function<Function<String, Field>, E> action) {
-        return handle(toTableName(clazz), action);
+        return handle(_tableName, action);
     }
 
     static <E> E handle(String table, Function<Function<String, Field>, E> action) {
@@ -64,7 +82,10 @@ abstract class BuilderService<E> {
     }
 
     static String toTableName(String table) {
-        return table + "s";
+        if (table == null)
+            throw new IllegalArgumentException("Table name cannot be null");
+
+        return table + (table.charAt(table.length() - 1) == 's' ? "" : "s");
     }
 
     public E build(ResultSet resultSet) {
@@ -129,7 +150,7 @@ abstract class BuilderService<E> {
         }
     }
 
-    public <M> void interaction(ResultSet resultSet, Runnable action) {
+    public void interaction(ResultSet resultSet, Runnable action) {
         JDBCService.build(resultSet, () -> {
             action.run();
             return null;

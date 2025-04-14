@@ -32,7 +32,7 @@ public class ChatRoomTemplateBuilder extends BuilderService<ChatRoom.Template> {
     }
 
     private ChatRoomTemplateBuilder() {
-        super(_instance, _logger);
+        super(ChatRoom.Template.class, _logger);
     }
 
     @Override

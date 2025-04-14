@@ -21,10 +21,6 @@ public class ChatRoomBuilder extends BuilderService<ChatRoom> {
 
     private static ChatRoomBuilder _instance;
 
-    private final MessageBuilder _messageBuilder = MessageBuilder.get_instance();
-
-    private final UserBuilder _userBuilder = UserBuilder.get_instance();
-
     public static ChatRoomBuilder get_instance() {
         if (_instance == null)
             _instance = new ChatRoomBuilder();
@@ -33,7 +29,7 @@ public class ChatRoomBuilder extends BuilderService<ChatRoom> {
     }
 
     private ChatRoomBuilder() {
-        super(_instance, _logger);
+        super(ChatRoom.class, _logger);
     }
 
     @Override
@@ -56,8 +52,8 @@ public class ChatRoomBuilder extends BuilderService<ChatRoom> {
                     () -> {
                         set(id, table.apply(Model.ModelDTO.Fields.id));
                         set(title, table.apply(Model.ModelDTO.Fields.title));
-                        combine(messages, _messageBuilder.build(resultSet));
-                        combine(chatters, _userBuilder.build(resultSet));
+                        combine(messages, MessageBuilder.get_instance().build(resultSet));
+                        combine(chatters, UserBuilder.get_instance().build(resultSet));
                         timestamp.set(getInstant(table.apply(Model.ModelDTO.Fields.timestamp)));
                     },
                     id

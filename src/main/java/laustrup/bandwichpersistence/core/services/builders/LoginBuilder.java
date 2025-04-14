@@ -24,7 +24,7 @@ public class LoginBuilder extends BuilderService<Login> {
     }
 
     private LoginBuilder() {
-        super(_instance, _logger);
+        super(Login.class, _logger);
     }
 
     @Override

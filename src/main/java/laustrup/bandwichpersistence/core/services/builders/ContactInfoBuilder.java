@@ -19,12 +19,6 @@ public class ContactInfoBuilder extends BuilderService<ContactInfo> {
 
     private static ContactInfoBuilder _instance;
 
-    private final PhoneBuilder _phoneBuilder = PhoneBuilder.get_instance();
-
-    private final AddressBuilder _addressBuilder = AddressBuilder.get_instance();
-
-    private final CountryBuilder _countryBuilder = CountryBuilder.get_instance();
-
     public static ContactInfoBuilder get_instance() {
         if (_instance == null)
             _instance = new ContactInfoBuilder();
@@ -33,7 +27,7 @@ public class ContactInfoBuilder extends BuilderService<ContactInfo> {
     }
 
     private ContactInfoBuilder() {
-        super(_instance, _logger);
+        super(ContactInfo.class, _logger);
     }
 
     @Override
@@ -55,9 +49,9 @@ public class ContactInfoBuilder extends BuilderService<ContactInfo> {
                     () -> {
                         set(id, table.apply(Model.ModelDTO.Fields.id));
                         set(email, table.apply(ContactInfo.DTO.Fields.email));
-                        combine(phones, _phoneBuilder.build(resultSet));
-                        _addressBuilder.complete(address, _addressBuilder.build(resultSet));
-                        _countryBuilder.complete(country, _countryBuilder.build(resultSet));
+                        combine(phones, PhoneBuilder.get_instance().build(resultSet));
+                        AddressBuilder.get_instance().complete(address, AddressBuilder.get_instance().build(resultSet));
+                        CountryBuilder.get_instance().complete(country, CountryBuilder.get_instance().build(resultSet));
                     },
                     id
             );
