@@ -1,34 +1,37 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
-import jdk.jshell.spi.ExecutionControl;
 import laustrup.bandwichpersistence.core.models.Ticket;
+import laustrup.bandwichpersistence.core.services.persistence.JDBCService;
 
 import java.sql.ResultSet;
+import java.util.function.Function;
+import java.util.logging.Logger;
 
 //TODO
-public class TicketBuilder {
+public class TicketBuilder extends BuilderService<Ticket> {
 
-    public static Ticket build(ResultSet resultSet) {
-        try {
-            throw new ExecutionControl.NotImplementedException("Ticket build not yet implemented");
-        } catch (ExecutionControl.NotImplementedException e) {
-            throw new RuntimeException(e);
-        }
+    private static final Logger _logger = Logger.getLogger(TicketBuilder.class.getName());
+
+    private static TicketBuilder _instance;
+
+    public static TicketBuilder get_instance() {
+        if (_instance == null)
+            _instance = new TicketBuilder();
+
+        return _instance;
     }
 
-    public static Ticket.Option buildOption(ResultSet resultSet) {
-        try {
-            throw new ExecutionControl.NotImplementedException("Ticket build not yet implemented");
-        } catch (ExecutionControl.NotImplementedException e) {
-            throw new RuntimeException(e);
-        }
+    private TicketBuilder() {
+        super(_instance, _logger);
     }
 
-    public static Ticket.Option.Template buildOptionTemplate(ResultSet resultSet) {
-        try {
-            throw new ExecutionControl.NotImplementedException("Ticket build not yet implemented");
-        } catch (ExecutionControl.NotImplementedException e) {
-            throw new RuntimeException(e);
-        }
+    @Override
+    protected void completion(Ticket reference, Ticket object) {
+
+    }
+
+    @Override
+    protected Function<Function<String, JDBCService.Field>, Ticket> logic(ResultSet resultSet) {
+        return null;
     }
 }

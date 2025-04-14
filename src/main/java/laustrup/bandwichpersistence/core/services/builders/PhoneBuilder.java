@@ -7,13 +7,25 @@ import laustrup.bandwichpersistence.core.services.persistence.JDBCService.Field;
 import java.sql.ResultSet;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
+import java.util.logging.Logger;
 
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
 
 public class PhoneBuilder extends BuilderService<ContactInfo.Phone> {
 
-    public PhoneBuilder() {
-        super(ContactInfo.Phone.class, PhoneBuilder.class);
+    private static final Logger _logger = Logger.getLogger(PhoneBuilder.class.getName());
+
+    private static PhoneBuilder _instance;
+
+    public static PhoneBuilder get_instance() {
+        if (_instance == null)
+            _instance = new PhoneBuilder();
+
+        return _instance;
+    }
+
+    private PhoneBuilder() {
+        super(_instance, _logger);
     }
 
     @Override

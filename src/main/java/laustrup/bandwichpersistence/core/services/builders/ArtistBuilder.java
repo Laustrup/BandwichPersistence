@@ -13,29 +13,41 @@ import java.time.Instant;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
+import java.util.logging.Logger;
 
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
 
 public class ArtistBuilder extends BuilderService<Artist> {
 
-    private final AlbumBuilder _albumBuilder = new AlbumBuilder();
+    private static final Logger _logger = Logger.getLogger(ArtistBuilder.class.getName());
 
-    private final BandBuilder _bandBuilder = new BandBuilder();
+    private static ArtistBuilder _instance;
 
-    private final ChatRoomBuilder _chatRoomBuilder = new ChatRoomBuilder();
+    private final AlbumBuilder _albumBuilder = AlbumBuilder.get_instance();
 
-    private final ContactInfoBuilder _contactInfoBuilder = new ContactInfoBuilder();
+    private final BandBuilder _bandBuilder = BandBuilder.get_instance();
 
-    private final SubscriptionBuilder _subscriptionBuilder = new SubscriptionBuilder();
+    private final ChatRoomBuilder _chatRoomBuilder = ChatRoomBuilder.get_instance();
 
-    private final GigBuilder _gigBuilder = new GigBuilder();
+    private final ContactInfoBuilder _contactInfoBuilder = ContactInfoBuilder.get_instance();
 
-    private final VenueRatingBuilder _venueRatingBuilder = new VenueRatingBuilder();
+    private final SubscriptionBuilder _subscriptionBuilder = SubscriptionBuilder.get_instance();
 
-    private final RequestBuilder _requestBuilder = new RequestBuilder();
+    private final GigBuilder _gigBuilder = GigBuilder.get_instance();
 
-    public ArtistBuilder() {
-        super(Artist.class, ArtistBuilder.class);
+    private final VenueRatingBuilder _venueRatingBuilder = VenueRatingBuilder.get_instance();
+
+    private final RequestBuilder _requestBuilder = RequestBuilder.get_instance();
+
+    public static ArtistBuilder get_instance() {
+        if (_instance == null)
+            _instance = new ArtistBuilder();
+
+        return _instance;
+    }
+
+    private ArtistBuilder() {
+        super(_instance, _logger);
     }
 
     @Override

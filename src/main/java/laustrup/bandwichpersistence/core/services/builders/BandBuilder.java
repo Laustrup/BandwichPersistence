@@ -9,23 +9,35 @@ import java.time.Instant;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
+import java.util.logging.Logger;
 
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
 
 public class BandBuilder extends BuilderService<Band> {
 
-    private final AlbumBuilder _albumBuilder = new AlbumBuilder();
+    private static final Logger _logger = Logger.getLogger(BandBuilder.class.getName());
 
-    private final EventBuilder _eventBuilder = new EventBuilder();
+    private static BandBuilder _instance;
 
-    private final UserBuilder _userBuilder = new UserBuilder();
+    private final AlbumBuilder _albumBuilder = AlbumBuilder.get_instance();
 
-    private final SubscriptionBuilder _subscriptionBuilder = new SubscriptionBuilder();
+    private final EventBuilder _eventBuilder = EventBuilder.get_instance();
 
-    private final PostBuilder _postBuilder = new PostBuilder();
+    private final UserBuilder _userBuilder = UserBuilder.get_instance();
 
-    public BandBuilder() {
-        super(Band.class, BandBuilder.class);
+    private final SubscriptionBuilder _subscriptionBuilder = SubscriptionBuilder.get_instance();
+
+    private final PostBuilder _postBuilder = PostBuilder.get_instance();
+
+    public static BandBuilder get_instance() {
+        if (_instance == null)
+            _instance = new BandBuilder();
+
+        return _instance;
+    }
+
+    private BandBuilder() {
+        super(_instance, _logger);
     }
 
     @Override

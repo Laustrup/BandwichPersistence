@@ -11,17 +11,29 @@ import java.time.Instant;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
+import java.util.logging.Logger;
 
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
 
 public class ChatRoomBuilder extends BuilderService<ChatRoom> {
 
-    private final MessageBuilder _messageBuilder = new MessageBuilder();
+    private static final Logger _logger = Logger.getLogger(ChatRoomBuilder.class.getSimpleName());
 
-    private final UserBuilder _userBuilder = new UserBuilder();
+    private static ChatRoomBuilder _instance;
 
-    protected ChatRoomBuilder() {
-        super(ChatRoom.class, ChatRoomBuilder.class);
+    private final MessageBuilder _messageBuilder = MessageBuilder.get_instance();
+
+    private final UserBuilder _userBuilder = UserBuilder.get_instance();
+
+    public static ChatRoomBuilder get_instance() {
+        if (_instance == null)
+            _instance = new ChatRoomBuilder();
+
+        return _instance;
+    }
+
+    private ChatRoomBuilder() {
+        super(_instance, _logger);
     }
 
     @Override

@@ -21,6 +21,17 @@ public class HistoryBuilder {
 
     private static final Logger _logger = Logger.getLogger(HistoryBuilder.class.getSimpleName());
 
+    private static HistoryBuilder _instance;
+
+    public static HistoryBuilder get_instance() {
+        if (_instance == null)
+            _instance = new HistoryBuilder();
+
+        return _instance;
+    }
+
+    private HistoryBuilder() {}
+
     public static History.Story buildStory(ResultSet resultSet, History history) {
         AtomicReference<UUID> id = new AtomicReference<>();
 

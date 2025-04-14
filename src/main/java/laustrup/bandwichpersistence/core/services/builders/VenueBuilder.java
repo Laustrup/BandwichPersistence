@@ -10,23 +10,35 @@ import java.time.Instant;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
+import java.util.logging.Logger;
 
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
 
 public class VenueBuilder extends BuilderService<Venue> {
 
-    private final OrganisationBuilder _organisationBuilder = new OrganisationBuilder();
+    private static final Logger _logger = Logger.getLogger(VenueBuilder.class.getName());
 
-    private final AlbumBuilder _albumBuilder = new AlbumBuilder();
+    private static VenueBuilder _instance;
 
-    private final AddressBuilder _addressBuilder = new AddressBuilder();
+    private final OrganisationBuilder _organisationBuilder = OrganisationBuilder.get_instance();
 
-    private final PostBuilder _postBuilder = new PostBuilder();
+    private final AlbumBuilder _albumBuilder = AlbumBuilder.get_instance();
 
-    private final VenueRatingBuilder _venueRatingBuilder = new VenueRatingBuilder();
+    private final AddressBuilder _addressBuilder = AddressBuilder.get_instance();
 
-    protected VenueBuilder() {
-        super(Venue.class, VenueBuilder.class);
+    private final PostBuilder _postBuilder = PostBuilder.get_instance();
+
+    private final VenueRatingBuilder _venueRatingBuilder = VenueRatingBuilder.get_instance();
+
+    public static VenueBuilder get_instance() {
+        if (_instance == null)
+            _instance = new VenueBuilder();
+
+        return _instance;
+    }
+
+    private VenueBuilder() {
+        super(_instance, _logger);
     }
 
     @Override

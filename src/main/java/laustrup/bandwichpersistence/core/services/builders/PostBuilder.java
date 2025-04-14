@@ -4,24 +4,35 @@ import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.models.User;
 import laustrup.bandwichpersistence.core.models.chats.messages.Post;
 import laustrup.bandwichpersistence.core.models.chats.messages.MessageBase;
-import laustrup.bandwichpersistence.core.services.persistence.JDBCService;
 
 import java.sql.ResultSet;
 import java.time.Instant;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
+import java.util.logging.Logger;
 
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
 
 public class PostBuilder extends BuilderService<Post> {
 
-    private final UserBuilder _userBuilder = new UserBuilder();
+    private static final Logger _logger = Logger.getLogger(PostBuilder.class.getName());
 
-    private final ModelBuilder _modelBuilder = new ModelBuilder();
+    private static PostBuilder _instance;
 
-    protected PostBuilder() {
-        super(Post.class, PostBuilder.class);
+    private final UserBuilder _userBuilder = UserBuilder.get_instance();
+
+    private final ModelBuilder _modelBuilder = ModelBuilder.get_instance();
+
+    public static PostBuilder get_instance() {
+        if (_instance == null)
+            _instance = new PostBuilder();
+
+        return _instance;
+    }
+
+    private PostBuilder() {
+        super(_instance, _logger);
     }
 
     @Override

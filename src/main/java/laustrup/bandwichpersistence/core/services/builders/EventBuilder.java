@@ -14,31 +14,47 @@ import java.time.ZoneId;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
+import java.util.logging.Logger;
 
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
 
 public class EventBuilder extends BuilderService<Event> {
 
-    private final OrganisationBuilder _organisationBuilder = new OrganisationBuilder();
+    private static final Logger _logger = Logger.getLogger(EventBuilder.class.getName());
 
-    private final ChatRoomBuilder _chatRoomBuilder = new ChatRoomBuilder();
+    private static EventBuilder _instance;
 
-    private final AlbumBuilder _albumBuilder = new AlbumBuilder();
+    private final OrganisationBuilder _organisationBuilder = OrganisationBuilder.get_instance();
 
-    private final GigBuilder _gigBuilder = new GigBuilder();
+    private final ChatRoomBuilder _chatRoomBuilder = ChatRoomBuilder.get_instance();
 
-    private final AddressBuilder _addressBuilder = new AddressBuilder();
+    private final AlbumBuilder _albumBuilder = AlbumBuilder.get_instance();
 
-    private final ContactInfoBuilder _contactInfoBuilder = new ContactInfoBuilder();
+    private final GigBuilder _gigBuilder = GigBuilder.get_instance();
 
-    private final VenueBuilder _venueBuilder = new VenueBuilder();
+    private final AddressBuilder _addressBuilder = AddressBuilder.get_instance();
 
-    private final PostBuilder _postBuilder = new PostBuilder();
+    private final ContactInfoBuilder _contactInfoBuilder = ContactInfoBuilder.get_instance();
 
-    private final RequestBuilder _requestBuilder = new RequestBuilder();
+    private final VenueBuilder _venueBuilder = VenueBuilder.get_instance();
 
-    protected EventBuilder() {
-        super(Event.class, EventBuilder.class);
+    private final PostBuilder _postBuilder = PostBuilder.get_instance();
+
+    private final RequestBuilder _requestBuilder = RequestBuilder.get_instance();
+
+    private final TicketOptionBuilder _ticketOptionBuilder = TicketOptionBuilder.get_instance();
+
+    private final TicketBuilder _ticketBuilder = TicketBuilder.get_instance();
+
+    public static EventBuilder get_instance() {
+        if (_instance == null)
+            _instance = new EventBuilder();
+
+        return _instance;
+    }
+
+    private EventBuilder() {
+        super(_instance, _logger);
     }
 
     @Override
@@ -96,8 +112,8 @@ public class EventBuilder extends BuilderService<Event> {
                         set(isSoldOut, table.apply(Event.DTO.Fields.isSoldOut));
                         _addressBuilder.complete(location, _addressBuilder.build(resultSet));
                         zoneId.set(ZoneId.of(getString(Event.DTO.Fields.zoneId)));
-                        combine(ticketOptions, TicketBuilder.buildOption(resultSet));
-                        combine(tickets, TicketBuilder.build(resultSet));
+                        combine(ticketOptions, _ticketOptionBuilder.build(resultSet));
+                        combine(tickets, _ticketBuilder.build(resultSet));
                         _contactInfoBuilder.complete(contactInfo, resultSet);
                         combine(gigs, _gigBuilder.build(resultSet));
                         combine(organisations, _organisationBuilder.build(resultSet));

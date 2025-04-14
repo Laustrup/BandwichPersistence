@@ -12,16 +12,28 @@ import java.time.Instant;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
+import java.util.logging.Logger;
 
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.get;
 
 public class RequestBuilder extends BuilderService<Request> {
 
-    private final EventBuilder _eventBuilder = new EventBuilder();
+    private static final Logger _logger = Logger.getLogger(RequestBuilder.class.getName());
 
-    protected RequestBuilder() {
-        super(Request.class, RequestBuilder.class);
+    private static RequestBuilder _instance;
+
+    private final EventBuilder _eventBuilder = EventBuilder.get_instance();
+
+    public static RequestBuilder get_instance() {
+        if (_instance == null)
+            _instance = new RequestBuilder();
+
+        return _instance;
+    }
+
+    private RequestBuilder() {
+        super(_instance, _logger);
     }
 
     @Override

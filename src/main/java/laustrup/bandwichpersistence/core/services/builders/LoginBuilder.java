@@ -6,13 +6,25 @@ import laustrup.bandwichpersistence.core.services.persistence.JDBCService.Field;
 import java.sql.ResultSet;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
+import java.util.logging.Logger;
 
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.set;
 
 public class LoginBuilder extends BuilderService<Login> {
 
-    protected LoginBuilder() {
-        super(Login.class, LoginBuilder.class);
+    private static final Logger _logger = Logger.getLogger(LoginBuilder.class.getName());
+
+    private static LoginBuilder _instance;
+
+    public static LoginBuilder get_instance() {
+        if (_instance == null)
+            _instance = new LoginBuilder();
+
+        return _instance;
+    }
+
+    private LoginBuilder() {
+        super(_instance, _logger);
     }
 
     @Override

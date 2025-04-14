@@ -9,19 +9,31 @@ import java.sql.ResultSet;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
+import java.util.logging.Logger;
 
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
 
 public class ContactInfoBuilder extends BuilderService<ContactInfo> {
 
-    private final PhoneBuilder _phoneBuilder = new PhoneBuilder();
+    private static final Logger _logger = Logger.getLogger(ContactInfoBuilder.class.getSimpleName());
 
-    private final AddressBuilder _addressBuilder = new AddressBuilder();
+    private static ContactInfoBuilder _instance;
 
-    private final CountryBuilder _countryBuilder = new CountryBuilder();
+    private final PhoneBuilder _phoneBuilder = PhoneBuilder.get_instance();
 
-    public ContactInfoBuilder() {
-        super(ContactInfo.class, ContactInfoBuilder.class);
+    private final AddressBuilder _addressBuilder = AddressBuilder.get_instance();
+
+    private final CountryBuilder _countryBuilder = CountryBuilder.get_instance();
+
+    public static ContactInfoBuilder get_instance() {
+        if (_instance == null)
+            _instance = new ContactInfoBuilder();
+
+        return _instance;
+    }
+
+    private ContactInfoBuilder() {
+        super(_instance, _logger);
     }
 
     @Override

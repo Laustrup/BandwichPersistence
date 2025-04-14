@@ -11,19 +11,31 @@ import java.time.Instant;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
+import java.util.logging.Logger;
 
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
 
 public class OrganisationEmployeeBuilder extends BuilderService<Organisation.Employee> {
 
-    private final ContactInfoBuilder _contactInfoBuilder = new ContactInfoBuilder();
+    private static final Logger _logger = Logger.getLogger(OrganisationEmployeeBuilder.class.getSimpleName());
 
-    private final SubscriptionBuilder _subscriptionBuilder = new SubscriptionBuilder();
+    private static OrganisationEmployeeBuilder _instance;
 
-    private final ChatRoomBuilder _chatRoomBuilder = new ChatRoomBuilder();
+    private final ContactInfoBuilder _contactInfoBuilder = ContactInfoBuilder.get_instance();
 
-    protected OrganisationEmployeeBuilder() {
-        super(Organisation.Employee.class, OrganisationEmployeeBuilder.class);
+    private final SubscriptionBuilder _subscriptionBuilder = SubscriptionBuilder.get_instance();
+
+    private final ChatRoomBuilder _chatRoomBuilder = ChatRoomBuilder.get_instance();
+
+    public static OrganisationEmployeeBuilder get_instance() {
+        if (_instance == null)
+            _instance = new OrganisationEmployeeBuilder();
+
+        return _instance;
+    }
+
+    private OrganisationEmployeeBuilder() {
+        super(_instance, _logger);
     }
 
     @Override

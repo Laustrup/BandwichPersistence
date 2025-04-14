@@ -8,15 +8,27 @@ import java.time.Instant;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
+import java.util.logging.Logger;
 
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
 
 public class AlbumBuilder extends BuilderService<Album> {
 
-    private final AlbumMediaBuilder _albumMediaBuilder = new AlbumMediaBuilder();
+    private static final Logger _logger = Logger.getLogger(AlbumBuilder.class.getName());
 
-    public AlbumBuilder() {
-        super(Album.class, AlbumBuilder.class);
+    private static AlbumBuilder _instance;
+
+    private final AlbumMediaBuilder _albumMediaBuilder = AlbumMediaBuilder.get_instance();
+
+    public static AlbumBuilder get_instance() {
+        if (_instance == null)
+            _instance = new AlbumBuilder();
+
+        return _instance;
+    }
+
+    private AlbumBuilder() {
+        super(_instance, _logger);
     }
 
     @Override

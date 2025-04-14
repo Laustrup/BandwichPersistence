@@ -7,13 +7,25 @@ import java.sql.ResultSet;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
+import java.util.logging.Logger;
 
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
 
 public class AddressBuilder extends BuilderService<ContactInfo.Address> {
 
-    public AddressBuilder() {
-        super(ContactInfo.Address.class, AddressBuilder.class);
+    private static final Logger _logger = Logger.getLogger(AddressBuilder.class.getName());
+
+    private static AddressBuilder _instance;
+
+    public static AddressBuilder get_instance() {
+        if (_instance == null)
+            _instance = new AddressBuilder();
+
+        return _instance;
+    }
+
+    private AddressBuilder() {
+        super(_instance, _logger);
     }
 
     @Override

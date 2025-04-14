@@ -5,22 +5,35 @@ import laustrup.bandwichpersistence.core.models.User;
 import laustrup.bandwichpersistence.core.models.chats.messages.Message;
 import laustrup.bandwichpersistence.core.models.chats.messages.MessageBase;
 import laustrup.bandwichpersistence.core.services.persistence.JDBCService;
+import laustrup.bandwichpersistence.core.services.persistence.JDBCService.Field;
 
 import java.sql.ResultSet;
 import java.time.Instant;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
+import java.util.logging.Logger;
 
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.getInstant;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.set;
 
 public class MessageBuilder extends BuilderService<Message> {
 
-    private final UserBuilder _userBuilder = new UserBuilder();
+    private static final Logger _logger = Logger.getLogger(MessageBuilder.class.getName());
 
-    protected MessageBuilder() {
-        super(Message.class, MessageBuilder.class);
+    private static MessageBuilder _instance;
+
+    private final UserBuilder _userBuilder = UserBuilder.get_instance();
+
+    public static MessageBuilder get_instance() {
+        if (_instance == null)
+            _instance = new MessageBuilder();
+
+        return _instance;
+    }
+
+    private MessageBuilder() {
+        super(_instance, _logger);
     }
 
     @Override
@@ -29,7 +42,7 @@ public class MessageBuilder extends BuilderService<Message> {
     }
 
     @Override
-    protected Function<Function<String, JDBCService.Field>, Message> logic(ResultSet resultSet) {
+    protected Function<Function<String, Field>, Message> logic(ResultSet resultSet) {
         return table -> {
             AtomicReference<UUID> id = new AtomicReference<>();
             AtomicReference<User> author = new AtomicReference<>();

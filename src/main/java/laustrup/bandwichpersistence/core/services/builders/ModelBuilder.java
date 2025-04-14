@@ -12,17 +12,30 @@ import java.sql.ResultSet;
 import java.time.ZoneId;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.logging.Logger;
 
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.get;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.peek;
 
 public class ModelBuilder extends BuilderService<Model> {
 
-    private final UserBuilder _userBuilder = new UserBuilder();
-    private final EventBuilder _eventBuilder = new EventBuilder();
+    private static final Logger _logger = Logger.getLogger(ModelBuilder.class.getName());
 
-    protected ModelBuilder() {
-        super(Model.class, ModelBuilder.class);
+    private static ModelBuilder _instance;
+
+    private final UserBuilder _userBuilder = UserBuilder.get_instance();
+
+    private final EventBuilder _eventBuilder = EventBuilder.get_instance();
+
+    public static ModelBuilder get_instance() {
+        if (_instance == null)
+            _instance = new ModelBuilder();
+
+        return _instance;
+    }
+
+    private ModelBuilder() {
+        super(_instance, _logger);
     }
 
     @Override

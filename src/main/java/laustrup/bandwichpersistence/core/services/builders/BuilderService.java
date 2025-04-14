@@ -5,7 +5,6 @@ import laustrup.bandwichpersistence.core.services.persistence.JDBCService;
 import laustrup.bandwichpersistence.core.services.persistence.JDBCService.Field;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
@@ -13,18 +12,17 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.logging.Logger;
 
 abstract class BuilderService<E> {
 
-    protected Class<E> _class;
+    private final BuilderService<E> _instance;
 
-    protected final Logger _logger;
+    private final Logger _logger;
 
-    protected BuilderService(Class<E> element, Class<? extends BuilderService<E>> builder) {
-        _class = element;
-        _logger = Logger.getLogger(builder.getSimpleName());
+    protected BuilderService(BuilderService<E> instance, Logger logger) {
+        _instance = instance;
+        _logger = logger;
     }
 
     static <M> void printError(Class<?> origin, AtomicReference<M> id, Exception exception, Logger logger) throws RuntimeException {
@@ -46,11 +44,11 @@ abstract class BuilderService<E> {
     }
 
     protected <M> void printError(M id, Exception exception) throws RuntimeException {
-        printError(_class, id, exception, _logger);
+        printError(_instance.getClass(), id, exception, _logger);
     }
 
     protected E handle(Function<Function<String, Field>, E> action) {
-        return handle(toTableName(_class), action);
+        return handle(toTableName(_instance.getClass()), action);
     }
 
     static <E> E handle(Class<E> clazz, Function<Function<String, Field>, E> action) {

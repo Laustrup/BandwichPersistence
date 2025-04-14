@@ -11,16 +11,28 @@ import java.time.Instant;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
+import java.util.logging.Logger;
 
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.getInstant;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.set;
 
 public class ChatRoomTemplateBuilder extends BuilderService<ChatRoom.Template> {
 
-    private final UserBuilder _userBuilder = new UserBuilder();
+    private static final Logger _logger = Logger.getLogger(ChatRoomTemplateBuilder.class.getSimpleName());
 
-    protected ChatRoomTemplateBuilder() {
-        super(ChatRoom.Template.class, ChatRoomTemplateBuilder.class);
+    private static ChatRoomTemplateBuilder _instance;
+
+    private final UserBuilder _userBuilder = UserBuilder.get_instance();
+
+    public static ChatRoomTemplateBuilder get_instance() {
+        if (_instance == null)
+            _instance = new ChatRoomTemplateBuilder();
+
+        return _instance;
+    }
+
+    private ChatRoomTemplateBuilder() {
+        super(_instance, _logger);
     }
 
     @Override

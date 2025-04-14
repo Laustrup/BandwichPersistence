@@ -8,14 +8,26 @@ import java.sql.ResultSet;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
+import java.util.logging.Logger;
 
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.getString;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.set;
 
 public class SubscriptionBuilder extends BuilderService<Subscription> {
 
-    public SubscriptionBuilder() {
-        super(Subscription.class, SubscriptionBuilder.class);
+    private static final Logger _logger = Logger.getLogger(SubscriptionBuilder.class.getName());
+
+    private static SubscriptionBuilder _instance;
+
+    public static SubscriptionBuilder get_instance() {
+        if (_instance == null)
+            _instance = new SubscriptionBuilder();
+
+        return _instance;
+    }
+
+    private SubscriptionBuilder() {
+        super(_instance, _logger);
     }
 
     @Override

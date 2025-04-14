@@ -6,14 +6,25 @@ import java.sql.ResultSet;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
+import java.util.logging.Logger;
 
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
 
 public class CountryBuilder extends BuilderService<ContactInfo.Country> {
 
+    private static final Logger _logger = Logger.getLogger(CountryBuilder.class.getName());
 
-    public CountryBuilder() {
-        super(ContactInfo.Country.class, CountryBuilder.class);
+    private static CountryBuilder _instance;
+
+    public static CountryBuilder get_instance() {
+        if (_instance == null)
+            _instance = new CountryBuilder();
+
+        return _instance;
+    }
+
+    private CountryBuilder() {
+        super(_instance, _logger);
     }
 
     @Override

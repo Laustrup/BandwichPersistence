@@ -8,6 +8,7 @@ import laustrup.bandwichpersistence.core.services.persistence.JDBCService;
 import java.sql.ResultSet;
 import java.util.*;
 import java.util.function.Function;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 import static laustrup.bandwichpersistence.core.models.Subscription.UserType.valueOf;
@@ -15,12 +16,23 @@ import static laustrup.bandwichpersistence.core.services.persistence.JDBCService
 
 public class UserBuilder extends BuilderService<User> {
 
-    private final ArtistBuilder _artistBuilder = new ArtistBuilder();
+    private static final Logger _logger = Logger.getLogger(UserBuilder.class.getName());
 
-    private final OrganisationEmployeeBuilder _organisationEmployeeBuilder = new OrganisationEmployeeBuilder();
+    private static UserBuilder _instance;
 
-    public UserBuilder() {
-        super(User.class, UserBuilder.class);
+    private final ArtistBuilder _artistBuilder = ArtistBuilder.get_instance();
+
+    private final OrganisationEmployeeBuilder _organisationEmployeeBuilder = OrganisationEmployeeBuilder.get_instance();
+
+    public static UserBuilder get_instance() {
+        if (_instance == null)
+            _instance = new UserBuilder();
+
+        return _instance;
+    }
+
+    private UserBuilder() {
+        super(_instance, _logger);
     }
 
     public static Stream<Login> buildLogins(ResultSet resultSet) {

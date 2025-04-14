@@ -59,7 +59,7 @@ public class Program {
                     
                         Application started!
                     
-                    Now you can implementation
+                    Now you can enter the following commands:
                     
                     * restart: Restarts Spring Boot, but program keeps running
                     * inject: With generate some data for developers, if any sqls are specified

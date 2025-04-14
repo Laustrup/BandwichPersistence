@@ -11,16 +11,28 @@ import java.time.Instant;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
+import java.util.logging.Logger;
 
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.get;
 
 public class RatingBuilder extends BuilderService<Rating> {
 
-    private final Service _service = new Service();
+    private static final Logger _logger = Logger.getLogger(RatingBuilder.class.getName());
 
-    public RatingBuilder() {
-        super(Rating.class, RatingBuilder.class);
+    private static RatingBuilder _instance;
+
+    private final Service _service = Service.get_instance();
+
+    public static RatingBuilder get_instance() {
+        if (_instance == null)
+            _instance = new RatingBuilder();
+
+        return _instance;
+    }
+
+    private RatingBuilder() {
+        super(_instance, _logger);
     }
 
     @Override
@@ -35,7 +47,19 @@ public class RatingBuilder extends BuilderService<Rating> {
 
     public static class Service {
 
-        private final OrganisationBuilder _organisationBuilder = new OrganisationBuilder();
+        private static Service _instance = new Service();
+
+        public static Service get_instance() {
+            if (_instance == null)
+                _instance = new Service();
+
+            return _instance;
+        }
+
+        private Service() {
+        }
+
+        private final OrganisationBuilder _organisationBuilder = OrganisationBuilder.get_instance();
 
         public Rating generateLogic(ResultSet resultSet, Implementation implementation, Function<String, Field> table) {
             AtomicReference<Integer> value = new AtomicReference<>();

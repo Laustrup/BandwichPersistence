@@ -9,13 +9,25 @@ import java.time.Instant;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
+import java.util.logging.Logger;
 
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
 
 public class AlbumMediaBuilder extends BuilderService<Album.Media> {
 
-    public AlbumMediaBuilder() {
-        super(Album.Media.class, AlbumMediaBuilder.class);
+    private static final Logger _logger = Logger.getLogger(AlbumMediaBuilder.class.getName());
+
+    private static AlbumMediaBuilder _instance;
+
+    public static AlbumMediaBuilder get_instance() {
+        if (_instance == null)
+            _instance = new AlbumMediaBuilder();
+
+        return _instance;
+    }
+
+    private AlbumMediaBuilder() {
+        super(_instance, _logger);
     }
 
     @Override

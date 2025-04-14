@@ -21,7 +21,7 @@ public class UserDetailsManager {
 
     private static final Logger _logger = Logger.getLogger(UserDetailsManager.class.getName());
 
-    private static final UserBuilder _userBuilder = new UserBuilder();
+    private static final UserBuilder _userBuilder = UserBuilder.get_instance();
 
     public static UserDetails getUserDetails(String email) {
         return databaseInteraction(() ->

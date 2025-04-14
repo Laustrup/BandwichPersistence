@@ -11,17 +11,29 @@ import java.time.Instant;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
+import java.util.logging.Logger;
 
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
 
 public class GigBuilder extends BuilderService<Event.Gig> {
 
-    private final EventBuilder _eventBuilder = new EventBuilder();
+    private static final Logger _logger = Logger.getLogger(GigBuilder.class.getName());
 
-    private final BandBuilder _bandBuilder = new BandBuilder();
+    private static GigBuilder _instance;
 
-    protected GigBuilder() {
-        super(Event.Gig.class, GigBuilder.class);
+    private final EventBuilder _eventBuilder = EventBuilder.get_instance();
+
+    private final BandBuilder _bandBuilder = BandBuilder.get_instance();
+
+    public static GigBuilder get_instance() {
+        if (_instance == null)
+            _instance = new GigBuilder();
+
+        return _instance;
+    }
+
+    private GigBuilder() {
+        super(_instance, _logger);
     }
 
     @Override

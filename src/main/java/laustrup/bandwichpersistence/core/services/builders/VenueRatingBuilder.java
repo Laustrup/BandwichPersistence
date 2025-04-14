@@ -4,15 +4,27 @@ import laustrup.bandwichpersistence.core.models.Venue;
 
 import java.sql.ResultSet;
 import java.util.function.Function;
+import java.util.logging.Logger;
 
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
 
 public class VenueRatingBuilder extends BuilderService<Venue.Rating> {
 
-    private final RatingBuilder.Service _ratingBuilderService = new RatingBuilder.Service();
+    private static final Logger _logger = Logger.getLogger(VenueRatingBuilder.class.getSimpleName());
 
-    protected VenueRatingBuilder() {
-        super(Venue.Rating.class, VenueRatingBuilder.class);
+    private static VenueRatingBuilder _instance;
+
+    private static RatingBuilder.Service _ratingBuilderService = RatingBuilder.Service.get_instance();
+
+    public static VenueRatingBuilder get_instance() {
+        if (_instance == null)
+            _instance = new VenueRatingBuilder();
+
+        return _instance;
+    }
+
+    private VenueRatingBuilder() {
+        super(_instance, _logger);
     }
 
     @Override

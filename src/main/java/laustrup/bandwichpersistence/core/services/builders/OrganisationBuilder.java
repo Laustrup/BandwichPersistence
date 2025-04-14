@@ -6,32 +6,45 @@ import laustrup.bandwichpersistence.core.models.chats.Request;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 
+
 import java.sql.ResultSet;
 import java.time.Instant;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
+import java.util.logging.Logger;
 
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
 
 public class OrganisationBuilder extends BuilderService<Organisation> {
 
-    private OrganisationEmployeeBuilder _employeeBuilder = new OrganisationEmployeeBuilder();
+    private static final Logger _logger = Logger.getLogger(OrganisationBuilder.class.getSimpleName());
 
-    private EventBuilder _eventBuilder = new EventBuilder();
+    private static OrganisationBuilder _instance;
 
-    private VenueBuilder _venueBuilder = new VenueBuilder();
+    private OrganisationEmployeeBuilder _employeeBuilder = OrganisationEmployeeBuilder.get_instance();
 
-    private ContactInfoBuilder _contactInfoBuilder = new ContactInfoBuilder();
+    private EventBuilder _eventBuilder = EventBuilder.get_instance();
 
-    private ChatRoomTemplateBuilder _chatRoomTemplateBuilder = new ChatRoomTemplateBuilder();
+    private VenueBuilder _venueBuilder = VenueBuilder.get_instance();
 
-    private AlbumBuilder _albumBuilder = new AlbumBuilder();
+    private ContactInfoBuilder _contactInfoBuilder = ContactInfoBuilder.get_instance();
 
-    private RequestBuilder _requestBuilder = new RequestBuilder();
+    private ChatRoomTemplateBuilder _chatRoomTemplateBuilder = ChatRoomTemplateBuilder.get_instance();
 
-    protected OrganisationBuilder() {
-        super(Organisation.class, OrganisationBuilder.class);
+    private AlbumBuilder _albumBuilder = AlbumBuilder.get_instance();
+
+    private RequestBuilder _requestBuilder = RequestBuilder.get_instance();
+
+    public static OrganisationBuilder get_instance() {
+        if (_instance == null)
+            _instance = new OrganisationBuilder();
+
+        return _instance;
+    }
+
+    private OrganisationBuilder() {
+        super(_instance, _logger);
     }
 
     @Override
