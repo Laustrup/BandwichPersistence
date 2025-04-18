@@ -4,8 +4,8 @@ import laustrup.bandwichpersistence.core.models.Event;
 import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.models.Rating;
 import laustrup.bandwichpersistence.core.models.chats.Request;
+import laustrup.bandwichpersistence.core.persistence.Field;
 import laustrup.bandwichpersistence.core.services.persistence.JDBCService;
-import laustrup.bandwichpersistence.core.services.persistence.JDBCService.Field;
 
 import java.sql.ResultSet;
 import java.time.Instant;

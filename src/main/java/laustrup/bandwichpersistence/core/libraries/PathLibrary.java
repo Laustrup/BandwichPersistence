@@ -12,16 +12,19 @@ public class PathLibrary {
     private static final String _rootPath = findSpringBootDirectory();
 
     @Getter
-    private static final String _migrationDirectoryPath = "/src/main/resources/database/scriptorian/migrations/";
+    private static final String _migrationDirectoryPath = "/src/main/resources/database/scriptorian/scripts/migrations/";
 
     @Getter
     private static final String _migrationDirectoryFullPath = get_rootPath() + get_migrationDirectoryPath();
 
     @Getter
-    private static final String _injectionDirectoryPath = "/src/main/resources/database/scriptorian/injections/";
+    private static final String _populationsDirectoryPath = "/src/main/resources/database/scriptorian/scripts/populations/";
 
     @Getter
-    private static final String _injectionDirectoryFullPath = get_rootPath() + get_injectionDirectoryPath();
+    private static final String _scriptsDirectoryPath = "/src/main/resources/database/scriptorian/scripts/";
+
+    @Getter
+    private static final String _injectionDirectoryFullPath = get_rootPath() + get_populationsDirectoryPath();
 
     private static String findSpringBootDirectory() {
         String rootPath = PathService.getRootPath();

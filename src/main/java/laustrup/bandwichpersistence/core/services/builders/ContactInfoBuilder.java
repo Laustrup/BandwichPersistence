@@ -2,6 +2,7 @@ package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
+import laustrup.bandwichpersistence.core.persistence.Field;
 import laustrup.bandwichpersistence.core.services.persistence.JDBCService;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 
@@ -27,7 +28,7 @@ public class ContactInfoBuilder extends BuilderService<ContactInfo> {
     }
 
     private ContactInfoBuilder() {
-        super(ContactInfo.class, _logger);
+        super(ContactInfo.class, ContactInfo.class::getSimpleName, _logger);
     }
 
     @Override
@@ -36,7 +37,7 @@ public class ContactInfoBuilder extends BuilderService<ContactInfo> {
     }
 
     @Override
-    protected Function<Function<String, JDBCService.Field>, ContactInfo> logic(ResultSet resultSet) {
+    protected Function<Function<String, Field>, ContactInfo> logic(ResultSet resultSet) {
         return table -> {
             AtomicReference<UUID> id = new AtomicReference<>();
             AtomicReference<String> email = new AtomicReference<>();

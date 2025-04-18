@@ -2,7 +2,7 @@ package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.Album;
 import laustrup.bandwichpersistence.core.models.Model;
-import laustrup.bandwichpersistence.core.services.persistence.JDBCService.Field;
+import laustrup.bandwichpersistence.core.persistence.Field;
 
 import java.sql.ResultSet;
 import java.time.Instant;

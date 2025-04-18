@@ -8,9 +8,8 @@ import java.util.function.Supplier;
 /**
  * Is used for acting of tests. Will also print the performances of arrangement and act after an act,
  * also saves the print of the action.
- * @param <T> The return type.
  */
-public abstract class Actor<T> extends Arranger<T> {
+public abstract class Actor extends Arranger {
 
     /** The performance of an act that has been calculated. */
     private long _performance;
@@ -50,8 +49,8 @@ public abstract class Actor<T> extends Arranger<T> {
      * @param supplier The Supplier that will be acted with a call.
      * @return The return of the Supplier.
      */
-    protected T act(Supplier<T> supplier) {
-        return act(supplier,new String());
+    protected <T> T act(Supplier<T> supplier) {
+        return act(supplier, "");
     }
 
     /**
@@ -59,7 +58,7 @@ public abstract class Actor<T> extends Arranger<T> {
      * @param runnable The runnable that will be acted with a run.
      */
     protected void act(Runnable runnable) {
-        act(runnable,new String());
+        act(runnable, "");
     }
 
     /**
@@ -68,7 +67,7 @@ public abstract class Actor<T> extends Arranger<T> {
      * @param function The function that should be acted with an apply.
      * @return The return of the function.
      */
-    protected T act(Object input, Function<Object,T> function) {
+    protected <T> T act(Object input, Function<Object, T> function) {
         begin();
         T actual = function.apply(input);
         _performance = calculatePerformance();
@@ -85,7 +84,7 @@ public abstract class Actor<T> extends Arranger<T> {
      *              in case there is multiple acts, this will be the title.
      * @return The return of the Supplier.
      */
-    protected T act(Supplier<T> supplier, String title) {
+    protected <T> T act(Supplier<T> supplier, String title) {
         begin();
         T actual = supplier.get();
         _performance = calculatePerformance();
@@ -122,7 +121,7 @@ public abstract class Actor<T> extends Arranger<T> {
      *              in case there is multiple acts, this will be the title.
      * @return The return of the function.
      */
-    protected T act(Object input, Function<Object,T> function, String title) {
+    protected <T> T act(Object input, Function<Object, T> function, String title) {
         begin();
         T actual = function.apply(input);
         _performance = calculatePerformance();

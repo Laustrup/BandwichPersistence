@@ -3,6 +3,7 @@ package laustrup.bandwichpersistence;
 import laustrup.bandwichpersistence.core.libraries.DatabaseLibrary;
 import laustrup.bandwichpersistence.core.libraries.SecurityLibrary;
 import laustrup.bandwichpersistence.core.persistence.SQL;
+import laustrup.bandwichpersistence.core.scriptorian.managers.ScriptorianManager;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -13,7 +14,7 @@ public class ProgramInitializer {
 
     private static final Logger _logger = Logger.getLogger(ProgramInitializer.class.getSimpleName());
 
-    public static boolean startup(Map<String, String> arguments, String[] args, String defaultSchema) throws IllegalArgumentException {
+    static boolean startup(Map<String, String> arguments, String[] args, String defaultSchema) throws IllegalArgumentException {
         try {
             SecurityLibrary.setup(arguments.get(SecurityLibrary.CommandOption.GIBBERISH.get_title()));
 
@@ -32,7 +33,8 @@ public class ProgramInitializer {
                 databaseSchema != null ? databaseSchema : defaultSchema,
                 arguments.get(DatabaseLibrary.CommandOption.DATABASE_USER.get_title()),
                 arguments.get(DatabaseLibrary.CommandOption.DATABASE_PASSWORD.get_title()),
-                args
+                args,
+                arguments.containsKey(DatabaseLibrary.CommandOption.IN_MEMORY.get_title())
             );
 
             return true;
@@ -42,6 +44,21 @@ public class ProgramInitializer {
 
             return false;
         }
+    }
+
+    static void startUpTestMode(String schema) {
+        SecurityLibrary.setup("123");
+        DatabaseLibrary.setup(
+                SQL.H2,
+                null,
+                null,
+                schema,
+                "sa",
+                "",
+                new String[]{},
+                true
+        );
+        ScriptorianManager.onStartup();
     }
 
     static Map<String, String> argumentsToMap(String[] arguments) {
@@ -65,6 +82,10 @@ public class ProgramInitializer {
                         {
                                 DatabaseLibrary.CommandOption.DATABASE_SCHEMA.get_title(),
                                 findArgument(DatabaseLibrary.CommandOption.DATABASE_SCHEMA.get_title(), arguments, false, false)
+                        },
+                        {
+                                DatabaseLibrary.CommandOption.IN_MEMORY.get_title(),
+                                findArgument(DatabaseLibrary.CommandOption.IN_MEMORY.get_title(), arguments, true, false)
                         },
                         {
                                 DatabaseLibrary.CommandOption.DATABASE_USER.get_title(),

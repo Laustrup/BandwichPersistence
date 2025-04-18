@@ -6,9 +6,8 @@ import java.util.function.Supplier;
 /**
  * Will arrange a setup of a test and calculate its performance,
  * also saves a print of the arrangement.
- * @param <T> The return type.
  */
-public abstract class Arranger<T> extends TestCalculator {
+public abstract class Arranger extends TestCalculator {
 
     /** The time the arrangement has performed */
     protected long _arrangement;
@@ -23,7 +22,7 @@ public abstract class Arranger<T> extends TestCalculator {
      * @param supplier The Supplier for the arrangement.
      * @return The arrangement.
      */
-    protected T arrange(Supplier<T> supplier) {
+    protected <T> T arrange(Supplier<T> supplier) {
         begin();
         T arranged;
         arranged = supplier.get();
@@ -38,7 +37,7 @@ public abstract class Arranger<T> extends TestCalculator {
      * @param function The function for the arrangement.
      * @return The arrangement.
      */
-    protected T arrange(Object input, Function<Object,T> function) {
+    protected <T> T arrange(Object input, Function<Object,T> function) {
         begin();
         T arranged = function.apply(input);
         _arrangement = calculatePerformance();

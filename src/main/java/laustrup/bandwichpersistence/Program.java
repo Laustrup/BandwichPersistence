@@ -3,13 +3,14 @@ package laustrup.bandwichpersistence;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
 import java.util.Map;
 import java.util.Scanner;
 
-import static laustrup.bandwichpersistence.ProgramInitializer.argumentsToMap;
-import static laustrup.bandwichpersistence.core.scriptorian.managers.ScriptorianManager.runInjections;
+import static laustrup.bandwichpersistence.ProgramInitializer.*;
+import static laustrup.bandwichpersistence.core.scriptorian.managers.ScriptorianManager.runPopulation;
 
 public class Program {
 
@@ -37,6 +38,10 @@ public class Program {
         running(applicationClass, arguments, args, defaultSchema);
     }
 
+    public static void testMode(String schema) {
+        startUpTestMode(schema);
+    }
+
     private static void displayArguments(Map<String, String> arguments) {
         System.out.println("Arguments:\n");
         arguments.forEach((key, value) -> System.out.println(key + ": " + value));
@@ -49,7 +54,7 @@ public class Program {
             String defaultSchema
     ) {
         Input input;
-        boolean startApplication = ProgramInitializer.startup(arguments, args, defaultSchema);
+        boolean startApplication = startup(arguments, args, defaultSchema);
 
         if (startApplication)
             do {
@@ -62,7 +67,7 @@ public class Program {
                     Now you can enter the following commands:
                     
                     * restart: Restarts Spring Boot, but program keeps running
-                    * inject: With generate some data for developers, if any sqls are specified
+                    * populate: With generate some data for developers, if any sqls are specified
                     * exit: Simply shuts down the whole application
                     """);
 
@@ -82,8 +87,8 @@ public class Program {
                             SpringApplication.exit(context);
                             doRestart = true;
                             break;
-                        } case INJECT: {
-                            runInjections();
+                        } case POPULATE: {
+                            runPopulation();
                             input = null;
                             break;
                         }
@@ -111,7 +116,7 @@ public class Program {
     public enum Input {
         RESTART("restart"),
         EXIT("exit"),
-        INJECT("inject");
+        POPULATE("populate");
 
         private final String _key;
     }

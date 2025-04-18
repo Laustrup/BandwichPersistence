@@ -3,6 +3,7 @@ package laustrup.bandwichpersistence.core.services.builders;
 import laustrup.bandwichpersistence.core.models.Band;
 import laustrup.bandwichpersistence.core.models.Event;
 import laustrup.bandwichpersistence.core.models.Model;
+import laustrup.bandwichpersistence.core.persistence.Field;
 import laustrup.bandwichpersistence.core.services.persistence.JDBCService;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 

@@ -2,13 +2,14 @@ package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
-import laustrup.bandwichpersistence.core.services.persistence.JDBCService.Field;
+import laustrup.bandwichpersistence.core.persistence.Field;
 
 import java.sql.ResultSet;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.logging.Logger;
 
+import static laustrup.bandwichpersistence.core.services.ConvertingService.of;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
 
 public class PhoneBuilder extends BuilderService<ContactInfo.Phone> {
@@ -49,15 +50,15 @@ public class PhoneBuilder extends BuilderService<ContactInfo.Phone> {
                         set(mobile, table.apply(ContactInfo.Phone.DTO.Fields.isMobile));
                         set(business, table.apply(ContactInfo.Phone.DTO.Fields.isBusiness));
                     },
-                    primary -> !getLong(Model.ModelDTO.Fields.id).equals(primary),
+                    primary -> !getLong(table.apply(Model.ModelDTO.Fields.id).get_content()).equals(primary),
                     numbers
             );
 
             return new ContactInfo.Phone(
-                    firstDigits.get(),
-                    numbers.get(),
-                    mobile.get(),
-                    business.get()
+                    of(firstDigits.get()),
+                    of(numbers.get()),
+                    of(mobile.get()),
+                    of(business.get())
             );
         };
     }

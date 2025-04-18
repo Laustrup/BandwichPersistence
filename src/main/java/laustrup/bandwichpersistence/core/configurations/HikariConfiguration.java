@@ -16,7 +16,7 @@ public class HikariConfiguration extends HikariConfig {
 
     private void setup() {
         setDriverClassName(DatabaseLibrary.get_driver());
-        setJdbcUrl(DatabaseLibrary.get_urlPath());
+        setJdbcUrl(DatabaseLibrary.get_connectionString());
         setUsername(DatabaseLibrary.get_user());
         setPassword(DatabaseLibrary.get_password());
     }

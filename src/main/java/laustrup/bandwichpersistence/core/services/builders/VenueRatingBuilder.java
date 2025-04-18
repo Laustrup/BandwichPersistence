@@ -1,6 +1,7 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.Venue;
+import laustrup.bandwichpersistence.core.persistence.Field;
 
 import java.sql.ResultSet;
 import java.util.function.Function;

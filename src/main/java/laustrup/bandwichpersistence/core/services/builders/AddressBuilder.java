@@ -2,6 +2,7 @@ package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
+import laustrup.bandwichpersistence.core.persistence.Field;
 
 import java.sql.ResultSet;
 import java.util.UUID;
@@ -25,7 +26,11 @@ public class AddressBuilder extends BuilderService<ContactInfo.Address> {
     }
 
     private AddressBuilder() {
-        super(ContactInfo.Address.class, _logger);
+        super(
+                ContactInfo.Address.class,
+                ContactInfo.Address.class.getSimpleName() + "es",
+                _logger
+        );
     }
 
     @Override

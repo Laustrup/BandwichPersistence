@@ -1,5 +1,6 @@
 package laustrup.bandwichpersistence.core.persistence.models;
 
+import laustrup.bandwichpersistence.core.libraries.DatabaseLibrary;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -62,6 +63,15 @@ public class Query {
 
     public static String formatIndexedKey(String parameter, int index) {
         return String.format("%s_%s", parameter, index).replace(" ", "") + " ";
+    }
+
+    public String get_script() {
+        return DatabaseLibrary.isH2InMemory() ? h2Script() : _script;
+    }
+
+    private String h2Script() {
+        return _script
+                .replace("database", "schema");
     }
 
     @Getter

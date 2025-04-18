@@ -1,5 +1,6 @@
 package laustrup.bandwichpersistence.core.scriptorian.managers;
 
+import laustrup.bandwichpersistence.core.libraries.DatabaseLibrary;
 import laustrup.bandwichpersistence.core.libraries.PathLibrary;
 import laustrup.bandwichpersistence.core.persistence.DatabaseParameter;
 import laustrup.bandwichpersistence.core.scriptorian.Scriptorian;
@@ -51,7 +52,8 @@ public class ScriptorianManager {
             Seszt<File> scripts = prepareScripts(PathLibrary.get_migrationDirectoryFullPath());
 
             databaseInteraction(() -> {
-                createDefaultSchemaIfNotExists();
+                if (!DatabaseLibrary.isH2InMemory())
+                    createDefaultSchemaIfNotExists();
                 Seszt<Scriptorian.Scriptory> scriptoriesWithoutSuccess = scriptoriesWithoutSuccess();
                 if (!scriptoriesWithoutSuccess.isEmpty())
                     throw new IllegalStateException(String.format("""
@@ -118,7 +120,7 @@ public class ScriptorianManager {
         }
     }
 
-    public static void runInjections() {
+    public static void runPopulation() {
         databaseInteraction(() -> {
             for (File sql :
                     new Seszt<>(prepareScripts(PathLibrary.get_injectionDirectoryFullPath()).stream()

@@ -17,7 +17,7 @@ public class DatabaseLibraryRepository {
             DatabaseManager.execute(
                     DatabaseLibraryQueries.createSchemaIfNotExists(schema),
                     DatabaseManager.Action.ROOT_PATH,
-                    DatabaseLibrary.get_rootURLPath(true)
+                    DatabaseLibrary.get_rootConnectionString(true)
             );
         } catch (SQLException e) {
             _logger.log(

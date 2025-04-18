@@ -3,6 +3,7 @@ package laustrup.bandwichpersistence.core.services.builders;
 import laustrup.bandwichpersistence.core.models.BusinessUser;
 import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.models.chats.ChatRoom;
+import laustrup.bandwichpersistence.core.persistence.Field;
 import laustrup.bandwichpersistence.core.services.persistence.JDBCService;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 
@@ -41,7 +42,7 @@ public class ChatRoomTemplateBuilder extends BuilderService<ChatRoom.Template> {
     }
 
     @Override
-    protected Function<Function<String, JDBCService.Field>, ChatRoom.Template> logic(ResultSet resultSet) {
+    protected Function<Function<String, Field>, ChatRoom.Template> logic(ResultSet resultSet) {
         return table -> {
             AtomicReference<UUID> id = new AtomicReference<>();
             AtomicReference<String> title = new AtomicReference<>();

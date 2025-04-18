@@ -68,7 +68,7 @@ public class DatabaseManager {
     }
 
     public static DatabaseResponse execute(Query query, Action action) throws SQLException {
-        return execute(query, action, Objects.requireNonNull(DatabaseLibrary.get_urlPath()));
+        return execute(query, action, Objects.requireNonNull(DatabaseLibrary.get_connectionString()));
     }
 
     public static DatabaseResponse execute(Query query, Action action, String url) throws SQLException {
@@ -76,11 +76,11 @@ public class DatabaseManager {
     }
 
     public static DatabaseResponse execute(Query query, Action action, Stream<DatabaseParameter> parameters) throws SQLException {
-        return execute(query, action, parameters, Objects.requireNonNull(DatabaseLibrary.get_urlPath()));
+        return execute(query, action, parameters, Objects.requireNonNull(DatabaseLibrary.get_connectionString()));
     }
 
-    public static DatabaseResponse execute(Query query, Action action, DatabaseParameter parameter) throws SQLException {
-        return execute(query, action, parameter, Objects.requireNonNull(DatabaseLibrary.get_urlPath()));
+    public static DatabaseResponse execute(Query query, Action action, DatabaseParameter parameter) {
+        return execute(query, action, parameter, Objects.requireNonNull(DatabaseLibrary.get_connectionString()));
     }
 
     public static DatabaseResponse execute(
@@ -88,7 +88,7 @@ public class DatabaseManager {
             Action action,
             DatabaseParameter parameter,
             String url
-    ) throws SQLException {
+    ) {
         return execute(query, action, Stream.of(parameter), url);
     }
 
@@ -97,7 +97,7 @@ public class DatabaseManager {
             Action action,
             Stream<DatabaseParameter> parameters,
             String url
-    ) throws SQLException {
+    ){
         Exception exception = null;
         PreparedStatement preparedStatement = null;
 
@@ -131,7 +131,7 @@ public class DatabaseManager {
                 .replace("\n", "")
                 .endsWith(";");
 
-        return /*language=mysql*/
+        return DatabaseLibrary.isH2InMemory() ? sql : /*language=mysql*/
                 "\nstart transaction;\n\n" +
                         sql +
                         (insertSemicolon ? ";" : "") +

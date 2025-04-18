@@ -4,8 +4,8 @@ import jdk.jshell.spi.ExecutionControl;
 import laustrup.bandwichpersistence.core.models.Event;
 import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.models.User;
+import laustrup.bandwichpersistence.core.persistence.Field;
 import laustrup.bandwichpersistence.core.services.persistence.JDBCService;
-import laustrup.bandwichpersistence.core.services.persistence.JDBCService.Field;
 import lombok.SneakyThrows;
 
 import java.sql.ResultSet;

@@ -1,37 +1,40 @@
 package laustrup.bandwichpersistence.core.services;
 
+import laustrup.bandwichpersistence.BandwichTester;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class ModelServiceTests {
+@SpringBootTest
+class ModelServiceTests extends BandwichTester {
 
     @Test
     void canGetIdsFromToString() {
-        //ARRANGE
-        List<UUID> expectations = List.of(
-                UUID.randomUUID(),
-                UUID.randomUUID()
-        );
-        UUID
-                first = expectations.getFirst(),
-                second = expectations.getLast();
-        String toString = ModelService.defineToString(
-                "Test",
-                first,
-                second,
-                new String[]{"first", "second"},
-                new String[]{first.toString(), second.toString()}
-        );
+        test(() -> {
+            List<UUID> expectations = arrange(() -> List.of(
+                    UUID.randomUUID(),
+                    UUID.randomUUID()
+            ));
 
-        //ACT
-        List<UUID> act = ModelService.getIds(toString).toList();
+            UUID
+                    first = expectations.getFirst(),
+                    second = expectations.getLast();
+            String toString = ModelService.defineToString(
+                    "Test",
+                    first,
+                    second,
+                    new String[]{"first", "second"},
+                    new String[]{first.toString(), second.toString()}
+            );
 
-        //ASSERT
-        for (int i = 0; i < expectations.size(); i++)
-            assertEquals(expectations.get(i), act.get(i));
+            List<UUID> actual = act(() -> ModelService.getIds(toString).toList());
+
+            for (int i = 0; i < expectations.size(); i++)
+                assertEquals(expectations.get(i), actual.get(i));
+        });
     }
 }

@@ -1,12 +1,12 @@
 package laustrup.bandwichpersistence.core.services.persistence;
 
 import laustrup.bandwichpersistence.core.models.Model;
+import laustrup.bandwichpersistence.core.persistence.DataType;
+import laustrup.bandwichpersistence.core.persistence.Field;
 import laustrup.bandwichpersistence.core.utilities.collections.Liszt;
-import lombok.Getter;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+import javax.naming.NameNotFoundException;
+import java.sql.*;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -28,8 +28,8 @@ public class JDBCService {
     public static <T> AtomicReference<T> set(AtomicReference<T> reference, Field field) {
         try {
             return (AtomicReference<T>) reference.getAndSet((T) (
-                    field.is_key()
-                            ? UUID.nameUUIDFromBytes(_resultSet.getBytes(toDatabaseColumn(field.get_content())))
+                    field.is_key() && getType(field) == DataType.BINARY
+                            ? getUUID(field)
                             : _resultSet.getObject(toDatabaseColumn(field.get_content()))
             ));
         } catch (SQLException e) {
@@ -42,8 +42,8 @@ public class JDBCService {
         try {
             collection.add((T) _resultSet.getObject(toDatabaseColumn(field.get_content())));
             return collection;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        } catch (SQLException exception) {
+            throw new RuntimeException(exception);
         }
     }
 
@@ -77,22 +77,11 @@ public class JDBCService {
         };
     }
 
-    private static <T> T perform(String field, Function<String, T> function) {
-        try {
-            return function.apply(field);
-        } catch (Exception e) {
-            return function.apply(field.split("\\.")[1]);
-        }
-    }
-
     public static String specifyColumn(String... columnTitle) {
         return String.join(".", columnTitle);
     }
 
-    public static <T> T ifColumnExists(
-            Function<String, T> function,
-            String... columns
-    ) {
+    public static <T> T ifColumnExists(Function<String, T> function, String... columns) {
         for (String column : columns) {
             try {
                 T t = function.apply(toDatabaseColumn(column));
@@ -105,28 +94,26 @@ public class JDBCService {
     }
 
     public static String getString(String column) {
-        return perform(toDatabaseColumn(column), title -> {
-            try {
-                return _resultSet.getString(title);
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        });
+        try {
+            return _resultSet.getString(toDatabaseColumn(column));
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static String getString(Field field) {
-        return perform(toDatabaseColumn(field.get_content()), title -> {
-            while (true) {
-                try {
-                    return _resultSet.getString(title);
-                } catch (SQLException e) {
-                    if (title.contains("."))
-                        title = title.substring(title.indexOf("."));
-                    else
-                        throw new RuntimeException(e);
-                }
+        String title = toDatabaseColumn(field.get_content());
+
+        while (true) {
+            try {
+                return _resultSet.getString(title);
+            } catch (SQLException e) {
+                if (title.contains("."))
+                    title = title.substring(title.indexOf("."));
+                else
+                    throw new RuntimeException(e);
             }
-        });
+        }
     }
 
     public static UUID getUUID(Field field) {
@@ -134,53 +121,43 @@ public class JDBCService {
     }
 
     public static UUID getUUID(String column) {
-        return perform(toDatabaseColumn(column), title -> {
-            try {
-                return UUID.nameUUIDFromBytes(_resultSet.getBytes(title));
-            } catch (SQLException exception) {
-                throw new RuntimeException(exception);
-            }
-        });
+        try {
+            return UUID.nameUUIDFromBytes(_resultSet.getBytes(toDatabaseColumn(column)));
+        } catch (SQLException exception) {
+            throw new RuntimeException(exception);
+        }
     }
 
     public static Integer getInteger(String column) {
-        return perform(toDatabaseColumn(column), title -> {
-            try {
-                return _resultSet.getInt(title);
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        });
+        try {
+            return _resultSet.getInt(toDatabaseColumn(column));
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static Long getLong(String column) {
-        return perform(toDatabaseColumn(column), title -> {
-            try {
-                return _resultSet.getLong(title);
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        });
+        try {
+            return _resultSet.getLong(toDatabaseColumn(column));
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static Boolean getBoolean(String column) {
-        return perform(toDatabaseColumn(column), title -> {
-            try {
-                return _resultSet.getBoolean(title);
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        });
+        try {
+            return _resultSet.getBoolean(toDatabaseColumn(column));
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static <T> T getTimestamp(String column, Function<Timestamp, T> function) {
-        return perform(toDatabaseColumn(column), title -> {
-            try {
-                return get(_resultSet.getTimestamp(title), function);
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        });
+        try {
+            return get(_resultSet.getTimestamp(toDatabaseColumn(column)), function);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static Instant getInstant(Field field) {
@@ -188,10 +165,10 @@ public class JDBCService {
     }
 
     public static Instant getInstant(String column) {
-        return perform(toDatabaseColumn(column), title -> get(
+        return get(
                 name -> getTimestamp(name, Timestamp::toInstant),
-                title
-        ));
+                toDatabaseColumn(column)
+        );
     }
 
     /**
@@ -364,28 +341,25 @@ public class JDBCService {
         _currentRow = null;
     }
 
-    @Getter
-    public static class Field {
-
-        private final String _table;
-
-        private final String _row;
-
-        public Field(String table, String row) {
-            _table = table;
-            _row = row;
+    private static DataType getType(Field field) {
+        try {
+            return DataType.valueOf(_resultSet.getMetaData().getColumnType(columnIndex(field)));
+        } catch (SQLException | NameNotFoundException exception) {
+            throw new RuntimeException(exception);
         }
+    }
 
-        public static Field of(String table, String row) {
-            return new Field(table, row);
-        }
+    private static int columnIndex(Field field) throws NameNotFoundException {
+        try {
+            ResultSetMetaData metaData = _resultSet.getMetaData();
 
-        public String get_content() {
-            return String.format("%s.%s", _table, _row);
-        }
+            for (int i = 1; i <= metaData.getColumnCount(); i++)
+                if (metaData.getColumnName(i).equals(field.get_content().toLowerCase()))
+                    return i;
 
-        public boolean is_key() {
-            return _row.contains(".id") || _row.contains("_id");
+            throw new NameNotFoundException("Could not find column " + field.get_content() + " when finding its index.");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 }

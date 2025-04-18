@@ -10,6 +10,7 @@ import lombok.Setter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -40,9 +41,12 @@ public class DatabaseLibrary {
     private static boolean _schemaExists;
 
     @Getter
-    public static Properties _properties;
+    private static Properties _properties;
 
-    private static boolean _isConfigured = false;
+    @Getter
+    private static boolean _isInMemory;
+
+    private static boolean _isConfigured;
 
     public static void setup(
             SQL sql,
@@ -51,7 +55,8 @@ public class DatabaseLibrary {
             String schema,
             String user,
             String password,
-            String[] arguments
+            String[] arguments,
+            boolean isInMemory
     ) {
         setup(
                 sql,
@@ -60,7 +65,8 @@ public class DatabaseLibrary {
                 schema,
                 user,
                 password,
-                convertToProperties(arguments)
+                convertToProperties(arguments),
+                isInMemory
         );
     }
 
@@ -71,7 +77,8 @@ public class DatabaseLibrary {
             String schema,
             String user,
             String password,
-            Properties properties
+            Properties properties,
+            boolean isInMemory
     ) {
         if (_isConfigured)
             throw new IllegalStateException("Database library is already configured");
@@ -89,6 +96,7 @@ public class DatabaseLibrary {
         _user = user;
         _password = password;
         _properties = properties;
+        _isInMemory = isInMemory;
         ManagerService.databaseInteraction(() -> DatabaseLibraryRepository.createSchemaIfNotExists(_schema));
         _isConfigured = true;
     }
@@ -102,15 +110,11 @@ public class DatabaseLibrary {
         );
     }
 
-    public static String get_urlPath() {
-        return (
-                _isConfigured
-                        ? get_rootURLPath(false) + (_schema == null ? "" : _schema) + get_URLPropertyParameters()
-                        : null
-        );
+    public static String get_connectionString() {
+        return actIfIsConfigured(() -> get_rootConnectionString(false) + (_schema == null ? "" : _schema) + get_URLPropertyParameters());
     }
 
-    public static String get_rootURLPath(boolean includeProperties) {
+    public static String get_rootConnectionString(boolean includeProperties) {
         return String.format(
                 "jdbc:%s://%s:%s/",
                 _sql.name().toLowerCase(),
@@ -128,6 +132,14 @@ public class DatabaseLibrary {
                 .map(option -> option.get_command().get_parameter())
                 .collect(Collectors.joining());
     }
+
+    public static boolean isH2InMemory() {
+        return _isInMemory && _sql == SQL.H2;
+    }
+
+    public static String actIfIsConfigured(Supplier<String> act) {
+        return _isConfigured ? act.get() : null;
+    }
     
     @Getter @AllArgsConstructor
     public enum CommandOption {
@@ -137,7 +149,8 @@ public class DatabaseLibrary {
         DATABASE_SCHEMA("databaseSchema", false),
         DATABASE_USER("databaseUser", false),
         DATABASE_PASSWORD("databasePassword", false),
-        DISALLOW_MULTIPLE_QUERIES("disAllowMultiQueries", false);
+        DISALLOW_MULTIPLE_QUERIES("disAllowMultiQueries", false),
+        IN_MEMORY("inMemory", true),;
 
         private final String _title;
 

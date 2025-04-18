@@ -1,8 +1,8 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
+import laustrup.bandwichpersistence.core.persistence.Field;
 import laustrup.bandwichpersistence.core.services.ModelService;
 import laustrup.bandwichpersistence.core.services.persistence.JDBCService;
-import laustrup.bandwichpersistence.core.services.persistence.JDBCService.Field;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 
 import java.sql.ResultSet;
@@ -13,6 +13,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.logging.Logger;
 
 abstract class BuilderService<E> {
@@ -35,6 +36,11 @@ abstract class BuilderService<E> {
         _logger = logger;
     }
 
+    protected BuilderService(Class<E> clazz, Supplier<String> tableName, Logger logger) {
+        _class = clazz;
+        _tableName = tableName.get();
+        _logger = logger;
+    }
     protected static String classToTableName(Class<?>... classes) {
         return classToTableName(Arrays.stream(classes).map(Class::getSimpleName).toArray(String[]::new));
     }

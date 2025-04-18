@@ -1,6 +1,7 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.*;
+import laustrup.bandwichpersistence.core.persistence.Field;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 
 import java.sql.ResultSet;

@@ -13,10 +13,9 @@ import java.util.function.Supplier;
  * Extends ARRANGER, ACTOR and ASSERTER.
  * Includes a random generated password, that will be random generated beforeEach,
  * along with other attributes such as expected, a random and other.
- * @param <T> The return type.
  */
 @NoArgsConstructor
-public abstract class Tester<T> extends Actor<T> {
+public abstract class Tester extends Actor {
 
     /**
      * An interface to implement in constructor.
@@ -42,7 +41,6 @@ public abstract class Tester<T> extends Actor<T> {
     /** A default password, with the purpose of creating, logging in and various alike features. */
     protected String _password = null;
 
-    // TODO Use RandomCreatorService when new test dependency are added.
     private String generateString(boolean uniqueCharacter, int length) {
         int min = !uniqueCharacter ? 97 : 123, // letter a
                 max = !uniqueCharacter ? 122 : 122 * 2; // letter z
@@ -108,8 +106,8 @@ public abstract class Tester<T> extends Actor<T> {
     @BeforeEach
     protected void beforeEach() {
         _password = generatePassword();
-        _expected = new String();
-        _actual = new String();
+        _expected = "";
+        _actual = "";
 
         _adding = "Default";
         _addings = new Object[3];
@@ -128,7 +126,7 @@ public abstract class Tester<T> extends Actor<T> {
             print(supplier.get());
         } catch (Exception e) {
             addToPrint("An exception was caught in the main test method...");
-            Printer.get_instance().print(_print, e);
+            Printer.print(_print, e);
             throw e;
         }
     }
@@ -144,7 +142,7 @@ public abstract class Tester<T> extends Actor<T> {
             print();
         } catch (Exception e) {
             addToPrint("An exception was caught in the main test method...");
-            Printer.get_instance().print(_print, e);
+            Printer.print(_print, e);
             throw e;
         }
     }
@@ -164,11 +162,8 @@ public abstract class Tester<T> extends Actor<T> {
         String message = response + "\n\n" + _print;
 
         if (response.equals(TestMessage.SUCCESS.get_content()))
-            Printer.get_instance().print(message);
+            Printer.print(message);
         else
-            Printer.get_instance().print(
-                    message,
-                    new Exception()
-            );
+            Printer.print(message, new Exception());
     }
 }

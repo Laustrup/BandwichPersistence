@@ -4,8 +4,7 @@ import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.models.User;
 import laustrup.bandwichpersistence.core.models.chats.messages.Message;
 import laustrup.bandwichpersistence.core.models.chats.messages.MessageBase;
-import laustrup.bandwichpersistence.core.services.persistence.JDBCService;
-import laustrup.bandwichpersistence.core.services.persistence.JDBCService.Field;
+import laustrup.bandwichpersistence.core.persistence.Field;
 
 import java.sql.ResultSet;
 import java.time.Instant;

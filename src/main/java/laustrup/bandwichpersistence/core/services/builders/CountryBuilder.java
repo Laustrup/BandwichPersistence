@@ -2,6 +2,7 @@ package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.Event;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
+import laustrup.bandwichpersistence.core.persistence.Field;
 
 import java.sql.ResultSet;
 import java.util.UUID;

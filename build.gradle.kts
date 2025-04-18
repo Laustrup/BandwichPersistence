@@ -20,7 +20,6 @@ dependencies {
     api(libs.com.zaxxer.hikaricp)
     api(libs.org.projectlombok.lombok)
     runtimeOnly(libs.com.mysql.mysql.connector.j)
-    runtimeOnly(libs.com.h2database.h2)
     testImplementation(libs.org.springframework.boot.spring.boot.starter.test)
     compileOnly(libs.org.springframework.boot.spring.boot.starter.tomcat)
     compileOnly(libs.org.projectlombok.lombok)

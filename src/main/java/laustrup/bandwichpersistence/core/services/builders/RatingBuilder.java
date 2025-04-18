@@ -3,6 +3,7 @@ package laustrup.bandwichpersistence.core.services.builders;
 import laustrup.bandwichpersistence.core.models.Organisation;
 import laustrup.bandwichpersistence.core.models.Rating;
 import laustrup.bandwichpersistence.core.models.Venue;
+import laustrup.bandwichpersistence.core.persistence.Field;
 import laustrup.bandwichpersistence.core.services.persistence.JDBCService;
 
 import java.sql.ResultSet;
@@ -39,7 +40,7 @@ public class RatingBuilder extends BuilderService<Rating> {
     }
 
     @Override
-    protected Function<Function<String, JDBCService.Field>, Rating> logic(ResultSet resultSet) {
+    protected Function<Function<String, Field>, Rating> logic(ResultSet resultSet) {
         return table -> Service.get_instance().generateLogic(resultSet, Service.Implementation.STANDARD, table);
     }
 

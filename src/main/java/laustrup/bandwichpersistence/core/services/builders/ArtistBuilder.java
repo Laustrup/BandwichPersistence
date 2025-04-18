@@ -6,6 +6,7 @@ import laustrup.bandwichpersistence.core.models.chats.Request;
 import laustrup.bandwichpersistence.core.models.users.Artist;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
 import laustrup.bandwichpersistence.core.models.users.Follow;
+import laustrup.bandwichpersistence.core.persistence.Field;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 
 import java.sql.ResultSet;
