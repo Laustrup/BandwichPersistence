@@ -49,12 +49,12 @@ public class ProgramInitializer {
     static void startUpTestMode(String schema) {
         SecurityLibrary.setup("123");
         DatabaseLibrary.setup(
-                SQL.H2,
+                SQL.MySQL,
                 null,
-                null,
+                3306,
                 schema,
-                "sa",
-                "",
+                null,
+                "testword",
                 new String[]{},
                 true
         );
