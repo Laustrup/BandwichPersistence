@@ -93,7 +93,7 @@ public class DatabaseLibrary {
         _target = Objects.requireNonNullElse(target, "localhost");
         _port = Objects.requireNonNullElse(port, 3306);
         _schema = schema;
-        _user = user;
+        _user = Objects.requireNonNullElse(user, "root");
         _password = password;
         _properties = properties;
         _isInMemory = isInMemory;

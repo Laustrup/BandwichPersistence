@@ -140,7 +140,8 @@ public class DatabaseManager {
 
     private static PreparedStatement prepareStatement(
             Query query,
-            Action action, Stream<DatabaseParameter> parameters,
+            Action action,
+            Stream<DatabaseParameter> parameters,
             String url
     ) {
         PreparedStatement preparedStatement;

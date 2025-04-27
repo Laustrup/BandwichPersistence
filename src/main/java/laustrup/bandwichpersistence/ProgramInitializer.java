@@ -51,7 +51,7 @@ public class ProgramInitializer {
         DatabaseLibrary.setup(
                 SQL.MySQL,
                 null,
-                3306,
+                3307,
                 schema,
                 null,
                 "testword",
@@ -59,6 +59,7 @@ public class ProgramInitializer {
                 true
         );
         ScriptorianManager.onStartup();
+        ScriptorianManager.runPopulation();
     }
 
     static Map<String, String> argumentsToMap(String[] arguments) {

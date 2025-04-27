@@ -284,11 +284,15 @@ public class Printer extends Painter {
     private static String generate(String content) {
         if (content == null || content.isEmpty()) {
             String generated = _startRow + (_mode.equals(PrinterMode.HIGH_CONTRAST)
-                ? green(_emptyIndicator)
-                : _emptyIndicator);
+                    ? green(_emptyIndicator)
+                    : _emptyIndicator);
             _content = "";
             return generated;
         }
+
+        //TODO fix size issue
+        if (true)
+            return content;
 
         StringBuilder print = new StringBuilder(_startRow);
 

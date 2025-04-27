@@ -1,9 +1,16 @@
 services:
+  mysql-dev:
+    image: mysql:8.0-debian
+    command: --default-authentication-plugin=caching_sha2_password
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: devword
   mysql-test:
     image: mysql:8.0-debian
     command: --default-authentication-plugin=caching_sha2_password
-#    restart: always
     ports:
-      - "3306:3306"
+      - "3307:3307"
     environment:
       MYSQL_ROOT_PASSWORD: testword
