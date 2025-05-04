@@ -14,6 +14,8 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static laustrup.bandwichpersistence.core.managers.ManagerService.databaseInteraction;
+
 public class DatabaseLibrary {
 
     @Getter
@@ -97,7 +99,7 @@ public class DatabaseLibrary {
         _password = password;
         _properties = properties;
         _isInMemory = isInMemory;
-        ManagerService.databaseInteraction(() -> DatabaseLibraryRepository.createSchemaIfNotExists(_schema));
+        databaseInteraction(() -> DatabaseLibraryRepository.createSchemaIfNotExists(_schema));
         _isConfigured = true;
     }
 

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import laustrup.bandwichpersistence.core.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.core.models.chats.Request;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
+import laustrup.bandwichpersistence.core.persistence.Table;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
 import lombok.experimental.FieldNameConstants;
@@ -19,6 +20,8 @@ import static laustrup.bandwichpersistence.core.utilities.collections.Seszt.copy
 
 @Getter
 public class Organisation extends Model {
+
+    public static final Table TABLE = new Table(Organisation.class.getSimpleName() + "s");
 
     private Seszt<Request> _requests;
 

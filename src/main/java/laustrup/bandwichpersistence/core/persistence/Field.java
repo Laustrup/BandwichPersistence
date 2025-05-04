@@ -1,22 +1,10 @@
 package laustrup.bandwichpersistence.core.persistence;
 
-import lombok.Getter;
-
 import java.util.Arrays;
 
-@Getter
-public class Field {
+public record Field(String _table, String _row) {
 
-    private final String _table;
-
-    private final String _row;
-
-    private final String[] _idIndicators = new String[]{"id", "_id"};
-
-    public Field(String table, String row) {
-        _table = table;
-        _row = row;
-    }
+    private static final String[] _idIndicators = new String[]{"id", "_id"};
 
     public static Field of(String table, String row) {
         return new Field(table, row);

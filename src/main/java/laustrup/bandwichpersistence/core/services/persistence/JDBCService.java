@@ -283,7 +283,7 @@ public class JDBCService {
     ) throws SQLException {
         _resultSet = _resultSet == null ? resultSet : _resultSet;
         boolean isFirst = false;
-        if (_currentRow == null) {
+        if (!isBuilding()) {
             isFirst = true;
             _resultSet.next();
             _currentRow = _resultSet.getRow();
@@ -305,6 +305,17 @@ public class JDBCService {
 
         if (isFirst)
             reset();
+    }
+
+    public static boolean isBuilding() {
+        return _currentRow != null;
+    }
+
+    public static void set_resultSet(ResultSet resultSet) throws IllegalStateException {
+        if (!isBuilding())
+            _resultSet = resultSet;
+        else
+            throw new IllegalStateException("ResultSet of JDBC Service cannot be mutated, since a build is already in progress!");
     }
 
     private static <T> boolean isDoneBuilding(Function<T, Boolean> breaker, T... primaries) {
