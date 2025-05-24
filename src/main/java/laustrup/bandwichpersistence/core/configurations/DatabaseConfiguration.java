@@ -12,7 +12,7 @@ import javax.sql.DataSource;
 
 @Configuration
 @ConfigurationProperties(prefix = "spring.datasource")
-public class HikariConfiguration extends HikariConfig {
+public class DatabaseConfiguration extends HikariConfig {
 
     private void setup() {
         setDriverClassName(DatabaseLibrary.get_driver());

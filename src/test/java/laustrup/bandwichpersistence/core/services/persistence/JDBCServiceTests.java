@@ -53,15 +53,13 @@ class JDBCServiceTests extends BandwichTester {
                     () -> new AtomicReference<>(supplyArrangement.get())
             );
 
-            act(() ->
-                    set(
-                            instance,
-                            Field.of(
-                                    Organisation.TABLE.title(),
-                                    isBinary ? "id" : "title"
-                            )
+            act(() -> set(
+                    instance,
+                    Field.of(
+                            Organisation.TABLE.title(),
+                            isBinary ? "id" : "title"
                     )
-            );
+            ));
 
             asserting(supplyArrangement.get())
                     .isNotEqualTo(instance);

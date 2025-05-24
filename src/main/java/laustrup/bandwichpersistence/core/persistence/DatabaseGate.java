@@ -5,6 +5,7 @@ import laustrup.bandwichpersistence.core.libraries.DatabaseLibrary;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -29,12 +30,13 @@ public class DatabaseGate {
         }
     }
 
-    private static Connection createConnection(String url) throws SQLException {
-        _connection = DriverManager.getConnection(
-                url,
-                DatabaseLibrary.get_user(),
-                DatabaseLibrary.get_password()
-        );
+    private static Connection createConnection(String url) throws SQLException, InterruptedException {
+        Properties properties = new Properties();
+        properties.setProperty("user", DatabaseLibrary.get_user());
+        properties.setProperty("password", DatabaseLibrary.get_password());
+        // For docker, the application would need to sleep for communication error
+        Thread.sleep(500);
+        _connection = DriverManager.getConnection(url, properties);
 
         return _connection;
     }

@@ -1,10 +1,11 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Run" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
     <module name="BandwichPersistence.main" />
-    <option name="PROGRAM_PARAMETERS" value="sql=MySQL databasePassword=devword gibberish=123 skipConfirmation" />
+    <option name="PROGRAM_PARAMETERS" value="sql=MySQL databasePassword=devword databasePort=3307 gibberish=123 skipConfirmation" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="laustrup.bandwichpersistence.BandwichPersistenceApplication" />
     <method v="2">
       <option name="Make" enabled="true" />
+      <option name="RunConfigurationTask" enabled="true" run_configuration_name="MySQL - dev" run_configuration_type="docker-deploy" />
       <option name="RunConfigurationTask" enabled="true" run_configuration_name="MySQL - dev" run_configuration_type="docker-deploy" />
     </method>
   </configuration>

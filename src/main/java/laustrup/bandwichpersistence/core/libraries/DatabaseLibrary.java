@@ -1,7 +1,6 @@
 package laustrup.bandwichpersistence.core.libraries;
 
 import laustrup.bandwichpersistence.core.persistence.SQL;
-import laustrup.bandwichpersistence.core.managers.ManagerService;
 import laustrup.bandwichpersistence.core.repositories.DatabaseLibraryRepository;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static laustrup.bandwichpersistence.core.managers.ManagerService.databaseInteraction;
@@ -49,6 +47,8 @@ public class DatabaseLibrary {
     private static boolean _isInMemory;
 
     private static boolean _isConfigured;
+
+    public static final int LOGIN_TIMEOUT = 1;
 
     public static void setup(
             SQL sql,
@@ -113,26 +113,21 @@ public class DatabaseLibrary {
     }
 
     public static String get_connectionString() {
-        return actIfIsConfigured(() -> get_rootConnectionString(false) + (_schema == null ? "" : _schema) + get_URLPropertyParameters());
+        return actIfIsConfigured(() -> String.format(
+                "%s%s",
+                get_rootConnectionString(false) + (_schema == null ? "" : _schema),
+                _properties.get_endpoint()
+        ));
     }
 
     public static String get_rootConnectionString(boolean includeProperties) {
         return String.format(
-                "jdbc:%s://%s:%s/",
+                "jdbc:%s://%s:%s/%s",
                 _sql.name().toLowerCase(),
                 _target,
-                _port
-        ) + (includeProperties
-                ? get_URLPropertyParameters()
-                : ""
+                _port,
+                includeProperties ? _properties.get_endpoint() : ""
         );
-    }
-
-    public static String get_URLPropertyParameters() {
-        return _properties.get_options().stream()
-                .filter(Properties.Option::is_isEnabled)
-                .map(option -> option.get_command().get_parameter())
-                .collect(Collectors.joining());
     }
 
     public static boolean isH2InMemory() {
@@ -162,17 +157,41 @@ public class DatabaseLibrary {
     @Getter
     public static class Properties {
 
-        private final List<Option> _options = new ArrayList<>(List.of(
-                new Option(Option.Command.ALLOW_MULTIPLE_QUERIES)
-        ));
+        private final List<Option> _options = initializeOptions();
 
-        public Properties(
-                boolean allowMultipleQueries
-        ) {
+        public Properties(boolean allowMultipleQueries) {
             _options.forEach(option -> {
-                if (allowMultipleQueries)
+                switch (option.get_command()) {
+                    case ALLOW_MULTIPLE_QUERIES -> {
+                        if (allowMultipleQueries)
+                            option.set_isEnabled(allowMultipleQueries);
+                    }
+                    case TIMEZONE -> option.set_isEnabled(true);
+                }
+                if (option.get_command() == Option.Command.ALLOW_MULTIPLE_QUERIES && allowMultipleQueries)
                     option.set_isEnabled(allowMultipleQueries);
             });
+        }
+
+        private static List<Option> initializeOptions() {
+            return new ArrayList<>(List.of(
+                    new Option(Option.Command.ALLOW_MULTIPLE_QUERIES),
+                    new Option(Option.Command.TIMEZONE)
+            ));
+        }
+
+        public String get_endpoint() {
+            return _options.isEmpty() ? "" : String.format(
+                    "?%s",
+                    String.join(
+                            "&",
+                            _options.stream()
+                                    .filter(Option::is_isEnabled)
+                                    .map(option -> option.get_command().get_parameter())
+                                    .toList()
+                    )
+
+            );
         }
 
         @Getter @AllArgsConstructor
@@ -189,7 +208,8 @@ public class DatabaseLibrary {
 
             @Getter @AllArgsConstructor
             public enum Command {
-                ALLOW_MULTIPLE_QUERIES("?allowMultiQueries=true");
+                ALLOW_MULTIPLE_QUERIES("allowMultiQueries=true"),
+                TIMEZONE("serverTimezone=UTC");
 
                 private final String _parameter;
             }

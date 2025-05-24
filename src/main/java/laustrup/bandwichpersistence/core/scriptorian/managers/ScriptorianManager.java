@@ -44,10 +44,7 @@ public class ScriptorianManager {
 
     public static void onStartup() {
         try {
-            _logger.log(
-                    Level.INFO,
-                    "Scriptorian started"
-            );
+            _logger.log(Level.INFO, "Scriptorian started");
 
             Seszt<File> scripts = prepareScripts(PathLibrary.get_migrationDirectoryFullPath());
 
@@ -92,9 +89,8 @@ public class ScriptorianManager {
 
                         putScriptory(generateParameters(currentFile, errorMessage).stream());
 
-                        if (errorMessage != null) {
+                        if (errorMessage != null)
                             System.exit(6);
-                        }
 
                         _logger.log(
                                 Level.INFO,
