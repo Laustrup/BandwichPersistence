@@ -29,7 +29,7 @@ public class JDBCService {
         try {
             return (AtomicReference<T>) reference.getAndSet((T) (
                     field.is_key() && getType(field) == DataType.BINARY
-                            ? getUUID(field)
+                            ? getUUID(toDatabaseColumn(field.get_content()))
                             : _resultSet.getObject(toDatabaseColumn(field.get_content()))
             ));
         } catch (SQLException e) {

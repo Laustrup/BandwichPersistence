@@ -9,6 +9,7 @@ import lombok.Setter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Properties;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -41,14 +42,14 @@ public class DatabaseLibrary {
     private static boolean _schemaExists;
 
     @Getter
-    private static Properties _properties;
+    private static URLProperties _URLProperties;
 
     @Getter
     private static boolean _isInMemory;
 
     private static boolean _isConfigured;
 
-    public static final int LOGIN_TIMEOUT = 1;
+    public static Properties _DBProperties;
 
     public static void setup(
             SQL sql,
@@ -79,7 +80,7 @@ public class DatabaseLibrary {
             String schema,
             String user,
             String password,
-            Properties properties,
+            URLProperties URLProperties,
             boolean isInMemory
     ) {
         if (_isConfigured)
@@ -97,14 +98,14 @@ public class DatabaseLibrary {
         _schema = schema;
         _user = Objects.requireNonNullElse(user, "root");
         _password = password;
-        _properties = properties;
+        _URLProperties = URLProperties;
         _isInMemory = isInMemory;
         databaseInteraction(() -> DatabaseLibraryRepository.createSchemaIfNotExists(_schema));
         _isConfigured = true;
     }
 
-    private static Properties convertToProperties(String[] arguments) {
-        return new Properties(
+    private static URLProperties convertToProperties(String[] arguments) {
+        return new URLProperties(
                 Stream.of(arguments)
                         .filter(argument -> argument.equals(CommandOption.DISALLOW_MULTIPLE_QUERIES.get_title()))
                         .toList()
@@ -116,7 +117,7 @@ public class DatabaseLibrary {
         return actIfIsConfigured(() -> String.format(
                 "%s%s",
                 get_rootConnectionString(false) + (_schema == null ? "" : _schema),
-                _properties.get_endpoint()
+                _URLProperties.get_endpoint()
         ));
     }
 
@@ -126,8 +127,19 @@ public class DatabaseLibrary {
                 _sql.name().toLowerCase(),
                 _target,
                 _port,
-                includeProperties ? _properties.get_endpoint() : ""
+                includeProperties ? _URLProperties.get_endpoint() : ""
         );
+    }
+
+    public static Properties get_DBProperties() {
+        if (_DBProperties != null)
+            return _DBProperties;
+
+        _DBProperties = new Properties();
+        _DBProperties.setProperty("user", get_user());
+        _DBProperties.setProperty("password", get_password());
+
+        return _DBProperties;
     }
 
     public static boolean isH2InMemory() {
@@ -155,11 +167,11 @@ public class DatabaseLibrary {
     }
 
     @Getter
-    public static class Properties {
+    public static class URLProperties {
 
         private final List<Option> _options = initializeOptions();
 
-        public Properties(boolean allowMultipleQueries) {
+        public URLProperties(boolean allowMultipleQueries) {
             _options.forEach(option -> {
                 switch (option.get_command()) {
                     case ALLOW_MULTIPLE_QUERIES -> {
