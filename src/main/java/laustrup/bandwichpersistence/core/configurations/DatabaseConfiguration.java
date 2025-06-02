@@ -3,12 +3,13 @@ package laustrup.bandwichpersistence.core.configurations;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import laustrup.bandwichpersistence.core.libraries.DatabaseLibrary;
-import laustrup.bandwichpersistence.core.scriptorian.managers.ScriptorianManager;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.sql.DataSource;
+
+import static laustrup.bandwichpersistence.core.scriptorian.managers.ScriptorianManager.onStartup;
 
 @Configuration
 @ConfigurationProperties(prefix = "spring.datasource")
@@ -24,7 +25,7 @@ public class DatabaseConfiguration extends HikariConfig {
     @Bean
     public DataSource dataSource() {
         try {
-            ScriptorianManager.onStartup();
+            onStartup();
         } catch (IllegalStateException e) {
             System.err.println(e.getMessage());
             System.exit(2);

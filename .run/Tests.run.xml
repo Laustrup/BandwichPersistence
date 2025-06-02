@@ -9,8 +9,8 @@
     <option name="METHOD_NAME" value="" />
     <option name="TEST_OBJECT" value="package" />
     <method v="2">
+      <option name="RunConfigurationTask" enabled="true" run_configuration_name="MySQL - dev" run_configuration_type="docker-deploy" />
       <option name="Make" enabled="true" />
-      <option name="RunConfigurationTask" enabled="true" run_configuration_name="MySQL" run_configuration_type="docker-deploy" />
     </method>
   </configuration>
 </component>

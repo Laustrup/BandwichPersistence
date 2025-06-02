@@ -49,8 +49,6 @@ public class ScriptorianManager {
             Seszt<File> scripts = prepareScripts(PathLibrary.get_migrationDirectoryFullPath());
 
             databaseInteraction(() -> {
-                if (!DatabaseLibrary.isH2InMemory())
-                    createDefaultSchemaIfNotExists();
                 Seszt<Scriptorian.Scriptory> scriptoriesWithoutSuccess = scriptoriesWithoutSuccess();
                 if (!scriptoriesWithoutSuccess.isEmpty())
                     throw new IllegalStateException(String.format("""

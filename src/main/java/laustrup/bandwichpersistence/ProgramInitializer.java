@@ -3,12 +3,14 @@ package laustrup.bandwichpersistence;
 import laustrup.bandwichpersistence.core.libraries.DatabaseLibrary;
 import laustrup.bandwichpersistence.core.libraries.SecurityLibrary;
 import laustrup.bandwichpersistence.core.persistence.SQL;
-import laustrup.bandwichpersistence.core.scriptorian.managers.ScriptorianManager;
 
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static laustrup.bandwichpersistence.core.persistence.SQL.MySQL;
+import static laustrup.bandwichpersistence.core.scriptorian.managers.ScriptorianManager.*;
 
 public class ProgramInitializer {
 
@@ -48,18 +50,21 @@ public class ProgramInitializer {
 
     static void startUpTestMode(String schema) {
         SecurityLibrary.setup("123");
-        DatabaseLibrary.setup(
-                SQL.MySQL,
-                null,
-                3307,
-                schema,
-                null,
-                "testword",
-                new String[]{},
-                true
-        );
-        ScriptorianManager.onStartup();
-        ScriptorianManager.runPopulation();
+        if (!DatabaseLibrary.is_configured())
+                DatabaseLibrary.setup(
+                        MySQL,
+                        null,
+                        3307,
+                        schema,
+                        null,
+                        "devword",
+                        new String[]{},
+                        true
+                );
+        else
+            DatabaseLibrary.startup(schema);
+        onStartup();
+        runPopulation();
     }
 
     static Map<String, String> argumentsToMap(String[] arguments) {

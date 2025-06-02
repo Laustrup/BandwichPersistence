@@ -16,7 +16,7 @@ public class TestItems {
 
     private static OrganisationBuilder _organisationBuilder = OrganisationBuilder.get_instance();
 
-    private static Query generateQuery(String table, String title) {
+    private static Query selectQuery(String table, String title) {
         return new Query(String.format(/*language=mysql*/ """
                 select * from %s
                      inner join contact_info
@@ -43,19 +43,19 @@ public class TestItems {
         ));
     }
 
-    private static Query generateVenueQuery(String title) {
-        return generateQuery("venues", title);
+    private static Query selectOrganizationQuery(String title) {
+        return selectQuery("organizations", title);
     }
 
-    public static Organisation generateOrganisation(OrganisationTitle organisation) {
+    public static Organisation selectOrganisation(OrganisationTitle organisation) {
         return _organisationBuilder.build(
-                read(generateVenueQuery(organisation.get_naming()))
+                read(selectOrganizationQuery(organisation.get_naming()))
                         .get_resultSet()
         );
     }
 
     public static ResultSet generateResultSet() {
-        return read(generateVenueQuery(OrganisationTitle.ARENA.get_naming()))
+        return read(selectOrganizationQuery(OrganisationTitle.ARENA.get_naming()))
                 .get_resultSet();
     }
 

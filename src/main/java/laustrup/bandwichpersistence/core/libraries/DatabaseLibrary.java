@@ -1,7 +1,6 @@
 package laustrup.bandwichpersistence.core.libraries;
 
 import laustrup.bandwichpersistence.core.persistence.SQL;
-import laustrup.bandwichpersistence.core.repositories.DatabaseLibraryRepository;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,6 +13,7 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static laustrup.bandwichpersistence.core.managers.ManagerService.databaseInteraction;
+import static laustrup.bandwichpersistence.core.repositories.DatabaseLibraryRepository.createSchemaIfNotExists;
 
 public class DatabaseLibrary {
 
@@ -29,7 +29,6 @@ public class DatabaseLibrary {
     @Getter
     private static int _port;
 
-    @Getter
     private static String _schema;
 
     @Getter
@@ -47,7 +46,8 @@ public class DatabaseLibrary {
     @Getter
     private static boolean _isInMemory;
 
-    private static boolean _isConfigured;
+    @Getter
+    private static boolean _configured;
 
     public static Properties _DBProperties;
 
@@ -83,7 +83,7 @@ public class DatabaseLibrary {
             URLProperties URLProperties,
             boolean isInMemory
     ) {
-        if (_isConfigured)
+        if (_configured)
             throw new IllegalStateException("Database library is already configured");
         if (schema == null)
             throw new IllegalArgumentException("Database must have a schema");
@@ -95,13 +95,20 @@ public class DatabaseLibrary {
         };
         _target = Objects.requireNonNullElse(target, "localhost");
         _port = Objects.requireNonNullElse(port, 3306);
-        _schema = schema;
+        _URLProperties = URLProperties;
         _user = Objects.requireNonNullElse(user, "root");
         _password = password;
-        _URLProperties = URLProperties;
         _isInMemory = isInMemory;
-        databaseInteraction(() -> DatabaseLibraryRepository.createSchemaIfNotExists(_schema));
-        _isConfigured = true;
+        databaseInteraction(() -> createSchemaIfNotExists(schema));
+        _schema = schema;
+        _configured = true;
+    }
+
+    public static void startup(String schema) {
+        if (_configured) {
+            databaseInteraction(() -> createSchemaIfNotExists(schema));
+            _schema = schema;
+        }
     }
 
     private static URLProperties convertToProperties(String[] arguments) {
@@ -147,7 +154,7 @@ public class DatabaseLibrary {
     }
 
     public static String actIfIsConfigured(Supplier<String> act) {
-        return _isConfigured ? act.get() : null;
+        return _configured ? act.get() : null;
     }
     
     @Getter @AllArgsConstructor
@@ -204,6 +211,10 @@ public class DatabaseLibrary {
                     )
 
             );
+        }
+
+        public String get_schema() {
+            return _schema == null ? "" : _schema;
         }
 
         @Getter @AllArgsConstructor
