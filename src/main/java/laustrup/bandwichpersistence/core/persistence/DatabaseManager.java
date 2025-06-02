@@ -6,13 +6,14 @@ import laustrup.bandwichpersistence.core.persistence.models.DatabaseResponse;
 import laustrup.bandwichpersistence.core.persistence.models.Query;
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static java.sql.ResultSet.*;
 
 public class DatabaseManager {
 
@@ -29,14 +30,6 @@ public class DatabaseManager {
 
     public static DatabaseResponse read(Query query, Stream<DatabaseParameter> databaseParameters) {
         return handle(query, Action.READ, databaseParameters);
-    }
-
-    public static DatabaseResponse upsert(Query query) {
-        return upsert(query, new ArrayList<>().stream().map(datum -> (DatabaseParameter) datum));
-    }
-
-    public static DatabaseResponse upsert(Query query, Stream<DatabaseParameter> parameters) {
-        return handle(query, Action.CUD, parameters);
     }
 
     public static DatabaseResponse create(Query query) {
@@ -198,11 +191,7 @@ public class DatabaseManager {
 
             preparedStatement = Objects
                     .requireNonNull(DatabaseGate.getConnection(url))
-                    .prepareStatement(
-                            script,
-                            ResultSet.TYPE_SCROLL_INSENSITIVE,
-                            ResultSet.CONCUR_READ_ONLY
-                    );
+                    .prepareStatement(script, TYPE_SCROLL_INSENSITIVE, CONCUR_READ_ONLY);
 
             for (Integer key : databaseParametersByIndex.keySet()) {
                 DatabaseParameter parameter = databaseParametersByIndex.get(key);

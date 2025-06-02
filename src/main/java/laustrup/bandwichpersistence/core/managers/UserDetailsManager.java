@@ -11,16 +11,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.sql.ResultSet;
-import java.util.Objects;
 import java.util.logging.Logger;
 
 import static laustrup.bandwichpersistence.core.managers.ManagerService.databaseInteraction;
 import static laustrup.bandwichpersistence.core.services.PasswordService.matches;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
+import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService.*;
+import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService.Configurations.Mode.*;
 
 public class UserDetailsManager {
 
     private static final Logger _logger = Logger.getLogger(UserDetailsManager.class.getName());
+
+    static private final UserBuilder _userBuilder = UserBuilder.get_instance();
 
     public static UserDetails getUserDetails(String email) {
         return databaseInteraction(() ->
@@ -36,18 +39,16 @@ public class UserDetailsManager {
             HttpStatus status = HttpStatus.OK;
 
             try {
-                user = UserBuilder.get_instance().build(passwordFits(
+                user = _userBuilder.build(passwordFits(
                         UserDetailsRepository.getUserByEmail(login),
                         login.getPassword()
                 ));
             } catch (IllegalArgumentException exception) {
                 status = HttpStatus.UNAUTHORIZED;
                 _logger.warning(exception.getMessage());
-                exception.printStackTrace();
             } catch (Exception exception) {
                 status = HttpStatus.INTERNAL_SERVER_ERROR;
                 _logger.warning(exception.getMessage());
-                exception.printStackTrace();
             }
 
             return new Response<>(user, status);
@@ -55,30 +56,26 @@ public class UserDetailsManager {
     }
 
     private static ResultSet passwordFits(ResultSet resultSet, String password) {
-        if (matches(
-                password,
-                peek(
-                        resultSet,
-                        results ->
-                                get(Field.of(Objects.requireNonNull(get(
-                                                        Field.of(
-                                                                Subscription.class.getSimpleName() + "s",
-                                                                Subscription.DTO.Fields.userType
-                                                        ),
-                                                        String.class
-                                                )).toLowerCase() + "s",
-                                                Login.Fields.password
-                                        ),
-                                        String.class
-                                ),
-                        exception -> {
-                            _logger.warning("Issue when checking for password fit: " + exception.getMessage());
-                            throw new RuntimeException(exception);
-                        }
-                )
-        ))
+        if (matches(password, get(
+                new ResultSetService.Configurations(new Field(getUserType(resultSet), "password"), resultSet, PEEK),
+                String.class
+        )))
             return resultSet;
         else
             throw new IllegalArgumentException("password does not match");
+    }
+
+    public static String getUserType(ResultSet resultSet) {
+        return get(
+                new Configurations(
+                        Field.of(
+                                Subscription.class.getSimpleName() + "s",
+                                Subscription.DTO.Fields.userType
+                        ),
+                        resultSet,
+                        PEEK
+                ),
+                String.class
+        );
     }
 }

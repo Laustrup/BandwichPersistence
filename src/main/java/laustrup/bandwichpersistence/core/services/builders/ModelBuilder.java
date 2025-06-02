@@ -6,6 +6,7 @@ import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.models.User;
 import laustrup.bandwichpersistence.core.persistence.Field;
 import laustrup.bandwichpersistence.core.services.persistence.JDBCService;
+import laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService.Configurations;
 import lombok.SneakyThrows;
 
 import java.sql.ResultSet;
@@ -14,8 +15,8 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 
-import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.get;
-import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.peek;
+import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService.Configurations.Mode.PEEK;
+import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService.get;
 
 public class ModelBuilder extends BuilderService<Model> {
 
@@ -78,13 +79,16 @@ public class ModelBuilder extends BuilderService<Model> {
     }
 
     private String getZoneId(ResultSet resultSet) {
-        return peek(
-                resultSet,
-                () -> get(
-                        JDBCService::getString,
-                        Event.DTO.Fields.zoneId
+        return get(
+                new Configurations(
+                        JDBCService.getString(new Field(
+                                Event.class.getSimpleName() + "s",
+                                Event.DTO.Fields.zoneId
+                        )),
+                        resultSet,
+                        PEEK
                 ),
-                exception -> _logger.warning("Couldn't find user type when building user!\n" + exception.getMessage())
+                String.class
         );
     }
 }

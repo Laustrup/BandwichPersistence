@@ -3,6 +3,7 @@ package laustrup.bandwichpersistence.core.services.persistence;
 import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.persistence.DataType;
 import laustrup.bandwichpersistence.core.persistence.Field;
+import laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService.Configurations;
 import laustrup.bandwichpersistence.core.utilities.collections.Liszt;
 
 import javax.naming.NameNotFoundException;
@@ -24,209 +25,65 @@ public class JDBCService {
 
     private static Integer _currentRow = null;
 
-    @SuppressWarnings("unchecked")
     public static <T> AtomicReference<T> set(AtomicReference<T> reference, Field field) {
-        try {
-            return (AtomicReference<T>) reference.getAndSet((T) (
-                    field.is_key() && getType(field) == DataType.BINARY
-                            ? getUUID(toDatabaseColumn(field.get_content()))
-                            : _resultSet.getObject(toDatabaseColumn(field.get_content()))
-            ));
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <T> Collection<T> add(Collection<T> collection, Field field) {
-        try {
-            collection.add((T) _resultSet.getObject(toDatabaseColumn(field.get_content())));
-            return collection;
-        } catch (SQLException exception) {
-            throw new RuntimeException(exception);
-        }
-    }
-
-    public static <T> T get(Timestamp timestamp, Function<Timestamp, T> function) {
-        return timestamp == null
-                ? null
-                : function.apply(timestamp);
-    }
-
-    public static <T> T get(Function<String, T> function, String... columnTitle) {
-        for (int i = 0; i < columnTitle.length; i++)
-            columnTitle[i] = toDatabaseColumn(specifyColumn(Arrays.stream(columnTitle)
-                    .filter(Objects::nonNull)
-                    .findFirst()
-                    .orElseThrow()
-            ));
-
-        return ifColumnExists(function, columnTitle);
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <T> T get(Field field, Class<T> type) {
-        return switch (type.getSimpleName()) {
-            case "String" -> (T) getString(field.get_content());
-            case "Instant" -> (T) getInstant(field.get_content());
-            case "Boolean" -> (T) getBoolean(field.get_content());
-            case "UUID" -> (T) getUUID(field.get_content());
-            case "Integer" -> (T) getInteger(field.get_content());
-            case "Long" -> (T) getLong(field.get_content());
-            default -> null;
-        };
-    }
-
-    public static String specifyColumn(String... columnTitle) {
-        return String.join(".", columnTitle);
-    }
-
-    public static <T> T ifColumnExists(Function<String, T> function, String... columns) {
-        for (String column : columns) {
-            try {
-                T t = function.apply(toDatabaseColumn(column));
-                if (t != null)
-                    return t;
-            } catch (Exception ignored) {}
-        }
-
-        return null;
-    }
-
-    public static String getString(String column) {
-        try {
-            return _resultSet.getString(toDatabaseColumn(column));
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static String getString(Field field) {
-        String title = toDatabaseColumn(field.get_content());
-
-        while (true) {
-            try {
-                return _resultSet.getString(title);
-            } catch (SQLException e) {
-                if (title.contains("."))
-                    title = title.substring(title.indexOf("."));
-                else
-                    throw new RuntimeException(e);
-            }
-        }
-    }
-
-    public static UUID getUUID(Field field) {
-        return getUUID(field.get_content());
-    }
-
-    public static UUID getUUID(String column) {
-        try {
-            return UUID.nameUUIDFromBytes(_resultSet.getBytes(toDatabaseColumn(column)));
-        } catch (SQLException exception) {
-            throw new RuntimeException(exception);
-        }
-    }
-
-    public static Integer getInteger(String column) {
-        try {
-            return _resultSet.getInt(toDatabaseColumn(column));
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static Long getLong(String column) {
-        try {
-            return _resultSet.getLong(toDatabaseColumn(column));
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static Boolean getBoolean(String column) {
-        try {
-            return _resultSet.getBoolean(toDatabaseColumn(column));
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static <T> T getTimestamp(String column, Function<Timestamp, T> function) {
-        try {
-            return get(_resultSet.getTimestamp(toDatabaseColumn(column)), function);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static Instant getInstant(Field field) {
-        return getInstant(field.get_content());
-    }
-
-    public static Instant getInstant(String column) {
-        return get(
-                name -> getTimestamp(name, Timestamp::toInstant),
-                toDatabaseColumn(column)
+        return ResultSetService.set(
+                new Configurations(
+                        field.get_content(),
+                        _resultSet
+                ), reference
         );
     }
 
-    /**
-     * Looks into the resultSet to find a targeted information.
-     * Will go one line forward and then move all the way back.
-     * @param resultSet The table of gathered results.
-     * @param supply The algorithm to reach the target information.
-     * @param logging In case of a SQLException, how should this be logged?
-     * @return The target information.
-     * @param <T> The target information type.
-     */
-    public static <T> T peek(ResultSet resultSet, Supplier<T> supply, Consumer<SQLException> logging) {
-        T type = null;
-        _resultSet = resultSet;
-
-        try {
-            if (_resultSet.next())
-                type = supply.get();
-            else
-                throw new SQLException("No more rows when peeking");
-
-            moveBackwards(true);
-        } catch (SQLException exception) {
-            logging.accept(exception);
-        }
-
-        reset();
-
-        return type;
+    public static <T> Collection<T> add(Collection<T> collection, Field field) {
+        return ResultSetService.add(new Configurations(field, _resultSet), collection);
     }
 
-    /**
-     * Looks into the resultSet to find a targeted information.
-     * Will go one line forward and then move all the way back.
-     * @param resultSet The table of gathered results.
-     * @param action The algorithm to reach the target information.
-     * @param logging In case of a SQLException, how should this be logged?
-     * @return The target information.
-     * @param <T> The target information type.
-     */
-    public static <T> T peek(ResultSet resultSet, Function<ResultSet, T> action, Consumer<SQLException> logging) {
-        T type = null;
-        _resultSet = resultSet;
+    public static <T> T get(Field field, Class<T> type) {
+        return get(field.get_content(), type);
+    }
 
-        try {
-            if (_resultSet.next())
-                type = action.apply(_resultSet);
-            else
-                throw new SQLException("No more rows when peeking");
+    public static <T> T get(String field, Class<T> type) {
+        return ResultSetService.get(new Configurations(field, _resultSet), type);
+    }
 
-            moveBackwards(true);
-        } catch (SQLException exception) {
-            logging.accept(exception);
-        }
+    public static String getString(String column) {
+        return ResultSetService.getString(new Configurations(column, _resultSet));
+    }
 
-        reset();
+    public static String getString(Field field) {
+        return ResultSetService.getString(new Configurations(field, _resultSet));
+    }
 
-        return type;
+    public static UUID getUUID(Field field) {
+        return ResultSetService.getUUID(new Configurations(field.get_content(), _resultSet));
+    }
+
+    public static UUID getUUID(String column) {
+        return ResultSetService.getUUID(new Configurations(column, _resultSet));
+    }
+
+    public static Integer getInteger(String column) {
+        return ResultSetService.getInteger(new Configurations(column, _resultSet));
+    }
+
+    public static Long getLong(String column) {
+        return ResultSetService.getLong(new Configurations(column, _resultSet));
+    }
+
+    public static Boolean getBoolean(String column) {
+        return ResultSetService.getBoolean(new Configurations(column, _resultSet));
+    }
+
+    public static <T> T getTimestamp(String column, Function<Timestamp, T> function) {
+        return ResultSetService.getTimestamp(new Configurations(column, _resultSet), function);
+    }
+
+    public static Instant getInstant(Field field) {
+        return ResultSetService.getInstant(new Configurations(field.get_content(), _resultSet));
+    }
+
+    public static Instant getInstant(String column) {
+        return ResultSetService.getInstant(new Configurations(column, _resultSet));
     }
 
     public static <T> Stream<T> build(ResultSet resultSet, Supplier<T> supplier) {
@@ -267,7 +124,7 @@ public class JDBCService {
         build(
                 resultSet,
                 runnable,
-                id -> !get(
+                id -> !ResultSetService.get(
                         JDBCService::getUUID,
                         Model.ModelDTO.Fields.id
                 ).equals(id),
@@ -293,7 +150,7 @@ public class JDBCService {
             do {
                 if (isDoneBuilding(breaker, primaries)) {
                     if (isFirst)
-                        moveBackwards(false);
+                        ResultSetService.moveBackwards(_resultSet, false);
                     break;
                 }
                 runnable.run();
@@ -325,52 +182,267 @@ public class JDBCService {
         return false;
     }
 
-    public static String toDatabaseColumn(String field) {
-        StringBuilder databaseColumn = new StringBuilder();
-
-        for (char c : field.toCharArray())
-            databaseColumn
-                    .append(Character.isUpperCase(c) ? '_' : "")
-                    .append(Character.toLowerCase(c));
-
-        if (databaseColumn.charAt(0) == ' ' || databaseColumn.charAt(0) == '_')
-            databaseColumn.deleteCharAt(0);
-
-        return databaseColumn.toString()
-                .replace("._", ".");
-    }
-
-    private static void moveBackwards(boolean toStart) throws SQLException {
-        if (!_resultSet.isClosed() && _resultSet.getRow() > 0)
-            do
-                _resultSet.previous();
-            while (toStart && _resultSet.getRow() > 0 && !_resultSet.isBeforeFirst());
-    }
-
     private static void reset() {
         _resultSet = null;
         _currentRow = null;
     }
 
     private static DataType getType(Field field) {
-        try {
-            return DataType.valueOf(_resultSet.getMetaData().getColumnType(columnIndex(field)));
-        } catch (SQLException | NameNotFoundException exception) {
-            throw new RuntimeException(exception);
-        }
+        return ResultSetService.getType(new Configurations(field, _resultSet));
     }
 
-    private static int columnIndex(Field field) throws NameNotFoundException {
-        try {
-            ResultSetMetaData metaData = _resultSet.getMetaData();
+    public static class ResultSetService {
 
-            for (int i = 1; i <= metaData.getColumnCount(); i++)
-                if (metaData.getColumnName(i).equals(field.get_content().toLowerCase()))
-                    return i;
+        @SuppressWarnings("unchecked")
+        public static <T> AtomicReference<T> set(Configurations configurations, AtomicReference<T> reference) {
+            try {
+                Field field = configurations.getField();
+                
+                return (AtomicReference<T>) reference.getAndSet((T) (
+                        field.is_key() && getType(configurations) == DataType.BINARY
+                                ? getUUID(configurations)
+                                : configurations.resultSet.getObject(field.get_content())
+                ));
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
 
-            throw new NameNotFoundException("Could not find column " + field.get_content() + " when finding its index.");
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        @SuppressWarnings("unchecked")
+        public static <T> Collection<T> add(Configurations configurations, Collection<T> collection) {
+            try {
+                collection.add((T) configurations.resultSet.getObject(configurations.field()));
+                return collection;
+            } catch (SQLException exception) {
+                throw new RuntimeException(exception);
+            }
+        }
+
+        @SuppressWarnings("unchecked")
+        public static <T> T get(Configurations configurations, Class<T> type) {
+            return switch (type.getSimpleName()) {
+                case "String" -> (T) getString(configurations);
+                case "Instant" -> (T) getInstant(configurations);
+                case "Boolean" -> (T) getBoolean(configurations);
+                case "UUID" -> (T) getUUID(configurations);
+                case "Integer" -> (T) getInteger(configurations);
+                case "Long" -> (T) getLong(configurations);
+                default -> null;
+            };
+        }
+
+        public static <T> T get(Function<String, T> function, String... columnTitle) {
+            for (int i = 0; i < columnTitle.length; i++)
+                columnTitle[i] = DatabaseService.specifyColumn(Arrays.stream(columnTitle)
+                        .filter(Objects::nonNull)
+                        .findFirst()
+                        .orElseThrow()
+                );
+
+            return ifColumnExists(function, columnTitle);
+        }
+
+        public static <T> T get(Timestamp timestamp, Function<Timestamp, T> function) {
+            return timestamp == null ? null : function.apply(timestamp);
+        }
+
+        private static DataType getType(Configurations configurations) {
+            try {
+                return DataType.valueOf(configurations.resultSet.getMetaData().getColumnType(columnIndex(configurations.getField())));
+            } catch (SQLException | NameNotFoundException exception) {
+                throw new RuntimeException(exception);
+            }
+        }
+
+        public static void restart(ResultSet resultSet) {
+            try {
+                moveBackwards(resultSet, true);
+            } catch (SQLException e) {
+                _logger.warning(String.format("Failed to restart ResultSet: %s", e.getMessage()));
+            }
+        }
+
+        public static String getString(Configurations configurations) {
+            return handleGet(configurations, () -> {
+                try {
+                    return configurations.resultSet.getString(configurations.field());
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        }
+
+        public static UUID getUUID(Configurations configurations) {
+            return handleGet(configurations, () -> {
+                try {
+                    return UUID.nameUUIDFromBytes(configurations.resultSet.getBytes(configurations.field()));
+                } catch (SQLException exception) {
+                    throw new RuntimeException(exception);
+                }
+            });
+        }
+
+        public static Integer getInteger(Configurations configurations) {
+            return handleGet(configurations, () -> {
+                try {
+                    return configurations.resultSet.getInt(configurations.field());
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        }
+
+        public static Long getLong(Configurations configurations) {
+            return handleGet(configurations, () -> {
+                try {
+                    return configurations.resultSet.getLong(configurations.field());
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        }
+
+        public static Boolean getBoolean(Configurations configurations) {
+            return handleGet(configurations, () -> {
+                try {
+                    return configurations.resultSet.getBoolean(configurations.field());
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        }
+
+        public static Instant getInstant(Configurations configurations) {
+            return getTimestamp(configurations, Timestamp::toInstant);
+        }
+
+        public static <T> T getTimestamp(Configurations configurations, Function<Timestamp, T> function) {
+            return handleGet(configurations, () -> {
+                try {
+                    return get(configurations.resultSet.getTimestamp(configurations.field()), function);
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+        }
+
+        private static <T> T handleGet(Configurations configurations, Supplier<T> supplier) {
+            try {
+                return switch (configurations.mode) {
+                    case NEUTRAL -> supplier.get();
+                    case START -> {
+                        configurations.startResultSet();
+                        yield supplier.get();
+                    }
+                    case PEEK -> {
+                        configurations.startResultSet();
+                        T generic = supplier.get();
+                        restart(configurations.resultSet);
+                        yield generic;
+                    }
+                };
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        public static <T> T ifColumnExists(Function<String, T> function, String... columns) {
+            for (String column : columns) {
+                try {
+                    T generic = function.apply(column);
+                    if (generic != null)
+                        return generic;
+                } catch (Exception ignored) {}
+            }
+
+            return null;
+        }
+
+        private static int columnIndex(Field field) throws NameNotFoundException {
+            try {
+                ResultSetMetaData metaData = _resultSet.getMetaData();
+
+                for (int i = 1; i <= metaData.getColumnCount(); i++)
+                    if (metaData.getColumnName(i).equals(field.get_content().toLowerCase()))
+                        return i;
+
+                throw new NameNotFoundException("Could not find column " + field.get_content() + " when finding its index.");
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        private static void moveBackwards(ResultSet resultSet, boolean toStart) throws SQLException {
+            if (!resultSet.isClosed() && resultSet.getRow() > 0)
+                do
+                    resultSet.previous();
+                while (toStart && resultSet.getRow() > 0 && !resultSet.isBeforeFirst());
+        }
+
+        public record Configurations(String field, ResultSet resultSet, Mode mode) {
+
+            public Configurations(Field field, ResultSet resultSet, Mode mode) {
+                this(field.get_content(), resultSet, mode);
+            }
+
+            public Configurations(Field field, ResultSet resultSet) {
+                this(field.get_content(), resultSet, Mode.NEUTRAL);
+            }
+            
+            public Configurations(String field, ResultSet resultSet) {
+                this(field, resultSet, Mode.NEUTRAL);
+            }
+            
+            public Field getField() {
+                String[] content = field.split("\\.");
+                return new Field(content[0], content[1]);
+            }
+            
+            public String field() {
+                return DatabaseService.toDatabaseColumn(field);
+            }
+            
+            public void startResultSet() throws SQLException {
+                if (resultSet.isBeforeFirst())
+                    resultSet.next();
+            }
+
+            public enum Mode {
+                /**
+                 * Just acts on the resultset without either starting nor peeking.
+                 */
+                NEUTRAL,
+                /**
+                 * Before acting it start the resultset and afterward puts it back.
+                 */
+                PEEK,
+                /**
+                 * Only starts the resultset before acting.
+                 */
+                START
+            }
+        }
+    }
+    
+    public static class DatabaseService {
+
+        public static String toDatabaseColumn(String field) {
+            StringBuilder databaseColumn = new StringBuilder();
+
+            for (char c : field.toCharArray())
+                databaseColumn
+                        .append(Character.isUpperCase(c) ? '_' : "")
+                        .append(Character.toLowerCase(c));
+
+            if (databaseColumn.charAt(0) == ' ' || databaseColumn.charAt(0) == '_')
+                databaseColumn.deleteCharAt(0);
+
+            return databaseColumn.toString()
+                    .replace("._", ".");
+        }
+
+        public static String specifyColumn(String... columnTitle) {
+            return String.join(".", columnTitle);
         }
     }
 }

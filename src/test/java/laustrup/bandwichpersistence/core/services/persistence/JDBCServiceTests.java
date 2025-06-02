@@ -13,6 +13,7 @@ import java.util.function.Supplier;
 
 import static laustrup.bandwichpersistence.TestItems.*;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
+import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.DatabaseService.*;
 import static laustrup.bandwichpersistence.quality_assurance.Asserter.asserting;
 import static org.junit.jupiter.api.Assertions.*;
 

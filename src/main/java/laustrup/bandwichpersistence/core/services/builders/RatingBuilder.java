@@ -15,7 +15,6 @@ import java.util.function.Function;
 import java.util.logging.Logger;
 
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
-import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.get;
 
 public class RatingBuilder extends BuilderService<Rating> {
 
@@ -79,13 +78,8 @@ public class RatingBuilder extends BuilderService<Rating> {
                                 OrganisationBuilder.get_instance().complete(organisation, resultSet);
                             timestamp.set(getInstant(Rating.DTO.Fields.timestamp));
                         },
-                        primary -> !get(
-                                JDBCService::getUUID,
-                                Rating.DTO.Fields.appointedId
-                        ).equals(primary) || !get(
-                                JDBCService::getUUID,
-                                Rating.DTO.Fields.reviewerId
-                        ).equals(primary),
+                        primary -> !getUUID(Field.of("appointed_id")).equals(primary) ||
+                                !getUUID(Field.of("reviewer_id")).equals(primary),
                         appointedId.get(),
                         reviewerId.get()
                 );

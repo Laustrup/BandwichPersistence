@@ -1,10 +1,12 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
+import laustrup.bandwichpersistence.core.managers.UserDetailsManager;
 import laustrup.bandwichpersistence.core.models.*;
 import laustrup.bandwichpersistence.core.models.users.Artist;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
 import laustrup.bandwichpersistence.core.persistence.Field;
 import laustrup.bandwichpersistence.core.services.persistence.JDBCService;
+import laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService.Configurations.Mode;
 
 import java.sql.ResultSet;
 import java.util.*;
@@ -12,7 +14,6 @@ import java.util.function.Function;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
-import static laustrup.bandwichpersistence.core.models.Subscription.UserType.valueOf;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
 
 public class UserBuilder extends BuilderService<User> {
@@ -48,11 +49,13 @@ public class UserBuilder extends BuilderService<User> {
 
     @Override
     public User build(ResultSet resultSet) {
-        return switch (peek(
-                resultSet,
-                () -> valueOf(getString(Subscription.DTO.Fields.userType)),
-                exception -> _logger.warning("Couldn't find user type when building user!\n" + exception.getMessage())
-        )) {
+        return switch (Subscription.UserType.valueOf(
+                ResultSetService.get(new ResultSetService.Configurations(
+                        UserDetailsManager.getUserType(resultSet),
+                        resultSet,
+                        Mode.PEEK
+                ), String.class
+        ))) {
             case ARTIST -> ArtistBuilder.get_instance().build(resultSet);
             case ORGANISATION_EMPLOYEE -> OrganisationEmployeeBuilder.get_instance().build(resultSet);
             case null -> null;

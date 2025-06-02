@@ -2,10 +2,8 @@ package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.Event;
 import laustrup.bandwichpersistence.core.models.Model;
-import laustrup.bandwichpersistence.core.models.Rating;
 import laustrup.bandwichpersistence.core.models.chats.Request;
 import laustrup.bandwichpersistence.core.persistence.Field;
-import laustrup.bandwichpersistence.core.services.persistence.JDBCService;
 
 import java.sql.ResultSet;
 import java.time.Instant;
@@ -15,7 +13,6 @@ import java.util.function.Function;
 import java.util.logging.Logger;
 
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
-import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.get;
 
 public class RequestBuilder extends BuilderService<Request> {
 
@@ -59,15 +56,10 @@ public class RequestBuilder extends BuilderService<Request> {
                         approved.set(getInstant(Request.DTO.Fields.approved));
                         timestamp.set(getInstant(Request.DTO.Fields.timestamp));
                     },
-                    primary -> !get(
-                            JDBCService::getUUID,
-                            Rating.DTO.Fields.appointedId
-                    ).equals(primary) || !get(
-                            JDBCService::getUUID,
-                            Rating.DTO.Fields.reviewerId
-                    ).equals(primary),
-                    receiverId,
-                    senderId
+                    primary -> !getUUID(Field.of("receiver_id")).equals(primary) ||
+                            !getUUID(Field.of("sender_id")).equals(primary),
+                    receiverId.get(),
+                    senderId.get()
             );
 
             return new Request(

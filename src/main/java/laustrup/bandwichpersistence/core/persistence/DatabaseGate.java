@@ -57,7 +57,7 @@ public class DatabaseGate {
                 sleepInterval += 100;
                 exception = sqlException;
                 System.err.printf(
-                        "\n\tFailed to get connection to database for %s attempt(s) and took %s milliseconds\n",
+                        "\n\tFailed to get connection to database for %s attempt(s) and took %s milliseconds",
                         attempts,
                         countDuration.get()
                 );
