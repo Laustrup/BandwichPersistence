@@ -44,7 +44,7 @@ public class TestItems {
     }
 
     private static Query selectOrganizationQuery(String title) {
-        return selectQuery("organizations", title);
+        return selectQuery("organisations", title);
     }
 
     public static Organisation selectOrganisation(OrganisationTitle organisation) {
@@ -55,8 +55,7 @@ public class TestItems {
     }
 
     public static ResultSet generateResultSet() {
-        return read(selectOrganizationQuery(OrganisationTitle.ARENA.get_naming()))
-                .get_resultSet();
+        return read(selectOrganizationQuery(OrganisationTitle.ARENA.get_naming())).get_resultSet();
     }
 
     @Getter

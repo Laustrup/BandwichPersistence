@@ -1,5 +1,7 @@
 package laustrup.bandwichpersistence.quality_assurance;
 
+import java.util.function.Predicate;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class Asserter {
@@ -39,6 +41,16 @@ public class Asserter {
         @Override
         public void isNotEqualTo(E actual) {
             _notEqualToChecked = handleEqualing(() -> assertNotEquals(_expected, actual), false);
+        }
+
+        @Override
+        public void is(Predicate<E> predicate) {
+            assertTrue(predicate.test(_expected));
+        }
+
+        @Override
+        public void isNotNull() {
+            assertNotNull(_expected);
         }
     }
 }

@@ -17,6 +17,8 @@ import java.util.function.Supplier;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
+import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService.Configurations.Mode.*;
+
 public class JDBCService {
 
     private static final Logger _logger = Logger.getLogger(JDBCService.class.getName());
@@ -187,35 +189,35 @@ public class JDBCService {
         _currentRow = null;
     }
 
-    private static DataType getType(Field field) {
-        return ResultSetService.getType(new Configurations(field, _resultSet));
-    }
-
     public static class ResultSetService {
 
         @SuppressWarnings("unchecked")
         public static <T> AtomicReference<T> set(Configurations configurations, AtomicReference<T> reference) {
-            try {
-                Field field = configurations.getField();
-                
-                return (AtomicReference<T>) reference.getAndSet((T) (
-                        field.is_key() && getType(configurations) == DataType.BINARY
-                                ? getUUID(configurations)
-                                : configurations.resultSet.getObject(field.get_content())
-                ));
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
+            return handleConfigurations(configurations, () -> {
+                try {
+                    Field field = configurations.getField();
+
+                    return (AtomicReference<T>) reference.getAndSet((T) (
+                            field.is_key() && getType(Configurations.of(configurations, NEUTRAL)) == DataType.BINARY
+                                    ? getUUID(Configurations.of(configurations, NEUTRAL))
+                                    : configurations.resultSet.getObject(field.get_content())
+                    ));
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            });
         }
 
         @SuppressWarnings("unchecked")
         public static <T> Collection<T> add(Configurations configurations, Collection<T> collection) {
-            try {
-                collection.add((T) configurations.resultSet.getObject(configurations.field()));
-                return collection;
-            } catch (SQLException exception) {
-                throw new RuntimeException(exception);
-            }
+            return handleConfigurations(configurations, () -> {
+                try {
+                    collection.add((T) configurations.resultSet.getObject(configurations.field()));
+                    return collection;
+                } catch (SQLException exception) {
+                    throw new RuntimeException(exception);
+                }
+            });
         }
 
         @SuppressWarnings("unchecked")
@@ -247,11 +249,13 @@ public class JDBCService {
         }
 
         private static DataType getType(Configurations configurations) {
-            try {
-                return DataType.valueOf(configurations.resultSet.getMetaData().getColumnType(columnIndex(configurations.getField())));
-            } catch (SQLException | NameNotFoundException exception) {
-                throw new RuntimeException(exception);
-            }
+            return handleConfigurations(configurations, () -> {
+                try {
+                    return DataType.valueOf(configurations.resultSet.getMetaData().getColumnType(columnIndex(configurations)));
+                } catch (SQLException | NameNotFoundException exception) {
+                    throw new RuntimeException(exception);
+                }
+            });
         }
 
         public static void restart(ResultSet resultSet) {
@@ -263,7 +267,7 @@ public class JDBCService {
         }
 
         public static String getString(Configurations configurations) {
-            return handleGet(configurations, () -> {
+            return handleConfigurations(configurations, () -> {
                 try {
                     return configurations.resultSet.getString(configurations.field());
                 } catch (SQLException e) {
@@ -273,7 +277,7 @@ public class JDBCService {
         }
 
         public static UUID getUUID(Configurations configurations) {
-            return handleGet(configurations, () -> {
+            return handleConfigurations(configurations, () -> {
                 try {
                     return UUID.nameUUIDFromBytes(configurations.resultSet.getBytes(configurations.field()));
                 } catch (SQLException exception) {
@@ -283,7 +287,7 @@ public class JDBCService {
         }
 
         public static Integer getInteger(Configurations configurations) {
-            return handleGet(configurations, () -> {
+            return handleConfigurations(configurations, () -> {
                 try {
                     return configurations.resultSet.getInt(configurations.field());
                 } catch (SQLException e) {
@@ -293,7 +297,7 @@ public class JDBCService {
         }
 
         public static Long getLong(Configurations configurations) {
-            return handleGet(configurations, () -> {
+            return handleConfigurations(configurations, () -> {
                 try {
                     return configurations.resultSet.getLong(configurations.field());
                 } catch (SQLException e) {
@@ -303,7 +307,7 @@ public class JDBCService {
         }
 
         public static Boolean getBoolean(Configurations configurations) {
-            return handleGet(configurations, () -> {
+            return handleConfigurations(configurations, () -> {
                 try {
                     return configurations.resultSet.getBoolean(configurations.field());
                 } catch (SQLException e) {
@@ -317,7 +321,7 @@ public class JDBCService {
         }
 
         public static <T> T getTimestamp(Configurations configurations, Function<Timestamp, T> function) {
-            return handleGet(configurations, () -> {
+            return handleConfigurations(configurations, () -> {
                 try {
                     return get(configurations.resultSet.getTimestamp(configurations.field()), function);
                 } catch (SQLException e) {
@@ -326,7 +330,7 @@ public class JDBCService {
             });
         }
 
-        private static <T> T handleGet(Configurations configurations, Supplier<T> supplier) {
+        private static <T> T handleConfigurations(Configurations configurations, Supplier<T> supplier) {
             try {
                 return switch (configurations.mode) {
                     case NEUTRAL -> supplier.get();
@@ -358,15 +362,18 @@ public class JDBCService {
             return null;
         }
 
-        private static int columnIndex(Field field) throws NameNotFoundException {
+        private static int columnIndex(Configurations configurations) throws NameNotFoundException {
             try {
-                ResultSetMetaData metaData = _resultSet.getMetaData();
+                ResultSetMetaData metaData = configurations.resultSet.getMetaData();
 
                 for (int i = 1; i <= metaData.getColumnCount(); i++)
-                    if (metaData.getColumnName(i).equals(field.get_content().toLowerCase()))
+                    if ((metaData.getTableName(i) + "." + metaData.getColumnName(i)).equals(configurations.field().toLowerCase()))
                         return i;
 
-                throw new NameNotFoundException("Could not find column " + field.get_content() + " when finding its index.");
+                throw new NameNotFoundException(String.format(
+                        "Could not find column %s when finding its index.",
+                        configurations.field()
+                ));
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
@@ -386,11 +393,11 @@ public class JDBCService {
             }
 
             public Configurations(Field field, ResultSet resultSet) {
-                this(field.get_content(), resultSet, Mode.NEUTRAL);
+                this(field.get_content(), resultSet, NEUTRAL);
             }
             
             public Configurations(String field, ResultSet resultSet) {
-                this(field, resultSet, Mode.NEUTRAL);
+                this(field, resultSet, NEUTRAL);
             }
             
             public Field getField() {
@@ -405,6 +412,14 @@ public class JDBCService {
             public void startResultSet() throws SQLException {
                 if (resultSet.isBeforeFirst())
                     resultSet.next();
+            }
+
+            public static Configurations of(Configurations configurations, Mode mode) {
+                return new Configurations(
+                        configurations.field,
+                        configurations.resultSet,
+                        mode
+                );
             }
 
             public enum Mode {
