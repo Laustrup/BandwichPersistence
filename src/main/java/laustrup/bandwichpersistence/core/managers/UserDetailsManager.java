@@ -15,7 +15,6 @@ import java.util.logging.Logger;
 
 import static laustrup.bandwichpersistence.core.managers.ManagerService.databaseInteraction;
 import static laustrup.bandwichpersistence.core.services.PasswordService.matches;
-import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService.*;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService.Configurations.Mode.*;
 
@@ -57,7 +56,7 @@ public class UserDetailsManager {
 
     private static ResultSet passwordFits(ResultSet resultSet, String password) {
         if (matches(password, get(
-                new ResultSetService.Configurations(new Field(getUserType(resultSet), "password"), resultSet, PEEK),
+                new Configurations(new Field(getUserType(resultSet) + "s", "password"), resultSet, PEEK),
                 String.class
         )))
             return resultSet;
@@ -66,7 +65,7 @@ public class UserDetailsManager {
     }
 
     public static String getUserType(ResultSet resultSet) {
-        return get(
+        String type = get(
                 new Configurations(
                         Field.of(
                                 Subscription.class.getSimpleName() + "s",
@@ -77,5 +76,6 @@ public class UserDetailsManager {
                 ),
                 String.class
         );
+        return type != null ? type.toLowerCase() : null;
     }
 }

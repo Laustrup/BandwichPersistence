@@ -279,7 +279,8 @@ public class JDBCService {
         public static UUID getUUID(Configurations configurations) {
             return handleConfigurations(configurations, () -> {
                 try {
-                    return UUID.nameUUIDFromBytes(configurations.resultSet.getBytes(configurations.field()));
+                    Optional<byte[]> bytes = Optional.ofNullable(configurations.resultSet.getBytes(configurations.field()));
+                    return bytes.isPresent() ? UUID.nameUUIDFromBytes(bytes.orElseThrow()) : null;
                 } catch (SQLException exception) {
                     throw new RuntimeException(exception);
                 }

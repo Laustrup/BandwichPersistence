@@ -49,16 +49,14 @@ public class UserBuilder extends BuilderService<User> {
 
     @Override
     public User build(ResultSet resultSet) {
-        return switch (Subscription.UserType.valueOf(
-                ResultSetService.get(new ResultSetService.Configurations(
-                        UserDetailsManager.getUserType(resultSet),
-                        resultSet,
-                        Mode.PEEK
-                ), String.class
-        ))) {
+        Optional<String> usertype = Optional.ofNullable(UserDetailsManager.getUserType(resultSet));
+
+        if (usertype.isEmpty())
+            return null;
+
+        return switch (Subscription.UserType.valueOf(usertype.orElseThrow().toUpperCase())) {
             case ARTIST -> ArtistBuilder.get_instance().build(resultSet);
             case ORGANISATION_EMPLOYEE -> OrganisationEmployeeBuilder.get_instance().build(resultSet);
-            case null -> null;
             default -> throw new IllegalStateException("The type of User to build couldn't be found!");
         };
     }
@@ -67,7 +65,10 @@ public class UserBuilder extends BuilderService<User> {
     protected void completion(User collective, User part) {
         switch (collective.get_subscription().get_userType()) {
             case ARTIST -> ArtistBuilder.get_instance().completion((Artist) collective, (Artist) part);
-            case ORGANISATION_EMPLOYEE -> OrganisationEmployeeBuilder.get_instance().completion((Organisation.Employee) collective, (Organisation.Employee) part);
+            case ORGANISATION_EMPLOYEE -> OrganisationEmployeeBuilder.get_instance().completion(
+                    (Organisation.Employee) collective,
+                    (Organisation.Employee) part
+            );
             default -> throw new IllegalStateException("The type of User to build couldn't be found!");
         }
     }

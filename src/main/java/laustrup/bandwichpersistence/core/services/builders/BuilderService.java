@@ -24,6 +24,8 @@ abstract class BuilderService<E> {
 
     private final Logger _logger;
 
+    private static final Seszt<Character> pluralEndingCharacters = new Seszt<>(new Character[]{'y'});
+
     protected BuilderService(Class<E> clazz, Logger logger) {
         _class = clazz;
         _tableName = toTableName(clazz);
@@ -91,7 +93,10 @@ abstract class BuilderService<E> {
         if (table == null)
             throw new IllegalArgumentException("Table name cannot be null");
 
-        return table + (table.charAt(table.length() - 1) == 's' ? "" : "s");
+        return table.charAt(table.length() - 1) == 's' ? table : (
+                pluralEndingCharacters.contains(table.charAt(table.length() - 1))
+                        ? table.substring(0, table.length() - 1) + "ies" : table + "s"
+        );
     }
 
     public E build(ResultSet resultSet) {
