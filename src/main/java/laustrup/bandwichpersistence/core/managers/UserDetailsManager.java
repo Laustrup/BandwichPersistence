@@ -17,6 +17,7 @@ import static laustrup.bandwichpersistence.core.managers.ManagerService.database
 import static laustrup.bandwichpersistence.core.services.PasswordService.matches;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService.*;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService.Configurations.Mode.*;
+import static org.springframework.http.HttpStatus.OK;
 
 public class UserDetailsManager {
 
@@ -35,7 +36,7 @@ public class UserDetailsManager {
     public static Response<User> getUser(Login login) {
         return databaseInteraction(() -> {
             User user = null;
-            HttpStatus status = HttpStatus.OK;
+            HttpStatus status = OK;
 
             try {
                 user = _userBuilder.build(passwordFits(

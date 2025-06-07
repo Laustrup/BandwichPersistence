@@ -18,11 +18,15 @@ public class Program {
 
     private static final Scanner _scanner = new Scanner(System.in);
 
+    @Getter
+    private static boolean _testingMode;
+
     public static void start(
             Class<?> applicationClass,
             String defaultSchema,
             String... args
     ) {
+        _testingMode = false;
         Map<String, String> arguments = argumentsToMap(args);
         displayArguments(arguments);
 
@@ -39,6 +43,7 @@ public class Program {
     }
 
     public static void testMode(String schema) {
+        _testingMode = true;
         startUpTestMode(schema);
     }
 

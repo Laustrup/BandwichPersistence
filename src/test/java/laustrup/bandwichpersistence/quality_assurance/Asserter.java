@@ -1,6 +1,8 @@
 package laustrup.bandwichpersistence.quality_assurance;
 
+import java.util.List;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -34,23 +36,64 @@ public class Asserter {
         }
 
         @Override
-        public void isEqualTo(E actual) {
-            _equalToChecked = handleEqualing(() -> assertEquals(_expected, actual), true);
+        public AssertionChecker<E> isEqualTo(E actual) {
+            return check(() -> _equalToChecked = handleEqualing(() -> assertEquals(_expected, actual), true));
         }
 
         @Override
-        public void isNotEqualTo(E actual) {
-            _notEqualToChecked = handleEqualing(() -> assertNotEquals(_expected, actual), false);
+        public AssertionChecker<E> isNotEqualTo(E actual) {
+            return check(() -> _notEqualToChecked = handleEqualing(() -> assertNotEquals(_expected, actual), false));
         }
 
         @Override
-        public void is(Predicate<E> predicate) {
-            assertTrue(predicate.test(_expected));
+        public AssertionChecker<E> is(Predicate<E> assertion) {
+            return check(() -> assertTrue(assertion.test(_expected)));
         }
 
         @Override
-        public void isNotNull() {
-            assertNotNull(_expected);
+        public AssertionChecker<E> isTrue() {
+            return check(() -> assertTrue((boolean) _expected));
+        }
+
+        @Override
+        public AssertionChecker<E> is(Supplier<E> supplier) {
+            return check(() -> isEqualTo(supplier.get()));
+        }
+
+        @Override
+        public AssertionChecker<E> contains(E actual) {
+            return check(() -> assertTrue(((List<?>) _expected).contains(actual)));
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        public <W> AssertionChecker<E> anyMatches(Predicate<W> assertion) {
+            return check(() -> assertTrue(
+                    ((List<W>) _expected).stream()
+                            .anyMatch(assertion)
+            ));
+        }
+
+        @Override
+        public AssertionChecker<E> inCase(boolean condition, Predicate<E> assertion) {
+            return check(() -> {
+                if (condition)
+                    assertTrue(assertion.test(_expected));
+            });
+        }
+
+        @Override
+        public AssertionChecker<E> isNotNull() {
+            return check(() -> assertNotNull(_expected));
+        }
+
+        private AssertionChecker<E> check(Runnable action) {
+            return check(this, action);
+        }
+
+        public static <T> AssertionChecker<T> check(AssertionChecker<T> checker, Runnable action) {
+            action.run();
+            return checker;
         }
     }
 }

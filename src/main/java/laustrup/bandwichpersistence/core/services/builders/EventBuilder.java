@@ -7,7 +7,7 @@ import laustrup.bandwichpersistence.core.models.chats.messages.Post;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
 import laustrup.bandwichpersistence.core.persistence.Field;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
-import laustrup.bandwichpersistence.core.utilities.parameters.NotBoolean;
+import laustrup.bandwichpersistence.core.utilities.parameters.Truthiness;
 
 import java.sql.ResultSet;
 import java.time.Instant;
@@ -55,7 +55,7 @@ public class EventBuilder extends BuilderService<Event> {
                     title = new AtomicReference<>(),
                     description = new AtomicReference<>();
             AtomicReference<Instant> openDoors = new AtomicReference<>();
-            AtomicReference<NotBoolean> isCharity = new AtomicReference<>();
+            AtomicReference<Truthiness> isCharity = new AtomicReference<>();
             AtomicReference<Instant>
                     isPublic = new AtomicReference<>(),
                     isCancelled = new AtomicReference<>(),
@@ -82,9 +82,9 @@ public class EventBuilder extends BuilderService<Event> {
                         set(title, table.apply(Model.ModelDTO.Fields.title));
                         set(description, table.apply(Event.DTO.Fields.description));
                         set(openDoors, table.apply(Event.DTO.Fields.openDoors));
-                        isCharity.set(new NotBoolean(
-                                NotBoolean.Argument.valueOf(getString(NotBoolean.Fields._argument)),
-                                getString(NotBoolean.Fields._message)
+                        isCharity.set(new Truthiness(
+                                Truthiness.Argument.valueOf(getString(Truthiness.Fields._argument)),
+                                getString(Truthiness.Fields._message)
                         ));
                         set(isPublic, table.apply(Event.DTO.Fields.isPublic));
                         set(isCancelled, table.apply(Event.DTO.Fields.isCancelled));

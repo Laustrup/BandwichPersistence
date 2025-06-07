@@ -44,6 +44,14 @@ public abstract class Actor extends Arranger {
         return "The arrangement performance of current test" + Printer.get_instance().measurePerformance(_arrangement);
     }
 
+    protected <T> T act(T supply) {
+        return act(() -> supply);
+    }
+
+    protected void act(Void supply) {
+        act(supply);
+    }
+
     /**
      * Will call the Supplier and measure the act performance.
      * @param supplier The Supplier that will be acted with a call.

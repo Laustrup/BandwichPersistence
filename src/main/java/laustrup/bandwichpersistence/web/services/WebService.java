@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 
 import java.util.function.Supplier;
 
-public class WebService {
+public abstract class WebService {
 
     public static <DTO> ResponseEntity<DTO> respond(
             Supplier<Response<DTO>> manager

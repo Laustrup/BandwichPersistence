@@ -8,7 +8,7 @@ import laustrup.bandwichpersistence.core.models.users.Participant;
 import laustrup.bandwichpersistence.core.utilities.collections.Liszt;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import laustrup.bandwichpersistence.core.utilities.console.Printer;
-import laustrup.bandwichpersistence.core.utilities.parameters.NotBoolean;
+import laustrup.bandwichpersistence.core.utilities.parameters.Truthiness;
 import laustrup.bandwichpersistence.core.models.chats.Request;
 import laustrup.bandwichpersistence.core.models.chats.messages.Post;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
@@ -65,7 +65,7 @@ public class Event extends Model {
      * This Event is paid or voluntary.
      */
     @Setter
-    private NotBoolean _charity;
+    private Truthiness _charity;
 
     /**
      * If this is a public Event, other Users can view and interact with it.
@@ -158,7 +158,7 @@ public class Event extends Model {
                 event.getTitle(),
                 event.getDescription(),
                 event.getOpenDoors(),
-                new NotBoolean(event.getIsCharity()),
+                new Truthiness(event.getIsCharity()),
                 event.getIsPublic(),
                 event.getIsCancelled(),
                 event.getIsSoldOut(),
@@ -185,7 +185,7 @@ public class Event extends Model {
             String title,
             String description,
             Instant openDoors,
-            NotBoolean isCharity,
+            Truthiness isCharity,
             Instant isPublic,
             Instant isCancelled,
             Instant isSoldOut,
@@ -590,7 +590,7 @@ public class Event extends Model {
         /**
          * This Event is paid or voluntary.
          */
-        private NotBoolean.Argument isCharity;
+        private Truthiness.Argument isCharity;
 
         /**
          * If this is a public Event, other Users can view and interact with it.
@@ -673,7 +673,7 @@ public class Event extends Model {
                 @JsonProperty Instant start,
                 @JsonProperty Instant end,
                 @JsonProperty String description,
-                @JsonProperty NotBoolean.Argument isCharity,
+                @JsonProperty Truthiness.Argument isCharity,
                 @JsonProperty Instant isPublic,
                 @JsonProperty Instant isCancelled,
                 @JsonProperty Instant isSoldOut,
@@ -730,7 +730,7 @@ public class Event extends Model {
                     event.get_start(),
                     event.get_end(),
                     event.get_description(),
-                    NotBoolean.ofNullable(event.get_charity()).get_argument(),
+                    Truthiness.ofNullable(event.get_charity()).get_argument(),
                     event.get_public(),
                     event.get_cancelled(),
                     event.get_soldOut(),

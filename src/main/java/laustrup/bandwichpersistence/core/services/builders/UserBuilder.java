@@ -1,12 +1,12 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
-import laustrup.bandwichpersistence.core.managers.UserDetailsManager;
 import laustrup.bandwichpersistence.core.models.*;
+import laustrup.bandwichpersistence.core.models.Organisation.Employee;
+import laustrup.bandwichpersistence.core.models.Subscription.UserType;
 import laustrup.bandwichpersistence.core.models.users.Artist;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
 import laustrup.bandwichpersistence.core.persistence.Field;
 import laustrup.bandwichpersistence.core.services.persistence.JDBCService;
-import laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService.Configurations.Mode;
 
 import java.sql.ResultSet;
 import java.util.*;
@@ -14,11 +14,16 @@ import java.util.function.Function;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
+import static laustrup.bandwichpersistence.core.managers.UserDetailsManager.*;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
 
 public class UserBuilder extends BuilderService<User> {
 
     private static final Logger _logger = Logger.getLogger(UserBuilder.class.getName());
+
+    private static final ArtistBuilder _artistBuilder = ArtistBuilder.get_instance();
+
+    private static final OrganisationEmployeeBuilder _organisationEmployeeBuilder = OrganisationEmployeeBuilder.get_instance();
 
     private static UserBuilder _instance;
 
@@ -49,14 +54,14 @@ public class UserBuilder extends BuilderService<User> {
 
     @Override
     public User build(ResultSet resultSet) {
-        Optional<String> usertype = Optional.ofNullable(UserDetailsManager.getUserType(resultSet));
+        Optional<String> usertype = Optional.ofNullable(getUserType(resultSet));
 
         if (usertype.isEmpty())
             return null;
 
-        return switch (Subscription.UserType.valueOf(usertype.orElseThrow().toUpperCase())) {
-            case ARTIST -> ArtistBuilder.get_instance().build(resultSet);
-            case ORGANISATION_EMPLOYEE -> OrganisationEmployeeBuilder.get_instance().build(resultSet);
+        return switch (UserType.valueOf(usertype.orElseThrow().toUpperCase())) {
+            case ARTIST -> _artistBuilder.build(resultSet);
+            case ORGANISATION_EMPLOYEE -> _organisationEmployeeBuilder.build(resultSet);
             default -> throw new IllegalStateException("The type of User to build couldn't be found!");
         };
     }
@@ -64,10 +69,10 @@ public class UserBuilder extends BuilderService<User> {
     @Override
     protected void completion(User collective, User part) {
         switch (collective.get_subscription().get_userType()) {
-            case ARTIST -> ArtistBuilder.get_instance().completion((Artist) collective, (Artist) part);
-            case ORGANISATION_EMPLOYEE -> OrganisationEmployeeBuilder.get_instance().completion(
-                    (Organisation.Employee) collective,
-                    (Organisation.Employee) part
+            case ARTIST -> _artistBuilder.completion((Artist) collective, (Artist) part);
+            case ORGANISATION_EMPLOYEE -> _organisationEmployeeBuilder.completion(
+                    (Employee) collective,
+                    (Employee) part
             );
             default -> throw new IllegalStateException("The type of User to build couldn't be found!");
         }

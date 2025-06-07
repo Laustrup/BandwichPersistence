@@ -4,15 +4,15 @@
 |::._______________________________________.::|
 |::|      ___________     ___________      |::|
 |::|     / BBBBBBBBB \   / BBBBBBBBBB\     |::|
-|::|    / BBB/    \BB \_/ BB/     \BBB\    |::|
-|::|   / BBB/      \BBBBBBB/       \BBB\   |::|
-|::|  | BBB/________\BBBBB/_________\BBB|  |::|
+|::|    / BBB/     BB \_/ BB/      BBB\    |::|
+|::|   / BBB/       BBBBBBB/        BBB\   |::|
+|::|  | BBB/________ BBBBB/_________ BBB|  |::|
 |::|  | BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB|  |::|
 |::|  | BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB|  |::|
 |::|  |_________________________________|  |::|
-|::|     ______    ___   ____  _______     |::|
-|::|    /AAAAAA\  /NNN  /NNNN | DDDDDDDD   |::|
-|::|   / AA__  A\ | NNN |  NN | DD___  DD  |::|
+|::|     _____     ___   ____  _______     |::|
+|::|    /AAAAAA   /NNN  /NNNN | DDDDDDDD   |::|
+|::|   / AA__ AA  | NNN |  NN | DD___  DD  |::|
 |::|   | AA  | AA | NNNN|  NN | DD   \ DD  |::|
 |::|   | AAAAAAAA | NN\NN  NN | DD    |DD  |::|
 |::|   | AA__  AA | NN \NN NN | DD    |DD  |::|

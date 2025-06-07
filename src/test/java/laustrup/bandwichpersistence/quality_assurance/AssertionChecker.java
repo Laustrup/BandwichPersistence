@@ -1,14 +1,25 @@
 package laustrup.bandwichpersistence.quality_assurance;
 
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 public interface AssertionChecker<E> {
 
-    void isEqualTo(E actual);
+    AssertionChecker<E> isEqualTo(E actual);
 
-    void isNotEqualTo(E actual);
+    AssertionChecker<E> isNotEqualTo(E actual);
 
-    void is(Predicate<E> predicate);
+    AssertionChecker<E> is(Predicate<E> assertion);
 
-    void isNotNull();
+    AssertionChecker<E> isTrue();
+
+    AssertionChecker<E> is(Supplier<E> supplier);
+
+    AssertionChecker<E> contains(E actual);
+
+    <W> AssertionChecker<E> anyMatches(Predicate<W> assertion);
+
+    AssertionChecker<E> inCase(boolean condition, Predicate<E> assertion);
+
+    AssertionChecker<E> isNotNull();
 }

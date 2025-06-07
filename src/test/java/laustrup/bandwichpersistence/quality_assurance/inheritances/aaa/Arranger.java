@@ -17,6 +17,10 @@ public abstract class Arranger extends TestCalculator {
         addToPrint("There isn't any arrangement...");
     }
 
+    protected <T> T arrange(T supply) {
+        return arrange(() -> supply);
+    }
+
     /**
      * Will perform the Supplier and measure the arrangement performance.
      * @param supplier The Supplier for the arrangement.

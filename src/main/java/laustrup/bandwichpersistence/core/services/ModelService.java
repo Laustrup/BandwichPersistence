@@ -14,6 +14,8 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import static laustrup.bandwichpersistence.core.services.StringService.containsAny;
+
 public class ModelService {
 
     /** For the defineToString of how it should be split. */
@@ -44,12 +46,14 @@ public class ModelService {
         try {
             if (values.length <= keys.length)
                 for (int i = 0; i < keys.length; i++) {
-                    content.append(keys[i]).append(_toStringKeyValueSplitter).append(values[i] != null ? values[i] : "null");
+                    content.append(keys[i])
+                            .append(_toStringKeyValueSplitter)
+                            .append(values[i] != null ? values[i] : "null");
                     if (i < keys.length-1)
                         content.append(_toStringFieldSplitter);
                 }
             else
-                content = new StringBuilder("Content couldn't be generated, since there are less attributes than values");
+                throw new IllegalArgumentException("Content couldn't be generated, since there are less attributes than values");
         } catch (Exception e) {
             String message = title + " had an error when trying to define its ToString.";
             Printer.print(message, e);
@@ -106,16 +110,27 @@ public class ModelService {
         }
 
 
-        return Arrays.stream(idValues(value.toString()).split(separator))
+        return Arrays.stream(idValues(value.toString())
+                .split(separator))
                 .map(UUID::fromString);
     }
 
     private static String idValues(String value) {
-        return value
-                .substring(1, value.length() - 1)
-                .replace(",\n\\", "")
-                .replace("\n", "")
-                .replace("| ", "|");
+        return ifContainsIds(value, string ->
+                string.substring(1, string.length() - 1)
+                        .replace(",\n\\", "")
+                        .replace("\n", "")
+                        .replace("| ", "|")
+        );
+    }
+
+    private static String ifContainsIds(String value, Function<String, String> substring) {
+        String idValues = "";
+
+        if (containsAny(value, new Seszt<>(",\n\\")))
+            idValues = substring.apply(value);
+
+        return idValues;
     }
 
     public static boolean equals(Object object, Object other) {
@@ -123,6 +138,7 @@ public class ModelService {
                 objectIds = getIds(object.toString()).toList(),
                 otherIds = getIds(other.toString()).toList();
 
-        return objectIds.stream().allMatch(id -> otherIds.stream().anyMatch(id::equals));
+        return objectIds.stream()
+                .allMatch(id -> otherIds.stream().anyMatch(id::equals));
     }
 }

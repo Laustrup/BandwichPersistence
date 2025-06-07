@@ -2,6 +2,7 @@ package laustrup.bandwichpersistence.core.services;
 
 import lombok.Getter;
 
+import java.util.Collection;
 import java.util.Random;
 
 public class StringService {
@@ -60,6 +61,13 @@ public class StringService {
 
 
         return options.toString();
+    }
+
+    public static boolean containsAny(String string, Collection<String> collection) {
+        for (String item : collection)
+            if (string.contains(item))
+                return true;
+        return false;
     }
 
     @Getter
