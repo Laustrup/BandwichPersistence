@@ -31,22 +31,22 @@ public class TestItems {
     private static Query selectQuery(String table, String title) {
         return new Query(String.format(/*language=mysql*/ """
                 select * from %s
-                     inner join contact_info
-                         on %s.contact_info_id = contact_info.id
+                     inner join contact_info contactInfo
+                         on %s.contact_info_id = contactInfo.id
                      inner join addresses
-                         on contact_info.address_id = addresses.id
+                         on contactInfo.address_id = addresses.id
                      inner join countries
-                         on contact_info.country_id = countries.id
+                         on contactInfo.country_id = countries.id
                      inner join phones
-                         on contact_info.id = phones.contact_info_id
-                     left join organisation_venues
-                         on %s.id = organisation_venues.organisation_id
+                         on contactInfo.id = phones.contact_info_id
+                     left join organisation_venues organisationVenues
+                         on %s.id = organisationVenues.organisation_id
                      left join venues
-                         on organisation_venues.venue_id = venues.id
-                     left join organisation_employments
-                         on %s.id = organisation_employments.organisation_id
-                     left join organisation_employees
-                         on contact_info.id = organisation_employees.contact_info_id
+                         on organisationVenues.venue_id = venues.id
+                     left join organisation_employments organisationEmployments
+                         on %s.id = organisationEmployments.organisation_id
+                     left join organisation_employees organisationEmployees
+                         on organisationEmployments.organisation_employee_id = organisationEmployees.id
                 where
                     %s.title = '%s'
                 """,
@@ -54,6 +54,15 @@ public class TestItems {
                 title
         ));
     }
+
+    private static final String organisationSelect(String table) {
+        return /*language=mysql*/ """
+                select * from organisations
+                    inner join contact_info contactInfo
+                        on organisations.contact_info_id = contactInfo.id
+                    
+        """;
+    };
 
     private static Query selectOrganizationQuery(String title) {
         return selectQuery("organisations", title);

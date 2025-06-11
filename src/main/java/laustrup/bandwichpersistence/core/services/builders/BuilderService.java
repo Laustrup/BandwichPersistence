@@ -124,7 +124,7 @@ abstract class BuilderService<E> {
         entities.forEach(entity -> combine(collection, entity));
     }
 
-    protected <M> void combine(Seszt<M> collection, M entity) {
+    public <M> Seszt<M> combine(Seszt<M> collection, M entity) {
         AtomicBoolean isIdentical = new AtomicBoolean(true);
         AtomicInteger counter = new AtomicInteger(0);
 
@@ -138,6 +138,8 @@ abstract class BuilderService<E> {
 
         if (!isIdentical.get())
             collection.add(entity);
+
+        return collection;
     }
 
     protected void interaction(ResultSet resultSet, Runnable action, AtomicReference<UUID> id) {
