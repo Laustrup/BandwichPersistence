@@ -84,9 +84,8 @@ class SelectServiceTests extends Tester {
                     selecting(_table)
                             .addJoin(new Join(
                                     INNER,
-                                    "join_table",
                                     alias,
-                                    new Field(alias, row),
+                                    new Field("join_table", row),
                                     new Field(_table, row)
                             ))
                             .select()

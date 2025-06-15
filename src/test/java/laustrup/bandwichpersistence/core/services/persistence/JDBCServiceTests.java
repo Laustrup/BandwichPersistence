@@ -16,7 +16,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
-import static laustrup.bandwichpersistence.TestItems.*;
+import static laustrup.bandwichpersistence.items.TestItems.*;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.DatabaseService.*;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService.Configurations.Mode.*;
@@ -48,17 +48,18 @@ class JDBCServiceTests extends BandwichTester {
             AtomicReference<String> reference = isBinary ? null : arrange(AtomicReference::new);
             AtomicReference<UUID> uuidReference = isBinary ? arrange(AtomicReference::new) : null;
 
-            Consumer<AtomicReference<?>> action = atomicReference ->                 act(() -> ResultSetService.set(
-                    new Configurations(
-                            Field.of(
-                                    Organisation.TABLE.title(),
-                                    isBinary ? "id" : "title"
+            Consumer<AtomicReference<?>> action = atomicReference ->
+                    act(() -> ResultSetService.set(
+                            new Configurations(
+                                    Field.of(
+                                            Organisation.TABLE.title(),
+                                            isBinary ? "id" : "title"
+                                    ),
+                                    resultSet,
+                                    PEEK
                             ),
-                            resultSet,
-                            PEEK
-                    ),
-                    atomicReference
-            ));
+                            atomicReference
+                    ));
             action.accept(isBinary ? uuidReference : reference);
 
             asserting((isBinary ? uuidReference : reference).get())

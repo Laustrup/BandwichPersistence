@@ -5,12 +5,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import laustrup.bandwichpersistence.core.models.Model;
 
+import laustrup.bandwichpersistence.core.models.Table;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.FieldNameConstants;
-import java.time.Instant;
 import java.util.*;
 
 import static laustrup.bandwichpersistence.core.services.ModelService.defineToString;
@@ -20,6 +20,7 @@ import static laustrup.bandwichpersistence.core.utilities.collections.Seszt.copy
  * Contains information that people need in order to contact the User.
  */
 @Getter @FieldNameConstants
+@Table(title = "contact_info")
 public class ContactInfo {
 
     private UUID _id;
@@ -69,23 +70,6 @@ public class ContactInfo {
     }
 
     /**
-     * A constructor with all the values of this Object.
-     * @param id The primary id that identifies this unique Object.
-     * @param email The email that the User wants to be contacted through outside the application.
-     * @param phones A Phone object that is used to have information about how to contact the User through Phone.
-     * @param address An Address object with info about the location of the User.
-     * @param country A Country object for the information of which Country the User is living in.
-     * @param timestamp The date and time this ContactInfo was created.
-     */
-    public ContactInfo(UUID id, String email, Seszt<Phone> phones, Address address, Country country, Instant timestamp) {
-        _id = id;
-        _email = email;
-        _phones = phones;
-        _address = address;
-        _country = country;
-    }
-
-    /**
      * Collects the details of the Address as a one liner String.
      * @return The collected one liner String of the Address.
      */
@@ -118,7 +102,7 @@ public class ContactInfo {
     /**
      * Contains values that determines address attributes.
      */
-    @Setter @Getter
+    @Setter @Getter @Table(title = "addresses")
     public static class Address {
 
         private UUID _id;
@@ -241,7 +225,7 @@ public class ContactInfo {
     /**
      * An object with information about a curtain Country.
      */
-    @Getter @ToString
+    @Getter @ToString @Table(title = "countries")
     public static class Country {
 
         private UUID _id;
@@ -318,7 +302,7 @@ public class ContactInfo {
     /**
      * Details about phone contacting information.
      */
-    @Getter @ToString
+    @Getter @ToString @Table(title = "phones")
     public static class Phone {
 
         /**

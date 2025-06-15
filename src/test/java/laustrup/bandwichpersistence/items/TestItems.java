@@ -1,11 +1,14 @@
-package laustrup.bandwichpersistence;
+package laustrup.bandwichpersistence.items;
 
 import laustrup.bandwichpersistence.core.models.Model;
-import laustrup.bandwichpersistence.core.models.Organisation;
 import laustrup.bandwichpersistence.core.models.Situation;
 import laustrup.bandwichpersistence.core.models.ToStringArgument;
+import laustrup.bandwichpersistence.core.persistence.Field;
 import laustrup.bandwichpersistence.core.persistence.models.Query;
-import laustrup.bandwichpersistence.core.services.builders.OrganisationBuilder;
+import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting;
+import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Properties;
+import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Whereing.Thating;
+import laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService.Configurations;
 import laustrup.bandwichpersistence.core.utilities.Coollection;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import laustrup.bandwichpersistence.core.utilities.parameters.Truthiness;
@@ -21,12 +24,12 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 
-import static laustrup.bandwichpersistence.core.persistence.DatabaseManager.*;
+import static laustrup.bandwichpersistence.core.persistence.DatabaseManager.read;
+import static laustrup.bandwichpersistence.core.persistence.services.SelectService.selecting;
 import static laustrup.bandwichpersistence.core.services.StringService.randomString;
+import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService.get;
 
 public class TestItems {
-
-    private static OrganisationBuilder _organisationBuilder = OrganisationBuilder.get_instance();
 
     private static Query selectQuery(String table, String title) {
         return new Query(String.format(/*language=mysql*/ """
@@ -55,42 +58,30 @@ public class TestItems {
         ));
     }
 
-    private static final String organisationSelect(String table) {
-        return /*language=mysql*/ """
-                select * from organisations
-                    inner join contact_info contactInfo
-                        on organisations.contact_info_id = contactInfo.id
-                    
-        """;
-    };
-
     private static Query selectOrganizationQuery(String title) {
         return selectQuery("organisations", title);
     }
 
-    public static Organisation selectOrganisation(OrganisationTitle organisation) {
-        return _organisationBuilder.build(
-                read(selectOrganizationQuery(organisation.get_naming()))
-                        .get_resultSet()
+    public static ResultSet generateResultSet() {
+        return read(selectOrganizationQuery(OrganisationTestItems.OrganisationTitle.ARENA.get_naming())).get_resultSet();
+    }
+
+    public static UUID generateUUID(String table, Thating that) {
+        return get(new Configurations(
+                Field.of(table, "id"), read(
+                        new Query(selecting(new Properties(table, that)).select())
+                ).get_resultSet()),
+                UUID.class
         );
     }
 
-    public static ResultSet generateResultSet() {
-        return read(selectOrganizationQuery(OrganisationTitle.ARENA.get_naming())).get_resultSet();
-    }
-
-    @Getter
-    public enum OrganisationTitle {
-        IVÆRKSTED("Iværksted"),
-        ARENA("Arena"),
-        TWOGETHER("Twogether"),
-        JAMSTER("Jamster");
-
-        private String _naming;
-
-        OrganisationTitle(String naming) {
-            _naming = naming;
-        }
+    public static UUID generateUUID(String table, Selecting selecting) {
+        return get(new Configurations(
+                        Field.of(table, "id"), read(
+                        new Query(selecting.select())
+                ).get_resultSet()),
+                UUID.class
+        );
     }
 
     @Getter

@@ -18,7 +18,7 @@ import java.util.UUID;
 
 import static laustrup.bandwichpersistence.core.utilities.collections.Seszt.copy;
 
-@Getter
+@Getter @laustrup.bandwichpersistence.core.models.Table(title = "organisations")
 public class Organisation extends Model {
 
     public static final Table TABLE = new Table(Organisation.class.getSimpleName() + "s");
@@ -126,7 +126,7 @@ public class Organisation extends Model {
         }
     }
 
-    @Getter
+    @Getter @laustrup.bandwichpersistence.core.models.Table(title = "organisation_employee")
     public static class Employee extends BusinessUser {
 
         private Seszt<Role> _roles;

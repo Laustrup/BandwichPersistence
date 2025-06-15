@@ -1,7 +1,7 @@
 package laustrup.bandwichpersistence.core.services;
 
 import laustrup.bandwichpersistence.BandwichTester;
-import laustrup.bandwichpersistence.TestItems.*;
+import laustrup.bandwichpersistence.items.TestItems.*;
 import laustrup.bandwichpersistence.core.models.Model;
 import org.junit.jupiter.api.Test;
 

@@ -1,13 +1,12 @@
 package laustrup.bandwichpersistence.core.persistence.services;
 
 import laustrup.bandwichpersistence.core.persistence.Field;
-import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Whereing;
+import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Whereing.Thating;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
 
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Supplier;
 
 import static java.lang.String.format;
 import static java.lang.String.join;
@@ -23,6 +22,10 @@ public class SelectService {
     }
 
     public static class Selecting {
+
+        private interface ISubSelecting {
+            String apply();
+        }
 
         private final Properties _properties;
 
@@ -54,7 +57,9 @@ public class SelectService {
         }
 
         public String select() {
-            return _statement + _properties.get_where().map(Whereing::apply).orElse("");
+            return _statement + _properties.get_that()
+                    .map(Thating::apply)
+                    .orElse("");
         }
 
         @Getter
@@ -64,7 +69,7 @@ public class SelectService {
 
             private final Set<Field> _selections;
 
-            private final Optional<Whereing> _where;
+            private final Optional<Thating> _that;
 
             private final String _table;
 
@@ -76,7 +81,7 @@ public class SelectService {
                 this(table, distinct, selections, Optional.empty());
             }
 
-            public Properties(String table, Whereing where) {
+            public Properties(String table, Thating where) {
                 this(table, false, new Seszt<>(), Optional.of(where));
             }
 
@@ -84,14 +89,14 @@ public class SelectService {
                 this(table, false, selections, Optional.empty());
             }
 
-            public Properties(String table, boolean distinct, Set<Field> selections, Optional<Whereing> where) {
+            public Properties(String table, boolean distinct, Set<Field> selections, Optional<Thating> that) {
                 if (table == null)
                     throw new NullPointerException("table can't be null for selecting properties!");
 
                 _table = table;
                 _distinct = distinct;
                 _selections = selections;
-                _where = where;
+                _that = that;
             }
 
             public String getSelects() {
@@ -103,7 +108,7 @@ public class SelectService {
         }
 
         @Getter
-        public static class Join {
+        public static class Join implements ISubSelecting {
 
             private final Area _area;
 
@@ -115,30 +120,55 @@ public class SelectService {
 
             private final Field _external;
 
-            public Join(Area area, String table, String alias, Field internal, Field external) {
+            public Join(Area area, String table, Field internal, Field external) {
                 if (area == null)
                     throw  new NullPointerException("area can't be null for selecting properties!");
                 if (table == null)
                     throw new NullPointerException("table can't be null for selecting properties!");
-                if (alias == null)
-                    throw new NullPointerException("alias can't be null for selecting properties!");
                 if (internal == null)
                     throw new NullPointerException("internal can't be null for selecting properties!");
+                if (internal.table() == null)
+                    throw new NullPointerException("alias can't be null for selecting properties!");
                 if (external == null)
                     throw new NullPointerException("external can't be null for selecting properties!");
                 _area = area;
                 _table = table;
-                _alias = alias;
+                _alias = internal.table();
                 _internal = internal;
                 _external = external;
             }
 
+            public Join(Area area, Field internal, Field external) {
+                if (area == null)
+                    throw  new NullPointerException("area can't be null for selecting properties!");
+                if (internal == null)
+                    throw new NullPointerException("internal can't be null for selecting properties!");
+                if (internal.table() == null)
+                    throw new NullPointerException("table can't be null for selecting properties!");
+                if (external == null)
+                    throw new NullPointerException("external can't be null for selecting properties!");
+                _area = area;
+                _table = internal.table();
+                _alias = null;
+                _internal = internal;
+                _external = external;
+            }
+
+            public static Join of(Area area, String alias, Field internal, Field external) {
+                return new Join(area, alias, internal, external);
+            }
+
+            public static Join of(Area area, Field internal, Field external) {
+                return new Join(area, internal, external);
+            }
+
+            @Override
             public String apply() {
                 return format(
-                        /*language=MySQL*/ " %s join %s %s on %s = %s",
+                        /*language=MySQL*/ " %s join %s%s on %s = %s",
                         _area.get_statement(),
                         _table,
-                        _alias,
+                        _alias == null ? "" : " " + _alias,
                         _internal.get_content(),
                         _external.get_content()
                 );
@@ -160,53 +190,61 @@ public class SelectService {
         }
 
         @Getter
-        public static class Where {
+        public static class Where implements ISubSelecting {
+
+            private static Whereing _whereing;
 
             public static Whereing complying() {
-                return new Whereing();
+                _whereing = new Whereing();
+                return _whereing;
             }
 
-            public static class Whereing {
+            @Override
+            public String apply() {
+                return _whereing.apply();
+            }
 
-                private String _statement;
+            public static class Whereing implements ISubSelecting {
 
-                public Whereing() {
-                    _statement = "";
+                private static Thating _thating;
+
+                public Thating that(Condition condition) {
+                    _thating = new Thating(condition.apply());
+                    return _thating;
                 }
 
-                public Whereing that(Condition condition) {
-                    if (!_statement.isEmpty())
-                        throw new IllegalStateException("Multiple conditions in where must be acompanied with a gate statement!");
-
-                    _statement += condition.apply();
-
-                    return this;
-                }
-
-                public Whereing and(Condition condition) {
-                    _statement += gate(() -> Gate.AND.get_statement() + condition.apply());
-
-                    return this;
-                }
-
-                public Whereing or(Condition condition) {
-                    _statement += gate(() -> Gate.OR.get_statement() + condition.apply());
-
-                    return this;
-                }
-
-                private String gate(Supplier<String> action) {
-                    if (_statement.isEmpty())
-                        throw new IllegalStateException("Must have a statement in where in order to add gate of statements!");
-
-                    return action.get();
-                }
-
+                @Override
                 public String apply() {
-                    return _statement.isEmpty() ? "" : format(
-                            /*language=MySQL*/ " where %s",
-                            _statement
-                    );
+                    return _thating.apply();
+                }
+
+                public static class Thating implements ISubSelecting {
+
+                    private String _statement;
+
+                    public Thating(String statement) {
+                        _statement = statement;
+                    }
+
+                    public Thating and(Condition condition) {
+                        _statement += Gate.AND.get_statement() + condition.apply();
+
+                        return this;
+                    }
+
+                    public Thating or(Condition condition) {
+                        _statement += Gate.OR.get_statement() + condition.apply();
+
+                        return this;
+                    }
+
+                    @Override
+                    public String apply() {
+                        return _statement.isEmpty() ? "" : format(
+                                /*language=MySQL*/ " where %s",
+                                _statement
+                        );
+                    }
                 }
             }
 
@@ -223,13 +261,15 @@ public class SelectService {
             }
 
             @Getter
-            public static class Condition {
+            public static class Condition implements ISubSelecting {
 
                 private final Field _this;
 
                 private final Field _that;
 
-                private final String _selection;
+                private final String _thing;
+
+                private final Selection _selection;
 
                 private final Equation _equation;
 
@@ -238,39 +278,100 @@ public class SelectService {
                         throw new NullPointerException("This can't be null for selecting properties!");
                     if (that == null)
                         throw new NullPointerException("That can't be null for selecting properties!");
-                    switch (equation) {
-                        case IN, NOT_IN, IS_NULL, IS_NOT_NULL -> throw new IllegalArgumentException(format(
-                                "Equation %s not allow for where condition with this and that!",
-                                equation
-                        ));
-                        case null ->  throw new NullPointerException("Equation is needed for where condition with this and that!");
-                        default -> {}
-                    }
+                    validateEquation(equation, true, false);
 
                     _this = thiz;
                     _that = that;
                     _equation = equation;
                     _selection = null;
+                    _thing = null;
+                }
+
+                public Condition(Field thiz, Equation equation, String thing) {
+                    if (thiz == null)
+                        throw new NullPointerException("This can't be null for selecting properties!");
+                    if (thing == null)
+                        throw new NullPointerException("Thing can't be null for selecting properties!");
+                    validateEquation(equation, true, false);
+
+                    _this = thiz;
+                    _thing = prepareThing(thing);
+                    _equation = equation;
+                    _selection = null;
+                    _that = null;
                 }
 
                 public Condition(Field thiz, Equation equation) {
                     if (thiz == null)
                         throw new NullPointerException("this can't be null for selecting properties!");
-                    switch (equation) {
-                        case EQUALS, NOT_EQUALS, IN, NOT_IN -> throw new IllegalArgumentException(format(
-                                "Equation %s not allow for where condition with this!",
-                                equation
-                        ));
-                        case null ->  throw new NullPointerException("Equation is needed for where condition with this!");
-                        default -> {}
-                    }
+                    validateEquation(equation, false, false);
 
                     _this = thiz;
                     _that = null;
                     _equation = equation;
                     _selection = null;
+                    _thing = null;
                 }
 
+                public Condition(Field thiz, Equation equation, Selection selection) {
+                    if (thiz == null)
+                        throw new NullPointerException("this can't be null for selecting properties!");
+                    if (selection == null)
+                        throw new NullPointerException("Selection can't be null for selecting properties!");
+                    validateEquation(equation, true, true);
+
+                    _this = thiz;
+                    _selection = selection;
+                    _equation = equation;
+                    _that = null;
+                    _thing = null;
+                }
+
+                public static Condition of(Field thiz, Equation equation, Field that) {
+                    return new Condition(thiz, equation, that);
+                }
+
+                public static Condition of(Field thiz, Equation equation) {
+                    return new Condition(thiz, equation);
+                }
+
+                public static Condition of(Field thiz, Equation equation, String thing) {
+                    return new Condition(thiz, equation, thing);
+                }
+
+                public static Condition of(Field thiz, Equation equation, Selection selection) {
+                    return new Condition(thiz, equation, selection);
+                }
+
+                private String prepareThing(String thing) {
+                    if (_thing == null)
+                        thing = "null";
+                    else {
+                        if (thing.charAt(0) != '\'')
+                            thing = "'" + thing;
+                        if (thing.charAt(thing.length() - 1) != '\'')
+                            thing = thing + "'";
+                    }
+
+                    return thing;
+                }
+
+                private void validateEquation(Equation equation, boolean isPlural, boolean isCollection) {
+                    if (equation == null)
+                        throw new NullPointerException("Equation must not be null for condition!");
+
+                    if (equation.is_plural() != isPlural || equation.is_collection() != isCollection)
+                        throw new IllegalStateException(format(
+                                "Equation %s is plural:%s and collection:%s, but should be plural:%s and collection:%s",
+                                equation.name(),
+                                equation.is_plural(),
+                                equation.is_collection(),
+                                isPlural,
+                                isCollection
+                        ));
+                }
+
+                @Override
                 public String apply() {
                     return format(
                             /*language=MySQL*/ "%s = %s",
@@ -281,17 +382,23 @@ public class SelectService {
 
                 @Getter
                 public enum Equation {
-                    EQUALS(" = "),
-                    NOT_EQUALS(" != "),
-                    IN(" in "),
-                    NOT_IN(" not in "),
-                    IS_NULL(" is null "),
-                    IS_NOT_NULL(" is not null ");
+                    EQUALS(" = ", true, false),
+                    NOT_EQUALS(" != ",  true, false),
+                    IN(" in ", true, true),
+                    NOT_IN(" not in ", true,  true),
+                    IS_NULL(" is null ",  false, false),
+                    IS_NOT_NULL(" is not null ",  false, false);
 
                     private final String _statement;
 
-                    Equation(String statement) {
+                    private boolean _plural;
+
+                    private boolean _collection;
+
+                    Equation(String statement, boolean plural, boolean collection) {
                         _statement = statement;
+                        _plural = plural;
+                        _collection = collection;
                     }
                 }
 

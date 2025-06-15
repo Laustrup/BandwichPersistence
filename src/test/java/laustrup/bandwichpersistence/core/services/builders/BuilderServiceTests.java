@@ -1,7 +1,7 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.BandwichTester;
-import laustrup.bandwichpersistence.TestItems.Instance;
+import laustrup.bandwichpersistence.items.TestItems.Instance;
 import laustrup.bandwichpersistence.core.persistence.Field;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -11,7 +11,7 @@ import java.sql.ResultSet;
 import java.util.function.Function;
 import java.util.logging.Logger;
 
-import static laustrup.bandwichpersistence.TestItems.*;
+import static laustrup.bandwichpersistence.items.TestItems.*;
 import static laustrup.bandwichpersistence.quality_assurance.Asserter.asserting;
 
 class BuilderServiceTests extends BandwichTester {
