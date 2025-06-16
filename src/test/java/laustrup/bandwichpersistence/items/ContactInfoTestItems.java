@@ -5,11 +5,14 @@ import laustrup.bandwichpersistence.core.models.users.ContactInfo.Address;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo.Country;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo.Phone;
 import laustrup.bandwichpersistence.core.persistence.Field;
+import laustrup.bandwichpersistence.core.persistence.services.SelectService;
+import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Properties;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition.Equation.EQUALS;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.complying;
+import static laustrup.bandwichpersistence.core.persistence.services.SelectService.selecting;
 import static laustrup.bandwichpersistence.core.services.TableAnnotationService.get_tableTitle;
 import static laustrup.bandwichpersistence.items.TestItems.generateUUID;
 
@@ -26,10 +29,9 @@ public class ContactInfoTestItems {
         return new ContactInfo(
                 generateUUID(
                     table,
-                    complying().that(Condition.of(
-                        Field.of(table, ContactInfo.DTO.Fields.email),
-                        EQUALS,
-                        email
+                    selecting(new Properties(
+                            table,
+                            complying().that(Condition.of(Field.of(table, ContactInfo.DTO.Fields.email), EQUALS, email))
                     ))
                 ),
                 email,

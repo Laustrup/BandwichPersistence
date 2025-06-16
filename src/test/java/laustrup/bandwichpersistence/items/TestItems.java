@@ -19,6 +19,7 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.time.Instant;
+import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -76,10 +77,17 @@ public class TestItems {
     }
 
     public static UUID generateUUID(String table, Selecting selecting) {
-        return get(new Configurations(
-                        Field.of(table, "id"), read(
-                        new Query(selecting.select())
-                ).get_resultSet()),
+        return get(
+                new Configurations(
+                        Field.of(table, "id"),
+                        read(new Query(selecting.select())).get_resultSet(),
+                        () -> {
+                            throw new RuntimeException(String.format(
+                                    "Couldn't generate UUID for table '%s' with selecting '%s'",
+                                    table,
+                                    Optional.of(selecting).map(Selecting::select).orElse("<null>")
+                        ));}
+                ),
                 UUID.class
         );
     }

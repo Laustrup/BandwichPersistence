@@ -332,6 +332,11 @@ public class JDBCService {
         }
 
         private static <T> T handleConfigurations(Configurations configurations, Supplier<T> supplier) {
+            if (configurations.resultSet == null)
+                configurations.log(() -> {
+                    throw new RuntimeException("ResultSet can not be null in ResultSetService!");
+                });
+
             try {
                 return switch (configurations.mode) {
                     case NEUTRAL -> supplier.get();
@@ -387,20 +392,36 @@ public class JDBCService {
                 while (toStart && resultSet.getRow() > 0 && !resultSet.isBeforeFirst());
         }
 
-        public record Configurations(String field, ResultSet resultSet, Mode mode) {
+        public record Configurations(String field, ResultSet resultSet, Mode mode, Optional<Runnable> logging) {
+
+            public Configurations(String field, ResultSet resultSet, Mode mode) {
+                this(field, resultSet, mode, Optional.empty());
+            }
 
             public Configurations(Field field, ResultSet resultSet, Mode mode) {
-                this(field.get_content(), resultSet, mode);
+                this(field.get_content(), resultSet, mode, Optional.empty());
+            }
+
+            public Configurations(Field field, ResultSet resultSet, Mode mode, Runnable logging) {
+                this(field.get_content(), resultSet, mode, Optional.ofNullable(logging));
             }
 
             public Configurations(Field field, ResultSet resultSet) {
-                this(field.get_content(), resultSet, NEUTRAL);
+                this(field.get_content(), resultSet, NEUTRAL, Optional.empty());
+            }
+
+            public Configurations(Field field, ResultSet resultSet, Runnable logging) {
+                this(field.get_content(), resultSet, NEUTRAL, Optional.ofNullable(logging));
             }
             
             public Configurations(String field, ResultSet resultSet) {
-                this(field, resultSet, NEUTRAL);
+                this(field, resultSet, NEUTRAL, Optional.empty());
             }
-            
+
+            public Configurations(String field, ResultSet resultSet, Runnable logging) {
+                this(field, resultSet, NEUTRAL, Optional.ofNullable(logging));
+            }
+
             public Field getField() {
                 String[] content = field.split("\\.");
                 return new Field(content[0], content[1]);
@@ -415,11 +436,16 @@ public class JDBCService {
                     resultSet.next();
             }
 
+            public void log(Runnable orElse) {
+                logging().ifPresentOrElse(Runnable::run, orElse);
+            }
+
             public static Configurations of(Configurations configurations, Mode mode) {
                 return new Configurations(
                         configurations.field,
                         configurations.resultSet,
-                        mode
+                        mode,
+                        configurations.logging
                 );
             }
 

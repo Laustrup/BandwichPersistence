@@ -54,6 +54,7 @@ tasks.withType<Jar> {
 }
 
 tasks.named<Test>("test") {
+    useJUnit()
     useJUnitPlatform()
 
     maxHeapSize = "1G"

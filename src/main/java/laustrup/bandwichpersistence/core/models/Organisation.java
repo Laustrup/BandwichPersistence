@@ -126,7 +126,9 @@ public class Organisation extends Model {
         }
     }
 
-    @Getter @laustrup.bandwichpersistence.core.models.Table(title = "organisation_employee")
+    @Getter
+    @laustrup.bandwichpersistence.core.models.Table(title = "organisation_employees")
+    @FieldNameConstants
     public static class Employee extends BusinessUser {
 
         private Seszt<Role> _roles;

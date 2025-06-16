@@ -4,11 +4,13 @@ import jdk.jshell.spi.ExecutionControl.NotImplementedException;
 import laustrup.bandwichpersistence.core.models.History;
 import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.models.Organisation.Employee;
+import laustrup.bandwichpersistence.core.models.User;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
 import laustrup.bandwichpersistence.core.persistence.Field;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Join;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Properties;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition;
+import laustrup.bandwichpersistence.core.services.StringService;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 
 import java.time.Instant;
@@ -22,6 +24,7 @@ import static laustrup.bandwichpersistence.core.persistence.services.SelectServi
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition.Equation.EQUALS;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.complying;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.selecting;
+import static laustrup.bandwichpersistence.core.services.StringService.fieldToColumnName;
 import static laustrup.bandwichpersistence.core.services.TableAnnotationService.get_tableTitle;
 import static laustrup.bandwichpersistence.items.OrganisationTestItems.generateIværkstedContactInfo;
 import static laustrup.bandwichpersistence.items.SubscriptionTestItems.generateSubscription;
@@ -90,7 +93,7 @@ public class OrganisationEmployeeTestItems {
                         ),
                         Field.of(
                                 employeeTable,
-                                Model.ModelDTO.Fields.id
+                                fieldToColumnName(ContactInfo.class.getSimpleName() + Model.Fields._id)
                         )
                 ))
         );

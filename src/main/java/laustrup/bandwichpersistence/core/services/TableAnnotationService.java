@@ -1,7 +1,6 @@
 package laustrup.bandwichpersistence.core.services;
 
 import laustrup.bandwichpersistence.core.models.Table;
-import laustrup.bandwichpersistence.core.models.users.ContactInfo;
 
 public class TableAnnotationService {
 
@@ -13,6 +12,6 @@ public class TableAnnotationService {
                             clazz.getSimpleName()
                     ));
 
-        return ContactInfo.class.getAnnotation(Table.class).title();
+        return clazz.getAnnotation(Table.class).title();
     }
 }
