@@ -44,11 +44,7 @@ public class OrganisationEmployeeBuilder extends BuilderService<Employee> {
     }
 
     private OrganisationEmployeeBuilder() {
-        super(
-                Employee.class,
-                classToTableName(Organisation.class, Employee.class),
-                _logger
-        );
+        super(Employee.class, classToTableName(Organisation.class, Employee.class), _logger);
     }
 
     @Override

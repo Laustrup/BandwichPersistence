@@ -20,7 +20,7 @@ class SelectServiceTests extends Tester {
     @Test
     void canSelectAll() {
         test(() -> {
-            String expected = arrange(/*language=MySQL*/ "select * from " + _table);
+            String expected = arrange(/*language=MySQL*/ "\nselect * from " + _table + "\n");
 
             String actual = act(
                     selecting(_table)
@@ -35,7 +35,7 @@ class SelectServiceTests extends Tester {
     @Test
     void canSelectAllWhereCondition() {
         test(() -> {
-            String expected = /*language=MySQL*/ String.format("select * from %s where this.thing = that.thing", _table);
+            String expected = /*language=MySQL*/ String.format("\nselect * from %s\n\nwhere this.thing = that.thing\n", _table);
             Properties properties = arrange(new Properties(
                     _table,
                     complying()
@@ -55,7 +55,7 @@ class SelectServiceTests extends Tester {
     @Test
     void canSelectAllWhereConditionAndCondition() {
         test(() -> {
-            String expected = /*language=MySQL*/ String.format("select * from %s where this.thing = that.thing and this.other = that.other", _table);
+            String expected = /*language=MySQL*/ String.format("\nselect * from %s\nwhere this.thing = that.thing and this.other = that.other\n", _table);
             Properties properties = arrange(new Properties(
                     _table,
                     complying()
@@ -78,14 +78,16 @@ class SelectServiceTests extends Tester {
         test(() -> {
             String alias = "joinTable";
             String row = "id";
-            String expected = /*language=MySQL*/ arrange(String.format("select * from %s inner join join_table joinTable on joinTable.id = %s.id", _table, _table));
+            String expected = /*language=MySQL*/ arrange(String.format(
+                    "\nselect * from %s\ninner join join_table joinTable on joinTable.id = %s.id\n", _table, _table)
+            );
 
             String actual = act(
                     selecting(_table)
                             .addJoin(new Join(
                                     INNER,
                                     alias,
-                                    new Field("join_table", row),
+                                    new Field("joinTable", row),
                                     new Field(_table, row)
                             ))
                             .select()

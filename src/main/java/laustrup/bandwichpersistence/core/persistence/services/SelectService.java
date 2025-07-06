@@ -61,17 +61,19 @@ public class SelectService {
         }
 
         public String select() {
-            return String.format(
-                    "\n%s\n%s\n%s\n",
-                    _statement,
-                    _joins.stream()
+            String
+                    joins = _joins.stream()
                             .map(Join::apply)
                             .reduce((a, b) -> a + "\n" + b)
                             .orElse(""),
-                    _properties.get_that()
+                    where = _properties.get_that()
                             .map(Thating::apply)
-                            .orElse("")
-            );
+                            .orElse("");
+            boolean
+                    containsJoins = !_joins.isEmpty(),
+                    containsWhere = !where.isEmpty();
+
+            return String.format("\n%s\n%s%s%s%s", _statement, joins, containsJoins ? "\n" : "", where, containsWhere ? "\n" : "");
         }
 
         @Getter
@@ -140,7 +142,7 @@ public class SelectService {
                 if (internal == null)
                     throw new NullPointerException("internal can't be null for selecting properties!");
                 if (internal.table() == null)
-                    throw new NullPointerException("alias can't be null for selecting properties!");
+                    throw new NullPointerException("table can't be null for selecting properties!");
                 if (external == null)
                     throw new NullPointerException("external can't be null for selecting properties!");
                 _area = area;
@@ -150,28 +152,8 @@ public class SelectService {
                 _external = external;
             }
 
-            public Join(Area area, Field internal, Field external) {
-                if (area == null)
-                    throw  new NullPointerException("area can't be null for selecting properties!");
-                if (internal == null)
-                    throw new NullPointerException("internal can't be null for selecting properties!");
-                if (internal.table() == null)
-                    throw new NullPointerException("table can't be null for selecting properties!");
-                if (external == null)
-                    throw new NullPointerException("external can't be null for selecting properties!");
-                _area = area;
-                _table = internal.table();
-                _alias = null;
-                _internal = internal;
-                _external = external;
-            }
-
             public static Join of(Area area, String alias, Field internal, Field external) {
                 return new Join(area, alias, internal, external);
-            }
-
-            public static Join of(Area area, Field internal, Field external) {
-                return new Join(area, internal, external);
             }
 
             @Override
