@@ -1,7 +1,8 @@
-package laustrup.bandwichpersistence.core.models;
+package laustrup.bandwichpersistence.core.models.users;
 
+import laustrup.bandwichpersistence.core.models.History;
+import laustrup.bandwichpersistence.core.models.Subscription;
 import laustrup.bandwichpersistence.core.models.chats.ChatRoom;
-import laustrup.bandwichpersistence.core.models.users.ContactInfo;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
 import lombok.experimental.FieldNameConstants;
@@ -13,17 +14,17 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Getter
-public abstract class BusinessUser extends User {
+public abstract class BusinessUser<IDENTITY extends User.Id> extends User<IDENTITY> {
 
     private Seszt<ChatRoom> _chatRooms;
 
-    public BusinessUser(BusinessUserDTO user) {
-        super(user);
+    public BusinessUser(BusinessUserDTO<IDENTITY> user, IDENTITY identity) {
+        super(user, identity);
         _chatRooms = new Seszt<>(user.getChatRooms().stream().map(ChatRoom::new));
     }
 
     public BusinessUser(
-            UUID id,
+            IDENTITY id,
             String username,
             String firstName,
             String lastName,
@@ -53,7 +54,7 @@ public abstract class BusinessUser extends User {
     }
 
     @Getter @FieldNameConstants
-    public abstract static class BusinessUserDTO extends UserDTO {
+    public abstract static class BusinessUserDTO<IDENTITY extends User.Id> extends UserDTO<IDENTITY> {
 
         private Set<ChatRoom.DTO> chatRooms;
 
@@ -87,7 +88,7 @@ public abstract class BusinessUser extends User {
             this.chatRooms = chatRooms;
         }
 
-        public BusinessUserDTO(BusinessUser businessUser) {
+        public BusinessUserDTO(BusinessUser<IDENTITY> businessUser) {
             super(businessUser);
             chatRooms = Arrays.stream(businessUser.get_chatRooms().get_data())
                     .map(ChatRoom.DTO::new)

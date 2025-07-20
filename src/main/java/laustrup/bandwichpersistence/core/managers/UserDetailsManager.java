@@ -3,7 +3,7 @@ package laustrup.bandwichpersistence.core.managers;
 import laustrup.bandwichpersistence.core.models.Login;
 import laustrup.bandwichpersistence.core.models.Response;
 import laustrup.bandwichpersistence.core.models.Subscription;
-import laustrup.bandwichpersistence.core.models.User;
+import laustrup.bandwichpersistence.core.models.users.User;
 import laustrup.bandwichpersistence.core.persistence.Field;
 import laustrup.bandwichpersistence.core.repositories.UserDetailsRepository;
 import laustrup.bandwichpersistence.core.services.builders.UserBuilder;
@@ -57,7 +57,7 @@ public class UserDetailsManager {
 
     private static ResultSet passwordFits(ResultSet resultSet, String password) {
         if (matches(password, get(
-                new Configurations(new Field(getUserType(resultSet) + "s", "password"), resultSet, PEEK),
+                new Configurations(Field.of(getUserType(resultSet) + "s", "password"), resultSet, PEEK),
                 String.class
         )))
             return resultSet;

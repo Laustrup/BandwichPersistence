@@ -76,7 +76,7 @@ public class OrganisationBuilder extends BuilderService<Organisation> {
             );
 
             return new Organisation(
-                    id.get(),
+                    new Organisation.Id(id.get()),
                     title.get(),
                     events,
                     venues,

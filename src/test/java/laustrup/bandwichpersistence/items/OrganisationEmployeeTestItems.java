@@ -1,16 +1,15 @@
 package laustrup.bandwichpersistence.items;
 
 import jdk.jshell.spi.ExecutionControl.NotImplementedException;
-import laustrup.bandwichpersistence.core.models.History;
 import laustrup.bandwichpersistence.core.models.Model;
+import laustrup.bandwichpersistence.core.models.Organisation;
 import laustrup.bandwichpersistence.core.models.Organisation.Employee;
-import laustrup.bandwichpersistence.core.models.User;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
+import laustrup.bandwichpersistence.core.models.users.User;
 import laustrup.bandwichpersistence.core.persistence.Field;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Join;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Properties;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition;
-import laustrup.bandwichpersistence.core.services.StringService;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 
 import java.time.Instant;
@@ -26,6 +25,7 @@ import static laustrup.bandwichpersistence.core.persistence.services.SelectServi
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.selecting;
 import static laustrup.bandwichpersistence.core.services.StringService.fieldToColumnName;
 import static laustrup.bandwichpersistence.core.services.TableAnnotationService.get_tableTitle;
+import static laustrup.bandwichpersistence.core.services.TableAnnotationService.toAlias;
 import static laustrup.bandwichpersistence.items.OrganisationTestItems.generateIværkstedContactInfo;
 import static laustrup.bandwichpersistence.items.SubscriptionTestItems.generateSubscription;
 import static laustrup.bandwichpersistence.items.TestItems.generateUUID;
@@ -43,7 +43,7 @@ public class OrganisationEmployeeTestItems {
 
     private static Employee generateJensJensen() throws NotImplementedException {
         String email = "jens@ivaerkstedet.dk";
-        UUID id = generateEmployeeId(email);
+        Employee.Id id = generateEmployeeId(email);
 
         return new Employee(
                 id,
@@ -52,51 +52,45 @@ public class OrganisationEmployeeTestItems {
                 "Jensen",
                 "Jeg hedder Jens",
                 generateIværkstedContactInfo("contact@ivaerkstedet.dk"),
-                generateSubscription(
-                        id,
-                        ACCEPTED,
-                        PAYING,
-                        ORGANISATION_EMPLOYEE
-                ),
+                generateSubscription(id, ACCEPTED, PAYING, ORGANISATION_EMPLOYEE),
                 new Seszt<>(LEADER),
                 new Seszt<>(),
                 new Seszt<>(),
                 new Seszt<>(),
-                new History(History.JoinTableDetails.ORGANISATION_EMPLOYEE),
+                null,
                 Instant.now()
         );
     }
 
-    private static UUID generateEmployeeId(String email) {
+    private static Employee.Id generateEmployeeId(String email) {
         String
                 employeeTable = get_tableTitle(Employee.class),
                 contactInfoTable = get_tableTitle(ContactInfo.class);
 
-        return generateUUID(
+        return new Employee.Id(generateUUID(
                 employeeTable,
                 selecting(new Properties(
                         employeeTable,
                         complying()
-                                .that(Condition.of(
+                                .which(Condition.of(
                                         Field.of(
-                                                contactInfoTable,
+                                                toAlias(contactInfoTable),
                                                 ContactInfo.DTO.Fields.email
                                         ),
                                         EQUALS,
                                         email
                                 ))
-                )).addJoin(Join.of(
-                        INNER,
+                )).addJoin(Join.inner(
                         Field.of(
-                                contactInfoTable,
+                                toAlias(contactInfoTable),
                                 Model.ModelDTO.Fields.id
                         ),
                         Field.of(
                                 employeeTable,
-                                fieldToColumnName(ContactInfo.class.getSimpleName() + Model.Fields._id)
+                                fieldToColumnName(ContactInfo.class.getSimpleName() + Model.Fields._identity)
                         )
                 ))
-        );
+        ));
     }
 
     public enum OrganisationEmployeeTitle {

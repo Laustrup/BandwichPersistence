@@ -422,6 +422,10 @@ public class JDBCService {
                 this(field, resultSet, NEUTRAL, Optional.ofNullable(logging));
             }
 
+            public Configurations(Field field, ResultSet resultSet, Runnable logging, Mode mode) {
+                this(field.get_content(), resultSet, mode, Optional.ofNullable(logging));
+            }
+
             public Field getField() {
                 String[] content = field.split("\\.");
                 return new Field(content[0], content[1]);

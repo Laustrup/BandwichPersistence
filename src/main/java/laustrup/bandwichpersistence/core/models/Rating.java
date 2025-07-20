@@ -1,6 +1,7 @@
 package laustrup.bandwichpersistence.core.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import laustrup.bandwichpersistence.core.models.users.User;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
@@ -18,7 +19,7 @@ import java.util.UUID;
 @FieldNameConstants
 public class Rating {
 
-    private UUID _appointedId, _reviewerId;
+    private User.Id _appointedId, _reviewerId;
 
     /**
      * The value of the rating that is appointed.
@@ -41,8 +42,8 @@ public class Rating {
     public Rating(DTO rating) throws InputMismatchException {
         this(
                 rating.getValue(),
-                rating.getAppointedId(),
-                rating.getReviewerId(),
+                new User.Id(rating.getAppointedId()),
+                new User.Id(rating.getReviewerId()),
                 rating.getComment(),
                 rating.getTimestamp()
         );
@@ -58,8 +59,8 @@ public class Rating {
      */
     public Rating(
             int value,
-            UUID appointedId,
-            UUID reviewerId,
+            User.Id appointedId,
+            User.Id reviewerId,
             String comment,
             Instant timestamp
     ) {
@@ -78,7 +79,7 @@ public class Rating {
      * @param judgeId The one giving the Rating.
      * @param comment A comment that is attached to the Rating.
      */
-    public Rating(int value, UUID appointedId, UUID judgeId, String comment) {
+    public Rating(int value, User.Id appointedId, User.Id judgeId, String comment) {
         this(value, appointedId, judgeId, comment, Instant.now());
     }
 
@@ -134,8 +135,8 @@ public class Rating {
         private Instant timestamp;
 
         public DTO(Rating rating) {
-            appointedId = rating.get_appointedId();
-            reviewerId = rating.get_reviewerId();
+            appointedId = rating.get_appointedId().get_value();
+            reviewerId = rating.get_reviewerId().get_value();
             value = rating.get_value();
             comment = rating.get_comment();
             timestamp = rating.get_timestamp();

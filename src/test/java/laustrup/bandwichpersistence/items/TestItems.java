@@ -3,6 +3,8 @@ package laustrup.bandwichpersistence.items;
 import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.models.Situation;
 import laustrup.bandwichpersistence.core.models.ToStringArgument;
+import laustrup.bandwichpersistence.core.models.identification.CommonIdentity;
+import laustrup.bandwichpersistence.core.models.identification.Identity;
 import laustrup.bandwichpersistence.core.persistence.Field;
 import laustrup.bandwichpersistence.core.persistence.models.Query;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting;
@@ -69,9 +71,11 @@ public class TestItems {
 
     public static UUID generateUUID(String table, Thating that) {
         return get(new Configurations(
-                Field.of(table, "id"), read(
-                        new Query(selecting(new Properties(table, that)).select())
-                ).get_resultSet()),
+                        Field.of(table, "id"), read(
+                                new Query(selecting(new Properties(table, that)).select())
+                        ).get_resultSet(),
+                        Configurations.Mode.START
+                ),
                 UUID.class
         );
     }
@@ -86,7 +90,8 @@ public class TestItems {
                                     "Couldn't generate UUID for table '%s' with selecting '%s'",
                                     table,
                                     Optional.of(selecting).map(Selecting::select).orElse("<null>")
-                        ));}
+                        ));},
+                        Configurations.Mode.START
                 ),
                 UUID.class
         );
@@ -97,7 +102,7 @@ public class TestItems {
     @AllArgsConstructor
     public static class Instance {
 
-        private UUID _id;
+        private Id _id;
 
         private String _title;
 
@@ -105,7 +110,7 @@ public class TestItems {
 
         private int _amount;
 
-        public Instance(UUID id) {
+        public Instance(Id id) {
             this(id, randomString(), true, randomAmount());
         }
 
@@ -114,7 +119,7 @@ public class TestItems {
         }
 
         public Instance(String title, int amount) {
-            this(UUID.randomUUID(), title, true, amount);
+            this(Id.randomize(), title, true, amount);
         }
 
         public static Instance initialise() {
@@ -154,11 +159,12 @@ public class TestItems {
             return truthiness;
         }
 
-        public static Model toModel(Instance instance) {
-            return new Model() {
+        public static <IDENTITY extends Identity<UUID>> Model<IDENTITY, UUID> toModel(Instance instance) {
+            return new Model<>() {
+                @SuppressWarnings("unchecked")
                 @Override
-                public UUID get_id() {
-                    return instance.get_id();
+                public IDENTITY get_identity() {
+                    return (IDENTITY) instance.get_id();
                 }
 
                 @Override
@@ -192,6 +198,7 @@ public class TestItems {
                 }
 
                 @Override
+                @SuppressWarnings("unchecked")
                 protected String defineToString(String title, Coollection<ToStringArgument> arguments) {
                     return super.defineToString(title, arguments);
                 }
@@ -210,6 +217,22 @@ public class TestItems {
 
         private static int randomAmount() {
             return new Random().nextInt(100);
+        }
+
+        public static class Id extends CommonIdentity<UUID> {
+
+            public Id(UUID identifier) {
+                super(identifier);
+            }
+
+            public static Id randomize() {
+                return new Id(UUID.randomUUID());
+            }
+
+            @Override
+            public Class<Instance> getOwnerClassType() {
+                return Instance.class;
+            }
         }
     }
 

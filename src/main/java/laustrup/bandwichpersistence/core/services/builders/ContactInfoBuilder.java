@@ -58,7 +58,7 @@ public class ContactInfoBuilder extends BuilderService<ContactInfo> {
             );
 
             return new ContactInfo(
-                    id.get(),
+                    new ContactInfo.Id(id.get()),
                     email.get(),
                     phones,
                     address.get(),

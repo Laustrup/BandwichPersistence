@@ -1,10 +1,21 @@
 package laustrup.bandwichpersistence.core.persistence;
 
+import laustrup.bandwichpersistence.core.persistence.models.ConjunctionTable;
+import laustrup.bandwichpersistence.core.persistence.models.DatabaseTable;
+
 import java.util.Arrays;
 
-public record Field(String table, String row) {
+public record Field(String alias, String row) {
 
     private static final String[] _idIndicators = new String[]{"id", "_id"};
+
+    public static Field of(ConjunctionTable table, String row) {
+        return of(table, row);
+    }
+
+    public static Field of(DatabaseTable table, String row) {
+        return of(table.get_alias(), row);
+    }
 
     public static Field of(String alias, String row) {
         return new Field(alias, row);
@@ -15,8 +26,8 @@ public record Field(String table, String row) {
     }
 
     public String get_content() {
-        return table != null
-                ? String.format("%s.%s", table, row)
+        return alias != null
+                ? String.format("%s.%s", alias, row)
                 : row
         ;
     }

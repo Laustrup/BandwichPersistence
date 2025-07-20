@@ -1,8 +1,12 @@
 package laustrup.bandwichpersistence.quality_assurance;
 
+import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -94,6 +98,19 @@ public class Asserter {
         public static <T> AssertionChecker<T> check(AssertionChecker<T> checker, Runnable action) {
             action.run();
             return checker;
+        }
+
+        public void compare(E actual) {
+            Map<String, Field> actualFields = Arrays.stream(actual.getClass().getDeclaredFields())
+                    .collect(Collectors.toMap(Field::getName, field -> field));
+
+            Arrays.stream(_expected.getClass().getDeclaredFields()).forEach(field -> {
+                try {
+                    assertEquals(field.get(_expected), actualFields.get(field.getName()).get(actual));
+                } catch (IllegalAccessException e) {
+                    fail(e.getMessage());
+                }
+            });
         }
     }
 }

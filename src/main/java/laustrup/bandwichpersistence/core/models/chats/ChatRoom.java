@@ -3,29 +3,30 @@ package laustrup.bandwichpersistence.core.models.chats;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import laustrup.bandwichpersistence.core.models.BusinessUser;
-import laustrup.bandwichpersistence.core.models.Situation;
+import laustrup.bandwichpersistence.core.models.*;
+import laustrup.bandwichpersistence.core.models.identification.Signature;
+import laustrup.bandwichpersistence.core.models.users.BusinessUser;
+import laustrup.bandwichpersistence.core.models.users.BusinessUser.BusinessUserDTO;
 import laustrup.bandwichpersistence.core.models.chats.messages.Message;
+import laustrup.bandwichpersistence.core.models.identification.CommonIdentity;
+import laustrup.bandwichpersistence.core.models.users.User;
 import laustrup.bandwichpersistence.core.services.UserService;
-import laustrup.bandwichpersistence.core.models.Model;
-import laustrup.bandwichpersistence.core.models.User;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
 import lombok.experimental.FieldNameConstants;
 
 import java.time.Instant;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static laustrup.bandwichpersistence.core.models.User.UserDTO;
+import static laustrup.bandwichpersistence.core.models.users.User.UserDTO;
 import static laustrup.bandwichpersistence.core.services.ObjectService.ifExists;
 
 /**
  * This is used for multiple Users to communicate with each other through Mails.
  */
 @Getter @FieldNameConstants
-public class ChatRoom extends Model {
+public class ChatRoom extends Model<ChatRoom.Id, Signature.UUID> {
 
     /**
      * All the Mails that has been sent will be stored here.
@@ -35,14 +36,10 @@ public class ChatRoom extends Model {
     /**
      * The Users, except the responsible, that can write with each other.
      */
-    private Seszt<User> _chatters;
+    private Seszt<User<? extends User.Id>> _chatters;
 
-    /**
-     * Converts a Data Transport Object into this object.
-     * @param chatRoom The Data Transport Object that will be converted.
-     */
     public ChatRoom(ChatRoom.DTO chatRoom) {
-        super(chatRoom);
+        super(chatRoom, new Id(chatRoom.getId()));
         _messages = Seszt.copy(chatRoom.getMails(), Message::new);
         _chatters = Seszt.copy(chatRoom.getChatters(), UserService::from);
     }
@@ -56,10 +53,10 @@ public class ChatRoom extends Model {
      * @param timestamp The time this ChatRoom was created.
      */
     public ChatRoom(
-            UUID id,
+            Id id,
             String title,
             Seszt<Message> messages,
-            Seszt<User> chatters,
+            Seszt<User<?>> chatters,
             Instant timestamp
     ) {
         super(id, title, timestamp);
@@ -75,7 +72,7 @@ public class ChatRoom extends Model {
      * @param messages The Mails with relations to this ChatRoom.
      * @param chatters The chatters that are members of this ChatRoom.
      */
-    public ChatRoom(String title, Seszt<Message> messages, Seszt<User> chatters) {
+    public ChatRoom(String title, Seszt<Message> messages, Seszt<User<?>> chatters) {
         super(title);
         _messages = messages;
         _chatters = chatters;
@@ -140,7 +137,7 @@ public class ChatRoom extends Model {
      * @param chatter A user that is wished to be added as a chatter of the ChatRoom.
      * @return All the chatters of the ChatRoom.
      */
-    public Seszt<User> add(User chatter) {
+    public Seszt<User<?>> add(User<?> chatter) {
         return add(new User[]{chatter});
     }
 
@@ -151,9 +148,9 @@ public class ChatRoom extends Model {
      * @param chatters A users that is wished to be added as a chatter of the ChatRoom.
      * @return All the chatters of the ChatRoom.
      */
-    public Seszt<User> add(User[] chatters) {
+    public Seszt<User<?>> add(User<?>[] chatters) {
         ifExists(chatters,() -> {
-            for (User chatter : chatters) {
+            for (User<?> chatter : chatters) {
                 _chatters.add(chatter);
                 _title = determineChatRoomTitle();
             }
@@ -167,11 +164,11 @@ public class ChatRoom extends Model {
      * @param chatter A User, that should be checked, if it already exists in the ChatRoom.
      * @return True if the chatter exists in the ChatRoom.
      */
-    public boolean exists(User chatter) {
-        for (User user : _chatters)
+    public boolean exists(User<?> chatter) {
+        for (User<?> user : _chatters)
             if (
                 user.getClass() == chatter.getClass()
-                && user.get_id() == chatter.get_id()
+                && user.get_identity() == chatter.get_identity()
             )
                 return true;
 
@@ -185,7 +182,7 @@ public class ChatRoom extends Model {
      */
     public Seszt<Message> remove(Message message) {
         for (int i = 1; i <= _messages.size(); i++) {
-            if (_messages.Get(i).get_id() == message.get_id()) {
+            if (_messages.Get(i).get_identity() == message.get_identity()) {
                 _messages.remove(_messages.Get(i));
                 break;
             }
@@ -195,29 +192,13 @@ public class ChatRoom extends Model {
     }
 
     /**
-     * Will remove a chatter from the ChatRoom.
-     * @param chatter A user object that is wished to be removed.
-     * @return All the chatters of this ChatRoom.
-     */
-    public Seszt<User> remove(User chatter) {
-        for (int i = 1; i <= _chatters.size(); i++) {
-            if (_chatters.Get(i).get_id() == chatter.get_id()) {
-                _chatters.remove(_chatters.Get(i));
-                break;
-            }
-        }
-
-        return _chatters;
-    }
-
-    /**
      * Edits a Mail of the ChatRoom.
      * @param message The Mail that is an updated version of a previous Mail, which will be updated.
      * @return True if it will be edited correctly.
      */
     public boolean edit(Message message) {
         for (int i = 1; i <= _messages.size(); i++) {
-            if (_messages.Get(i).get_id() == message.get_id()) {
+            if (_messages.Get(i).get_identity() == message.get_identity()) {
                 _messages.set(i, message);
                 return message == _messages.get(i);
             }
@@ -226,17 +207,33 @@ public class ChatRoom extends Model {
         return false;
     }
 
+    public static class Id extends CommonIdentity<Signature.UUID> {
+
+        public Id(Signature.UUID signature) {
+            super(signature);
+        }
+
+        public Id(java.util.UUID signature) {
+            super(new Signature.UUID(signature));
+        }
+
+        @Override
+        public Class<?> getOwnerClassType() {
+            return Id.class;
+        }
+    }
+
     @Override
     public String toString() {
         return defineToString(
             getClass().getSimpleName(),
             new String[]{
-                Model.Fields._id,
+                Model.Fields._identity,
                 Model.Fields._title,
                 Model.Fields._timestamp
             },
             new String[]{
-                String.valueOf(_id),
+                String.valueOf(_identity),
                 _title,
                 String.valueOf(_timestamp)
             }
@@ -244,13 +241,13 @@ public class ChatRoom extends Model {
     }
 
     @Getter
-    public static class Template extends Model {
+    public static class Template extends Model<Template.Id, Signature.UUID> {
 
-        private Seszt<BusinessUser> _chatters;
+        private Seszt<BusinessUser<?>> _chatters;
 
         public Template(DTO settings) {
             this(
-                    settings.getId(),
+                    new Id(new Signature.UUID(settings.getId())),
                     settings.getTitle(),
                     Seszt.copy(settings.getChatters(), UserService::fromBusinessUser),
                     settings.getTimestamp()
@@ -258,26 +255,42 @@ public class ChatRoom extends Model {
         }
 
         public Template(
-                UUID id,
+                Id id,
                 String title,
-                Seszt<BusinessUser> chatters,
+                Seszt<BusinessUser<?>> chatters,
                 Instant timestamp
         ) {
             super(id, title, timestamp);
             _chatters = chatters;
         }
 
-    @Getter @FieldNameConstants @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class DTO extends ModelDTO {
+        public static class Id extends CommonIdentity<Signature.UUID> {
 
-            private Set<BusinessUser.BusinessUserDTO> chatters;
+            public Id(Signature.UUID identifier) {
+                super(identifier);
+            }
+
+            public Id(java.util.UUID identifier) {
+                super(new Signature.UUID(identifier));
+            }
+
+            @Override
+            public Class<?> getOwnerClassType() {
+                return Id.class;
+            }
+        }
+
+    @Getter @FieldNameConstants @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class DTO extends ModelDTO<ChatRoom.Template.Id, Signature.UUID, java.util.UUID> {
+
+            private Set<BusinessUserDTO<? extends User.Id>> chatters;
 
             @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
             public DTO(
-                    @JsonProperty UUID id,
+                    @JsonProperty java.util.UUID id,
                     @JsonProperty String title,
                     @JsonProperty Instant timestamp,
-                    @JsonProperty Set<BusinessUser.BusinessUserDTO> chatters
+                    @JsonProperty Set<BusinessUserDTO<?>> chatters
             ) {
                 super(id, title, timestamp);
                 this.chatters = chatters;
@@ -298,22 +311,22 @@ public class ChatRoom extends Model {
      * Doesn't have any logic.
      */
     @Getter
-    public static class DTO extends ModelDTO {
+    public static class DTO extends ModelDTO<ChatRoom.Id, Signature.UUID, java.util.UUID> {
 
         /** All the Mails that has been sent will be stored here. */
         private Set<Message.DTO> mails;
 
         /** The Users, except the responsible, that can write with each other. */
-        private Set<UserDTO> chatters;
+        private Set<UserDTO<? extends User.Id>> chatters;
 
         @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
         public DTO(
-                @JsonProperty UUID id,
+                @JsonProperty java.util.UUID id,
                 @JsonProperty String title,
                 @JsonProperty Situation situation,
                 @JsonProperty Instant timestamp,
                 @JsonProperty Set<Message.DTO> mails,
-                @JsonProperty Set<UserDTO> chatters
+                @JsonProperty Set<UserDTO<? extends User.Id>> chatters
         ) {
             super(id, title, situation, timestamp);
             this.mails = mails;

@@ -1,16 +1,24 @@
 package laustrup.bandwichpersistence.core.persistence.services;
 
 import laustrup.bandwichpersistence.core.persistence.Field;
+import laustrup.bandwichpersistence.core.persistence.models.ConjunctionTable;
+import laustrup.bandwichpersistence.core.persistence.models.DatabaseTable;
+import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Whereing.Thating;
+import laustrup.bandwichpersistence.core.services.TableAnnotationService;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
 
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
 
 import static java.lang.String.format;
 import static java.lang.String.join;
+import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition.Equation.EQUALS;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition.Equation.IS_NULL;
+import static laustrup.bandwichpersistence.core.services.TableAnnotationService.get_tableTitle;
+import static laustrup.bandwichpersistence.core.services.TableAnnotationService.toAlias;
 
 public class SelectService {
 
@@ -53,6 +61,11 @@ public class SelectService {
                             .orElse("* "),
                     _properties.get_table()
             );
+        }
+
+        public Selecting addJoins(Join... joins) {
+            Arrays.stream(joins).forEach(this::addJoin);
+            return this;
         }
 
         public Selecting addJoin(Join join) {
@@ -103,6 +116,10 @@ public class SelectService {
                 this(table, false, selections, Optional.empty());
             }
 
+            public Properties(String table, boolean distinct, Optional<Thating> that) {
+                this(table, distinct, new Seszt<>(), that);
+            }
+
             public Properties(String table, boolean distinct, Set<Field> selections, Optional<Thating> that) {
                 if (table == null)
                     throw new NullPointerException("table can't be null for selecting properties!");
@@ -121,6 +138,17 @@ public class SelectService {
             }
         }
 
+        public record Table(String title) {
+
+            public Table(Class<?> clazz) {
+                this(get_tableTitle(clazz));
+            }
+
+            public String alias() {
+                return toAlias(title);
+            }
+        }
+
         @Getter
         public static class Join implements ISubSelecting {
 
@@ -130,41 +158,60 @@ public class SelectService {
 
             private final String _alias;
 
-            private final Field _internal;
+            private final Seszt<Product> _products;
 
-            private final Field _external;
+            public Join(Area area, Condition condition) {
+                this(area, condition.get_this().alias(), Seszt.of(Product.of(condition)));
+            }
 
-            public Join(Area area, String table, Field internal, Field external) {
+            public Join(Area area, String table, Seszt<Product> products) {
                 if (area == null)
                     throw  new NullPointerException("area can't be null for selecting properties!");
                 if (table == null)
                     throw new NullPointerException("table can't be null for selecting properties!");
-                if (internal == null)
-                    throw new NullPointerException("internal can't be null for selecting properties!");
-                if (internal.table() == null)
-                    throw new NullPointerException("table can't be null for selecting properties!");
-                if (external == null)
-                    throw new NullPointerException("external can't be null for selecting properties!");
+                if (products == null || products.isEmpty())
+                    throw new IllegalArgumentException("Join needs at least one product!");
+
                 _area = area;
                 _table = table;
-                _alias = internal.table();
-                _internal = internal;
-                _external = external;
+                _alias = TableAnnotationService.toAlias(table);
+                _products = products;
             }
 
-            public static Join of(Area area, String alias, Field internal, Field external) {
-                return new Join(area, alias, internal, external);
+            public static Join left(ConjunctionTable table, Condition... conditions) {
+                return left(table, conditions);
+            }
+
+            public static Join left(DatabaseTable table, Condition... conditions) {
+                return left(table.get_title(), conditions);
+            }
+
+            public static Join left(String table, Condition... condition) {
+                return new Join(Area.LEFT, table, new Seszt<>(Product.of(condition)));
+            }
+
+            public static Join left(String table, Product... products) {
+                return new Join(Area.LEFT, table, new Seszt<>(products));
+            }
+
+            public static Join left(Field internal, Field external) {
+                return new Join(Area.LEFT, Condition.equals(internal, external));
+            }
+
+            public static Join inner(Field internal, Field external) {
+                return new Join(Area.INNER, Condition.equals(internal, external));
             }
 
             @Override
             public String apply() {
                 return format(
-                        /*language=MySQL*/ "%s join %s%s on %s = %s",
+                        /*language=MySQL*/ "%s join %s%s on %s",
                         _area.get_statement(),
                         _table,
                         _alias == null ? "" : " " + _alias,
-                        _internal.get_content(),
-                        _external.get_content()
+                        _products.stream()
+                                .map(Product::apply)
+                                .reduce((a, b) -> String.join(" && ", a, b))
                 );
             }
 
@@ -179,6 +226,26 @@ public class SelectService {
 
                 Area(String statement) {
                     _statement = statement;
+                }
+            }
+
+            public record Product(Seszt<Condition> _conditions) {
+
+                public static Product of(Condition... conditions) {
+                    return new Product(new Seszt<>(conditions));
+                }
+
+                public String apply() {
+                    String statement = _conditions.stream()
+                            .map(Condition::apply)
+                            .reduce((a, b) -> join(" || ", a, b))
+                            .orElse("");
+
+                    return statement.isEmpty() ? "" : (
+                            statement.length() > 0
+                            ? String.format("(%s)", statement)
+                            : statement
+                    );
                 }
             }
         }
@@ -202,7 +269,7 @@ public class SelectService {
 
                 private static Thating _thating;
 
-                public Thating that(Condition condition) {
+                public Thating which(Condition condition) {
                     _thating = new Thating(condition.apply());
                     return _thating;
                 }
@@ -319,6 +386,14 @@ public class SelectService {
                     _equation = equation;
                     _that = null;
                     _thing = null;
+                }
+
+                public static Condition equals(Field thiz, String thing) {
+                    return of(thiz, EQUALS, thing);
+                }
+
+                public static Condition equals(Field thiz, Field that) {
+                    return of(thiz, EQUALS, that);
                 }
 
                 public static Condition of(Field thiz, Equation equation, Field that) {

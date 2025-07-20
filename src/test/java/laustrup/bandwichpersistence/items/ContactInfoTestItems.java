@@ -5,7 +5,6 @@ import laustrup.bandwichpersistence.core.models.users.ContactInfo.Address;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo.Country;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo.Phone;
 import laustrup.bandwichpersistence.core.persistence.Field;
-import laustrup.bandwichpersistence.core.persistence.services.SelectService;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Properties;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
@@ -27,13 +26,13 @@ public class ContactInfoTestItems {
         String table = get_tableTitle(ContactInfo.class);
 
         return new ContactInfo(
-                generateUUID(
-                    table,
-                    selecting(new Properties(
-                            table,
-                            complying().that(Condition.of(Field.of(table, ContactInfo.DTO.Fields.email), EQUALS, email))
-                    ))
-                ),
+                new ContactInfo.Id(generateUUID(
+                        table,
+                        selecting(new Properties(
+                                table,
+                                complying().which(Condition.of(Field.of(table, ContactInfo.DTO.Fields.email), EQUALS, email))
+                        ))
+                )),
                 email,
                 phones,
                 address,
@@ -65,14 +64,14 @@ public class ContactInfoTestItems {
         String table = get_tableTitle(Address.class);
 
         return new Address(
-                generateUUID(
+                new Address.Id(generateUUID(
                         table,
-                        complying().that(Condition.of(
+                        complying().which(Condition.of(
                                 Field.of(table, Address.DTO.Fields.street),
                                 EQUALS,
                                 street
                         ))
-                ),
+                )),
                 street,
                 floor,
                 municipality,
@@ -85,14 +84,14 @@ public class ContactInfoTestItems {
         String table = get_tableTitle(Country.class);
 
         return new Country(
-                generateUUID(
+                new Country.Id(generateUUID(
                         table,
-                        complying().that(Condition.of(
+                        complying().which(Condition.of(
                                 Field.of(table, Country.DTO.Fields.title),
                                 EQUALS,
                                 title
                         ))
-                ),
+                )),
                 title,
                 code
         );

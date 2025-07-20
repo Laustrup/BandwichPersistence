@@ -55,7 +55,7 @@ public class SubscriptionBuilder extends BuilderService<Subscription> {
             );
 
             return new Subscription(
-                    id.get(),
+                    new Subscription.Id(id.get()),
                     status.get(),
                     kind.get(),
                     userType.get()

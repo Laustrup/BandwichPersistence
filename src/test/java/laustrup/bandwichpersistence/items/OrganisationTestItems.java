@@ -28,7 +28,7 @@ public class OrganisationTestItems {
 
     private static Organisation generateIværksted() throws NotImplementedException {
         return new Organisation(
-                randomUUID(),
+                new Organisation.Id(randomUUID()),
                 "Iværksted",
                 new Seszt<>(),
                 new Seszt<>(),

@@ -1,19 +1,21 @@
 package laustrup.bandwichpersistence.core.services;
 
 import laustrup.bandwichpersistence.core.models.Event;
+import laustrup.bandwichpersistence.core.models.identification.Identity;
 import laustrup.bandwichpersistence.core.models.Model;
-import laustrup.bandwichpersistence.core.models.User;
+import laustrup.bandwichpersistence.core.models.identification.Signature;
+import laustrup.bandwichpersistence.core.models.users.User;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import laustrup.bandwichpersistence.core.utilities.console.Printer;
 import lombok.Getter;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import static laustrup.bandwichpersistence.core.services.ObjectService.ifTrue;
 import static laustrup.bandwichpersistence.core.services.StringService.containsAny;
 
 public class ModelService {
@@ -24,23 +26,41 @@ public class ModelService {
             _toStringFieldSplitter = ",\n\t",
             _toStringKeyValueSplitter = ": ";
 
-    public static Model from(Model.ModelDTO model) {
-        return model.getClass() == Event.DTO.class
-                ? new Event((Event.DTO) model)
-                : UserService.from((User.UserDTO) model);
+    public static <IDENTITY extends Identity<SIGNATURE>, SIGNATURE extends Signature<UUID>> Model<IDENTITY, SIGNATURE> from(
+            Model.ModelDTO<IDENTITY, SIGNATURE, UUID> model
+    ) {
+        return ifTrue(model.getClass() == Event.DTO.class,
+                new Event((Event.DTO) model),
+                UserService.from((User.UserDTO) model)
+        );
     }
 
-    public static Model.ModelDTO from(Model model) {
-        return model.getClass() == Event.class
-                ? new Event.DTO((Event) model)
-                : UserService.from((User) model);
+    @SuppressWarnings("unchecked")
+    public static <IDENTITY extends Identity<SIGNATURE>, SIGNATURE extends Signature<?>> Model.ModelDTO<IDENTITY, SIGNATURE, ?> from(
+            Model<IDENTITY, SIGNATURE> model
+    ) {
+        return ifTrue(model.getClass() == Event.class,
+                new Event.DTO((Event) model),
+                UserService.from((User) model)
+        );
     }
 
-    public static String defineToString(String title, UUID id, String[] keys, String[] values) {
+    public static <SIGNATURE extends Signature<?>> String defineToString(
+            String title,
+            Identity<SIGNATURE> id,
+            String[] keys,
+            String[] values
+    ) {
         return defineToString(title, id, null, keys, values);
     }
 
-    public static String defineToString(String title, UUID primaryId, UUID secondaryId, String[] keys, String[] values) {
+    public static <SIGNATURE extends Signature<?>> String defineToString(
+            String title,
+            Identity<SIGNATURE> primaryId,
+            Identity<SIGNATURE> secondaryId,
+            String[] keys,
+            String[] values
+    ) {
         StringBuilder content = new StringBuilder();
 
         try {
@@ -64,25 +84,25 @@ public class ModelService {
         return title + "(\n \t" + content + "\n)";
     }
 
-    public static UUID getId(Model model) {
+    public static <IDENTITY extends Identity<SIGNATURE>, SIGNATURE extends Signature<?>> Identity.Identifier<Signature<UUID>> getId(Model<IDENTITY, SIGNATURE> model) {
         return getId(model.toString());
     }
 
-    public static Stream<UUID> getIds(Model model) {
+    public static <IDENTITY extends Identity<SIGNATURE>, SIGNATURE extends Signature<?>> Stream<Identity.Identifier<Signature<UUID>>> getIds(Model<IDENTITY, SIGNATURE> model) {
         return getIds(model.toString());
     }
 
-    public static UUID getId(String toString) {
+    public static Identity.Identifier<Signature<UUID>> getId(String toString) {
         return handleGetIds(toString, false)
                 .findFirst()
                 .orElse(null);
     }
 
-    public static Stream<UUID> getIds(String toString) {
+    public static Stream<Identity.Identifier<Signature<UUID>>> getIds(String toString) {
         return handleGetIds(toString, true);
     }
 
-    public static Stream<UUID> handleGetIds(String toString, boolean isPlural) {
+    public static Stream<Identity.Identifier<Signature<UUID>>> handleGetIds(String toString, boolean isPlural) {
         boolean isValue = false;
         StringBuilder
                 store = new StringBuilder(),
@@ -112,7 +132,7 @@ public class ModelService {
 
         return Arrays.stream(idValues(value.toString())
                 .split(separator))
-                .map(UUID::fromString);
+                .map(string -> Identity.Identifier.of(Signature.UUID.fromString(string)));
     }
 
     private static String idValues(String value) {
@@ -134,7 +154,7 @@ public class ModelService {
     }
 
     public static boolean equals(Object object, Object other) {
-        List<UUID>
+        List<Identity.Identifier<Signature<UUID>>>
                 objectIds = getIds(object.toString()).toList(),
                 otherIds = getIds(other.toString()).toList();
 

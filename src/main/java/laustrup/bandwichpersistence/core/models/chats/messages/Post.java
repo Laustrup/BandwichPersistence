@@ -4,7 +4,10 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import laustrup.bandwichpersistence.core.models.Model;
-import laustrup.bandwichpersistence.core.models.User;
+import laustrup.bandwichpersistence.core.models.identification.Identity;
+import laustrup.bandwichpersistence.core.models.identification.Signature;
+import laustrup.bandwichpersistence.core.models.users.User;
+import laustrup.bandwichpersistence.core.models.identification.CommonIdentity;
 import laustrup.bandwichpersistence.core.services.ModelService;
 import lombok.Getter;
 import lombok.experimental.FieldNameConstants;
@@ -18,26 +21,23 @@ import static laustrup.bandwichpersistence.core.services.ModelService.from;
  * A kind of post that can be posted at any Model Object.
  */
 @Getter
-public class Post extends MessageBase {
+public class Post extends MessageBase<Post.Id> {
 
-    /**
-     * The Model receiver that are having the Bulletin posted at its dashboard.
-     */
-    public Model _receiver;
+    public Model<? extends Identity<?>, ?> _receiver;
 
     /**
      * Will translate a transport object of this object into a construct of this object.
      * @param post The transport object to be transformed.
      */
     public Post(DTO post) {
-        super(post);
+        super(post, new Id(new Signature.UUID(post.getId())));
         _receiver = from(post);
     }
 
     public Post(
-            UUID id,
-            User author,
-            Model receiver,
+            Id id,
+            User<?> author,
+            Model<? extends Identity<?>, ?> receiver,
             String content,
             Instant isSent,
             boolean isEdited,
@@ -48,19 +48,35 @@ public class Post extends MessageBase {
         _receiver = receiver;
     }
 
+    public static class Id extends CommonIdentity<Signature.UUID> {
+
+        public Id(Signature.UUID signature) {
+            super(signature);
+        }
+
+        public Id(java.util.UUID id) {
+            super(new Signature.UUID(id));
+        }
+
+        @Override
+        public Class<?> getOwnerClassType() {
+            return Post.class;
+        }
+    }
+
     @Override
     public String toString() {
         return defineToString(
             getClass().getSimpleName(),
             new String[]{
-                Model.Fields._id,
+                Model.Fields._identity,
                 MessageBase.Fields._content,
                 MessageBase.Fields._sent,
                 MessageBase.Fields._edited,
                 Model.Fields._timestamp
             },
             new String[]{
-                String.valueOf(_id),
+                String.valueOf(_identity),
                 _content,
                 String.valueOf(_sent),
                 String.valueOf(_edited),
@@ -75,24 +91,21 @@ public class Post extends MessageBase {
      * Doesn't have any logic.
      */
     @Getter @FieldNameConstants @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class DTO extends MessageBase.DTO {
+    public static class DTO extends MessageBase.DTO<Post.Id> {
 
-        /**
-         * The Model that are receiving this Bulletin.
-         */
-        public ModelDTO receiver;
+        public ModelDTO<Identity<Signature<?>>, Signature<?>, ?> receiver;
 
         @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
         public DTO(
                 @JsonProperty UUID id,
                 @JsonProperty String title,
                 @JsonProperty Instant timestamp,
-                @JsonProperty User.UserDTO author,
+                @JsonProperty User.UserDTO<? extends User.Id> author,
                 @JsonProperty String content,
                 @JsonProperty Instant sent,
                 @JsonProperty boolean isEdited,
                 @JsonProperty Instant read,
-                @JsonProperty ModelDTO receiver
+                @JsonProperty ModelDTO<Identity<Signature<?>>, Signature<?>, ?> receiver
         ) {
             super(id, title, timestamp, author, content, sent, isEdited, read);
             this.receiver = receiver;
@@ -104,7 +117,7 @@ public class Post extends MessageBase {
          */
         public DTO(Post post) {
             super(post);
-            receiver = ModelService.from(post.get_receiver());
+            receiver = (ModelDTO<Identity<Signature<?>>, Signature<?>, ?>) ModelService.from(post.get_receiver());
         }
     }
 }

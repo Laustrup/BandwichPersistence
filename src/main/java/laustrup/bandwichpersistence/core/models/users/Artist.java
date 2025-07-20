@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import laustrup.bandwichpersistence.core.models.*;
 import laustrup.bandwichpersistence.core.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.core.models.chats.Request;
+import laustrup.bandwichpersistence.core.models.identification.Signature;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,11 +14,10 @@ import lombok.experimental.FieldNameConstants;
 
 import java.time.Instant;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
-@Getter @FieldNameConstants
-public class Artist extends BusinessUser {
+@Getter @FieldNameConstants @Table(title = "artists")
+public class Artist extends BusinessUser<Artist.Id> {
 
     /**
      * The Bands that the Artist is a member of.
@@ -49,7 +49,7 @@ public class Artist extends BusinessUser {
      */
     public Artist(DTO artist) {
         this(
-                artist.getId(),
+                new Artist.Id(artist.getId()),
                 artist.getUsername(),
                 artist.getFirstName(),
                 artist.getLastName(),
@@ -72,7 +72,7 @@ public class Artist extends BusinessUser {
     }
 
     public Artist(
-            UUID id,
+            Artist.Id id,
             String username,
             String firstName,
             String lastName,
@@ -93,7 +93,7 @@ public class Artist extends BusinessUser {
             Instant timestamp
     ) {
         super(
-            id,
+                id,
                 username,
                 firstName,
                 lastName,
@@ -134,18 +134,34 @@ public class Artist extends BusinessUser {
         return _requests.remove(new Request[]{request});
     }
 
+    public static class Id extends User.Id {
+
+        public Id(Signature.UUID identifier) {
+            super(identifier);
+        }
+
+        public Id(java.util.UUID identifier) {
+            super(identifier);
+        }
+
+        @Override
+        public Class<?> getOwnerClassType() {
+            return User.Id.class;
+        }
+    }
+
     @Override
     public String toString() {
         return defineToString(
             getClass().getSimpleName(),
             new String[] {
-                Model.Fields._id,
+                Model.Fields._identity,
                 User.Fields._username,
                 User.Fields._description,
                 Model.Fields._timestamp
             },
             new String[] {
-                String.valueOf(get_id()),
+                String.valueOf(get_identity()),
                 get_username(),
                 get_description(),
                 String.valueOf(get_timestamp())
@@ -159,7 +175,7 @@ public class Artist extends BusinessUser {
      */
     @Getter @Setter @FieldNameConstants
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class DTO extends BusinessUserDTO {
+    public static class DTO extends BusinessUserDTO<Artist.Id> {
 
         /**
          * The Bands that the Artist is a member of.
@@ -193,7 +209,7 @@ public class Artist extends BusinessUser {
 
         @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
         public DTO(
-                @JsonProperty UUID id,
+                @JsonProperty java.util.UUID id,
                 @JsonProperty String username,
                 @JsonProperty String firstName,
                 @JsonProperty String lastName,
@@ -239,7 +255,7 @@ public class Artist extends BusinessUser {
         }
     }
 
-    @Getter
+    @Getter @Table(title = "band_memberships")
     public static class Membership {
 
         private Band _band;

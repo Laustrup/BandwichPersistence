@@ -3,6 +3,7 @@ package laustrup.bandwichpersistence.core.models.chats;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import laustrup.bandwichpersistence.core.models.*;
+import laustrup.bandwichpersistence.core.models.users.User;
 import laustrup.bandwichpersistence.core.services.ModelService;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,8 +11,6 @@ import lombok.experimental.FieldNameConstants;
 
 import java.time.Instant;
 import java.util.UUID;
-
-import static laustrup.bandwichpersistence.core.services.UserService.fromBusinessUser;
 
 /**
  * Determines if a User have approved to be a part of the Event.
@@ -22,9 +21,9 @@ public class Request {
     /**
      * The User that needs to approve the Event.
      */
-    private UUID _receiverId;
+    private User.Id _receiverId;
 
-    private UUID _senderId;
+    private User.Id _senderId;
 
     /**
      * The Event that has been requested for.
@@ -70,8 +69,8 @@ public class Request {
      */
     public Request(DTO request) {
         this(
-                request.getReceiverId(),
-                request.getSenderId(),
+                new User.Id(request.getReceiverId()),
+                new User.Id(request.getSenderId()),
                 new Event(request.getEvent()),
                 request.getApproved(),
                 request.getTimestamp()
@@ -79,8 +78,8 @@ public class Request {
     }
 
     public Request(
-            UUID receiver,
-            UUID sender,
+            User.Id receiver,
+            User.Id sender,
             Event event,
             Instant approved,
             Instant timestamp
@@ -116,8 +115,8 @@ public class Request {
         );
     }
 
-    public UUID get_eventId() {
-        return _event.get_id();
+    public Event.Id get_eventId() {
+        return _event.get_identity();
     }
 
     /** Determines if a User have approved to be a part of the Event. */
@@ -157,8 +156,8 @@ public class Request {
          * @param request The Object to be converted.
          */
         public DTO(Request request) {
-            receiverId = request.get_receiverId();
-            senderId = request.get_senderId();
+            receiverId = request.get_receiverId().get_value();
+            senderId = request.get_senderId().get_value();
             event = new Event.DTO(request.get_event());
             approved = request.get_approved();
             timestamp = request.get_timestamp();

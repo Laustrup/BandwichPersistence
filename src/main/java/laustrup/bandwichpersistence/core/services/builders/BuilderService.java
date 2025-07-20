@@ -18,7 +18,7 @@ import java.util.logging.Logger;
 
 abstract class BuilderService<E> {
 
-    private final Class<E> _class;
+    private static String _class;
 
     private final String _tableName;
 
@@ -27,22 +27,27 @@ abstract class BuilderService<E> {
     private static final Seszt<Character> pluralEndingCharacters = new Seszt<>(new Character[]{'y'});
 
     protected BuilderService(Class<E> clazz, Logger logger) {
+        this(clazz.getSimpleName(), logger);
+    }
+
+    protected BuilderService(String clazz, Logger logger) {
         _class = clazz;
         _tableName = toTableName(clazz);
         _logger = logger;
     }
 
     protected BuilderService(Class<E> clazz, String tableName, Logger logger) {
-        _class = clazz;
+        _class = clazz.getSimpleName();
         _tableName = toTableName(tableName);
         _logger = logger;
     }
 
     protected BuilderService(Class<E> clazz, Supplier<String> tableName, Logger logger) {
-        _class = clazz;
+        _class = clazz.getSimpleName();
         _tableName = tableName.get();
         _logger = logger;
     }
+
     protected static String classToTableName(Class<?>... classes) {
         return classToTableName(Arrays.stream(classes).map(Class::getSimpleName).toArray(String[]::new));
     }
@@ -74,7 +79,7 @@ abstract class BuilderService<E> {
     }
 
     protected <M> void printError(M id, Exception exception) throws RuntimeException {
-        printError(_class.getSimpleName(), id, exception, _logger);
+        printError(_class, id, exception, _logger);
     }
 
     protected E handle(Function<Function<String, Field>, E> action) {

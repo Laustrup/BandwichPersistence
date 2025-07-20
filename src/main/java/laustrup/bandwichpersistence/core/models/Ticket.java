@@ -2,6 +2,10 @@ package laustrup.bandwichpersistence.core.models;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import laustrup.bandwichpersistence.core.models.identification.CommonIdentity;
+import laustrup.bandwichpersistence.core.models.identification.Identity;
+import laustrup.bandwichpersistence.core.models.identification.Signature;
+import laustrup.bandwichpersistence.core.models.users.User;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,7 +15,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Set;
-import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static laustrup.bandwichpersistence.core.services.ModelService.defineToString;
 import static laustrup.bandwichpersistence.core.utilities.collections.Seszt.copy;
@@ -23,9 +27,9 @@ import static laustrup.bandwichpersistence.core.utilities.collections.Seszt.copy
 @FieldNameConstants
 public class Ticket extends TicketBase {
 
-    private UUID _userId;
+    private User.Id _userId;
 
-    private UUID _eventId;
+    private Event.Id _eventId;
 
     private String _seat;
 
@@ -39,7 +43,7 @@ public class Ticket extends TicketBase {
     /**
      * The option that this ticket was created from.
      */
-    private UUID _optionId;
+    private Identity<Signature.UUID> _optionId;
 
     /**
      * Converts a Data Transport Object into this object.
@@ -47,29 +51,29 @@ public class Ticket extends TicketBase {
      */
     public Ticket(DTO ticket) {
         this(
-                ticket.getUserId(),
-                ticket.getEventId(),
+                new User.Id(ticket.getUserId()),
+                new Event.Id(ticket.getEventId()),
                 ticket.getSeat(),
                 ticket.getPrice(),
                 ticket.getValuta(),
                 ticket.getArrived(),
                 ticket.isSitting(),
                 copy(ticket.getAreas(), area -> area),
-                ticket.getOptionId(),
+                new Option.Id(ticket.getOptionId()),
                 ticket.getTimestamp()
         );
     }
 
     public Ticket(
-            UUID userId,
-            UUID eventId,
+            User.Id userId,
+            Event.Id eventId,
             String seat,
             BigDecimal price,
             String valuta,
             LocalDateTime arrived,
             boolean isSitting,
             Seszt<String> areas,
-            UUID optionId,
+            Identity<Signature.UUID> optionId,
             Instant timestamp
     ) {
         super(
@@ -113,9 +117,9 @@ public class Ticket extends TicketBase {
     @FieldNameConstants
     public static class DTO extends TicketBase.DTO {
 
-        private UUID userId;
+        private java.util.UUID userId;
 
-        private UUID eventId;
+        private java.util.UUID eventId;
 
         private String seat;
 
@@ -128,7 +132,7 @@ public class Ticket extends TicketBase {
         /**
          * The option that this ticket was created from.
          */
-        private UUID optionId;
+        private java.util.UUID optionId;
 
         @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
         public DTO(
@@ -137,11 +141,11 @@ public class Ticket extends TicketBase {
                 @JsonProperty boolean isSitting,
                 @JsonProperty Set<String> areas,
                 @JsonProperty Instant timestamp,
-                @JsonProperty UUID userId,
-                @JsonProperty UUID eventId,
+                @JsonProperty java.util.UUID userId,
+                @JsonProperty java.util.UUID eventId,
                 @JsonProperty String seat,
                 @JsonProperty LocalDateTime arrived,
-                @JsonProperty UUID optionId
+                @JsonProperty java.util.UUID optionId
         ) {
             super(price, valuta, isSitting, areas, timestamp);
             this.userId = userId;
@@ -158,10 +162,10 @@ public class Ticket extends TicketBase {
         public DTO(Ticket ticket) {
             super(ticket);
             seat = ticket.get_seat();
-            userId = ticket.get_userId();
-            eventId = ticket.get_eventId();
+            userId = ticket.get_userId().get_value();
+            eventId = ticket.get_eventId().get_value();
             arrived = ticket.get_arrived();
-            optionId = ticket.get_optionId();
+            optionId = ticket.get_optionId().get_value();
         }
     }
 
@@ -172,16 +176,16 @@ public class Ticket extends TicketBase {
     @FieldNameConstants
     public static class Option extends TicketBase {
 
-        private UUID _id;
+        private Id _id;
 
-        private UUID _eventId;
+        private Event.Id _eventId;
 
         private String _title;
 
         /**
          * This venue is the owner of this option and can reuse them for events.
          */
-        private UUID _venueId;
+        private Venue.Id _venueId;
 
         /**
          * Will translate a transport object of this object into a construct of this object.
@@ -189,9 +193,9 @@ public class Ticket extends TicketBase {
          */
         public Option(DTO ticketOption) {
             this(
-                    ticketOption.getId(),
-                    ticketOption.getEventId(),
-                    ticketOption.getVenueId(),
+                    new Id(ticketOption.getId()),
+                    new Event.Id(ticketOption.getEventId()),
+                    new Venue.Id(ticketOption.getVenueId()),
                     ticketOption.getTitle(),
                     ticketOption.getPrice(),
                     ticketOption.getValuta(),
@@ -202,9 +206,9 @@ public class Ticket extends TicketBase {
         }
 
         public Option(
-                UUID id,
-                UUID eventId,
-                UUID venueId,
+                Id id,
+                Event.Id eventId,
+                Venue.Id venueId,
                 String title,
                 BigDecimal price,
                 String valuta,
@@ -225,7 +229,7 @@ public class Ticket extends TicketBase {
             _title = title;
         }
 
-        public Ticket toTicket(UUID userId, String seat) {
+        public Ticket toTicket(User.Id userId, String seat) {
             return new Ticket(
                     userId,
                     get_eventId(),
@@ -240,13 +244,29 @@ public class Ticket extends TicketBase {
             );
         }
 
+        public static class Id extends CommonIdentity<Signature.UUID> {
+
+            public Id(Signature.UUID signature) {
+                super(signature);
+            }
+
+            public Id(java.util.UUID signature) {
+                super(new Signature.UUID(signature));
+            }
+
+            @Override
+            public Class<Option> getOwnerClassType() {
+                return Option.class;
+            }
+        }
+
         @Override
         public String toString() {
             return defineToString(
                     getClass().getSimpleName(),
                     get_id(),
                     new String[]{
-                            Model.Fields._id,
+                            Model.Fields._identity,
                             Model.Fields._title,
                             TicketBase.Fields._price,
                             Model.Fields._timestamp
@@ -269,17 +289,17 @@ public class Ticket extends TicketBase {
         @FieldNameConstants
         public static class DTO extends TicketBase.DTO {
 
-            private UUID id;
+            private java.util.UUID id;
 
             /**
              * The events that this is configured for.
              */
-            private UUID eventId;
+            private java.util.UUID eventId;
 
             /**
              * The venue that is the owner of this option and can reuse them for events.
              */
-            private UUID venueId;
+            private java.util.UUID venueId;
 
 
             private String title;
@@ -290,9 +310,9 @@ public class Ticket extends TicketBase {
                     @JsonProperty String valuta,
                     @JsonProperty boolean isSitting,
                     @JsonProperty Seszt<String> areas,
-                    @JsonProperty UUID id,
-                    @JsonProperty UUID eventId,
-                    @JsonProperty UUID venueId,
+                    @JsonProperty java.util.UUID id,
+                    @JsonProperty java.util.UUID eventId,
+                    @JsonProperty java.util.UUID venueId,
                     @JsonProperty String title,
                     @JsonProperty Instant timestamp
             ) {
@@ -315,8 +335,8 @@ public class Ticket extends TicketBase {
              */
             public DTO(Ticket.Option ticketOption) {
                 super(ticketOption);
-                eventId = ticketOption.get_eventId();
-                venueId = ticketOption.get_venueId();
+                eventId = ticketOption.get_eventId().get_value();
+                venueId = ticketOption.get_venueId().get_value();
                 title = ticketOption.get_title();
             }
         }
@@ -327,13 +347,13 @@ public class Ticket extends TicketBase {
             /**
              * The events that this is configured for.
              */
-            private Seszt<UUID> _eventIds;
+            private Seszt<Event.Id> _eventIds;
 
             private String _title;
 
             public Template(DTO template) {
                 this(
-                        copy(template.getEventIds(), id -> id),
+                        copy(template.getEventIds(), id -> new Event.Id(id)),
                         template.getTitle(),
                         template.getPrice(),
                         template.getValuta(),
@@ -344,7 +364,7 @@ public class Ticket extends TicketBase {
             }
 
             public Template(
-                    Seszt<UUID> eventIds,
+                    Seszt<Event.Id> eventIds,
                     String title,
                     BigDecimal price,
                     String valuta,
@@ -360,13 +380,13 @@ public class Ticket extends TicketBase {
             @Getter
             public static class DTO extends TicketBase.DTO {
 
-                private Set<UUID> eventIds;
+                private Set<java.util.UUID> eventIds;
 
                 private String title;
 
                 public DTO(Template template) {
                     super(template);
-                    eventIds = template.get_eventIds().asSet();
+                    eventIds = template.get_eventIds().asSet(Identity::get_value);
                     title = template.get_title();
                 }
             }

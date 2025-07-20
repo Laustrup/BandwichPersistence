@@ -3,6 +3,7 @@ package laustrup.bandwichpersistence.core.services.builders;
 import laustrup.bandwichpersistence.core.models.Event;
 import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.models.chats.Request;
+import laustrup.bandwichpersistence.core.models.users.User;
 import laustrup.bandwichpersistence.core.persistence.Field;
 
 import java.sql.ResultSet;
@@ -63,8 +64,8 @@ public class RequestBuilder extends BuilderService<Request> {
             );
 
             return new Request(
-                    receiverId.get(),
-                    senderId.get(),
+                    new User.Id(receiverId.get()),
+                    new User.Id(senderId.get()),
                     event.get(),
                     approved.get(),
                     timestamp.get()

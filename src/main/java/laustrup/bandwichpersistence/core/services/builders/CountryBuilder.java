@@ -57,7 +57,7 @@ public class CountryBuilder extends BuilderService<ContactInfo.Country> {
             );
 
             return new ContactInfo.Country(
-                    id.get(),
+                    new ContactInfo.Country.Id(id.get()),
                     title.get(),
                     code.get()
             );

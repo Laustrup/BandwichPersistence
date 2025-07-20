@@ -5,6 +5,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import laustrup.bandwichpersistence.core.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.core.models.chats.Request;
+import laustrup.bandwichpersistence.core.models.identification.CommonIdentity;
+import laustrup.bandwichpersistence.core.models.identification.Signature;
+import laustrup.bandwichpersistence.core.models.users.BusinessUser;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
 import laustrup.bandwichpersistence.core.persistence.Table;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
@@ -14,12 +17,11 @@ import lombok.experimental.FieldNameConstants;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 import static laustrup.bandwichpersistence.core.utilities.collections.Seszt.copy;
 
 @Getter @laustrup.bandwichpersistence.core.models.Table(title = "organisations")
-public class Organisation extends Model {
+public class Organisation extends Model<Organisation.Id, Signature.UUID> {
 
     public static final Table TABLE = new Table(Organisation.class.getSimpleName() + "s");
 
@@ -39,7 +41,7 @@ public class Organisation extends Model {
 
     public Organisation(DTO organisation) {
         this(
-                organisation.getId(),
+                new Id(organisation.getId()),
                 organisation.getTitle(),
                 copy(organisation.getEvents(),Event::new),
                 copy(organisation.getVenues(), Venue::new),
@@ -53,7 +55,7 @@ public class Organisation extends Model {
     }
 
     public Organisation(
-            UUID id,
+            Id id,
             String title,
             Seszt<Event> events,
             Seszt<Venue> venues,
@@ -74,8 +76,24 @@ public class Organisation extends Model {
         _employees = employees;
     }
 
+    public static class Id extends CommonIdentity<Signature.UUID> {
+
+        public Id(Signature.UUID signature) {
+            super(signature);
+        }
+
+        public Id(java.util.UUID signature) {
+            super(new Signature.UUID(signature));
+        }
+
+        @Override
+        public Class<?> getOwnerClassType() {
+            return Organisation.class;
+        }
+    }
+
     @Getter @FieldNameConstants @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class DTO extends ModelDTO {
+    public static class DTO extends ModelDTO<Organisation.Id, Signature.UUID, java.util.UUID> {
 
         private Set<Request.DTO> requests;
 
@@ -93,7 +111,7 @@ public class Organisation extends Model {
 
         @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
         public DTO(
-                @JsonProperty UUID id,
+                @JsonProperty java.util.UUID id,
                 @JsonProperty String title,
                 @JsonProperty Instant timestamp,
                 @JsonProperty Set<Request.DTO> requests,
@@ -129,13 +147,14 @@ public class Organisation extends Model {
     @Getter
     @laustrup.bandwichpersistence.core.models.Table(title = "organisation_employees")
     @FieldNameConstants
-    public static class Employee extends BusinessUser {
+    public static class Employee extends BusinessUser<Employee.Id> {
 
+        @laustrup.bandwichpersistence.core.models.Table(title = "organisation_employments")
         private Seszt<Role> _roles;
 
         public Employee(DTO employee) {
             this(
-                    employee.getId(),
+                    new Employee.Id(employee.getId()),
                     employee.getUsername(),
                     employee.getFirstName(),
                     employee.getLastName(),
@@ -152,7 +171,7 @@ public class Organisation extends Model {
         }
 
         public Employee(
-                UUID id,
+                Id id,
                 String username,
                 String firstName,
                 String lastName,
@@ -189,14 +208,30 @@ public class Organisation extends Model {
             LEADER
         }
 
+        public static class Id extends BusinessUser.Id {
+
+            public Id(Signature.UUID identifier) {
+                super(identifier);
+            }
+
+            public Id(java.util.UUID identifier) {
+                super(identifier);
+            }
+
+            @Override
+            public Class<Organisation.Employee> getOwnerClassType() {
+                return Organisation.Employee.class;
+            }
+        }
+
         @Getter @FieldNameConstants
-        public static class DTO extends BusinessUserDTO {
+        public static class DTO extends BusinessUserDTO<Employee.Id> {
 
             private Set<Role> roles;
 
             @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
             public DTO(
-                    @JsonProperty UUID id,
+                    @JsonProperty java.util.UUID id,
                     @JsonProperty String username,
                     @JsonProperty String firstName,
                     @JsonProperty String lastName,

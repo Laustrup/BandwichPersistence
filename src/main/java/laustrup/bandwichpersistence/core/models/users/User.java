@@ -1,10 +1,13 @@
-package laustrup.bandwichpersistence.core.models;
+package laustrup.bandwichpersistence.core.models.users;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import laustrup.bandwichpersistence.core.models.users.ContactInfo;
+import laustrup.bandwichpersistence.core.models.*;
+import laustrup.bandwichpersistence.core.models.identification.CommonIdentity;
+import laustrup.bandwichpersistence.core.models.identification.Identity;
 import laustrup.bandwichpersistence.core.models.chats.ChatRoom;
+import laustrup.bandwichpersistence.core.models.identification.Signature;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,7 +17,6 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 /**
  * An abstract class, which is meant to be extended to a user type of object.
@@ -22,7 +24,7 @@ import java.util.UUID;
  * Can calculate full name from first- and last name.
  */
 @Getter @FieldNameConstants
-public abstract class User extends Model {
+public abstract class User<IDENTITY extends User.Id> extends Model<IDENTITY, Signature.UUID> {
 
     /**
      * The title of the user, that the user uses to use as a title for the profile.
@@ -75,9 +77,9 @@ public abstract class User extends Model {
      * Will translate a transport object of this object into a construct of this object.
      * @param user The transport object to be transformed.
      */
-    public User(UserDTO user) {
+    public User(UserDTO<IDENTITY> user, IDENTITY identity) {
         this(
-                user.getId(),
+                identity,
                 user.getUsername(),
                 user.getFirstName(),
                 user.getLastName(),
@@ -92,7 +94,7 @@ public abstract class User extends Model {
     }
 
     public User(
-            UUID id,
+            IDENTITY id,
             String username,
             String firstName,
             String lastName,
@@ -104,11 +106,7 @@ public abstract class User extends Model {
             History history,
             Instant timestamp
     ) {
-        super(
-                id,
-                username + "-" + id,
-                timestamp
-        );
+        super(id, username + "-" + id, timestamp);
         _username = username;
         _firstName = firstName;
         _lastName = lastName;
@@ -201,6 +199,23 @@ public abstract class User extends Model {
         return _participations;
     }
 
+    public static class Id extends CommonIdentity<Signature.UUID> {
+
+        public Id(Signature.UUID identifier) {
+            super(identifier);
+        }
+
+        public Id(java.util.UUID identifier) {
+            super(new Signature.UUID(identifier));
+        }
+
+        @Override
+        public Class<?> getOwnerClassType() {
+            return User.class;
+        }
+    }
+
+    @Table(title = "authorities")
     public enum Authority {
         STANDARD,
         ADMIN
@@ -228,8 +243,8 @@ public abstract class User extends Model {
             _event = event;
         }
 
-        public UUID get_eventId() {
-            return _event.get_id();
+        public Event.Id get_eventId() {
+            return _event.get_identity();
         }
 
         @Getter @FieldNameConstants @JsonIgnoreProperties(ignoreUnknown = true)
@@ -264,7 +279,7 @@ public abstract class User extends Model {
      */
     @Getter @Setter @FieldNameConstants
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public abstract static class UserDTO extends ModelDTO {
+    public abstract static class UserDTO<IDENTITY extends Identity<Signature.UUID>> extends ModelDTO<IDENTITY, Signature.UUID, java.util.UUID> {
 
         /**
          * The title of the user, that the user uses to use as a title for the profile.
@@ -323,7 +338,7 @@ public abstract class User extends Model {
         protected History history;
 
         public UserDTO(
-                UUID id,
+                java.util.UUID id,
                 String username,
                 String firstName,
                 String lastName,
@@ -350,9 +365,9 @@ public abstract class User extends Model {
             this.timestamp = timestamp;
         }
 
-        public UserDTO(User user) {
+        public UserDTO(User<?> user) {
             this(
-                    user.get_id(),
+                    user.get_identity().get_value(),
                     user.get_username(),
                     user.get_firstName(),
                     user.get_lastName(),

@@ -1,7 +1,7 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.Model;
-import laustrup.bandwichpersistence.core.models.User;
+import laustrup.bandwichpersistence.core.models.users.User;
 import laustrup.bandwichpersistence.core.models.chats.messages.Message;
 import laustrup.bandwichpersistence.core.models.chats.messages.MessageBase;
 import laustrup.bandwichpersistence.core.persistence.Field;
@@ -29,6 +29,8 @@ public class MessageBuilder extends BuilderService<Message> {
         return _instance;
     }
 
+    private static UserBuilder _userBuilder = UserBuilder.get_instance();
+
     private MessageBuilder() {
         super(Message.class, _logger);
     }
@@ -42,7 +44,7 @@ public class MessageBuilder extends BuilderService<Message> {
     protected Function<Function<String, Field>, Message> logic(ResultSet resultSet) {
         return table -> {
             AtomicReference<UUID> id = new AtomicReference<>();
-            AtomicReference<User> author = new AtomicReference<>();
+            AtomicReference<User<? extends User.Id>> author = new AtomicReference<>();
             AtomicReference<String> content = new AtomicReference<>();
             AtomicReference<Instant>
                     isSent = new AtomicReference<>(),
@@ -54,7 +56,7 @@ public class MessageBuilder extends BuilderService<Message> {
                     resultSet,
                     () -> {
                         set(id, table.apply(Model.ModelDTO.Fields.id));
-                        UserBuilder.get_instance().complete(author, resultSet);
+                        _userBuilder.complete(author, resultSet);
                         set(content, table.apply(MessageBase.Fields._content));
                         set(isSent, table.apply(MessageBase.Fields._sent));
                         set(isRead, table.apply(MessageBase.Fields._read));
@@ -65,7 +67,7 @@ public class MessageBuilder extends BuilderService<Message> {
             );
 
             return new Message(
-                    id.get(),
+                    new Message.Id(id.get()),
                     author.get(),
                     content.get(),
                     isSent.get(),

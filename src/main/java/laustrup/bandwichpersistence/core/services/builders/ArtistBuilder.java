@@ -5,7 +5,8 @@ import laustrup.bandwichpersistence.core.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.core.models.chats.Request;
 import laustrup.bandwichpersistence.core.models.users.Artist;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
-import laustrup.bandwichpersistence.core.models.users.Follow;
+import laustrup.bandwichpersistence.core.models.Follow;
+import laustrup.bandwichpersistence.core.models.users.User;
 import laustrup.bandwichpersistence.core.persistence.Field;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 
@@ -113,8 +114,8 @@ public class ArtistBuilder extends BuilderService<Artist> {
                         set(runner, table.apply(Artist.DTO.Fields.runner));
                         combine(follows, new Follow(
                                 getBoolean(Follow.DTO.Fields.notify),
-                                getUUID(Follow.DTO.Fields.followerId),
-                                getUUID(Follow.DTO.Fields.followedId)
+                                new User.Id(getUUID(Follow.DTO.Fields.followerId)),
+                                new User.Id(getUUID(Follow.DTO.Fields.followedId))
                         ));
                         combine(requests, _requestBuilder.build(resultSet));
                         combine(ratings, _venueRatingBuilder.build(resultSet));
@@ -125,7 +126,7 @@ public class ArtistBuilder extends BuilderService<Artist> {
             );
 
             return new Artist(
-                    id.get(),
+                    new Artist.Id(id.get()),
                     username.get(),
                     firstName.get(),
                     lastName.get(),

@@ -1,7 +1,9 @@
 package laustrup.bandwichpersistence.core.models.chats.messages;
 
+import laustrup.bandwichpersistence.core.models.identification.Identity;
 import laustrup.bandwichpersistence.core.models.Model;
-import laustrup.bandwichpersistence.core.models.User;
+import laustrup.bandwichpersistence.core.models.identification.Signature;
+import laustrup.bandwichpersistence.core.models.users.User;
 import laustrup.bandwichpersistence.core.services.UserService;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,19 +12,19 @@ import lombok.experimental.FieldNameConstants;
 import java.time.Instant;
 import java.util.UUID;
 
-import static laustrup.bandwichpersistence.core.models.User.UserDTO;
+import static laustrup.bandwichpersistence.core.models.users.User.UserDTO;
 
 /**
  * An abstract class that contains common attributes for Messages.
  */
 @Getter @FieldNameConstants
-public abstract class MessageBase extends Model {
+public abstract class MessageBase<IDENTITY extends Identity<Signature.UUID>> extends Model<IDENTITY, Signature.UUID> {
 
     /**
      * The User that wrote the Message.
      */
     @Getter
-    protected User _author;
+    protected User<? extends User.Id> _author;
 
     /**
      * The content of the written Message.
@@ -47,9 +49,9 @@ public abstract class MessageBase extends Model {
      * Converts a Data Transport Object into this object.
      * @param message The Data Transport Object that will be converted.
      */
-    public MessageBase(DTO message) {
+    public MessageBase(DTO<IDENTITY> message, IDENTITY id) {
         this(
-                message.getId(),
+                id,
                 UserService.from(message.getAuthor()),
                 message.getContent(),
                 message.getSent(),
@@ -60,8 +62,8 @@ public abstract class MessageBase extends Model {
     }
 
     public MessageBase(
-            UUID id,
-            User author,
+            IDENTITY id,
+            User<? extends User.Id> author,
             String content,
             Instant sent,
             boolean isEdited,
@@ -109,12 +111,12 @@ public abstract class MessageBase extends Model {
      * An abstract class that contains common attributes for Messages.
      */
     @Getter @FieldNameConstants
-    public abstract static class DTO extends ModelDTO {
+    public abstract static class DTO<IDENTITY extends Identity<Signature.UUID>> extends ModelDTO<IDENTITY, Signature.UUID, UUID> {
 
         /**
          * The User that wrote the Message.
          */
-        protected UserDTO author;
+        protected UserDTO<? extends User.Id> author;
 
         /**
          * The content of the written Message.
@@ -137,7 +139,7 @@ public abstract class MessageBase extends Model {
                 UUID id,
                 String title,
                 Instant timestamp,
-                UserDTO author,
+                UserDTO<? extends User.Id> author,
                 String content,
                 Instant sent,
                 boolean isEdited,
@@ -155,7 +157,7 @@ public abstract class MessageBase extends Model {
          * Converts into this DTO Object.
          * @param message The Object to be converted.
          */
-        public DTO(MessageBase message) {
+        public DTO(MessageBase<IDENTITY> message) {
             super(message);
             author = UserService.from(message.get_author());
             content = message.get_content();

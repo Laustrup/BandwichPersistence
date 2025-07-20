@@ -3,6 +3,7 @@ package laustrup.bandwichpersistence.core.services.builders;
 import laustrup.bandwichpersistence.core.models.Organisation;
 import laustrup.bandwichpersistence.core.models.Rating;
 import laustrup.bandwichpersistence.core.models.Venue;
+import laustrup.bandwichpersistence.core.models.users.User;
 import laustrup.bandwichpersistence.core.persistence.Field;
 import laustrup.bandwichpersistence.core.services.persistence.JDBCService;
 
@@ -90,16 +91,16 @@ public class RatingBuilder extends BuilderService<Rating> {
             return switch (implementation) {
                 case VENUE -> new Venue.Rating(
                         value.get(),
-                        appointedId.get(),
-                        reviewerId.get(),
+                        new User.Id(appointedId.get()),
+                        new User.Id(reviewerId.get()),
                         comment.get(),
                         organisation.get(),
                         timestamp.get()
                 );
                 case STANDARD -> new Rating(
                         value.get(),
-                        appointedId.get(),
-                        reviewerId.get(),
+                        new User.Id(appointedId.get()),
+                        new User.Id(reviewerId.get()),
                         comment.get(),
                         timestamp.get()
                 );

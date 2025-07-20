@@ -39,7 +39,7 @@ class SelectServiceTests extends Tester {
             Properties properties = arrange(new Properties(
                     _table,
                     complying()
-                            .that(new Condition(Field.of("this", "thing"), EQUALS, Field.of("that", "thing")))
+                            .which(new Condition(Field.of("this", "thing"), EQUALS, Field.of("that", "thing")))
             ));
 
             String actual = act(
@@ -59,7 +59,7 @@ class SelectServiceTests extends Tester {
             Properties properties = arrange(new Properties(
                     _table,
                     complying()
-                            .that(new Condition(Field.of("this", "thing"), EQUALS, Field.of("that", "thing")))
+                            .which(new Condition(Field.of("this", "thing"), EQUALS, Field.of("that", "thing")))
                             .and(new Condition(Field.of("this", "other"), EQUALS, Field.of("that", "other")))
             ));
 
@@ -84,13 +84,10 @@ class SelectServiceTests extends Tester {
 
             String actual = act(
                     selecting(_table)
-                            .addJoin(new Join(
-                                    INNER,
-                                    alias,
+                            .addJoin(Join.inner(
                                     new Field("joinTable", row),
                                     new Field(_table, row)
-                            ))
-                            .select()
+                            )).select()
             );
 
             asserting(expected)

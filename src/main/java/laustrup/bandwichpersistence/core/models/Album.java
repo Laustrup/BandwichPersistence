@@ -2,6 +2,8 @@ package laustrup.bandwichpersistence.core.models;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import laustrup.bandwichpersistence.core.models.identification.CommonIdentity;
+import laustrup.bandwichpersistence.core.models.identification.Signature;
 import laustrup.bandwichpersistence.core.utilities.collections.Liszt;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
@@ -9,14 +11,13 @@ import lombok.experimental.FieldNameConstants;
 
 import java.time.Instant;
 import java.util.Set;
-import java.util.UUID;
 
 /**
  * Contains objects that are describing data of either photos or music.
  * The items contain the link to the file source.
  */
 @Getter @FieldNameConstants
-public class Album extends Model {
+public class Album extends Model<Album.Id, Signature.UUID> {
 
     /**
      * Items containing endpoints that are being used for getting the image/music file.
@@ -29,7 +30,7 @@ public class Album extends Model {
      */
     public Album(Album.DTO album) {
         this(
-                album.getId(),
+                new Id(album.getId()),
                 album.getTitle(),
                 Seszt.copy(album.getMedia(), Media::new),
                 album.getTimestamp()
@@ -44,7 +45,7 @@ public class Album extends Model {
      * @param timestamp The date this Album was created.
      */
     public Album(
-            UUID id,
+            Id id,
             String title,
             Seszt<Media> media,
             Instant timestamp
@@ -129,17 +130,33 @@ public class Album extends Model {
         return _media.remove(media);
     }
 
+    public static class Id extends CommonIdentity<Signature.UUID> {
+
+        public Id(Signature.UUID signature) {
+            super(signature);
+        }
+
+        public Id(java.util.UUID signature) {
+            super(new Signature.UUID(signature));
+        }
+
+        @Override
+        public Class<?> getOwnerClassType() {
+            return Album.class;
+        }
+    }
+
     @Override
     public String toString() {
         return defineToString(
             getClass().getSimpleName(),
             new String[]{
-                Model.Fields._id,
+                Model.Fields._identity,
                 Model.Fields._title,
                 Model.Fields._timestamp
             },
             new String[]{
-                String.valueOf(_id),
+                String.valueOf(_identity),
                 _title,
                 String.valueOf(_timestamp)
         });
@@ -150,7 +167,7 @@ public class Album extends Model {
      * Has a link to the endpoint of the file source.
      */
     @Getter @FieldNameConstants
-    public static class Media extends Model {
+    public static class Media extends Model<Media.Id, Signature.UUID> {
 
         /** The endpoint for a URL, that is used to get the file of the item. */
         private String _endpoint;
@@ -167,7 +184,7 @@ public class Album extends Model {
          */
         public Media(DTO item) {
             this(
-                    item.getId(),
+                    new Id(item.getId()),
                     item.getTitle(),
                     item.getEndpoint(),
                     item.getKind(),
@@ -176,15 +193,31 @@ public class Album extends Model {
         }
 
         public Media(
-                UUID id,
+                Id id,
                 String title,
                 String endpoint,
                 Kind kind,
                 Instant timestamp
         ) {
-            super(title, timestamp);
+            super(id, title, timestamp);
             _endpoint = endpoint;
             _kind = kind;
+        }
+
+        public static class Id extends CommonIdentity<Signature.UUID> {
+
+            public Id(Signature.UUID signature) {
+                super(signature);
+            }
+
+            public Id(java.util.UUID signature) {
+                super(new Signature.UUID(signature));
+            }
+
+            @Override
+            public Class<?> getOwnerClassType() {
+                return Media.class;
+            }
         }
 
         @Override
@@ -209,7 +242,7 @@ public class Album extends Model {
          * Doesn't have any logic.
          */
         @Getter @FieldNameConstants
-        public static class DTO extends ModelDTO {
+        public static class DTO extends ModelDTO<Media.Id, Signature.UUID, java.util.UUID> {
 
             /** The endpoint for a URL, that is used to get the file of the item. */
             private String endpoint;
@@ -222,7 +255,7 @@ public class Album extends Model {
 
             @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
             public DTO(
-                    @JsonProperty UUID id,
+                    @JsonProperty java.util.UUID id,
                     @JsonProperty String title,
                     @JsonProperty Instant timestamp,
                     @JsonProperty String endpoint,
@@ -258,7 +291,7 @@ public class Album extends Model {
      * Doesn't have any logic.
      */
     @Getter
-    public static class DTO extends ModelDTO {
+    public static class DTO extends ModelDTO<Album.Id, Signature.UUID, java.util.UUID> {
 
         /**
          * These endpoints are being used for getting the image/music file.
@@ -267,7 +300,7 @@ public class Album extends Model {
 
         @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
         public DTO(
-                @JsonProperty UUID id,
+                @JsonProperty java.util.UUID id,
                 @JsonProperty String title,
                 @JsonProperty Instant timestamp,
                 @JsonProperty Set<Media.DTO> media

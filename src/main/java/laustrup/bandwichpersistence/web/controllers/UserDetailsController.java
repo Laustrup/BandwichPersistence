@@ -1,7 +1,7 @@
 package laustrup.bandwichpersistence.web.controllers;
 
 import laustrup.bandwichpersistence.core.models.Login;
-import laustrup.bandwichpersistence.core.models.User;
+import laustrup.bandwichpersistence.core.models.users.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.*;

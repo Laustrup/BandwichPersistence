@@ -1,10 +1,9 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
-import laustrup.bandwichpersistence.core.models.BusinessUser;
+import laustrup.bandwichpersistence.core.models.users.BusinessUser;
 import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.core.persistence.Field;
-import laustrup.bandwichpersistence.core.services.persistence.JDBCService;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 
 import java.sql.ResultSet;
@@ -46,7 +45,7 @@ public class ChatRoomTemplateBuilder extends BuilderService<ChatRoom.Template> {
         return table -> {
             AtomicReference<UUID> id = new AtomicReference<>();
             AtomicReference<String> title = new AtomicReference<>();
-            Seszt<BusinessUser> chatters = new Seszt<>();
+            Seszt<BusinessUser<?>> chatters = new Seszt<>();
             AtomicReference<Instant> timestamp = new AtomicReference<>();
 
             interaction(
@@ -61,7 +60,7 @@ public class ChatRoomTemplateBuilder extends BuilderService<ChatRoom.Template> {
             );
 
             return new ChatRoom.Template(
-                    id.get(),
+                    new ChatRoom.Template.Id(id.get()),
                     title.get(),
                     chatters,
                     timestamp.get()

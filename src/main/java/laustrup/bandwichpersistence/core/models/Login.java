@@ -3,14 +3,13 @@ package laustrup.bandwichpersistence.core.models;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import laustrup.bandwichpersistence.core.models.users.User;
 import lombok.experimental.FieldNameConstants;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Collection;
-import java.util.function.Function;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @FieldNameConstants
@@ -20,7 +19,7 @@ public class Login implements UserDetails {
 
     private String password;
 
-    private User user;
+    private User<? extends User.Id> user;
 
     @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
     public Login(
@@ -38,7 +37,7 @@ public class Login implements UserDetails {
                 .toList();
     }
 
-    public User setUser(User user) {
+    public User<?> setUser(User<?> user) {
         if (user != null && user.get_contactInfo() != null && user.get_contactInfo().get_email().equals(username))
             this.user = user;
 

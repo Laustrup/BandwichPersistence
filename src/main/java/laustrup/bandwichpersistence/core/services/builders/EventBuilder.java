@@ -108,7 +108,7 @@ public class EventBuilder extends BuilderService<Event> {
             );
 
             return new Event(
-                    id.get(),
+                    new Event.Id(id.get()),
                     title.get(),
                     description.get(),
                     openDoors.get(),

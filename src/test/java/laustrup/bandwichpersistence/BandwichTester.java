@@ -17,6 +17,8 @@ public class BandwichTester extends Tester {
 
     private final Query _cleanseDatabaseQuery = new Query(/*language=MySQL*/ "drop database " + _schema);
 
+    protected final String _testPassword = "123";
+
     @BeforeEach
     public void beforeEach() {
         testMode(_schema);

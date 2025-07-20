@@ -29,14 +29,14 @@ public abstract class Arranger extends TestCalculator {
     protected <T> T arrange(Supplier<T> supplier) {
         begin();
         T arranged;
-        arranged = supplier.get();
+        arranged = supplier == null ? null : supplier.get();
         _arrangement = calculatePerformance();
         addToPrint("The arrangement is:\n\n" + arranged);
         return arranged;
     }
 
     /**
-     * Will apply the function and measure the arrangement performance and and the arrangement setup to the print.
+     * Will apply the function and measure the arrangement performance and the arrangement setup to the print.
      * @param input The input for the function.
      * @param function The function for the arrangement.
      * @return The arrangement.

@@ -63,7 +63,7 @@ public class GigBuilder extends BuilderService<Event.Gig> {
             );
 
             return new Event.Gig(
-                    id.get(),
+                    new Event.Gig.Id(id.get()),
                     event.get(),
                     act,
                     start.get(),

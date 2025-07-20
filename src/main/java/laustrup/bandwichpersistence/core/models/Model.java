@@ -1,6 +1,8 @@
 package laustrup.bandwichpersistence.core.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import laustrup.bandwichpersistence.core.models.identification.Identity;
+import laustrup.bandwichpersistence.core.models.identification.Signature;
 import laustrup.bandwichpersistence.core.services.ModelService;
 import laustrup.bandwichpersistence.core.utilities.Coollection;
 import lombok.Getter;
@@ -9,7 +11,8 @@ import lombok.ToString;
 import lombok.experimental.FieldNameConstants;
 
 import java.time.Instant;
-import java.util.UUID;
+
+import static laustrup.bandwichpersistence.core.services.ObjectService.ifExists;
 
 /**
  * The base of many objects, that share these same attributes.
@@ -18,15 +21,10 @@ import java.util.UUID;
  */
 @Getter
 @FieldNameConstants
-@ToString(of = {"_id", "_title", "_timestamp"})
-public abstract class Model {
+@ToString(of = {"_identity", "_title", "_timestamp"})
+public abstract class Model<IDENTITY extends Identity<SIGNATURE>, SIGNATURE extends Signature<?>> {
 
-    /**
-     * The identification value in the database for a specific entity.
-     * Must be unique, if there ain't other ids for this entity.
-     * UUIDs are unique hex decimal values of the specific entity.
-     */
-    protected UUID _id;
+    protected IDENTITY _identity;
 
     /**
      * The name for an entity or model.
@@ -63,13 +61,8 @@ public abstract class Model {
         return _situation;
     }
 
-    /**
-     * Converts the data transport object into this model.
-     * @param model The data transport model to be converted.
-     */
-    public Model(ModelDTO model) {
-        _id = model.getId();
-        _title = model.getClass().getSimpleName() + " \"" + model.getId() + "\"";
+    public Model(ModelDTO<IDENTITY, SIGNATURE, ?> model, IDENTITY identity) {
+        _identity = identity;
         _situation = model.getSituation();
         _timestamp = model.getTimestamp();
     }
@@ -97,23 +90,14 @@ public abstract class Model {
         _timestamp = timestamp;
     }
 
-    /**
-     * @param id A hex decimal value identifying this item uniquely.
-     * @param title A title describing this entity internally.
-     * @param timestamp Specifies the time this entity was created.
-     */
-    public Model(UUID id, String title, Instant timestamp) {
-        _id = id;
+    public Model(IDENTITY id, String title, Instant timestamp) {
+        _identity = id;
         _title = title;
         _timestamp = timestamp;
     }
 
-    /**
-     * @param id A hex decimal value identifying this item uniquely.
-     * @param title A title describing this entity internally.
-     */
-    public Model(UUID id, String title) {
-        _id = id;
+    public Model(IDENTITY id, String title) {
+        _identity = id;
         _title = title;
         _timestamp = Instant.now();
     }
@@ -144,7 +128,7 @@ public abstract class Model {
      * @return The generated toString.
      */
     protected String defineToString(String title, String[] keys, String[] values) {
-        return ModelService.defineToString(title, get_id(), keys, values);
+        return ModelService.defineToString(title, get_identity(), keys, values);
     }
 
     /**
@@ -154,14 +138,14 @@ public abstract class Model {
      */
     @Getter @FieldNameConstants
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public abstract static class ModelDTO {
+    public abstract static class ModelDTO<IDENTITY extends Identity<SIGNATURE>, SIGNATURE extends Signature<SIGNATURE_TYPE>, SIGNATURE_TYPE> {
 
         /**
          * The identification value in the database for a specific entity.
          * Must be unique, if there ain't other ids for this entity.
          * UUIDs are unique hex decimal values of the specific entity.
          */
-        protected UUID id;
+        protected SIGNATURE_TYPE id;
 
         /**
          * The name for an entity or model.
@@ -184,7 +168,7 @@ public abstract class Model {
         protected Situation situation;
 
         public ModelDTO(
-                UUID id,
+                SIGNATURE_TYPE id,
                 String title,
                 Situation situation,
                 Instant timestamp
@@ -196,7 +180,7 @@ public abstract class Model {
         }
 
         public ModelDTO(
-                UUID id,
+                SIGNATURE_TYPE id,
                 String title,
                 Instant timestamp
         ) {
@@ -205,8 +189,8 @@ public abstract class Model {
             this.timestamp = timestamp;
         }
 
-        public ModelDTO(Model model) {
-            id = model.get_id();
+        public ModelDTO(Model<IDENTITY, SIGNATURE> model) {
+            id = ifExists(model.get_identity(), Identity::get_value);
             title = model.get_title();
             timestamp = model.get_timestamp();
             situation = model.get_situation();

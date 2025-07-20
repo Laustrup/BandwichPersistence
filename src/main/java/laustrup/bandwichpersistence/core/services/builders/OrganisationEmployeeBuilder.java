@@ -2,9 +2,9 @@ package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.*;
 import laustrup.bandwichpersistence.core.models.Organisation.Employee.Role;
-import laustrup.bandwichpersistence.core.models.User.Authority;
-import laustrup.bandwichpersistence.core.models.User.Participation;
-import laustrup.bandwichpersistence.core.models.User.UserDTO;
+import laustrup.bandwichpersistence.core.models.users.User.Authority;
+import laustrup.bandwichpersistence.core.models.users.User.Participation;
+import laustrup.bandwichpersistence.core.models.users.User.UserDTO;
 import laustrup.bandwichpersistence.core.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
 import laustrup.bandwichpersistence.core.persistence.Field;
@@ -96,7 +96,7 @@ public class OrganisationEmployeeBuilder extends BuilderService<Employee> {
             );
 
             return new Employee(
-                    id.get(),
+                    new Employee.Id(id.get()),
                     username.get(),
                     firstName.get(),
                     lastName.get(),

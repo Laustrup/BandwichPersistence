@@ -2,13 +2,13 @@ package laustrup.bandwichpersistence.core.managers;
 
 import jdk.jshell.spi.ExecutionControl.NotImplementedException;
 import laustrup.bandwichpersistence.BandwichTester;
+import laustrup.bandwichpersistence.core.models.Login;
 import laustrup.bandwichpersistence.items.OrganisationEmployeeTestItems;
 import laustrup.bandwichpersistence.core.models.Organisation.Employee;
+import laustrup.bandwichpersistence.quality_assurance.Asserter;
 import org.junit.jupiter.api.Test;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import static laustrup.bandwichpersistence.items.OrganisationEmployeeTestItems.OrganisationEmployeeTitle.JENS_JENSEN;
-import static laustrup.bandwichpersistence.quality_assurance.Asserter.asserting;
 
 class UserDetailsManagerTests extends BandwichTester {
 
@@ -17,6 +17,7 @@ class UserDetailsManagerTests extends BandwichTester {
         String email = "john@arena.com";
 
         test(() -> {
+            Login login = new Login(email, _testPassword);
             Employee expected;
 
             try {
@@ -25,14 +26,10 @@ class UserDetailsManagerTests extends BandwichTester {
                 throw new RuntimeException(e);
             }
 
-            UserDetails actual = act(UserDetailsManager.getUserDetails(email));
+            Employee actual = act((Employee) UserDetailsManager.getUser(login).get_object());
 
-            assertingOrganisationEmployee(expected, actual);
+            Asserter.asserting(expected)
+                    .compare(actual);
         });
-    }
-
-    private void assertingOrganisationEmployee(Employee expected, UserDetails actual) {
-        asserting(expected)
-                .is(ex -> ex.get_username().equals(actual.getUsername()));
     }
 }

@@ -1,8 +1,11 @@
 package laustrup.bandwichpersistence.core.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import laustrup.bandwichpersistence.core.models.identification.CommonIdentity;
+import laustrup.bandwichpersistence.core.models.identification.Signature;
 import laustrup.bandwichpersistence.core.models.users.Artist;
 import laustrup.bandwichpersistence.core.models.users.Participant;
+import laustrup.bandwichpersistence.core.models.users.User;
 import laustrup.bandwichpersistence.core.services.UserService;
 import laustrup.bandwichpersistence.core.models.chats.messages.Post;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
@@ -11,14 +14,15 @@ import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
  * Extends performer and contains Artists as members
  */
-@Getter @FieldNameConstants
-public class Band extends Model {
+@Getter @FieldNameConstants @Table(title = "bands")
+public class Band extends Model<Band.Id, Signature.UUID> {
 
     private String _description;
 
@@ -28,7 +32,7 @@ public class Band extends Model {
 
     private Seszt<Event> _events;
 
-    private Seszt<User> _fans;
+    private Seszt<User<? extends User.Id>> _fans;
 
     private Seszt<Post> _posts;
 
@@ -42,7 +46,7 @@ public class Band extends Model {
      */
     public Band(Band.DTO band) {
         this(
-                band.getId(),
+                new Id(band.getId()),
                 band.getName(),
                 band.getDescription(),
                 new Seszt<>(band.getAlbums().stream().map(Album::new)),
@@ -56,7 +60,7 @@ public class Band extends Model {
     }
 
     public Band(
-            UUID id,
+            Id id,
             String name,
             String description,
             Seszt<Album> albums,
@@ -64,7 +68,7 @@ public class Band extends Model {
             Subscription subscription,
             Seszt<Post> posts,
             String runner,
-            Seszt<User> fans,
+            Seszt<User<?>> fans,
             Instant timestamp
     ) {
         super(id, name + "|" + id, timestamp);
@@ -84,8 +88,24 @@ public class Band extends Model {
      * @param fan An object of Fan, that is wished to be removed.
      * @return The whole Liszt of fans.
      */
-    public Seszt<User> remove(Participant fan) {
+    public Seszt<User<?>> remove(Participant fan) {
         return _fans.remove(new Participant[]{fan});
+    }
+
+    public static class Id extends CommonIdentity<Signature.UUID> {
+
+        public Id(Signature.UUID signature) {
+            super(signature);
+        }
+
+        public Id(java.util.UUID signature) {
+            super(new Signature.UUID(signature));
+        }
+
+        @Override
+        public Class<?> getOwnerClassType() {
+            return Band.class;
+        }
     }
 
     @Override
@@ -93,13 +113,13 @@ public class Band extends Model {
         return defineToString(
             getClass().getSimpleName(),
             new String[] {
-                Model.Fields._id,
+                Model.Fields._identity,
                 User.Fields._username,
                 User.Fields._description,
                 Model.Fields._timestamp
             },
             new String[] {
-                String.valueOf(get_id()),
+                String.valueOf(get_identity()),
                 get_name(),
                 get_description(),
                 Model.Fields._timestamp
@@ -113,7 +133,7 @@ public class Band extends Model {
      * Doesn't have any logic.
      */
 @Getter @Setter@FieldNameConstants @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class DTO extends ModelDTO {
+    public static class DTO extends ModelDTO<Band.Id, Signature.UUID, java.util.UUID> {
 
 
         private String description;
@@ -124,7 +144,7 @@ public class Band extends Model {
 
         private Set<Event.DTO> events;
 
-        private Set<User.UserDTO> fans;
+        private Set<User.UserDTO<? extends User.Id>> fans;
 
         private Set<Post.DTO> posts;
 
@@ -158,7 +178,7 @@ public class Band extends Model {
         }
     }
 
-    @Getter
+    @Getter @Table(title = "band_memberships")
     public static class Membership {
 
         private Artist _member;

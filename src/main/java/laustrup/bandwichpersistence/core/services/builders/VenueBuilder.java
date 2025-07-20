@@ -79,7 +79,7 @@ public class VenueBuilder extends BuilderService<Venue> {
             );
 
             return new Venue(
-                    id.get(),
+                    new Venue.Id(id.get()),
                     title.get(),
                     description.get(),
                     organisations,

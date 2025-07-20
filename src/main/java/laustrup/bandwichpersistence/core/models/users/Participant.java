@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
  * Extends from User.
  */
 @Getter @FieldNameConstants
-public class Participant extends User {
+public class Participant extends User<Participant.Id> {
 
     /**
      * These are the Users that the Participant can follow,
@@ -35,19 +35,25 @@ public class Participant extends User {
      * @param participant The transport object to be transformed.
      */
     public Participant(DTO participant) {
-        super(participant);
-        _follows = new Seszt<>(
-                participant.getFollows().stream()
-                .map(Follow::new)
-        );
-        _ratings = new Seszt<>(
-                participant.getRatings().stream()
-                        .map(Rating::new)
+        this(
+                new Participant.Id(participant.getId()),
+                participant.getUsername(),
+                participant.getFirstName(),
+                participant.getLastName(),
+                participant.getDescription(),
+                new ContactInfo(participant.getContactInfo()),
+                new Seszt<>(participant.getParticipations().stream().map(Participation::new)),
+                new Seszt<>(participant.getRatings().stream().map(Rating::new)),
+                new Subscription(participant.getSubscription()),
+                new Seszt<>(participant.getAuthorities().stream()),
+                new Seszt<>(participant.getFollows().stream().map(Follow::new)),
+                participant.getHistory(),
+                participant.getTimestamp()
         );
     }
 
     public Participant(
-            UUID id,
+            Id id,
             String username,
             String firstName,
             String lastName,
@@ -96,17 +102,29 @@ public class Participant extends User {
         return _follows.remove(new Follow[]{following});
     }
 
+    public static class Id extends User.Id {
+
+        public Id(UUID identifier) {
+            super(identifier);
+        }
+
+        @Override
+        public Class<?> getOwnerClassType() {
+            return Participant.class;
+        }
+    }
+
     @Override
     public String toString() {
         return defineToString(
             getClass().getSimpleName(),
             new String[] {
-                Model.Fields._id,
+                Model.Fields._identity,
                 User.Fields._description,
                 Model.Fields._timestamp
             },
             new String[] {
-                String.valueOf(get_id()),
+                String.valueOf(get_identity()),
                 get_username(),
                 get_description(),
                 String.valueOf(get_timestamp())
@@ -120,7 +138,7 @@ public class Participant extends User {
      * Doesn't have any logic.
      */
     @Getter @Setter
-    public static class DTO extends UserDTO {
+    public static class DTO extends UserDTO<User.Id> {
 
         /**
          * These are the Users that the Participant can follow,

@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import laustrup.bandwichpersistence.core.models.chats.ChatRoom;
+import laustrup.bandwichpersistence.core.models.identification.CommonIdentity;
+import laustrup.bandwichpersistence.core.models.identification.Signature;
 import laustrup.bandwichpersistence.core.models.users.Participant;
 import laustrup.bandwichpersistence.core.utilities.collections.Liszt;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
@@ -19,7 +21,9 @@ import lombok.experimental.FieldNameConstants;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
-import java.util.*;
+import java.util.InputMismatchException;
+import java.util.Objects;
+import java.util.Set;
 
 import static laustrup.bandwichpersistence.core.utilities.collections.Seszt.copy;
 import static laustrup.bandwichpersistence.core.utilities.services.UtilityService.toSet;
@@ -28,7 +32,7 @@ import static laustrup.bandwichpersistence.core.utilities.services.UtilityServic
  * An Event is a place for gigs, where a venue is having bands playing at specific times.
  */
 @Getter @FieldNameConstants
-public class Event extends Model {
+public class Event extends Model<Event.Id, Signature.UUID> {
 
     /**
      * Is when the participants can enter the event,
@@ -154,7 +158,7 @@ public class Event extends Model {
      */
     public Event(DTO event) {
         this(
-                event.getId(),
+                new Id(event.getId()),
                 event.getTitle(),
                 event.getDescription(),
                 event.getOpenDoors(),
@@ -181,7 +185,7 @@ public class Event extends Model {
     }
     
     public Event(
-            UUID id,
+            Event.Id id,
             String title,
             String description,
             Instant openDoors,
@@ -316,7 +320,7 @@ public class Event extends Model {
      */
     private Seszt<Request> removeRequests(Band performer) {
         for (int i = 1; i <= _requests.size(); i++) {
-            if (_requests.Get(i).get_receiverId().equals(performer.get_id())) {
+            if (_requests.Get(i).get_receiverId().equals(performer.get_identity())) {
                 _requests.Remove(i);
                 break;
             }
@@ -380,7 +384,7 @@ public class Event extends Model {
      * @return The isCancelled Plato value.
      */
     public Instant changeCancelledStatus(Venue venue) {
-        if (venue.get_id() == _venue.get_id())
+        if (venue.get_identity() == _venue.get_identity())
             _cancelled = _cancelled == null
                     ? null
                     : Instant.now();
@@ -442,7 +446,7 @@ public class Event extends Model {
      */
     public Participation set(Participation participation) {
         for (int i = 1; i <= _participations.size(); i++) {
-            if (_participations.Get(i).get_participant().get_id() == participation.get_participant().get_id()) {
+            if (_participations.Get(i).get_participant().get_identity() == participation.get_participant().get_identity()) {
                 _participations.Get(i).set_type(participation.get_type());
                 return _participations.Get(i);
             }
@@ -460,7 +464,7 @@ public class Event extends Model {
         for (int i = 1; i <= _posts.size(); i++) {
             Post localPost = _posts.Get(i);
 
-            if (localPost.get_id() == post.get_id()) {
+            if (localPost.get_identity() == post.get_identity()) {
                 _posts.Set(i, post);
                 return _posts.Get(i);
             }
@@ -498,7 +502,7 @@ public class Event extends Model {
         for (int i = 1; i <= _albums.size(); i++) {
             Album localAlbum = _albums.Get(i);
 
-            if (localAlbum.get_id() == album.get_id()) {;
+            if (localAlbum.get_identity() == album.get_identity()) {;
                 return _albums.Set(i, album).Get(i);
             }
         }
@@ -534,18 +538,34 @@ public class Event extends Model {
         return _duration;
     }
 
+    public static class Id extends CommonIdentity<Signature.UUID> {
+
+        public Id(Signature.UUID signature) {
+            super(signature);
+        }
+
+        public Id(java.util.UUID signature) {
+            super(new Signature.UUID(signature));
+        }
+
+        @Override
+        public Class<?> getOwnerClassType() {
+            return Id.class;
+        }
+    }
+
     @Override
     public String toString() {
         return defineToString(
             getClass().getSimpleName(),
             new String[]{
-                Model.Fields._id,
+                Model.Fields._identity,
                 Model.Fields._title,
                 Fields._description,
                 Model.Fields._timestamp
             },
             new String[]{
-                String.valueOf(_id),
+                String.valueOf(_identity),
                 _title,
                 _description,
                 String.valueOf(_timestamp)
@@ -559,7 +579,7 @@ public class Event extends Model {
      * Doesn't have any logic.
      */
     @Getter @FieldNameConstants @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class DTO extends ModelDTO {
+    public static class DTO extends ModelDTO<Event.Id, Signature.UUID, java.util.UUID> {
 
         private ZoneId zoneId;
 
@@ -667,7 +687,7 @@ public class Event extends Model {
 
         @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
         public DTO(
-                @JsonProperty UUID id,
+                @JsonProperty java.util.UUID id,
                 @JsonProperty String title,
                 @JsonProperty Instant openDoors,
                 @JsonProperty Instant start,
@@ -724,7 +744,7 @@ public class Event extends Model {
          */
         public DTO(Event event) {
             this(
-                    event.get_id(),
+                    event.get_identity().get_value(),
                     event.get_title(),
                     event.get_openDoors(),
                     event.get_start(),
@@ -757,7 +777,7 @@ public class Event extends Model {
      * Determines a specific gig of one band for a specific time.
      */
     @Getter @Setter @FieldNameConstants
-    public static class Gig extends Model {
+    public static class Gig extends Model<Gig.Id, Signature.UUID> {
 
         /**
          * The Event of this Gig.
@@ -785,7 +805,7 @@ public class Event extends Model {
          */
         public Gig(DTO gig) {
             this(
-                    gig.getId(),
+                    new Id(gig.getId()),
                     new Event(gig.getEvent()),
                     copy(gig.getAct(), Band::new),
                     gig.getStart(),
@@ -804,7 +824,7 @@ public class Event extends Model {
          * @param timestamp The time this Object was created.
          */
         public Gig(
-                UUID id,
+                Gig.Id id,
                 Event event,
                 Seszt<Band> act,
                 Instant start,
@@ -838,7 +858,7 @@ public class Event extends Model {
          */
         public boolean contains(Band performer) {
             for (Band actor : _act)
-                if (actor.get_id() == performer.get_id())
+                if (actor.get_identity() == performer.get_identity())
                     return true;
 
             return false;
@@ -863,17 +883,33 @@ public class Event extends Model {
             return _act;
         }
 
+        public static class Id extends CommonIdentity<Signature.UUID> {
+
+            public Id(Signature.UUID signature) {
+                super(signature);
+            }
+
+            public Id(java.util.UUID signature) {
+                super(new Signature.UUID(signature));
+            }
+
+            @Override
+            public Class<Gig> getOwnerClassType() {
+                return Gig.class;
+            }
+        }
+
         @Override
         public String toString() {
             return defineToString(
                     getClass().getSimpleName(),
                     new String[] {
-                            Model.Fields._id,
+                            Model.Fields._identity,
                             Fields._start,
                             Fields._end
                     },
                     new String[] {
-                            String.valueOf(get_id()),
+                            String.valueOf(get_identity()),
                             String.valueOf(get_start()),
                             String.valueOf(get_end())
                     }
@@ -886,7 +922,7 @@ public class Event extends Model {
          * Doesn't have any logic.
          */
         @Getter @FieldNameConstants @JsonIgnoreProperties(ignoreUnknown = true)
-        public static class DTO extends ModelDTO {
+        public static class DTO extends ModelDTO<Gig.Id, Signature.UUID, java.util.UUID> {
 
             /** The Event of this Gig. */
             private Event.DTO event;
@@ -902,7 +938,7 @@ public class Event extends Model {
 
             @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
             public DTO(
-                    @JsonProperty UUID id,
+                    @JsonProperty java.util.UUID id,
                     @JsonProperty String title,
                     @JsonProperty Situation situation,
                     @JsonProperty Instant timestamp,
@@ -983,7 +1019,7 @@ public class Event extends Model {
                     """,
                     getClass().getSimpleName(),
                     Participant.class.getSimpleName(),
-                    _participant.get_id(),
+                    _participant.get_identity(),
                     Type.class.getSimpleName(),
                     _type
             );

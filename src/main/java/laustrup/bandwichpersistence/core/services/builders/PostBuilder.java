@@ -1,7 +1,8 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.Model;
-import laustrup.bandwichpersistence.core.models.User;
+import laustrup.bandwichpersistence.core.models.identification.Identity;
+import laustrup.bandwichpersistence.core.models.users.User;
 import laustrup.bandwichpersistence.core.models.chats.messages.Post;
 import laustrup.bandwichpersistence.core.models.chats.messages.MessageBase;
 import laustrup.bandwichpersistence.core.persistence.Field;
@@ -32,6 +33,10 @@ public class PostBuilder extends BuilderService<Post> {
         super(Post.class, _logger);
     }
 
+    private static UserBuilder _userBuilder = UserBuilder.get_instance();
+
+    private static ModelBuilder _modelBuilder = ModelBuilder.get_instance();
+
     @Override
     protected void completion(Post reference, Post object) {
 
@@ -41,8 +46,8 @@ public class PostBuilder extends BuilderService<Post> {
     protected Function<Function<String, Field>, Post> logic(ResultSet resultSet) {
         return table -> {
             AtomicReference<UUID> id = new AtomicReference<>();
-            AtomicReference<User> author = new AtomicReference<>();
-            AtomicReference<Model> receiver = new AtomicReference<>();
+            AtomicReference<User<? extends User.Id>> author = new AtomicReference<>();
+            AtomicReference<Model<? extends Identity<?>, ?>> receiver = new AtomicReference<>();
             AtomicReference<String> content = new AtomicReference<>();
             AtomicReference<Boolean> isEdited = new AtomicReference<>();
             AtomicReference<Instant>
@@ -54,8 +59,8 @@ public class PostBuilder extends BuilderService<Post> {
                     resultSet,
                     () -> {
                         set(id, table.apply(Model.ModelDTO.Fields.id));
-                        UserBuilder.get_instance().complete(author, resultSet);
-                        ModelBuilder.get_instance().complete(receiver, resultSet);
+                        _userBuilder.complete(author, resultSet);
+                        _modelBuilder.complete(receiver, resultSet);
                         set(content, table.apply(MessageBase.DTO.Fields.content));
                         set(isEdited, table.apply(MessageBase.DTO.Fields.isEdited));
                         set(isSent, table.apply(MessageBase.DTO.Fields.sent));
@@ -66,7 +71,7 @@ public class PostBuilder extends BuilderService<Post> {
             );
 
             return new Post(
-                    id.get(),
+                    new Post.Id(id.get()),
                     author.get(),
                     receiver.get(),
                     content.get(),

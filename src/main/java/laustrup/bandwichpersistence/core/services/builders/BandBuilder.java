@@ -2,6 +2,7 @@ package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.*;
 import laustrup.bandwichpersistence.core.models.chats.messages.Post;
+import laustrup.bandwichpersistence.core.models.users.User;
 import laustrup.bandwichpersistence.core.persistence.Field;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 
@@ -53,7 +54,7 @@ public class BandBuilder extends BuilderService<Band> {
             Seszt<Album> albums = new Seszt<>();
             Seszt<Event> events = new Seszt<>();
             Seszt<Post> posts = new Seszt<>();
-            Seszt<User> fans = new Seszt<>();
+            Seszt<User<?>> fans = new Seszt<>();
 
             interaction(
                     resultSet,
@@ -73,7 +74,7 @@ public class BandBuilder extends BuilderService<Band> {
             );
 
             return new Band(
-                    id.get(),
+                    new Band.Id(id.get()),
                     name.get(),
                     description.get(),
                     albums,

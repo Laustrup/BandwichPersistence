@@ -5,6 +5,7 @@ import laustrup.bandwichpersistence.core.models.Organisation.Employee;
 import laustrup.bandwichpersistence.core.models.Subscription.UserType;
 import laustrup.bandwichpersistence.core.models.users.Artist;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
+import laustrup.bandwichpersistence.core.models.users.User;
 import laustrup.bandwichpersistence.core.persistence.Field;
 import laustrup.bandwichpersistence.core.services.persistence.JDBCService;
 
@@ -17,7 +18,7 @@ import java.util.stream.Stream;
 import static laustrup.bandwichpersistence.core.managers.UserDetailsManager.*;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
 
-public class UserBuilder extends BuilderService<User> {
+public class UserBuilder extends BuilderService<User<?>> {
 
     private static final Logger _logger = Logger.getLogger(UserBuilder.class.getName());
 
@@ -35,7 +36,7 @@ public class UserBuilder extends BuilderService<User> {
     }
 
     private UserBuilder() {
-        super(User.class, _logger);
+        super(User.class.getSimpleName(), _logger);
     }
 
     public static Stream<Login> buildLogins(ResultSet resultSet) {
@@ -53,7 +54,7 @@ public class UserBuilder extends BuilderService<User> {
     }
 
     @Override
-    public User build(ResultSet resultSet) {
+    public User<?> build(ResultSet resultSet) {
         Optional<String> usertype = Optional.ofNullable(getUserType(resultSet));
 
         if (usertype.isEmpty())
@@ -67,7 +68,7 @@ public class UserBuilder extends BuilderService<User> {
     }
 
     @Override
-    protected void completion(User collective, User part) {
+    protected void completion(User<?> collective, User<?> part) {
         switch (collective.get_subscription().get_userType()) {
             case ARTIST -> _artistBuilder.completion((Artist) collective, (Artist) part);
             case ORGANISATION_EMPLOYEE -> _organisationEmployeeBuilder.completion(
@@ -79,7 +80,7 @@ public class UserBuilder extends BuilderService<User> {
     }
 
     @Override
-    protected Function<Function<String, Field>, User> logic(ResultSet resultSet) {
+    protected Function<Function<String, Field>, User<?>> logic(ResultSet resultSet) {
         throw new UnsupportedOperationException();
     }
 }

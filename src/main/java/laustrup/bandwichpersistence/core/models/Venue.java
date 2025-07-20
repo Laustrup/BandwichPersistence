@@ -3,8 +3,11 @@ package laustrup.bandwichpersistence.core.models;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import laustrup.bandwichpersistence.core.models.identification.CommonIdentity;
+import laustrup.bandwichpersistence.core.models.identification.Signature;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
 import laustrup.bandwichpersistence.core.models.chats.messages.Post;
+import laustrup.bandwichpersistence.core.models.users.User;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,7 +15,6 @@ import lombok.experimental.FieldNameConstants;
 
 import java.time.Instant;
 import java.util.Set;
-import java.util.UUID;
 
 import static laustrup.bandwichpersistence.core.utilities.collections.Seszt.copy;
 
@@ -22,7 +24,7 @@ import static laustrup.bandwichpersistence.core.utilities.collections.Seszt.copy
  * Extends from User, which means it also contains ChatRooms and other alike attributes.
  */
 @Getter @FieldNameConstants
-public class Venue extends Model {
+public class Venue extends Model<Venue.Id, Signature.UUID> {
 
     /**
      * The location that the Venue is located at, which could be an address or simple a place.
@@ -61,7 +63,7 @@ public class Venue extends Model {
      */
     public Venue(DTO venue) {
         this(
-                venue.getId(),
+                new Id(venue.getId()),
                 venue.getTitle(),
                 venue.getDescription(),
                 copy(venue.getOrganisations(),Organisation::new),
@@ -77,7 +79,7 @@ public class Venue extends Model {
     }
 
     public Venue(
-            UUID id,
+            Id id,
             String title,
             String description,
             Seszt<Organisation> organisations,
@@ -102,18 +104,34 @@ public class Venue extends Model {
         _size = size;
     }
 
+    public static class Id extends CommonIdentity<Signature.UUID> {
+
+        public Id(Signature.UUID signature) {
+            super(signature);
+        }
+
+        public Id(java.util.UUID signature) {
+            super(new Signature.UUID(signature));
+        }
+
+        @Override
+        public Class<Venue> getOwnerClassType() {
+            return Venue.class;
+        }
+    }
+
     @Override
     public String toString() {
         return defineToString(
             getClass().getSimpleName(),
                 new String[] {
-                    Model.Fields._id,
+                    Model.Fields._identity,
                     Fields._location,
                     Fields._stageSetup,
                     Model.Fields._timestamp
                 },
                 new String[] {
-                    String.valueOf(get_id()),
+                    String.valueOf(get_identity()),
                     get_location().toString(),
                     get_stageSetup(),
                     String.valueOf(get_timestamp())
@@ -127,7 +145,7 @@ public class Venue extends Model {
      * Doesn't have any logic.
      */
     @Getter @Setter @FieldNameConstants @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class DTO extends ModelDTO {
+    public static class DTO extends ModelDTO<Venue.Id, Signature.UUID, java.util.UUID> {
 
         /**
          * The location that the Venue is located at, which could be an address or simple a place.
@@ -158,7 +176,7 @@ public class Venue extends Model {
 
         @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
         public DTO(
-                @JsonProperty UUID id,
+                @JsonProperty java.util.UUID id,
                 @JsonProperty String title,
                 @JsonProperty Instant timestamp,
                 @JsonProperty ContactInfo.Address.DTO location,
@@ -209,8 +227,8 @@ public class Venue extends Model {
         public Rating(DTO rating) {
             this(
                     rating.getValue(),
-                    rating.getAppointedId(),
-                    rating.getReviewerId(),
+                    new User.Id(rating.getAppointedId()),
+                    new User.Id(rating.getReviewerId()),
                     rating.getComment(),
                     new Organisation(rating.getOrganisation()),
                     rating.getTimestamp()
@@ -219,8 +237,8 @@ public class Venue extends Model {
 
         public Rating(
                 int value,
-                UUID appointedId,
-                UUID reviewerId,
+                User.Id appointedId,
+                User.Id reviewerId,
                 String comment,
                 Organisation organisation,
                 Instant timestamp

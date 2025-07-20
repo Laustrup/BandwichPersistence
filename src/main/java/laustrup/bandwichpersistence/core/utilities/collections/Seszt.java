@@ -379,4 +379,9 @@ public class Seszt<E> extends Coollection<E> implements ISeszt<E>, Set<E>, ICool
                 .map(conversion)
                 .collect(Collectors.toSet());
     }
+
+    public static <T> Seszt<T> of(T... contents) {
+        Seszt<T> seszt = new Seszt<>();
+        return seszt.Add(contents);
+    }
 }

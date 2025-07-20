@@ -55,7 +55,7 @@ public class AlbumBuilder extends BuilderService<Album> {
             );
 
             return new Album(
-                    id.get(),
+                    new Album.Id(id.get()),
                     title.get(),
                     media,
                     timestamp.get()

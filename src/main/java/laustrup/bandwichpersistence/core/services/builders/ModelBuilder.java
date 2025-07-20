@@ -3,7 +3,8 @@ package laustrup.bandwichpersistence.core.services.builders;
 import jdk.jshell.spi.ExecutionControl;
 import laustrup.bandwichpersistence.core.models.Event;
 import laustrup.bandwichpersistence.core.models.Model;
-import laustrup.bandwichpersistence.core.models.User;
+import laustrup.bandwichpersistence.core.models.identification.Identity;
+import laustrup.bandwichpersistence.core.models.users.User;
 import laustrup.bandwichpersistence.core.persistence.Field;
 import laustrup.bandwichpersistence.core.services.persistence.JDBCService;
 import laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService.Configurations;
@@ -18,7 +19,7 @@ import java.util.logging.Logger;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService.Configurations.Mode.PEEK;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService.get;
 
-public class ModelBuilder extends BuilderService<Model> {
+public class ModelBuilder extends BuilderService<Model<? extends Identity<?>, ?>> {
 
     private static final Logger _logger = Logger.getLogger(ModelBuilder.class.getName());
 
@@ -32,11 +33,11 @@ public class ModelBuilder extends BuilderService<Model> {
     }
 
     private ModelBuilder() {
-        super(Model.class, _logger);
+        super("Model", _logger);
     }
 
     @Override
-    public Model build(ResultSet resultSet) {
+    public Model<? extends Identity<?>, ?> build(ResultSet resultSet) {
         return determineKind(
                 getZoneId(resultSet),
                 () -> UserBuilder.get_instance().build(resultSet),
@@ -45,7 +46,7 @@ public class ModelBuilder extends BuilderService<Model> {
     }
 
     @Override
-    protected void completion(Model collective, Model part) {
+    protected void completion(Model<? extends Identity<?>, ?> collective, Model<? extends Identity<?>, ?> part) {
         ZoneId zoneId = null;
 
         try {
@@ -60,7 +61,7 @@ public class ModelBuilder extends BuilderService<Model> {
     }
 
     @SneakyThrows @Override
-    protected Function<Function<String, Field>, Model> logic(ResultSet resultSet) {
+    protected Function<Function<String, Field>, Model<? extends Identity<?>, ?>> logic(ResultSet resultSet) {
         throw new ExecutionControl.NotImplementedException("Logic in Model builder should not be implemented");
     }
 
@@ -71,7 +72,7 @@ public class ModelBuilder extends BuilderService<Model> {
         };
     }
 
-    private Model determineKind(String zoneId, Supplier<Model>... actions) {
+    private Model<? extends Identity<?>, ?> determineKind(String zoneId, Supplier<Model<? extends Identity<?>, ?>>... actions) {
         return switch (zoneId) {
             case null -> actions[0].get();
             default -> actions[1].get();

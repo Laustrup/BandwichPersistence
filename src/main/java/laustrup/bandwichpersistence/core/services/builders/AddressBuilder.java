@@ -64,7 +64,7 @@ public class AddressBuilder extends BuilderService<ContactInfo.Address> {
             );
 
             return new ContactInfo.Address(
-                    id.get(),
+                    new ContactInfo.Address.Id(id.get()),
                     street.get(),
                     floor.get(),
                     municipality.get(),

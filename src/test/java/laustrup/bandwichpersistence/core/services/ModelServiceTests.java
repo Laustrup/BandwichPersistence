@@ -1,6 +1,7 @@
 package laustrup.bandwichpersistence.core.services;
 
 import laustrup.bandwichpersistence.BandwichTester;
+import laustrup.bandwichpersistence.core.models.identification.CommonIdentity;
 import laustrup.bandwichpersistence.items.TestItems.*;
 import laustrup.bandwichpersistence.core.models.Model;
 import org.junit.jupiter.api.Test;
@@ -16,11 +17,11 @@ class ModelServiceTests extends BandwichTester {
     @Test
     void canGetIdsFromToString() {
         test(() -> {
-            List<UUID> expectations = arrange(() -> List.of(
-                    UUID.randomUUID(),
-                    UUID.randomUUID()
+            List<Instance.Id> expectations = arrange(() -> List.of(
+                    Instance.Id.randomize(),
+                    Instance.Id.randomize()
             ));
-            UUID
+            Instance.Id
                     first = expectations.getFirst(),
                     second = expectations.getLast();
             String toString = defineToString(
@@ -31,7 +32,7 @@ class ModelServiceTests extends BandwichTester {
                     new String[]{first.toString(), second.toString()}
             );
 
-            List<UUID> actual = act(() -> getIds(toString).toList());
+            List<Instance.Id> actual = act(() -> getIds(toString).toList());
 
             for (int i = 0; i < expectations.size(); i++)
                 asserting(actual.get(i))

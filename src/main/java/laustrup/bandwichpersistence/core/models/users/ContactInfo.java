@@ -6,14 +6,20 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import laustrup.bandwichpersistence.core.models.Model;
 
 import laustrup.bandwichpersistence.core.models.Table;
+import laustrup.bandwichpersistence.core.models.identification.CommonIdentity;
+import laustrup.bandwichpersistence.core.models.identification.Signature;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.FieldNameConstants;
-import java.util.*;
+
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.Set;
 
 import static laustrup.bandwichpersistence.core.services.ModelService.defineToString;
+import static laustrup.bandwichpersistence.core.services.ObjectService.ifExists;
 import static laustrup.bandwichpersistence.core.utilities.collections.Seszt.copy;
 
 /**
@@ -23,7 +29,7 @@ import static laustrup.bandwichpersistence.core.utilities.collections.Seszt.copy
 @Table(title = "contact_info")
 public class ContactInfo {
 
-    private UUID _id;
+    private Id _id;
 
     /**
      * The email that the User wants to be contacted through outside the application.
@@ -53,7 +59,7 @@ public class ContactInfo {
      */
     public ContactInfo(DTO contactInfo) {
         this(
-                contactInfo.getId(),
+                new Id(contactInfo.getId()),
                 contactInfo.getEmail(),
                 copy(contactInfo.getPhones(), Phone::new),
                 new Address(contactInfo.getAddress()),
@@ -61,7 +67,7 @@ public class ContactInfo {
         );
     }
 
-    public ContactInfo(UUID id, String email, Seszt<Phone> phones, Address address, Country country) {
+    public ContactInfo(Id id, String email, Seszt<Phone> phones, Address address, Country country) {
         _id = id;
         _email = email;
         _phones = phones;
@@ -77,13 +83,29 @@ public class ContactInfo {
         return _address.toString();
     }
 
+    public static class Id extends CommonIdentity<Signature.UUID> {
+
+        public Id(Signature.UUID signature) {
+            super(signature);
+        }
+
+        public Id(java.util.UUID signature) {
+            super(new Signature.UUID(signature));
+        }
+
+        @Override
+        public Class<?> getOwnerClassType() {
+            return ContactInfo.class;
+        }
+    }
+
     @Override
     public String toString() {
         return defineToString(
             getClass().getSimpleName(),
             get_id(),
             new String[] {
-                Model.Fields._id,
+                Model.Fields._identity,
                 Fields._email,
                 Fields._address,
                 Fields._phones,
@@ -105,7 +127,7 @@ public class ContactInfo {
     @Setter @Getter @Table(title = "addresses")
     public static class Address {
 
-        private UUID _id;
+        private Id _id;
 
         /**
          * The street and street number.
@@ -135,22 +157,38 @@ public class ContactInfo {
          */
         public Address(DTO address) {
             this(
-                    address == null ? null : address.getId(),
-                    address == null ? null : address.getStreet(),
-                    address == null ? null : address.getFloor(),
-                    address == null ? null : address.getMunicipality(),
-                    address == null ? null : address.getZip(),
-                    address == null ? null : address.getCity()
+                    new Id(ifExists(address, DTO::getId)),
+                    ifExists(address, DTO::getStreet),
+                    ifExists(address, DTO::getFloor),
+                    ifExists(address, DTO::getMunicipality),
+                    ifExists(address, DTO::getZip),
+                    ifExists(address, DTO::getCity)
             );
         }
 
-        public Address(UUID id, String street, String floor, String municipality, String zip, String city) {
+        public Address(Id id, String street, String floor, String municipality, String zip, String city) {
             _id = id;
             _street = street;
             _floor = floor;
             _municipality = municipality;
             _zip = zip;
             _city = city;
+        }
+
+        public static class Id extends CommonIdentity<Signature.UUID> {
+
+            public Id(Signature.UUID signature) {
+                super(signature);
+            }
+
+            public Id(java.util.UUID signature) {
+                super(new Signature.UUID(signature));
+            }
+
+            @Override
+            public Class<?> getOwnerClassType() {
+                return Address.class;
+            }
         }
 
         @Override
@@ -172,7 +210,7 @@ public class ContactInfo {
         @Getter @FieldNameConstants
         public static class DTO {
 
-            private UUID id;
+            private java.util.UUID id;
 
             /** The street and street number. */
             private String street;
@@ -190,7 +228,7 @@ public class ContactInfo {
 
             @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
             public DTO(
-                    @JsonProperty UUID id,
+                    @JsonProperty java.util.UUID id,
                     @JsonProperty String street,
                     @JsonProperty String floor,
                     @JsonProperty String municipality,
@@ -211,7 +249,7 @@ public class ContactInfo {
              */
             public DTO(Address address) {
                 this(
-                        address.get_id(),
+                        address.get_id().get_value(),
                         address.get_street(),
                         address.get_floor(),
                         address.get_municipality(),
@@ -228,7 +266,7 @@ public class ContactInfo {
     @Getter @ToString @Table(title = "countries")
     public static class Country {
 
-        private UUID _id;
+        private Id _id;
 
         /**
          * The name of the Country.
@@ -245,17 +283,29 @@ public class ContactInfo {
          * @param country The transport object to be transformed.
          */
         public Country(Country.DTO country) {
-            this(
-                    country.getId(),
-                    country.getTitle(),
-                    country.getCode()
-            );
+            this(new Id(country.getId()), country.getTitle(), country.getCode());
         }
 
-        public Country(UUID id, String title, String code) {
+        public Country(Id id, String title, String code) {
             _id = id;
             _title = title;
             _code = code;
+        }
+
+        public static class Id extends CommonIdentity<Signature.UUID> {
+
+            public Id(Signature.UUID signature) {
+                super(signature);
+            }
+
+            public Id(java.util.UUID signature) {
+                super(new Signature.UUID(signature));
+            }
+
+            @Override
+            public Class<Country> getOwnerClassType() {
+                return Country.class;
+            }
         }
 
         /**
@@ -266,7 +316,7 @@ public class ContactInfo {
         @Getter @Setter @FieldNameConstants
         public static class DTO {
 
-            private UUID id;
+            private java.util.UUID id;
 
             /** The name of the Country. */
             private String title;
@@ -276,7 +326,7 @@ public class ContactInfo {
 
             @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
             public DTO(
-                    @JsonProperty UUID id,
+                    @JsonProperty java.util.UUID id,
                     @JsonProperty String title,
                     @JsonProperty String code
             ) {
@@ -291,7 +341,7 @@ public class ContactInfo {
              */
             public DTO(Country country) {
                 this(
-                        country.get_id(),
+                        country.get_id().get_value(),
                         country.get_title(),
                         country.get_code()
                 );
@@ -401,7 +451,7 @@ public class ContactInfo {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class DTO {
 
-        private UUID id;
+        private java.util.UUID id;
 
         /** The email that the User wants to be contacted through outside the application. */
         private String email;
@@ -417,7 +467,7 @@ public class ContactInfo {
 
         @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
         public DTO(
-                @JsonProperty(Fields.id) UUID id,
+                @JsonProperty(Fields.id) java.util.UUID id,
                 @JsonProperty(Fields.email) String email,
                 @JsonProperty(Fields.phones) Set<Phone.DTO> phones,
                 @JsonProperty(Fields.address) Address.DTO address,
@@ -436,7 +486,7 @@ public class ContactInfo {
          */
         public DTO(ContactInfo contactInfo) {
             this(
-                    contactInfo.get_id(),
+                    contactInfo.get_id().get_value(),
                     contactInfo.get_email(),
                     contactInfo.get_phones().asSet(Phone.DTO::new),
                     new Address.DTO(contactInfo.get_address()),

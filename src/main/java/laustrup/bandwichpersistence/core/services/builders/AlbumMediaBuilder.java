@@ -58,7 +58,7 @@ public class AlbumMediaBuilder extends BuilderService<Album.Media> {
             );
 
             return new Album.Media(
-                    id.get(),
+                    new Album.Media.Id(id.get()),
                     title.get(),
                     endpoint.get(),
                     kind.get(),

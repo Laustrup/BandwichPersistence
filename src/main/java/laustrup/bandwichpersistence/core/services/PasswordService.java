@@ -2,7 +2,6 @@ package laustrup.bandwichpersistence.core.services;
 
 import laustrup.bandwichpersistence.core.libraries.SecurityLibrary;
 import laustrup.bandwichpersistence.core.models.Password;
-import laustrup.bandwichpersistence.core.models.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import javax.naming.SizeLimitExceededException;

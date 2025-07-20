@@ -1,56 +1,91 @@
 package laustrup.bandwichpersistence.core.repositories.queries;
 
+import laustrup.bandwichpersistence.core.models.users.ContactInfo;
+import laustrup.bandwichpersistence.core.persistence.Field;
 import laustrup.bandwichpersistence.core.persistence.models.Query;
+import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Properties;
+import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition;
+import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Whereing.Thating;
 import lombok.Getter;
+
+import java.util.Optional;
+
+import static laustrup.bandwichpersistence.core.persistence.models.ConjunctionTable.*;
+import static laustrup.bandwichpersistence.core.persistence.models.DatabaseTable.*;
+import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Join.left;
+import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.complying;
+import static laustrup.bandwichpersistence.core.persistence.services.SelectService.selecting;
+import static laustrup.bandwichpersistence.core.services.TableAnnotationService.*;
 
 public class UserDetailsQueries {
 
-    private static final String _selectAll = /*language=mysql*/ """
-            select
-                *
-            from
-                contact_info
-                    left join phones
-                        on phones.contact_info_id = contact_info.id
-                    left join addresses
-                        on addresses.id = contact_info.address_id
-                    left join countries
-                        on countries.id = contact_info.country_id
-                    left join artists
-                        on contact_info.id = artists.contact_info_id
-                    left join band_memberships
-                        on artists.id = band_memberships.artist_id
-                    left join bands
-                        on band_memberships.band_id = bands.id
-                    left join organisation_employees
-                        on contact_info.id = organisation_employees.contact_info_id
-                    left join organisation_employments
-                        on organisation_employees.id = organisation_employments.organisation_employee_id
-                    left join organisation_employee_authorities
-                        on organisation_employees.id = organisation_employee_authorities.organisation_employee_id
-                    left join artist_authorities
-                        on artists.id = artist_authorities.artist_id
-                    left join authorities
-                        on authorities.id = artist_authorities.authority_id || organisation_employee_authorities.authority_id = authorities.id
-                    left join subscriptions
-                        on artists.subscription_id = subscriptions.id || organisation_employees.subscription_id = subscriptions.id
-                    left join organisation_employee_chat_rooms
-                        on organisation_employees.id = organisation_employee_chat_rooms.organisation_employee_id
-                    left join artist_chat_rooms
-                        on artists.id = artist_chat_rooms.artist_id
-                    left join chat_rooms
-                        on artist_chat_rooms.chat_room_id = chat_rooms.id || organisation_employee_chat_rooms.chat_room_id = chat_rooms.id
-                    left join messages
-                        on chat_rooms.id = messages.chat_room_id
-            """;
+    private static String selectAll(Optional<Thating> where) {
+        String
+                id = "id",
+                contactInfoId = "contact_info_id",
+                addressId = "address_id",
+                countryId = "country_id",
+                artistId = "artist_id",
+                bandId = "band_id",
+                employeeId = "organisation_employee_id",
+                authorityId = "authority_id",
+                subscriptionId = "subscription_id",
+                chatRoomId = "chat_room_id";
 
-    public static Query selectAllForLogins = new Query(_selectAll);
+        return selecting(new Properties(CONTACT_INFO.get_title(), true, where))
+                .addJoins(
+                        left(PHONE, Condition.equals(Field.of(PHONE, contactInfoId), Field.of(CONTACT_INFO, id))),
+                        left(ADDRESS, Condition.equals(Field.of(ADDRESS, id), Field.of(CONTACT_INFO, addressId))),
+                        left(COUNTRY, Condition.equals(Field.of(COUNTRY, id), Field.of(CONTACT_INFO, countryId))),
+                        left(ARTIST, Condition.equals(Field.of(ARTIST, contactInfoId), Field.of(CONTACT_INFO, id))),
+                        left(BAND_MEMBERSHIP, Condition.equals(Field.of(BAND_MEMBERSHIP, artistId), Field.of(ARTIST, id))),
+                        left(BAND, Condition.equals(Field.of(BAND_MEMBERSHIP, bandId), Field.of(BAND, id))),
+                        left(ORGANISATION_EMPLOYEE, Condition.equals(
+                                Field.of(ORGANISATION_EMPLOYEE, contactInfoId),
+                                Field.of(CONTACT_INFO, id)
+                        )),
+                        left(ORGANISATION_EMPLOYMENT, Condition.equals(
+                                Field.of(ORGANISATION_EMPLOYMENT, employeeId),
+                                Field.of(ORGANISATION_EMPLOYEE, id)
+                        )),
+                        left(EMPLOYEE_AUTHORIZATIONS, Condition.equals(
+                                Field.of(EMPLOYEE_AUTHORIZATIONS, employeeId),
+                                Field.of(ORGANISATION_EMPLOYEE, id)
+                        )),
+                        left(ARTIST_AUTHORIZATIONS, Condition.equals(Field.of(ARTIST_AUTHORIZATIONS, artistId), Field.of(ARTIST, id))),
+                        left(
+                                AUTHORITIES,
+                                Condition.equals(Field.of(AUTHORITIES, id), Field.of(ARTIST, authorityId)),
+                                Condition.equals(Field.of(AUTHORITIES, id), Field.of(ORGANISATION_EMPLOYEE, authorityId))
+                        ),
+                        left(
+                                SUBSCRIPTION,
+                                Condition.equals(Field.of(ARTIST, subscriptionId), Field.of(SUBSCRIPTION, id)),
+                                Condition.equals(Field.of(ORGANISATION_EMPLOYEE, subscriptionId), Field.of(SUBSCRIPTION, id))
+                        ),
+                        left(ORGANISATION_EMPLOYEE_CHAT_ROOM, Condition.equals(
+                                Field.of(ORGANISATION_EMPLOYEE_CHAT_ROOM, employeeId),
+                                Field.of(ORGANISATION_EMPLOYEE, id)
+                        )),
+                        left(ARTIST_CHAT_ROOMS, Condition.equals(Field.of(ARTIST_CHAT_ROOMS, artistId), Field.of(ARTIST, id))),
+                        left(
+                                CHAT_ROOM,
+                                Condition.equals(Field.of(CHAT_ROOM, id), Field.of(ARTIST, chatRoomId)),
+                                Condition.equals(Field.of(CHAT_ROOM, id), Field.of(ORGANISATION_EMPLOYEE_CHAT_ROOM, chatRoomId))
+                        ),
+                        left(MESSAGE, Condition.equals(Field.of(MESSAGE, chatRoomId), Field.of(CHAT_ROOM, id)))
+                )
+                .select();
+    }
 
-    public static Query selectAllForLogin = new Query(/*language=mysql*/ _selectAll + """
-            where contact_info.email = %s
-            """,
-            new Query.Parameter(Parameter.CONTACT_INFO_EMAIL.get_key())
-    );
+    public static Query selectAllForLogin(String email) {
+        return new Query(selectAll(
+                Optional.of(complying().which(Condition.equals(
+                        Field.of(get_tableTitle(ContactInfo.class), "email"),
+                        email
+                )))
+        ));
+    }
 
     @Getter
     public enum Parameter {
