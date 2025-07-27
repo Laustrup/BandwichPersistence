@@ -77,14 +77,9 @@ public class OrganisationEmployeeTestItems {
                                         email
                                 ))
                 )).addJoin(Join.inner(
-                        Field.of(
-                                toAlias(contactInfoTable),
-                                Model.ModelDTO.Fields.id
-                        ),
-                        Field.of(
-                                employeeTable,
-                                fieldToColumnName(ContactInfo.class.getSimpleName() + Model.Fields._identity)
-                        )
+                        contactInfoTable,
+                        Field.of(toAlias(contactInfoTable), Model.ModelDTO.Fields.id),
+                        Field.of(employeeTable, fieldToColumnName(ContactInfo.class.getSimpleName() + Model.Fields._identity))
                 ))
         ));
     }

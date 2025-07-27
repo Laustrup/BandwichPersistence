@@ -21,10 +21,7 @@ class SelectServiceTests extends Tester {
         test(() -> {
             String expected = arrange(/*language=MySQL*/ "\nselect * from " + _table + "\n");
 
-            String actual = act(
-                    selecting(_table)
-                            .select()
-            );
+            String actual = act(selecting(_table).select());
 
             asserting(expected)
                     .isEqualTo(actual);
@@ -34,17 +31,14 @@ class SelectServiceTests extends Tester {
     @Test
     void canSelectAllWhereCondition() {
         test(() -> {
-            String expected = /*language=MySQL*/ String.format("\nselect * from %s\n\nwhere this.thing = that.thing\n", _table);
+            String expected = /*language=MySQL*/ String.format("\nselect * from %s\nwhere this.thing = that.thing\n", _table);
             Properties properties = arrange(new Properties(
                     _table,
                     complying()
                             .which(new Condition(Field.of("this", "thing"), EQUALS, Field.of("that", "thing")))
             ));
 
-            String actual = act(
-                    selecting(properties)
-                            .select()
-            );
+            String actual = act(selecting(properties).select());
 
             asserting(expected)
                     .isEqualTo(actual);
@@ -75,18 +69,16 @@ class SelectServiceTests extends Tester {
     @Test
     void canSelectAllInnerJoin() {
         test(() -> {
+            String joinTable = "join_table";
             String alias = "joinTable";
             String row = "id";
             String expected = /*language=MySQL*/ arrange(String.format(
                     "\nselect * from %s\ninner join join_table joinTable on joinTable.id = %s.id\n", _table, _table)
             );
 
-            String actual = act(
-                    selecting(_table)
-                            .addJoin(Join.inner(
-                                    new Field("joinTable", row),
-                                    new Field(_table, row)
-                            )).select()
+            String actual = act(selecting(_table)
+                    .addJoin(Join.inner(joinTable, new Field(alias, row), new Field(_table, row)))
+                    .select()
             );
 
             asserting(expected)

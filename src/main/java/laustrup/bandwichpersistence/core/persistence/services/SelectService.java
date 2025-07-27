@@ -160,8 +160,12 @@ public class SelectService {
 
             private final Seszt<Product> _products;
 
-            public Join(Area area, Condition condition) {
-                this(area, condition.get_this().alias(), Seszt.of(Product.of(condition)));
+            public Join(Area area, String table, Condition... conditions) {
+                this(area, table, Seszt.of(Product.of(conditions)));
+            }
+
+            public Join(Area area, String table, Product... products) {
+                this(area, table, new Seszt<>(products));
             }
 
             public Join(Area area, String table, Seszt<Product> products) {
@@ -194,12 +198,12 @@ public class SelectService {
                 return new Join(Area.LEFT, table, new Seszt<>(products));
             }
 
-            public static Join left(Field internal, Field external) {
-                return new Join(Area.LEFT, Condition.equals(internal, external));
+            public static Join left(String table, Field internal, Field external) {
+                return new Join(Area.LEFT, table, Condition.equals(internal, external));
             }
 
-            public static Join inner(Field internal, Field external) {
-                return new Join(Area.INNER, Condition.equals(internal, external));
+            public static Join inner(String table, Field internal, Field external) {
+                return new Join(Area.INNER, table, Condition.equals(internal, external));
             }
 
             @Override
@@ -212,6 +216,7 @@ public class SelectService {
                         _products.stream()
                                 .map(Product::apply)
                                 .reduce((a, b) -> String.join(" && ", a, b))
+                                .orElseThrow(() -> new IllegalStateException("Join needs at least one product!"))
                 );
             }
 
@@ -229,20 +234,19 @@ public class SelectService {
                 }
             }
 
-            public record Product(Seszt<Condition> _conditions) {
+            public record Product(Seszt<Condition> conditions) {
 
                 public static Product of(Condition... conditions) {
                     return new Product(new Seszt<>(conditions));
                 }
 
                 public String apply() {
-                    String statement = _conditions.stream()
+                    String statement = conditions.stream()
                             .map(Condition::apply)
                             .reduce((a, b) -> join(" || ", a, b))
                             .orElse("");
 
-                    return statement.isEmpty() ? "" : (
-                            statement.length() > 0
+                    return statement.isEmpty() ? "" : (conditions().size() > 1
                             ? String.format("(%s)", statement)
                             : statement
                     );
