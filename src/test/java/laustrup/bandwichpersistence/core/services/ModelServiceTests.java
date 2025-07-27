@@ -1,13 +1,11 @@
 package laustrup.bandwichpersistence.core.services;
 
 import laustrup.bandwichpersistence.BandwichTester;
-import laustrup.bandwichpersistence.core.models.identification.CommonIdentity;
 import laustrup.bandwichpersistence.items.TestItems.*;
 import laustrup.bandwichpersistence.core.models.Model;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.UUID;
 
 import static laustrup.bandwichpersistence.core.services.ModelService.*;
 import static laustrup.bandwichpersistence.quality_assurance.Asserter.asserting;
@@ -32,7 +30,10 @@ class ModelServiceTests extends BandwichTester {
                     new String[]{first.toString(), second.toString()}
             );
 
-            List<Instance.Id> actual = act(() -> getIds(toString).toList());
+            List<Instance.Id> actual = act(() -> getIds(toString)
+                    .map(id -> new Instance.Id(id.get_value()))
+                    .toList()
+            );
 
             for (int i = 0; i < expectations.size(); i++)
                 asserting(actual.get(i))

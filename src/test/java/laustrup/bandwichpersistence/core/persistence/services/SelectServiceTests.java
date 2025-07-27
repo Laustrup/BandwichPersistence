@@ -8,7 +8,6 @@ import laustrup.bandwichpersistence.quality_assurance.Tester;
 import org.junit.jupiter.api.Test;
 
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.*;
-import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Join.Area.INNER;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition.Equation.EQUALS;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.complying;
 import static laustrup.bandwichpersistence.quality_assurance.Asserter.asserting;

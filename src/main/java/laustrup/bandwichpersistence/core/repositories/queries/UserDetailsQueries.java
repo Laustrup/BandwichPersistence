@@ -5,7 +5,7 @@ import laustrup.bandwichpersistence.core.persistence.Field;
 import laustrup.bandwichpersistence.core.persistence.models.Query;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Properties;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition;
-import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Whereing.Thating;
+import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Clause.Clausement;
 import lombok.Getter;
 
 import java.util.Optional;
@@ -19,7 +19,7 @@ import static laustrup.bandwichpersistence.core.services.TableAnnotationService.
 
 public class UserDetailsQueries {
 
-    private static String selectAll(Optional<Thating> where) {
+    private static String selectAll(Optional<Clausement> where) {
         String
                 id = "id",
                 contactInfoId = "contact_info_id",

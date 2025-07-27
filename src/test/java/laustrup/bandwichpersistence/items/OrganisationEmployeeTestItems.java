@@ -2,10 +2,8 @@ package laustrup.bandwichpersistence.items;
 
 import jdk.jshell.spi.ExecutionControl.NotImplementedException;
 import laustrup.bandwichpersistence.core.models.Model;
-import laustrup.bandwichpersistence.core.models.Organisation;
 import laustrup.bandwichpersistence.core.models.Organisation.Employee;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
-import laustrup.bandwichpersistence.core.models.users.User;
 import laustrup.bandwichpersistence.core.persistence.Field;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Join;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Properties;
@@ -13,13 +11,11 @@ import laustrup.bandwichpersistence.core.persistence.services.SelectService.Sele
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 
 import java.time.Instant;
-import java.util.UUID;
 
 import static laustrup.bandwichpersistence.core.models.Organisation.Employee.Role.LEADER;
 import static laustrup.bandwichpersistence.core.models.Subscription.Kind.PAYING;
 import static laustrup.bandwichpersistence.core.models.Subscription.Status.ACCEPTED;
 import static laustrup.bandwichpersistence.core.models.Subscription.UserType.ORGANISATION_EMPLOYEE;
-import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Join.Area.INNER;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition.Equation.EQUALS;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.complying;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.selecting;

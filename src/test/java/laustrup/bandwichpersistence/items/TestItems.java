@@ -5,11 +5,12 @@ import laustrup.bandwichpersistence.core.models.Situation;
 import laustrup.bandwichpersistence.core.models.ToStringArgument;
 import laustrup.bandwichpersistence.core.models.identification.CommonIdentity;
 import laustrup.bandwichpersistence.core.models.identification.Identity;
+import laustrup.bandwichpersistence.core.models.identification.Signature;
 import laustrup.bandwichpersistence.core.persistence.Field;
 import laustrup.bandwichpersistence.core.persistence.models.Query;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Properties;
-import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Whereing.Thating;
+import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Clause.Clausement;
 import laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService.Configurations;
 import laustrup.bandwichpersistence.core.utilities.Coollection;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
@@ -69,7 +70,7 @@ public class TestItems {
         return read(selectOrganizationQuery(OrganisationTestItems.OrganisationTitle.ARENA.get_naming())).get_resultSet();
     }
 
-    public static UUID generateUUID(String table, Thating that) {
+    public static UUID generateUUID(String table, Clausement that) {
         return get(new Configurations(
                         Field.of(table, "id"), read(
                                 new Query(selecting(new Properties(table, that)).select())
@@ -159,12 +160,12 @@ public class TestItems {
             return truthiness;
         }
 
-        public static <IDENTITY extends Identity<UUID>> Model<IDENTITY, UUID> toModel(Instance instance) {
+        public static <IDENTITY extends Identity<Signature.UUID>> Model<IDENTITY, Signature.UUID> toModel(Instance instance) {
             return new Model<>() {
-                @SuppressWarnings("unchecked")
+
                 @Override
                 public IDENTITY get_identity() {
-                    return (IDENTITY) instance.get_id();
+                    return super.get_identity();
                 }
 
                 @Override
@@ -219,14 +220,14 @@ public class TestItems {
             return new Random().nextInt(100);
         }
 
-        public static class Id extends CommonIdentity<UUID> {
+        public static class Id extends CommonIdentity<Signature.UUID> {
 
-            public Id(UUID identifier) {
+            public Id(Signature.UUID identifier) {
                 super(identifier);
             }
 
             public static Id randomize() {
-                return new Id(UUID.randomUUID());
+                return new Id(new Signature.UUID(UUID.randomUUID()));
             }
 
             @Override

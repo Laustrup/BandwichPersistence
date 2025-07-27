@@ -4,7 +4,7 @@ import laustrup.bandwichpersistence.core.persistence.Field;
 import laustrup.bandwichpersistence.core.persistence.models.ConjunctionTable;
 import laustrup.bandwichpersistence.core.persistence.models.DatabaseTable;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition;
-import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Whereing.Thating;
+import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Clause.Clausement;
 import laustrup.bandwichpersistence.core.services.TableAnnotationService;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
@@ -80,7 +80,7 @@ public class SelectService {
                             .reduce((a, b) -> a + "\n" + b)
                             .orElse(""),
                     where = _properties.get_that()
-                            .map(Thating::apply)
+                            .map(Clausement::apply)
                             .orElse("");
             boolean
                     containsJoins = !_joins.isEmpty(),
@@ -96,7 +96,7 @@ public class SelectService {
 
             private final Set<Field> _selections;
 
-            private final Optional<Thating> _that;
+            private final Optional<Clausement> _that;
 
             private final String _table;
 
@@ -108,7 +108,7 @@ public class SelectService {
                 this(table, distinct, selections, Optional.empty());
             }
 
-            public Properties(String table, Thating where) {
+            public Properties(String table, Clausement where) {
                 this(table, false, new Seszt<>(), Optional.of(where));
             }
 
@@ -116,11 +116,11 @@ public class SelectService {
                 this(table, false, selections, Optional.empty());
             }
 
-            public Properties(String table, boolean distinct, Optional<Thating> that) {
+            public Properties(String table, boolean distinct, Optional<Clausement> that) {
                 this(table, distinct, new Seszt<>(), that);
             }
 
-            public Properties(String table, boolean distinct, Set<Field> selections, Optional<Thating> that) {
+            public Properties(String table, boolean distinct, Set<Field> selections, Optional<Clausement> that) {
                 if (table == null)
                     throw new NullPointerException("table can't be null for selecting properties!");
 
@@ -253,47 +253,47 @@ public class SelectService {
         @Getter
         public static class Where implements ISubSelecting {
 
-            private static Whereing _whereing;
+            private static Clause _clause;
 
-            public static Whereing complying() {
-                _whereing = new Whereing();
-                return _whereing;
+            public static Clause complying() {
+                _clause = new Clause();
+                return _clause;
             }
 
             @Override
             public String apply() {
-                return _whereing.apply();
+                return _clause.apply();
             }
 
-            public static class Whereing implements ISubSelecting {
+            public static class Clause implements ISubSelecting {
 
-                private static Thating _thating;
+                private static Clausement _clausement;
 
-                public Thating which(Condition condition) {
-                    _thating = new Thating(condition.apply());
-                    return _thating;
+                public Clausement which(Condition condition) {
+                    _clausement = new Clausement(condition.apply());
+                    return _clausement;
                 }
 
                 @Override
                 public String apply() {
-                    return _thating.apply();
+                    return _clausement.apply();
                 }
 
-                public static class Thating implements ISubSelecting {
+                public static class Clausement implements ISubSelecting {
 
                     private String _statement;
 
-                    public Thating(String statement) {
+                    public Clausement(String statement) {
                         _statement = statement;
                     }
 
-                    public Thating and(Condition condition) {
+                    public Clausement and(Condition condition) {
                         _statement += Gate.AND.get_statement() + condition.apply();
 
                         return this;
                     }
 
-                    public Thating or(Condition condition) {
+                    public Clausement or(Condition condition) {
                         _statement += Gate.OR.get_statement() + condition.apply();
 
                         return this;
