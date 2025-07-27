@@ -5,9 +5,9 @@ import java.util.function.Supplier;
 
 public interface AssertionChecker<E> {
 
-    AssertionChecker<E> isEqualTo(E actual);
+    AssertionChecker<E> is(E actual);
 
-    AssertionChecker<E> isNotEqualTo(E actual);
+    AssertionChecker<E> isNot(E actual);
 
     AssertionChecker<E> is(Predicate<E> assertion);
 

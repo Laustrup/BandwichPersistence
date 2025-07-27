@@ -2,11 +2,9 @@ package laustrup.bandwichpersistence.core.services;
 
 import laustrup.bandwichpersistence.BandwichTester;
 import laustrup.bandwichpersistence.core.services.EternaryService.Operator.Property;
-import laustrup.bandwichpersistence.core.utilities.collections.Liszt;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
-import static laustrup.bandwichpersistence.core.services.ObjectService.getFieldValue;
 import static laustrup.bandwichpersistence.core.services.EternaryService.*;
 import static laustrup.bandwichpersistence.quality_assurance.Asserter.asserting;
 
@@ -20,64 +18,70 @@ class EternaryServiceTests extends BandwichTester {
     @ParameterizedTest
     @EnumSource(Scenario.class)
     void canCheckIfNotNull(Scenario scenario) {
-        test(() -> delegate(ifNotNull(arrange(null)), scenario, false));
-        test(() -> delegate(ifNotNull(arrange("Not null")), scenario, true));
+        test(() -> delegate(ifNotNull(arrange(null)), scenario, notExpectations(scenario)));
+        test(() -> delegate(ifNotNull(arrange("Not null")), scenario, _then));
     }
 
     @ParameterizedTest
     @EnumSource(Scenario.class)
     void canCheckIfIsSame(Scenario scenario) {
         String string = "string";
-        test(() -> delegate(arrange(isSame(string, string)), scenario, true));
-        test(() -> delegate(arrange(isSame(string, string, string)), scenario, true));
-        test(() -> delegate(arrange(isSame(string, "Not String")), scenario, false));
-        test(() -> delegate(arrange(isSame(string, string, "Not String")), scenario, false));
+        String notExpectations = notExpectations(scenario);
+
+        test(() -> delegate(arrange(isSame(string, string)), scenario, _then));
+        test(() -> delegate(arrange(isSame(string, string, string)), scenario, _then));
+        test(() -> delegate(arrange(isSame(string, "Not String")), scenario, notExpectations));
+        test(() -> delegate(arrange(isSame(string, string, "Not String")), scenario, notExpectations));
     }
 
-    private void delegate(Eternary eternary, Scenario scenario, boolean expectedCondition) {
+    private void delegate(Eternary eternary, Scenario scenario, String expected) {
         switch (scenario) {
-            case THEN -> then(eternary, expectedCondition);
-            case OR -> or(eternary, expectedCondition);
-            case OR_ELSE -> orElse(eternary, expectedCondition);
+            case THEN -> then(eternary, expected);
+            case OR -> or(eternary, expected);
+            case OR_ELSE -> orElse(eternary, expected);
         }
     }
 
-    private void then(Eternary eternary, boolean expectedCondition) {
+    private void then(Eternary eternary, String expected) {
         Binder<String> binder = act(eternary.then(_then));
         String actual = binder.orElse(_orElse);
 
-        asserting(new Binder<>(new Property<>(_then, expectedCondition)))
-                .isEqualTo(binder);
-        asserting(actual).isEqualTo(_then);
+        asserting(new Binder<>(new Property<>(_then, _then.equals(expected)))).compare(binder);
+        asserting(expected).is(actual);
     }
 
-    private void or(Eternary eternary, boolean expectedCondition) {
-        Binder<String> binder = act(eternary.then(_then)
-                .or(_or, or -> or.equals(_or))
+    private void or(Eternary eternary, String expected) {
+        Binder<String> binder = act(eternary
+                .then(_then)
+                .or(_or, expected::equals)
         );
         String actual = binder.orElse(_orElse);
 
-        asserting((getPropertyFromOption(binder, _or).is_success() == expectedCondition))
-                .isTrue();
-        asserting(actual).isEqualTo(_or);
+        asserting((getPropertyFromOption(binder, _or).is_success() == expected.equals(_or))).isTrue();
+        asserting(expected).is(actual);
     }
 
-    private void orElse(Eternary eternary, boolean expectedCondition) {
+    private void orElse(Eternary eternary, String expected) {
         String actual = act(eternary.then(_then)
                 .or(_or, String::isEmpty)
                 .orElse(_orElse)
         );
 
-        asserting(_orElse)
-                .is(expected -> actual.equals(expected) == expectedCondition);
+        asserting(expected).is(actual::equals);
     }
 
-    @SuppressWarnings("unchecked")
     private Property<String> getPropertyFromOption(Binder<String> actual, String option) {
-        return ((Liszt<Property<String>>) getFieldValue(actual, Operator.Fields._properties)).stream()
+        return actual.get_properties().stream()
                 .filter(property -> property.get_option().equals(option))
                 .findFirst()
                 .orElseThrow();
+    }
+
+    private String notExpectations(Scenario scenario) {
+        return switch (scenario) {
+            case THEN, OR_ELSE -> _orElse;
+            case OR -> _or;
+        };
     }
 
     public enum Scenario {

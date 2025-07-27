@@ -3,6 +3,7 @@ package laustrup.bandwichpersistence.core.services;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /** A Service for standard Object algorithms. */
@@ -40,8 +41,11 @@ public class ObjectService extends Service {
 
     @SuppressWarnings("unchecked")
     public static <VALUE> VALUE getFieldValue(Object object, String fieldName) {
+        if (object == null || fieldName == null)
+            return null;
+
         Field declaredField = getDeclaredField(object, fieldName);
-        Object fieldValue = null;
+        Object fieldValue;
 
         try {
             fieldValue = declaredField.get(object);
@@ -63,10 +67,32 @@ public class ObjectService extends Service {
         return value;
     }
 
+    private static <OBJECT, VALUE> VALUE accessUnaccessibleField(
+            OBJECT object,
+            Field field,
+            BiFunction<OBJECT, Field, VALUE> logic) {
+        boolean accessible = field.canAccess(object);
+        if (!accessible)
+            field.setAccessible(true);
+        VALUE value = logic.apply(object, field);
+        field.setAccessible(accessible);
+
+        return value;
+    }
+
     public static Field getDeclaredField(Object object, String fieldName) {
         return Arrays.stream(object.getClass().getDeclaredFields())
-                .filter(field -> field.getName().equals(fieldName))
+                .filter(field -> accessUnaccessibleField(
+                        object,
+                        field,
+                        (o,f) -> f.getName()
+                ).equals(fieldName))
                 .findFirst()
-                .orElse(null);
+                .orElseThrow(() -> new IllegalArgumentException(String.format(
+                        "Field \"%s\" not found in object \"%s\"",
+                        fieldName,
+                        object.getClass().getSimpleName()
+                ))
+        );
     }
 }

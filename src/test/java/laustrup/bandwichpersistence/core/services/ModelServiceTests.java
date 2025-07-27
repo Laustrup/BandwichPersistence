@@ -37,7 +37,7 @@ class ModelServiceTests extends BandwichTester {
 
             for (int i = 0; i < expectations.size(); i++)
                 asserting(actual.get(i))
-                        .isEqualTo(expectations.get(i));
+                        .is(expectations.get(i));
         });
     }
 

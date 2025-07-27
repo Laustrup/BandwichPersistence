@@ -24,7 +24,7 @@ class SelectServiceTests extends BandwichTester {
             String actual = act(selecting(_table).select());
 
             asserting(expected)
-                    .isEqualTo(actual);
+                    .is(actual);
         });
     }
 
@@ -41,7 +41,7 @@ class SelectServiceTests extends BandwichTester {
             String actual = act(selecting(properties).select());
 
             asserting(expected)
-                    .isEqualTo(actual);
+                    .is(actual);
         });
     }
 
@@ -62,7 +62,7 @@ class SelectServiceTests extends BandwichTester {
             );
 
             asserting(expected)
-                    .isEqualTo(actual);
+                    .is(actual);
         });
     }
 
@@ -82,7 +82,7 @@ class SelectServiceTests extends BandwichTester {
             );
 
             asserting(expected)
-                    .isEqualTo(actual);
+                    .is(actual);
         });
     }
 }

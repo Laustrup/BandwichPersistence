@@ -13,6 +13,8 @@ import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
+import static laustrup.bandwichpersistence.core.utilities.console.Printer.print;
+
 /**
  * Implements a List of element E in an append way of adding elements.
  * It also implements the interface ICollectionUtility, which contains extra useful methods.
@@ -95,8 +97,8 @@ public class Liszt<E> extends Coollection<E> implements ILiszt<E>, List<E>, ICoo
         try { handleAdd(elements); }
         catch (Exception e) {
             if (elements.length>1)
-                Printer.get_instance().print("Couldn't add elements of " + Arrays.toString(elements) + " to Liszt...", e);
-            else Printer.get_instance().print("Couldn't add element of " + Arrays.toString(elements) + " to Liszt...", e);
+                print("Couldn't add elements of " + Arrays.toString(elements) + " to Liszt...", e);
+            else print("Couldn't add element of " + Arrays.toString(elements) + " to Liszt...", e);
             return false;
         }
 

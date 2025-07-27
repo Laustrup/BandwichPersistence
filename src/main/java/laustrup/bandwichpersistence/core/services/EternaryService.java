@@ -5,9 +5,9 @@ import laustrup.bandwichpersistence.core.utilities.collections.Liszt;
 import lombok.Getter;
 import lombok.experimental.FieldNameConstants;
 
-import java.util.Arrays;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 public class EternaryService {
 
@@ -21,8 +21,9 @@ public class EternaryService {
 
     @SafeVarargs
     public static <ELEMENT> Eternary isSame(ELEMENT element, ELEMENT other, ELEMENT... elements) {
-        return stating(Arrays.stream(elements)
-                .allMatch(index -> index == element && index == other));
+        return stating(Stream.of(elements)
+                .allMatch(element::equals) && other.equals(element)
+        );
     }
 
     public static Eternary stating(boolean success) {
@@ -35,12 +36,11 @@ public class EternaryService {
 
     @SafeVarargs
     static <ELEMENT> boolean nextCondition(boolean current, Operator.Property<ELEMENT>... properties) {
-        return Arrays.stream(properties).noneMatch(Operator.Property::is_success) && current;
+        return nextCondition(current, new Liszt<>(properties));
     }
 
-    @SuppressWarnings("unchecked")
     static <ELEMENT> boolean nextCondition(boolean current, Coollection<Operator.Property<ELEMENT>> properties) {
-        return nextCondition(current, properties.get_data());
+        return properties.stream().filter(Operator.Property::is_success).toList().size() <= 1 && current;
     }
 
     @FieldNameConstants
@@ -52,9 +52,11 @@ public class EternaryService {
             _success = success;
         }
 
-        public <ITEM> Binder<ITEM> then(ITEM element) {
-            Operator.Property<ITEM> property = new Operator.Property<>(element, _success);
-            return new Binder<>(new Operator.Property<>(element, nextCondition(_success, property)));
+        public <ITEM> Binder<ITEM> then(ITEM item) {
+            return new Binder<>(new Operator.Property<>(
+                    item,
+                    nextCondition(_success, new Operator.Property<>(item, _success))
+            ));
         }
 
         public <ITEM> ITEM thenElseNull(ITEM element) {
@@ -88,21 +90,30 @@ public class EternaryService {
             super(properties);
         }
 
+        public Binder(Liszt<Operator.Property<ELEMENT>> properties) {
+            super(properties);
+        }
+
         public Binder<ELEMENT> or(ELEMENT element, Predicate<ELEMENT> predicate) {
             _properties.add(new Property<>(element, nextCondition(predicate.test(element), _properties)));
 
-            return new Binder<>(_properties.get_data());
+            return new Binder<>(_properties);
         }
     }
 
     @FieldNameConstants
+    @Getter
     public static class Operator<ITEM> {
 
         protected Liszt<Property<ITEM>> _properties;
 
         @SafeVarargs
         public Operator(Property<ITEM>... properties) {
-            _properties = new Liszt<>(properties);
+            this(new Liszt<>(properties));
+        }
+
+        public Operator(Liszt<Property<ITEM>> properties) {
+            _properties = properties;
         }
 
         public ITEM orElse(ITEM alternative) {
