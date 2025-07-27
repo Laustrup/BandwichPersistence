@@ -34,7 +34,7 @@ class BuilderServiceTests extends BandwichTester {
     @ParameterizedTest
     @CsvSource(value = {"true", "false"})
     void canCombine(boolean shouldUpdate) {
-        test(() -> {
+        mocked(() -> {
             Instance entity = Instance.initialise();
             Seszt<Instance> collection = new Seszt<>(
                     Instance.initialise(),

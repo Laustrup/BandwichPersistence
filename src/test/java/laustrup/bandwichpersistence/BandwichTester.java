@@ -3,7 +3,6 @@ package laustrup.bandwichpersistence;
 import laustrup.bandwichpersistence.core.persistence.models.Query;
 import laustrup.bandwichpersistence.quality_assurance.Tester;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 
 import java.sql.SQLException;
 
@@ -19,17 +18,23 @@ public class BandwichTester extends Tester {
 
     protected final String _testPassword = "123";
 
-    @BeforeEach
-    public void beforeEach() {
+    private boolean _mockedTest = false;
+
+    @Override
+    protected void mocking() {
+        _mockedTest = true;
         testMode(_schema);
     }
 
     @AfterEach
     void afterEach() {
-        try {
-            execute(_cleanseDatabaseQuery, ROOT_PATH);
-        } catch (SQLException exception) {
-            throw new RuntimeException(exception);
+        if (_mockedTest) {
+            try {
+                execute(_cleanseDatabaseQuery, ROOT_PATH);
+            } catch (SQLException exception) {
+                throw new RuntimeException(exception);
+            }
         }
+        _mockedTest = false;
     }
 }

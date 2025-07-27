@@ -31,7 +31,7 @@ class JDBCServiceTests extends BandwichTester {
             "Table.ColumnTest" + _delimiter + "table.column_test"
     }, delimiter = _delimiter)
     void canTranslateToDatabaseColumn(String field, String expectation) {
-        test(() -> {
+        mocked(() -> {
             arrange(() -> field);
 
             String actual = act(() -> toDatabaseColumn(field));
@@ -43,7 +43,7 @@ class JDBCServiceTests extends BandwichTester {
     @ParameterizedTest
     @CsvSource(value = {"true", "false"})
     void canSetReference(boolean isBinary) {
-        test(() -> {
+        mocked(() -> {
             ResultSet resultSet = generateResultSet();
             AtomicReference<String> reference = isBinary ? null : arrange(AtomicReference::new);
             AtomicReference<UUID> uuidReference = isBinary ? arrange(AtomicReference::new) : null;
@@ -69,7 +69,7 @@ class JDBCServiceTests extends BandwichTester {
 
     @Test
     void canBuildMultiple() {
-        test(() -> {
+        mocked(() -> {
             ResultSet resultSet = generateResultSet();
 
             var actual = act(build(

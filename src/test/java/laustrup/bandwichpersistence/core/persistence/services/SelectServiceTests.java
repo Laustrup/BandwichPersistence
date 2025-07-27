@@ -1,10 +1,10 @@
 package laustrup.bandwichpersistence.core.persistence.services;
 
+import laustrup.bandwichpersistence.BandwichTester;
 import laustrup.bandwichpersistence.core.persistence.Field;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Join;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Properties;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition;
-import laustrup.bandwichpersistence.quality_assurance.Tester;
 import org.junit.jupiter.api.Test;
 
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.*;
@@ -12,7 +12,7 @@ import static laustrup.bandwichpersistence.core.persistence.services.SelectServi
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.complying;
 import static laustrup.bandwichpersistence.quality_assurance.Asserter.asserting;
 
-class SelectServiceTests extends Tester {
+class SelectServiceTests extends BandwichTester {
 
     private final String _table = "table";
 

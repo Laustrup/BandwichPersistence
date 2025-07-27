@@ -32,4 +32,9 @@ public class QualityAssuranceTests extends Tester {
             }
         });
     }
+
+    @Override
+    protected void mocking() {
+        throw new IllegalStateException("Quality Assurance tests should not be mocked!");
+    }
 }

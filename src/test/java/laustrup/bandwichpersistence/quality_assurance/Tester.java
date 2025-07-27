@@ -116,6 +116,18 @@ public abstract class Tester extends Actor {
             _editor.beforeEach();
     }
 
+    protected abstract void mocking();
+
+    protected void mocked(Supplier<String> supplier) {
+        mocking();
+        test(supplier);
+    }
+
+    protected void mocked(Runnable runnable) {
+        mocking();
+        test(runnable);
+    }
+
     /**
      * Must be used before each test method, since it will catch exceptions and print test information.
      * @param supplier The test algorithm that will be supplied,

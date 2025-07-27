@@ -16,7 +16,7 @@ class UserDetailsManagerTests extends BandwichTester {
     void canGetOrganisationEmployee() {
         String email = "john@arena.com";
 
-        test(() -> {
+        mocked(() -> {
             Login login = new Login(email, _testPassword);
             Employee expected;
 
