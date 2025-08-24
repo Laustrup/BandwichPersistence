@@ -17,6 +17,7 @@ import java.util.function.Supplier;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
+import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.DatabaseService.columnOf;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService.Configurations.Mode.*;
 
 public class JDBCService {
@@ -281,8 +282,13 @@ public class JDBCService {
                 try {
                     Optional<byte[]> bytes = Optional.ofNullable(configurations.resultSet.getBytes(configurations.field()));
                     return bytes.isPresent() ? UUID.nameUUIDFromBytes(bytes.orElseThrow()) : null;
-                } catch (SQLException exception) {
-                    throw new RuntimeException(exception);
+                } catch (SQLException ignored) {
+                    try {
+                        Optional<byte[]> bytes = Optional.ofNullable(configurations.resultSet.getBytes(columnOf(configurations.field())));
+                        return bytes.isPresent() ? UUID.nameUUIDFromBytes(bytes.orElseThrow()) : null;
+                    } catch (SQLException exception) {
+                        throw new RuntimeException(exception);
+                    }
                 }
             });
         }
@@ -489,6 +495,10 @@ public class JDBCService {
 
         public static String specifyColumn(String... columnTitle) {
             return String.join(".", columnTitle);
+        }
+
+        public static String columnOf(String field) {
+            return field.split("\\.")[1];
         }
     }
 }

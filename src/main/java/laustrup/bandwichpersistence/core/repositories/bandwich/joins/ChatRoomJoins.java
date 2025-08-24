@@ -18,7 +18,7 @@ public class ChatRoomJoins {
                     Field.of(ARTIST)
             )), LEFT = left(
                     CHAT_ROOM.get_title(),
-                    Condition.equals(Field.of(CHAT_ROOM), Field.of(ARTIST, CHAT_ROOM.get_idReference())),
+                    Condition.equals(Field.of(CHAT_ROOM), Field.of(ARTIST_CHAT_ROOM, CHAT_ROOM.get_idReference())),
                     Condition.equals(Field.of(CHAT_ROOM), Field.of(ORGANISATION_EMPLOYEE_CHAT_ROOM, CHAT_ROOM.get_idReference()))
             );
 }

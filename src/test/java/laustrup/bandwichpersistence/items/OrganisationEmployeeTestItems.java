@@ -79,7 +79,7 @@ public class OrganisationEmployeeTestItems {
                 )).addJoin(Join.inner(
                         contactInfoTable,
                         Field.of(toAlias(contactInfoTable), Model.ModelDTO.Fields.id),
-                        Field.of(employeeTable, fieldToColumnName(ContactInfo.class.getSimpleName() + Model.Fields._identity))
+                        Field.of(toAlias(employeeTable), fieldToColumnName(ContactInfo.class.getSimpleName() + "_id"))
                 ))
         ));
     }

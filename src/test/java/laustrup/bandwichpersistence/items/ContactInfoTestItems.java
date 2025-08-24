@@ -7,13 +7,13 @@ import laustrup.bandwichpersistence.core.models.users.ContactInfo.Phone;
 import laustrup.bandwichpersistence.core.persistence.Field;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Properties;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition;
-import laustrup.bandwichpersistence.core.services.DatabaseTableAnnotationService;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition.Equation.EQUALS;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.complying;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.selecting;
 import static laustrup.bandwichpersistence.core.services.DatabaseTableAnnotationService.get_tableTitle;
+import static laustrup.bandwichpersistence.core.services.DatabaseTableAnnotationService.toAlias;
 import static laustrup.bandwichpersistence.items.TestItems.generateUUID;
 
 public class ContactInfoTestItems {
@@ -31,7 +31,7 @@ public class ContactInfoTestItems {
                         table,
                         selecting(new Properties(
                                 table,
-                                complying().which(Condition.of(Field.of(table, ContactInfo.DTO.Fields.email), EQUALS, email))
+                                complying().which(Condition.of(Field.of(toAlias(table), ContactInfo.DTO.Fields.email), EQUALS, email))
                         ))
                 )),
                 email,

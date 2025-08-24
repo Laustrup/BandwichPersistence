@@ -11,7 +11,7 @@ public record Field(String alias, String row) {
     private static final String[] _idIndicators = new String[]{"id", "_id"};
 
     public static Field of(DatabaseTable.Properties databaseTableProperties) {
-        return of(databaseTableProperties.get_title(), "id");
+        return of(toAlias(databaseTableProperties.get_title()), "id");
     }
 
     public static Field of(DatabaseTable.Properties databaseTableProperties, String referenceId) {

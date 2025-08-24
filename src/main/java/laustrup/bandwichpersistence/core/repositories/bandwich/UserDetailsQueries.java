@@ -7,6 +7,7 @@ import laustrup.bandwichpersistence.core.persistence.services.SelectService.Sele
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Clause.Clausement;
 import laustrup.bandwichpersistence.core.repositories.bandwich.joins.*;
+import laustrup.bandwichpersistence.core.services.DatabaseTableAnnotationService;
 import lombok.Getter;
 
 import java.util.Optional;
@@ -44,7 +45,7 @@ public class UserDetailsQueries extends BandwichCommonQueries {
     public static Query selectAllForLogin(String email) {
         return new Query(selectAll(
                 Optional.of(complying().which(Condition.equals(
-                        Field.of(get_tableTitle(ContactInfo.class), "email"),
+                        Field.of(toAlias(get_tableTitle(ContactInfo.class)), "email"),
                         email
                 )))
         ));
