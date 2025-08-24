@@ -1,11 +1,9 @@
 package laustrup.bandwichpersistence.core.persistence.services;
 
 import laustrup.bandwichpersistence.core.persistence.Field;
-import laustrup.bandwichpersistence.core.persistence.models.ConjunctionTable;
-import laustrup.bandwichpersistence.core.persistence.models.DatabaseTable;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Clause.Clausement;
-import laustrup.bandwichpersistence.core.services.TableAnnotationService;
+import laustrup.bandwichpersistence.core.services.DatabaseTableAnnotationService;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
 
@@ -17,8 +15,8 @@ import static java.lang.String.format;
 import static java.lang.String.join;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition.Equation.EQUALS;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition.Equation.IS_NULL;
-import static laustrup.bandwichpersistence.core.services.TableAnnotationService.get_tableTitle;
-import static laustrup.bandwichpersistence.core.services.TableAnnotationService.toAlias;
+import static laustrup.bandwichpersistence.core.services.DatabaseTableAnnotationService.get_tableTitle;
+import static laustrup.bandwichpersistence.core.services.DatabaseTableAnnotationService.toAlias;
 
 public class SelectService {
 
@@ -53,13 +51,14 @@ public class SelectService {
 
         private String defineSelectStatement() {
             return /*language=MySQL*/ format(
-                    "select%s%sfrom %s",
+                    "select%s%sfrom %s %s",
                     _properties.is_distinct() ? " distinct " : " ",
                     _properties.get_selections().stream()
                             .map(Field::get_content)
                             .reduce((a, b) -> a + ", " + b)
                             .orElse("* "),
-                    _properties.get_table()
+                    _properties.get_table(),
+                    toAlias(_properties.get_table())
             );
         }
 
@@ -74,12 +73,12 @@ public class SelectService {
         }
 
         public String select() {
-            String
-                    joins = _joins.stream()
-                            .map(Join::apply)
-                            .reduce((a, b) -> a + "\n" + b)
-                            .orElse(""),
-                    where = _properties.get_that()
+            StringBuilder joins = new StringBuilder();
+
+            for (Join join : _joins)
+                joins.append(joins.isEmpty() ? "" : "\n").append(join.apply());
+
+            String where = _properties.get_that()
                             .map(Clausement::apply)
                             .orElse("");
             boolean
@@ -178,16 +177,8 @@ public class SelectService {
 
                 _area = area;
                 _table = table;
-                _alias = TableAnnotationService.toAlias(table);
+                _alias = toAlias(table);
                 _products = products;
-            }
-
-            public static Join left(ConjunctionTable table, Condition... conditions) {
-                return left(table, conditions);
-            }
-
-            public static Join left(DatabaseTable table, Condition... conditions) {
-                return left(table.get_title(), conditions);
             }
 
             public static Join left(String table, Condition... condition) {

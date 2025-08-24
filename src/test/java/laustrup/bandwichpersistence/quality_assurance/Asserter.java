@@ -109,6 +109,9 @@ public class Asserter {
         }
 
         public void compare(EXPECTED actual) {
+            if (actual == null)
+                fail(new NullPointerException("When comparing expected with actual, actual was null!"));
+
             Map<String, Field> actualFields = Arrays.stream(actual.getClass().getDeclaredFields())
                     .collect(Collectors.toMap(Field::getName, field -> field));
 

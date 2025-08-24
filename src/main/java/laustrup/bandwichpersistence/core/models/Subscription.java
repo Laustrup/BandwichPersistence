@@ -15,7 +15,7 @@ import lombok.experimental.FieldNameConstants;
  * Only Artists and Bands can have a paying subscription.
  */
 @Getter @FieldNameConstants
-@Table(title = "subscriptions")
+@DatabaseTable(title = "subscriptions")
 public class Subscription {
 
     private Id _id;

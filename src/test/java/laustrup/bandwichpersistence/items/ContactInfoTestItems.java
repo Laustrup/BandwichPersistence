@@ -7,12 +7,13 @@ import laustrup.bandwichpersistence.core.models.users.ContactInfo.Phone;
 import laustrup.bandwichpersistence.core.persistence.Field;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Properties;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition;
+import laustrup.bandwichpersistence.core.services.DatabaseTableAnnotationService;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition.Equation.EQUALS;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.complying;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.selecting;
-import static laustrup.bandwichpersistence.core.services.TableAnnotationService.get_tableTitle;
+import static laustrup.bandwichpersistence.core.services.DatabaseTableAnnotationService.get_tableTitle;
 import static laustrup.bandwichpersistence.items.TestItems.generateUUID;
 
 public class ContactInfoTestItems {

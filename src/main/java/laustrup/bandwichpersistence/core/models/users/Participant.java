@@ -45,7 +45,6 @@ public class Participant extends User<Participant.Id> {
                 new Seszt<>(participant.getParticipations().stream().map(Participation::new)),
                 new Seszt<>(participant.getRatings().stream().map(Rating::new)),
                 new Subscription(participant.getSubscription()),
-                new Seszt<>(participant.getAuthorities().stream()),
                 new Seszt<>(participant.getFollows().stream().map(Follow::new)),
                 participant.getHistory(),
                 participant.getTimestamp()
@@ -62,7 +61,6 @@ public class Participant extends User<Participant.Id> {
             Seszt<Participation> participations,
             Seszt<Rating> ratings,
             Subscription subscription,
-            Seszt<User.Authority> authorities,
             Seszt<Follow> follows,
             History history,
             Instant timestamp
@@ -76,7 +74,6 @@ public class Participant extends User<Participant.Id> {
                 contactInfo,
                 participations,
                 subscription,
-                authorities,
                 history,
                 timestamp
         );

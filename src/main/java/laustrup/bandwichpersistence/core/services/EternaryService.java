@@ -5,8 +5,10 @@ import laustrup.bandwichpersistence.core.utilities.collections.Liszt;
 import lombok.Getter;
 import lombok.experimental.FieldNameConstants;
 
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 public class EternaryService {
@@ -19,6 +21,18 @@ public class EternaryService {
         return stating(element == null, element);
     }
 
+    public static Itemernary<String> ifEmpty(String string) {
+        return stating(string == null || string.isEmpty(), string);
+    }
+
+    public static Itemernary<String> ifNotEmpty(String string) {
+        return stating(string != null && !string.isEmpty(), string);
+    }
+
+    public static <ITEM> Itemernary<ITEM> stating(boolean success, ITEM item) {
+        return new Itemernary<>(success, item);
+    }
+
     @SafeVarargs
     public static <ELEMENT> Eternary isSame(ELEMENT element, ELEMENT other, ELEMENT... elements) {
         return stating(Stream.of(elements)
@@ -28,10 +42,6 @@ public class EternaryService {
 
     public static Eternary stating(boolean success) {
         return new Eternary(success);
-    }
-
-    public static <ITEM> Itemernary<ITEM> stating(boolean success, ITEM item) {
-        return new Itemernary<>(success, item);
     }
 
     @SafeVarargs
@@ -73,12 +83,20 @@ public class EternaryService {
             _item = item;
         }
 
+        public ITEM otherwise(ITEM item) {
+            return otherwise(origin -> item);
+        }
+
         public <RETURN> RETURN otherwise(Function<ITEM, RETURN> action) {
-            return !_success ? thenElseNull(action.apply(_item)) : null;
+            return !_success ? action.apply(_item) : null;
         }
 
         public <RETURN> RETURN get(Function<ITEM, RETURN> action) {
             return _success ? thenElseNull(action.apply(_item)) : null;
+        }
+
+        public ITEM elseNull() {
+            return _success ? _item : null;
         }
     }
 
@@ -116,16 +134,24 @@ public class EternaryService {
             _properties = properties;
         }
 
+        public ITEM orElse(Supplier<ITEM> action) {
+            return orElse(action.get());
+        }
+
         public ITEM orElse(ITEM alternative) {
-            return _properties.stream()
-                    .filter(Property::is_success)
-                    .map(Property::get_option)
-                    .findFirst()
+            return findSuccessfulProperty()
                     .orElse(alternative);
         }
 
+        private Optional<ITEM> findSuccessfulProperty() {
+            return _properties.stream()
+                    .filter(Property::is_success)
+                    .map(Property::get_option)
+                    .findFirst();
+        }
+
         public ITEM orElseNull() {
-            return orElse(null);
+            return orElse((ITEM) null);
         }
 
         @Getter

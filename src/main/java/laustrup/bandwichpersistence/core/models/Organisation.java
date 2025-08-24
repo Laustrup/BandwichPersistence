@@ -20,7 +20,7 @@ import java.util.Set;
 
 import static laustrup.bandwichpersistence.core.utilities.collections.Seszt.copy;
 
-@Getter @laustrup.bandwichpersistence.core.models.Table(title = "organisations")
+@Getter @DatabaseTable(title = "organisations")
 public class Organisation extends Model<Organisation.Id, Signature.UUID> {
 
     public static final Table TABLE = new Table(Organisation.class.getSimpleName() + "s");
@@ -145,12 +145,17 @@ public class Organisation extends Model<Organisation.Id, Signature.UUID> {
     }
 
     @Getter
-    @laustrup.bandwichpersistence.core.models.Table(title = "organisation_employees")
+    @DatabaseTable(
+            title = "organisation_employees",
+            idReference = "organisation_employee_id"
+    )
     @FieldNameConstants
     public static class Employee extends BusinessUser<Employee.Id> {
 
-        @laustrup.bandwichpersistence.core.models.Table(title = "organisation_employments")
+        @DatabaseTable(title = "organisation_employments")
         private Seszt<Role> _roles;
+
+        private Seszt<Authority> _authorities;
 
         public Employee(DTO employee) {
             this(
@@ -193,13 +198,13 @@ public class Organisation extends Model<Organisation.Id, Signature.UUID> {
                     description,
                     contactInfo,
                     subscription,
-                    authorities,
                     chatRooms,
                     participations,
                     history,
                     timestamp
             );
             _roles = roles;
+            _authorities = authorities;
         }
 
         public enum Role {
@@ -224,10 +229,18 @@ public class Organisation extends Model<Organisation.Id, Signature.UUID> {
             }
         }
 
+        @DatabaseTable(title = "organisation_employee_authorities")
+        public enum Authority {
+            STANDARD,
+            ADMIN
+        }
+
         @Getter @FieldNameConstants
         public static class DTO extends BusinessUserDTO<Employee.Id> {
 
             private Set<Role> roles;
+
+            private Set<Authority> authorities;
 
             @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
             public DTO(
@@ -255,11 +268,11 @@ public class Organisation extends Model<Organisation.Id, Signature.UUID> {
                         participations,
                         subscription,
                         chatRooms,
-                        authorities,
                         history,
                         timestamp
                 );
                 this.roles = roles;
+                this.authorities = authorities;
             }
 
             public DTO(Organisation.Employee employee) {

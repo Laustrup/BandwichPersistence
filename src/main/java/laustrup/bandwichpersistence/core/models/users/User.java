@@ -69,8 +69,6 @@ public abstract class User<IDENTITY extends User.Id> extends Model<IDENTITY, Sig
      */
     protected Subscription _subscription;
 
-    protected Seszt<Authority> _authorities;
-
     protected History _history;
 
     /**
@@ -87,7 +85,6 @@ public abstract class User<IDENTITY extends User.Id> extends Model<IDENTITY, Sig
                 new ContactInfo(user.getContactInfo()),
                 Seszt.copy(user.getParticipations(), User.Participation::new),
                 new Subscription(user.getSubscription()),
-                new Seszt<>(user.getAuthorities().stream()),
                 user.getHistory(),
                 user.getTimestamp()
         );
@@ -102,7 +99,6 @@ public abstract class User<IDENTITY extends User.Id> extends Model<IDENTITY, Sig
             ContactInfo contactInfo,
             Seszt<Participation> participations,
             Subscription subscription,
-            Seszt<Authority> authorities,
             History history,
             Instant timestamp
     ) {
@@ -114,7 +110,6 @@ public abstract class User<IDENTITY extends User.Id> extends Model<IDENTITY, Sig
         _description = description;
         _participations = participations;
         _subscription = subscription;
-        _authorities = authorities;
         _history = history;
     }
 
@@ -213,12 +208,6 @@ public abstract class User<IDENTITY extends User.Id> extends Model<IDENTITY, Sig
         public Class<?> getOwnerClassType() {
             return User.class;
         }
-    }
-
-    @Table(title = "authorities")
-    public enum Authority {
-        STANDARD,
-        ADMIN
     }
 
     @Getter
@@ -333,8 +322,6 @@ public abstract class User<IDENTITY extends User.Id> extends Model<IDENTITY, Sig
 
         protected ZoneId zoneId;
 
-        protected Set<Authority> authorities;
-
         protected History history;
 
         public UserDTO(
@@ -346,7 +333,6 @@ public abstract class User<IDENTITY extends User.Id> extends Model<IDENTITY, Sig
                 ContactInfo.DTO contactInfo,
                 Set<Participation.DTO> participations,
                 Subscription.DTO subscription,
-                Set<Authority> authorities,
                 History history,
                 Instant timestamp
         ) {
@@ -360,7 +346,6 @@ public abstract class User<IDENTITY extends User.Id> extends Model<IDENTITY, Sig
             this.participations = participations;
             this.chatRooms = new HashSet<>();
             this.subscription = subscription;
-            this.authorities = authorities;
             this.history = history;
             this.timestamp = timestamp;
         }
@@ -375,7 +360,6 @@ public abstract class User<IDENTITY extends User.Id> extends Model<IDENTITY, Sig
                     new ContactInfo.DTO(user.get_contactInfo()),
                     user.get_participations().asSet(Participation.DTO::new),
                     new Subscription.DTO(user.get_subscription()),
-                    user.get_authorities(),
                     user.get_history(),
                     user.get_timestamp()
             );

@@ -2,7 +2,7 @@ package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.*;
 import laustrup.bandwichpersistence.core.models.Organisation.Employee.Role;
-import laustrup.bandwichpersistence.core.models.users.User.Authority;
+import laustrup.bandwichpersistence.core.models.users.Artist;
 import laustrup.bandwichpersistence.core.models.users.User.Participation;
 import laustrup.bandwichpersistence.core.models.users.User.UserDTO;
 import laustrup.bandwichpersistence.core.models.chats.ChatRoom;
@@ -67,7 +67,7 @@ public class OrganisationEmployeeBuilder extends BuilderService<Employee> {
             AtomicReference<ContactInfo> contactInfo = new AtomicReference<>();
             AtomicReference<Subscription> subscription = new AtomicReference<>();
             Seszt<Role> roles = new Seszt<>();
-            Seszt<Authority> authorities = new Seszt<>();
+            Seszt<Employee.Authority> authorities = new Seszt<>();
             Seszt<ChatRoom> chatRooms = new Seszt<>();
             Seszt<Participation> participations = new Seszt<>();
             AtomicReference<History> history = new AtomicReference<>(new History(History.JoinTableDetails.ORGANISATION_EMPLOYEE));
@@ -87,7 +87,7 @@ public class OrganisationEmployeeBuilder extends BuilderService<Employee> {
                                 Organisation.class.getSimpleName() + "Employments",
                                 Employee.DTO.Fields.roles.replace("s", ""))
                         );
-                        add(authorities, Field.of(UserDTO.Fields.authorities, "level"));
+                        add(authorities, Field.of(Artist.DTO.Fields.authorities, "level"));
                         combine(chatRooms, _chatRoomBuilder.build(resultSet));
                         combine(history.get().get_stories(), _historyBuilder.buildStory(resultSet, history.get()));
                         timestamp.set(getTimestamp(Fields.timestamp, Timestamp::toInstant));

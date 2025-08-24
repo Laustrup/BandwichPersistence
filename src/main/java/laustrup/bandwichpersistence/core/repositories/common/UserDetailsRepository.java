@@ -1,9 +1,9 @@
-package laustrup.bandwichpersistence.core.repositories;
+package laustrup.bandwichpersistence.core.repositories.common;
 
 import laustrup.bandwichpersistence.core.models.Login;
 import laustrup.bandwichpersistence.core.persistence.DatabaseParameter;
-import laustrup.bandwichpersistence.core.repositories.queries.UserDetailsQueries;
-import laustrup.bandwichpersistence.core.repositories.queries.UserDetailsQueries.Parameter;
+import laustrup.bandwichpersistence.core.repositories.bandwich.UserDetailsQueries;
+import laustrup.bandwichpersistence.core.repositories.bandwich.UserDetailsQueries.Parameter;
 
 import java.sql.ResultSet;
 import java.util.stream.Stream;

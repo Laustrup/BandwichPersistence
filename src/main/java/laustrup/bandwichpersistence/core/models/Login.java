@@ -10,6 +10,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @FieldNameConstants
@@ -31,10 +32,9 @@ public class Login implements UserDetails {
     }
 
     @Override
+    //TODO Create service to get authorities
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return user.get_authorities().stream()
-                .map(authority -> new SimpleGrantedAuthority(authority.name()))
-                .toList();
+        return List.of();
     }
 
     public User<?> setUser(User<?> user) {

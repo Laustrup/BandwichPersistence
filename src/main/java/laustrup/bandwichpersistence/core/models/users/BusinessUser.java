@@ -1,8 +1,10 @@
 package laustrup.bandwichpersistence.core.models.users;
 
+import laustrup.bandwichpersistence.core.models.DatabaseTable;
 import laustrup.bandwichpersistence.core.models.History;
 import laustrup.bandwichpersistence.core.models.Subscription;
 import laustrup.bandwichpersistence.core.models.chats.ChatRoom;
+import laustrup.bandwichpersistence.core.services.DatabaseTableAnnotationService;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
 import lombok.experimental.FieldNameConstants;
@@ -13,7 +15,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-@Getter
+@Getter @FieldNameConstants
 public abstract class BusinessUser<IDENTITY extends User.Id> extends User<IDENTITY> {
 
     private Seszt<ChatRoom> _chatRooms;
@@ -31,7 +33,6 @@ public abstract class BusinessUser<IDENTITY extends User.Id> extends User<IDENTI
             String description,
             ContactInfo contactInfo,
             Subscription subscription,
-            Seszt<Authority> authorities,
             Seszt<ChatRoom> chatRooms,
             Seszt<Participation> participations,
             History history,
@@ -46,7 +47,6 @@ public abstract class BusinessUser<IDENTITY extends User.Id> extends User<IDENTI
                 contactInfo,
                 participations,
                 subscription,
-                authorities,
                 history,
                 timestamp
         );
@@ -68,7 +68,6 @@ public abstract class BusinessUser<IDENTITY extends User.Id> extends User<IDENTI
                 Set<Participation.DTO> participations,
                 Subscription.DTO subscription,
                 Set<ChatRoom.DTO> chatRooms,
-                Set<Authority> authorities,
                 History history,
                 Instant timestamp
         ) {
@@ -81,7 +80,6 @@ public abstract class BusinessUser<IDENTITY extends User.Id> extends User<IDENTI
                     contactInfo,
                     participations,
                     subscription,
-                    authorities,
                     history,
                     timestamp
             );

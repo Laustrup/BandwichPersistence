@@ -5,7 +5,7 @@ import laustrup.bandwichpersistence.core.models.Response;
 import laustrup.bandwichpersistence.core.models.Subscription;
 import laustrup.bandwichpersistence.core.models.users.User;
 import laustrup.bandwichpersistence.core.persistence.Field;
-import laustrup.bandwichpersistence.core.repositories.UserDetailsRepository;
+import laustrup.bandwichpersistence.core.repositories.common.UserDetailsRepository;
 import laustrup.bandwichpersistence.core.services.builders.UserBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;

@@ -1,20 +1,21 @@
 package laustrup.bandwichpersistence.core.persistence;
 
-import laustrup.bandwichpersistence.core.persistence.models.ConjunctionTable;
-import laustrup.bandwichpersistence.core.persistence.models.DatabaseTable;
+import laustrup.bandwichpersistence.core.models.DatabaseTable;
 
 import java.util.Arrays;
+
+import static laustrup.bandwichpersistence.core.services.DatabaseTableAnnotationService.toAlias;
 
 public record Field(String alias, String row) {
 
     private static final String[] _idIndicators = new String[]{"id", "_id"};
 
-    public static Field of(ConjunctionTable table, String row) {
-        return of(table, row);
+    public static Field of(DatabaseTable.Properties databaseTableProperties) {
+        return of(databaseTableProperties.get_title(), "id");
     }
 
-    public static Field of(DatabaseTable table, String row) {
-        return of(table.get_alias(), row);
+    public static Field of(DatabaseTable.Properties databaseTableProperties, String referenceId) {
+        return of(toAlias(databaseTableProperties.get_title()), referenceId);
     }
 
     public static Field of(String alias, String row) {

@@ -25,7 +25,7 @@ import static laustrup.bandwichpersistence.core.services.ObjectService.ifExists;
 /**
  * This is used for multiple Users to communicate with each other through Mails.
  */
-@Getter @FieldNameConstants
+@Getter @FieldNameConstants @DatabaseTable(title = "chat_rooms")
 public class ChatRoom extends Model<ChatRoom.Id, Signature.UUID> {
 
     /**

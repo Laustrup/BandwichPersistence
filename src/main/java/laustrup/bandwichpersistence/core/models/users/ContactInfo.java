@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import laustrup.bandwichpersistence.core.models.Model;
 
-import laustrup.bandwichpersistence.core.models.Table;
+import laustrup.bandwichpersistence.core.models.DatabaseTable;
 import laustrup.bandwichpersistence.core.models.identification.CommonIdentity;
 import laustrup.bandwichpersistence.core.models.identification.Signature;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
@@ -26,7 +26,7 @@ import static laustrup.bandwichpersistence.core.utilities.collections.Seszt.copy
  * Contains information that people need in order to contact the User.
  */
 @Getter @FieldNameConstants
-@Table(title = "contact_info")
+@DatabaseTable(title = "contact_info")
 public class ContactInfo {
 
     private Id _id;
@@ -124,7 +124,7 @@ public class ContactInfo {
     /**
      * Contains values that determines address attributes.
      */
-    @Setter @Getter @Table(title = "addresses")
+    @Setter @Getter @DatabaseTable(title = "addresses")
     public static class Address {
 
         private Id _id;
@@ -263,7 +263,7 @@ public class ContactInfo {
     /**
      * An object with information about a curtain Country.
      */
-    @Getter @ToString @Table(title = "countries")
+    @Getter @ToString @DatabaseTable(title = "countries")
     public static class Country {
 
         private Id _id;
@@ -352,7 +352,7 @@ public class ContactInfo {
     /**
      * Details about phone contacting information.
      */
-    @Getter @ToString @Table(title = "phones")
+    @Getter @ToString @DatabaseTable(title = "phones")
     public static class Phone {
 
         /**

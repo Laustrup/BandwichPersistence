@@ -79,7 +79,7 @@ public class ArtistBuilder extends BuilderService<Artist> {
             AtomicReference<ContactInfo> contactInfo = new AtomicReference<>();
             Seszt<Album> albums = new Seszt<>();
             AtomicReference<Subscription> subscription = new AtomicReference<>();
-            Seszt<User.Authority> authorities = new Seszt<>();
+            Seszt<Artist.Authority> authorities = new Seszt<>();
             Seszt<ChatRoom> chatRooms = new Seszt<>();
             Seszt<Artist.Membership> memberships = new Seszt<>();
             Seszt<Event.Gig> gigs = new Seszt<>();
@@ -101,7 +101,7 @@ public class ArtistBuilder extends BuilderService<Artist> {
                         _contactInfoBuilder.complete(contactInfo, resultSet);
                         combine(albums, _albumBuilder.build(resultSet));
                         _subscriptionBuilder.complete(subscription, resultSet);
-                        combine(authorities, User.Authority.valueOf(getString(User.UserDTO.Fields.authorities)));
+                        combine(authorities, Artist.Authority.valueOf(getString(Artist.DTO.Fields.authorities)));
                         combine(chatRooms, _chatRoomBuilder.build(resultSet));
                         combine(
                                 memberships,

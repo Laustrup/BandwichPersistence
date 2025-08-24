@@ -1,5 +1,6 @@
 package laustrup.bandwichpersistence.core.models.chats.messages;
 
+import laustrup.bandwichpersistence.core.models.DatabaseTable;
 import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.models.identification.Signature;
 import laustrup.bandwichpersistence.core.models.users.User;
@@ -11,7 +12,7 @@ import java.time.Instant;
 /**
  * A Message that are sent in a ChatRoom.
  */
-@Getter
+@Getter @DatabaseTable(title = "messages")
 public class Message extends MessageBase<Message.Id> {
 
     /**

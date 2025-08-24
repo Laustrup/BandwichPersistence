@@ -13,10 +13,11 @@ import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Getter @FieldNameConstants @Table(title = "artists")
+@Getter @FieldNameConstants @DatabaseTable(title = "artists")
 public class Artist extends BusinessUser<Artist.Id> {
 
     /**
@@ -36,6 +37,8 @@ public class Artist extends BusinessUser<Artist.Id> {
     private Seszt<Event.Gig> _gigs;
 
     private Seszt<Rating> _ratings;
+
+    private Seszt<Authority> _authorities;
 
     /**
      * A description of the gear, that the Artist possesses and what they require for an Event.
@@ -100,7 +103,6 @@ public class Artist extends BusinessUser<Artist.Id> {
                 description,
                 contactInfo,
                 subscription,
-                authorities,
                 chatRooms,
                 participations,
                 history,
@@ -113,7 +115,7 @@ public class Artist extends BusinessUser<Artist.Id> {
         _runner = runner;
         _gigs = gigs;
         _follows = follows;
-
+        _authorities = authorities;
     }
 
     /**
@@ -168,6 +170,12 @@ public class Artist extends BusinessUser<Artist.Id> {
             });
     }
 
+    @DatabaseTable(title = "artist_authorities")
+    public enum Authority {
+        STANDARD,
+        ADMIN
+    }
+
     /**
      * The Data Transfer Object.
      * Is meant to be used as having common fields and be the body of Requests and Responses.
@@ -201,6 +209,8 @@ public class Artist extends BusinessUser<Artist.Id> {
 
         protected Set<Rating.DTO> ratings;
 
+        protected Set<Authority> authorities;
+
         /**
          * A description of the gear, that the Artist possesses and what they require for an Event.
          */
@@ -229,7 +239,19 @@ public class Artist extends BusinessUser<Artist.Id> {
                 @JsonProperty Set<Rating.DTO> ratings,
                 @JsonProperty String runner
         ) {
-            super(id, username, firstName, lastName, description, contactInfo, participations, subscription, chatRooms, authorities, history, timestamp);
+            super(
+                    id,
+                    username,
+                    firstName,
+                    lastName,
+                    description,
+                    contactInfo,
+                    participations,
+                    subscription,
+                    chatRooms,
+                    history,
+                    timestamp
+            );
             this.bandMemberships = bandMemberships;
             this.requests = requests;
             this.gigs = gigs;
@@ -237,6 +259,7 @@ public class Artist extends BusinessUser<Artist.Id> {
             this.albums = albums;
             this.ratings = ratings;
             this.runner = runner;
+            this.authorities = authorities;
         }
 
         /**
@@ -252,10 +275,11 @@ public class Artist extends BusinessUser<Artist.Id> {
             albums = artist.get_albums().stream().map(Album.DTO::new).collect(Collectors.toSet());
             ratings = artist.get_ratings().stream().map(Rating.DTO::new).collect(Collectors.toSet());
             runner = artist.get_runner();
+            authorities = new HashSet<>(artist.get_authorities());
         }
     }
 
-    @Getter @Table(title = "band_memberships")
+    @Getter @DatabaseTable(title = "band_memberships")
     public static class Membership {
 
         private Band _band;

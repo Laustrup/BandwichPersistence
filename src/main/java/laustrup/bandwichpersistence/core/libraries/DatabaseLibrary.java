@@ -13,7 +13,7 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static laustrup.bandwichpersistence.core.managers.ManagerService.databaseInteraction;
-import static laustrup.bandwichpersistence.core.repositories.DatabaseLibraryRepository.createSchemaIfNotExists;
+import static laustrup.bandwichpersistence.core.repositories.common.DatabaseLibraryRepository.createSchemaIfNotExists;
 
 public class DatabaseLibrary {
 

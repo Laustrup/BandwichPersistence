@@ -16,12 +16,12 @@ import static laustrup.bandwichpersistence.core.models.Organisation.Employee.Rol
 import static laustrup.bandwichpersistence.core.models.Subscription.Kind.PAYING;
 import static laustrup.bandwichpersistence.core.models.Subscription.Status.ACCEPTED;
 import static laustrup.bandwichpersistence.core.models.Subscription.UserType.ORGANISATION_EMPLOYEE;
+import static laustrup.bandwichpersistence.core.persistence.services.DatabaseColumnService.fieldToColumnName;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition.Equation.EQUALS;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.complying;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.selecting;
-import static laustrup.bandwichpersistence.core.services.StringService.fieldToColumnName;
-import static laustrup.bandwichpersistence.core.services.TableAnnotationService.get_tableTitle;
-import static laustrup.bandwichpersistence.core.services.TableAnnotationService.toAlias;
+import static laustrup.bandwichpersistence.core.services.DatabaseTableAnnotationService.get_tableTitle;
+import static laustrup.bandwichpersistence.core.services.DatabaseTableAnnotationService.toAlias;
 import static laustrup.bandwichpersistence.items.OrganisationTestItems.generateIværkstedContactInfo;
 import static laustrup.bandwichpersistence.items.SubscriptionTestItems.generateSubscription;
 import static laustrup.bandwichpersistence.items.TestItems.generateUUID;
