@@ -1,13 +1,15 @@
 package laustrup.bandwichpersistence.core.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import laustrup.bandwichpersistence.core.models.chats.messages.Post;
 import laustrup.bandwichpersistence.core.models.identification.CommonIdentity;
 import laustrup.bandwichpersistence.core.models.identification.Signature;
 import laustrup.bandwichpersistence.core.models.users.Artist;
 import laustrup.bandwichpersistence.core.models.users.Participant;
 import laustrup.bandwichpersistence.core.models.users.User;
+import laustrup.bandwichpersistence.core.persistence.models.DatabaseEntityConfigurations;
+import laustrup.bandwichpersistence.core.persistence.models.annotations.DatabaseEntity;
 import laustrup.bandwichpersistence.core.services.UserService;
-import laustrup.bandwichpersistence.core.models.chats.messages.Post;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,8 +23,8 @@ import java.util.stream.Collectors;
 /**
  * Extends performer and contains Artists as members
  */
-@Getter @FieldNameConstants @DatabaseTable(title = "bands")
-public class Band extends Model<Band.Id, Signature.UUID> {
+@Getter @FieldNameConstants @DatabaseEntity(title = "bands")
+public class Band extends Model<Band.Id, Signature.UUID> implements DatabaseEntityConfigurations {
 
     private String _description;
 
@@ -178,8 +180,8 @@ public class Band extends Model<Band.Id, Signature.UUID> {
         }
     }
 
-    @Getter @DatabaseTable(title = "band_memberships")
-    public static class Membership {
+    @Getter @DatabaseEntity(title = "band_memberships")
+    public static class Membership implements DatabaseEntityConfigurations {
 
         private Artist _member;
 

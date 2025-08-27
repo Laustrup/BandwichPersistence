@@ -1,24 +1,21 @@
 package laustrup.bandwichpersistence.core.persistence.services;
 
 import laustrup.bandwichpersistence.core.persistence.Field;
-import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Clause.Clausement;
-import laustrup.bandwichpersistence.core.services.DatabaseTableAnnotationService;
+import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
 
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static java.lang.String.format;
 import static java.lang.String.join;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition.Equation.EQUALS;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition.Equation.IS_NULL;
-import static laustrup.bandwichpersistence.core.services.DatabaseTableAnnotationService.get_tableTitle;
-import static laustrup.bandwichpersistence.core.services.DatabaseTableAnnotationService.toAlias;
+import static laustrup.bandwichpersistence.core.services.DatabaseEntityConfigurationsService.toAlias;
+import static laustrup.bandwichpersistence.core.services.EternaryService.stating;
 
-public class SelectService {
+public abstract class SelectService {
 
     public static Selecting selecting(String table) {
         return new Selecting(new Selecting.Properties(table));
@@ -53,10 +50,7 @@ public class SelectService {
             return /*language=MySQL*/ format(
                     "select%s%sfrom %s %s",
                     _properties.is_distinct() ? " distinct " : " ",
-                    _properties.get_selections().stream()
-                            .map(Field::get_content)
-                            .reduce((a, b) -> a + ", " + b)
-                            .orElse("* "),
+                    _properties.get_selections().apply(),
                     _properties.get_table(),
                     toAlias(_properties.get_table())
             );
@@ -93,33 +87,29 @@ public class SelectService {
 
             private final boolean _distinct;
 
-            private final Set<Field> _selections;
+            private final Selections _selections;
 
             private final Optional<Clausement> _that;
 
             private final String _table;
 
             public Properties(String table) {
-                this(table, false, new Seszt<>());
+                this(table, false, new Selections());
             }
 
-            public Properties(String table, boolean distinct, Set<Field> selections) {
+            public Properties(String table, boolean distinct, Selections selections) {
                 this(table, distinct, selections, Optional.empty());
             }
 
             public Properties(String table, Clausement where) {
-                this(table, false, new Seszt<>(), Optional.of(where));
-            }
-
-            public Properties(String table, Set<Field> selections) {
-                this(table, false, selections, Optional.empty());
+                this(table, false, new Selections(), Optional.of(where));
             }
 
             public Properties(String table, boolean distinct, Optional<Clausement> that) {
-                this(table, distinct, new Seszt<>(), that);
+                this(table, distinct, new Selections(), that);
             }
 
-            public Properties(String table, boolean distinct, Set<Field> selections, Optional<Clausement> that) {
+            public Properties(String table, boolean distinct, Selections selections, Optional<Clausement> that) {
                 if (table == null)
                     throw new NullPointerException("table can't be null for selecting properties!");
 
@@ -129,22 +119,34 @@ public class SelectService {
                 _that = that;
             }
 
-            public String getSelects() {
-                return _selections == null || _selections.isEmpty() ? "*" : _selections.stream()
-                        .map(Field::get_content)
-                        .reduce((a,b) -> a + b)
-                        .orElse("*");
-            }
-        }
+            public static class Selections implements ISubSelecting {
 
-        public record Table(String title) {
+                private final Map<Field, String> _groupings;
 
-            public Table(Class<?> clazz) {
-                this(get_tableTitle(clazz));
-            }
+                public Selections() {
+                    _groupings = new HashMap<>();
+                }
 
-            public String alias() {
-                return toAlias(title);
+                private String generateRow(Map.Entry<Field, String> entry) {
+                    return String.format("%s as %s", entry.getKey(), entry.getValue());
+                }
+
+                public Selections(Map<Field, String> groupings) {
+                    _groupings = groupings;
+                }
+
+                @Override
+                public String apply() {
+                    String asterix = "*";
+
+                    return stating(_groupings.isEmpty())
+                            .then(asterix)
+                            .orElse(() -> _groupings.entrySet().stream()
+                                    .map(this::generateRow)
+                                    .reduce((a, b) -> String.format("%s\n%s", a, b))
+                                    .orElse(asterix)
+                            );
+                }
             }
         }
 

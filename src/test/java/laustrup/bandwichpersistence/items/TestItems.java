@@ -11,7 +11,6 @@ import laustrup.bandwichpersistence.core.persistence.models.Query;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Properties;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Clause.Clausement;
-import laustrup.bandwichpersistence.core.services.DatabaseTableAnnotationService;
 import laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService.Configurations;
 import laustrup.bandwichpersistence.core.utilities.Coollection;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
@@ -31,7 +30,6 @@ import java.util.function.BiConsumer;
 
 import static laustrup.bandwichpersistence.core.persistence.DatabaseManager.read;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.selecting;
-import static laustrup.bandwichpersistence.core.services.DatabaseTableAnnotationService.toAlias;
 import static laustrup.bandwichpersistence.core.services.StringService.randomString;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService.get;
 

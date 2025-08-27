@@ -1,10 +1,11 @@
 package laustrup.bandwichpersistence.core.models.chats.messages;
 
-import laustrup.bandwichpersistence.core.models.DatabaseTable;
 import laustrup.bandwichpersistence.core.models.Model;
+import laustrup.bandwichpersistence.core.models.identification.CommonIdentity;
 import laustrup.bandwichpersistence.core.models.identification.Signature;
 import laustrup.bandwichpersistence.core.models.users.User;
-import laustrup.bandwichpersistence.core.models.identification.CommonIdentity;
+import laustrup.bandwichpersistence.core.persistence.models.DatabaseEntityConfigurations;
+import laustrup.bandwichpersistence.core.persistence.models.annotations.DatabaseEntity;
 import lombok.Getter;
 
 import java.time.Instant;
@@ -12,8 +13,8 @@ import java.time.Instant;
 /**
  * A Message that are sent in a ChatRoom.
  */
-@Getter @DatabaseTable(title = "messages")
-public class Message extends MessageBase<Message.Id> {
+@Getter @DatabaseEntity(title = "messages")
+public class Message extends MessageBase<Message.Id> implements DatabaseEntityConfigurations {
 
     /**
      * Will translate a transport object of this object into a construct of this object.

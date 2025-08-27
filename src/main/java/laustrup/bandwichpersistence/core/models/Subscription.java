@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import laustrup.bandwichpersistence.core.models.identification.CommonIdentity;
 import laustrup.bandwichpersistence.core.models.identification.Signature;
+import laustrup.bandwichpersistence.core.persistence.models.DatabaseEntityConfigurations;
+import laustrup.bandwichpersistence.core.persistence.models.annotations.DatabaseEntity;
 import laustrup.bandwichpersistence.core.services.ModelService;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,8 +17,8 @@ import lombok.experimental.FieldNameConstants;
  * Only Artists and Bands can have a paying subscription.
  */
 @Getter @FieldNameConstants
-@DatabaseTable(title = "subscriptions")
-public class Subscription {
+@DatabaseEntity(title = "subscriptions")
+public class Subscription implements DatabaseEntityConfigurations {
 
     private Id _id;
 

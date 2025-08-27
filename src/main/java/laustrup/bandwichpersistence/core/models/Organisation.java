@@ -10,6 +10,8 @@ import laustrup.bandwichpersistence.core.models.identification.Signature;
 import laustrup.bandwichpersistence.core.models.users.BusinessUser;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
 import laustrup.bandwichpersistence.core.persistence.Table;
+import laustrup.bandwichpersistence.core.persistence.models.DatabaseEntityConfigurations;
+import laustrup.bandwichpersistence.core.persistence.models.annotations.DatabaseEntity;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
 import lombok.experimental.FieldNameConstants;
@@ -20,8 +22,8 @@ import java.util.Set;
 
 import static laustrup.bandwichpersistence.core.utilities.collections.Seszt.copy;
 
-@Getter @DatabaseTable(title = "organisations")
-public class Organisation extends Model<Organisation.Id, Signature.UUID> {
+@Getter @DatabaseEntity(title = "organisations")
+public class Organisation extends Model<Organisation.Id, Signature.UUID> implements DatabaseEntityConfigurations {
 
     public static final Table TABLE = new Table(Organisation.class.getSimpleName() + "s");
 
@@ -145,14 +147,11 @@ public class Organisation extends Model<Organisation.Id, Signature.UUID> {
     }
 
     @Getter
-    @DatabaseTable(
-            title = "organisation_employees",
-            idReference = "organisation_employee_id"
-    )
+    @DatabaseEntity(title = "organisation_employees")
     @FieldNameConstants
-    public static class Employee extends BusinessUser<Employee.Id> {
+    public static class Employee extends BusinessUser<Employee.Id> implements DatabaseEntityConfigurations {
 
-        @DatabaseTable(title = "organisation_employments")
+        @DatabaseEntity(title = "organisation_employments")
         private Seszt<Role> _roles;
 
         private Seszt<Authority> _authorities;
@@ -229,7 +228,7 @@ public class Organisation extends Model<Organisation.Id, Signature.UUID> {
             }
         }
 
-        @DatabaseTable(title = "organisation_employee_authorities")
+        @DatabaseEntity(title = "organisation_employee_authorities")
         public enum Authority {
             STANDARD,
             ADMIN

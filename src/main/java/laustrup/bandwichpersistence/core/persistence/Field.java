@@ -1,21 +1,21 @@
 package laustrup.bandwichpersistence.core.persistence;
 
-import laustrup.bandwichpersistence.core.models.DatabaseTable;
+import laustrup.bandwichpersistence.core.persistence.models.DatabaseEntityConfigurations;
 
 import java.util.Arrays;
 
-import static laustrup.bandwichpersistence.core.services.DatabaseTableAnnotationService.toAlias;
+import static laustrup.bandwichpersistence.core.services.DatabaseEntityConfigurationsService.toAlias;
 
 public record Field(String alias, String row) {
 
     private static final String[] _idIndicators = new String[]{"id", "_id"};
 
-    public static Field of(DatabaseTable.Properties databaseTableProperties) {
-        return of(toAlias(databaseTableProperties.get_title()), "id");
+    public static Field of(DatabaseEntityConfigurations.Data configurationProperties) {
+        return of(toAlias(configurationProperties.get_title()), "id");
     }
 
-    public static Field of(DatabaseTable.Properties databaseTableProperties, String referenceId) {
-        return of(toAlias(databaseTableProperties.get_title()), referenceId);
+    public static Field of(DatabaseEntityConfigurations.Data configurationsProperties, String referenceId) {
+        return of(toAlias(configurationsProperties.get_title()), referenceId);
     }
 
     public static Field of(String alias, String row) {

@@ -1,10 +1,8 @@
 package laustrup.bandwichpersistence.core.models.users;
 
-import laustrup.bandwichpersistence.core.models.DatabaseTable;
 import laustrup.bandwichpersistence.core.models.History;
 import laustrup.bandwichpersistence.core.models.Subscription;
 import laustrup.bandwichpersistence.core.models.chats.ChatRoom;
-import laustrup.bandwichpersistence.core.services.DatabaseTableAnnotationService;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
 import lombok.experimental.FieldNameConstants;

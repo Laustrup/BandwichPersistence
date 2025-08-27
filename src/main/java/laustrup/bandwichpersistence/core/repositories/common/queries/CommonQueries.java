@@ -1,35 +1,22 @@
 package laustrup.bandwichpersistence.core.repositories.common.queries;
 
-import laustrup.bandwichpersistence.core.models.DatabaseTable;
-
-import static laustrup.bandwichpersistence.core.services.DatabaseTableAnnotationService.getDatabaseTableProperties;
+import laustrup.bandwichpersistence.core.persistence.models.DatabaseEntityConfigurations;
 
 public abstract class CommonQueries {
 
-    protected static DatabaseTable.Properties fromField(Class<?> clazz, String fieldName) {
+    protected static DatabaseEntityConfigurations.Data fromField(Class<?> clazz, String fieldName) {
         try {
-            return getDatabaseTableProperties(clazz.getDeclaredField(fieldName));
+            return DatabaseEntityConfigurations.Data.of(clazz.getDeclaredField(fieldName));
         } catch (NoSuchFieldException e) {
             throw new RuntimeException(e);
         }
     }
 
-    protected static DatabaseTable.Properties fromField(Class<?> child, Class<?> inherited, String fieldName) {
-        try {
-            DatabaseTable.Properties fieldProperties = getDatabaseTableProperties(inherited.getDeclaredField(fieldName));
-            return new DatabaseTable.Properties(
-                    child,
-                    fieldProperties.get_field().orElse(null),
-                    fieldProperties.get_title(),
-                    fieldProperties.get_idReference()
-            );
-        } catch (NoSuchFieldException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    protected static DatabaseTable.Properties conjunction(DatabaseTable.Properties target, DatabaseTable.Properties common) {
-        return DatabaseTable.Properties.of(target, common);
+    protected static DatabaseEntityConfigurations.Data conjunction(
+            DatabaseEntityConfigurations.Data target,
+            DatabaseEntityConfigurations.Data common
+    ) {
+        return DatabaseEntityConfigurations.Data.of(target, common);
     }
 
     public abstract static class DatabasePropertiesCollection {}

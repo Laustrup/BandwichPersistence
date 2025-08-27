@@ -4,10 +4,10 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import laustrup.bandwichpersistence.core.models.Model;
-
-import laustrup.bandwichpersistence.core.models.DatabaseTable;
 import laustrup.bandwichpersistence.core.models.identification.CommonIdentity;
 import laustrup.bandwichpersistence.core.models.identification.Signature;
+import laustrup.bandwichpersistence.core.persistence.models.DatabaseEntityConfigurations;
+import laustrup.bandwichpersistence.core.persistence.models.annotations.DatabaseEntity;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,8 +26,8 @@ import static laustrup.bandwichpersistence.core.utilities.collections.Seszt.copy
  * Contains information that people need in order to contact the User.
  */
 @Getter @FieldNameConstants
-@DatabaseTable(title = "contact_info")
-public class ContactInfo {
+@DatabaseEntity(title = "contact_info")
+public class ContactInfo implements DatabaseEntityConfigurations {
 
     private Id _id;
 
@@ -124,8 +124,8 @@ public class ContactInfo {
     /**
      * Contains values that determines address attributes.
      */
-    @Setter @Getter @DatabaseTable(title = "addresses")
-    public static class Address {
+    @Setter @Getter @DatabaseEntity(title = "addresses")
+    public static class Address implements DatabaseEntityConfigurations {
 
         private Id _id;
 
@@ -263,8 +263,8 @@ public class ContactInfo {
     /**
      * An object with information about a curtain Country.
      */
-    @Getter @ToString @DatabaseTable(title = "countries")
-    public static class Country {
+    @Getter @ToString @DatabaseEntity(title = "countries")
+    public static class Country implements DatabaseEntityConfigurations {
 
         private Id _id;
 
@@ -352,8 +352,8 @@ public class ContactInfo {
     /**
      * Details about phone contacting information.
      */
-    @Getter @ToString @DatabaseTable(title = "phones")
-    public static class Phone {
+    @Getter @ToString @DatabaseEntity(title = "phone")
+    public static class Phone implements DatabaseEntityConfigurations {
 
         /**
          * A country object, that represents the nationality of this PhoneNumber.

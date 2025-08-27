@@ -4,18 +4,18 @@ import laustrup.bandwichpersistence.core.models.users.ContactInfo;
 import laustrup.bandwichpersistence.core.persistence.Field;
 import laustrup.bandwichpersistence.core.persistence.models.Query;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Properties;
-import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Clause.Clausement;
+import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition;
 import laustrup.bandwichpersistence.core.repositories.bandwich.joins.*;
-import laustrup.bandwichpersistence.core.services.DatabaseTableAnnotationService;
 import lombok.Getter;
 
 import java.util.Optional;
 
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.complying;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.selecting;
-import static laustrup.bandwichpersistence.core.repositories.bandwich.BandwichCommonQueries.BandwichDatabasePropertiesCollection.*;
-import static laustrup.bandwichpersistence.core.services.DatabaseTableAnnotationService.*;
+import static laustrup.bandwichpersistence.core.repositories.bandwich.BandwichCommonQueries.BandwichDatabasePropertiesCollection.CONTACT_INFO;
+import static laustrup.bandwichpersistence.core.services.DatabaseEntityConfigurationsService.get_tableTitle;
+import static laustrup.bandwichpersistence.core.services.DatabaseEntityConfigurationsService.toAlias;
 
 public class UserDetailsQueries extends BandwichCommonQueries {
 

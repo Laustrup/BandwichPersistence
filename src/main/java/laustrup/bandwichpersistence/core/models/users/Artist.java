@@ -7,6 +7,8 @@ import laustrup.bandwichpersistence.core.models.*;
 import laustrup.bandwichpersistence.core.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.core.models.chats.Request;
 import laustrup.bandwichpersistence.core.models.identification.Signature;
+import laustrup.bandwichpersistence.core.persistence.models.DatabaseEntityConfigurations;
+import laustrup.bandwichpersistence.core.persistence.models.annotations.DatabaseEntity;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,7 +19,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Getter @FieldNameConstants @DatabaseTable(title = "artists")
+@Getter @FieldNameConstants @DatabaseEntity(title = "artists")
 public class Artist extends BusinessUser<Artist.Id> {
 
     /**
@@ -170,7 +172,7 @@ public class Artist extends BusinessUser<Artist.Id> {
             });
     }
 
-    @DatabaseTable(title = "artist_authorities")
+    @DatabaseEntity(title = "artist_authorities")
     public enum Authority {
         STANDARD,
         ADMIN
@@ -279,8 +281,8 @@ public class Artist extends BusinessUser<Artist.Id> {
         }
     }
 
-    @Getter @DatabaseTable(title = "band_memberships")
-    public static class Membership {
+    @Getter @DatabaseEntity(title = "band_memberships")
+    public static class Membership implements DatabaseEntityConfigurations {
 
         private Band _band;
 

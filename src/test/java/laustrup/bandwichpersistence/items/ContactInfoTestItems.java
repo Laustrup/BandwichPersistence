@@ -12,8 +12,8 @@ import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition.Equation.EQUALS;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.complying;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.selecting;
-import static laustrup.bandwichpersistence.core.services.DatabaseTableAnnotationService.get_tableTitle;
-import static laustrup.bandwichpersistence.core.services.DatabaseTableAnnotationService.toAlias;
+import static laustrup.bandwichpersistence.core.services.DatabaseEntityConfigurationsService.get_tableTitle;
+import static laustrup.bandwichpersistence.core.services.DatabaseEntityConfigurationsService.toAlias;
 import static laustrup.bandwichpersistence.items.TestItems.generateUUID;
 
 public class ContactInfoTestItems {
