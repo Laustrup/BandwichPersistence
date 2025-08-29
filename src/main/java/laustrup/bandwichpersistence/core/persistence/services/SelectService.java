@@ -1,17 +1,20 @@
 package laustrup.bandwichpersistence.core.persistence.services;
 
-import laustrup.bandwichpersistence.core.persistence.Field;
+import laustrup.bandwichpersistence.core.persistence.DatabaseField;
+import laustrup.bandwichpersistence.core.persistence.models.DatabaseEntityData;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Clause.Clausement;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 import static java.lang.String.join;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition.Equation.EQUALS;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition.Equation.IS_NULL;
+import static laustrup.bandwichpersistence.core.services.DatabaseEntityConfigurationsService.classFieldToDatabaseField;
 import static laustrup.bandwichpersistence.core.services.DatabaseEntityConfigurationsService.toAlias;
 import static laustrup.bandwichpersistence.core.services.EternaryService.stating;
 
@@ -27,7 +30,7 @@ public abstract class SelectService {
 
     public static class Selecting {
 
-        private interface ISubSelecting {
+        private interface Selector {
             String apply();
         }
 
@@ -72,7 +75,7 @@ public abstract class SelectService {
             for (Join join : _joins)
                 joins.append(joins.isEmpty() ? "" : "\n").append(join.apply());
 
-            String where = _properties.get_that()
+            String where = _properties.get_where()
                             .map(Clausement::apply)
                             .orElse("");
             boolean
@@ -89,50 +92,66 @@ public abstract class SelectService {
 
             private final Selections _selections;
 
-            private final Optional<Clausement> _that;
+            private final Clausement _where;
 
             private final String _table;
 
             public Properties(String table) {
-                this(table, false, new Selections());
+                this(Selections.asterisk(), table, false);
             }
 
-            public Properties(String table, boolean distinct, Selections selections) {
-                this(table, distinct, selections, Optional.empty());
+            public Properties(Selections selections, String table, boolean distinct) {
+                this(selections, table, null, distinct);
             }
 
             public Properties(String table, Clausement where) {
-                this(table, false, new Selections(), Optional.of(where));
+                this(Selections.asterisk(), table, where, false);
             }
 
-            public Properties(String table, boolean distinct, Optional<Clausement> that) {
-                this(table, distinct, new Selections(), that);
+            public Properties(String table, boolean distinct, Clausement where) {
+                this(Selections.asterisk(), table, where, distinct);
             }
 
-            public Properties(String table, boolean distinct, Selections selections, Optional<Clausement> that) {
+            public Properties(Selections selections, String table, Clausement where, boolean distinct) {
                 if (table == null)
                     throw new NullPointerException("table can't be null for selecting properties!");
 
                 _table = table;
                 _distinct = distinct;
                 _selections = selections;
-                _that = that;
+                _where = where;
             }
 
-            public static class Selections implements ISubSelecting {
+            public Optional<Clausement> get_where() {
+                return Optional.ofNullable(_where);
+            }
 
-                private final Map<Field, String> _groupings;
+            public static class Selections implements Selector {
 
-                public Selections() {
-                    _groupings = new HashMap<>();
-                }
+                private final Map<DatabaseField, String> _groupings;
 
-                private String generateRow(Map.Entry<Field, String> entry) {
+                private String generateRow(Map.Entry<DatabaseField, String> entry) {
                     return String.format("%s as %s", entry.getKey(), entry.getValue());
                 }
 
-                public Selections(Map<Field, String> groupings) {
+                public Selections(Map<DatabaseField, String> groupings) {
                     _groupings = groupings;
+                }
+
+                public Selections(DatabaseEntityData configurationData) {
+                    _groupings = new HashMap<>(classFieldToDatabaseField(configurationData.get_columns()));
+                }
+
+                public static Selections asterisk() {
+                    return new Selections(new HashMap<>());
+                }
+
+                @SafeVarargs
+                public static Selections of(Class<?>... classes) {
+                    return new Selections(new HashMap<>(Arrays.stream(classes)
+                            .flatMap(clazz ->
+                                    classFieldToDatabaseField(new DatabaseEntityData(clazz).get_columns()).entrySet().stream()
+                            ).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))));
                 }
 
                 @Override
@@ -151,7 +170,7 @@ public abstract class SelectService {
         }
 
         @Getter
-        public static class Join implements ISubSelecting {
+        public static class Join implements Selector {
 
             private final Area _area;
 
@@ -183,19 +202,19 @@ public abstract class SelectService {
                 _products = products;
             }
 
-            public static Join left(String table, Condition... condition) {
-                return new Join(Area.LEFT, table, new Seszt<>(Product.of(condition)));
+            public static Join left(String table, Condition... conditions) {
+                return new Join(Area.LEFT, table, new Seszt<>(Product.of(conditions)));
             }
 
             public static Join left(String table, Product... products) {
                 return new Join(Area.LEFT, table, new Seszt<>(products));
             }
 
-            public static Join left(String table, Field internal, Field external) {
+            public static Join left(String table, DatabaseField internal, DatabaseField external) {
                 return new Join(Area.LEFT, table, Condition.equals(internal, external));
             }
 
-            public static Join inner(String table, Field internal, Field external) {
+            public static Join inner(String table, DatabaseField internal, DatabaseField external) {
                 return new Join(Area.INNER, table, Condition.equals(internal, external));
             }
 
@@ -248,7 +267,7 @@ public abstract class SelectService {
         }
 
         @Getter
-        public static class Where implements ISubSelecting {
+        public static class Where implements Selector {
 
             private static Clause _clause;
 
@@ -262,7 +281,7 @@ public abstract class SelectService {
                 return _clause.apply();
             }
 
-            public static class Clause implements ISubSelecting {
+            public static class Clause implements Selector {
 
                 private static Clausement _clausement;
 
@@ -276,7 +295,7 @@ public abstract class SelectService {
                     return _clausement.apply();
                 }
 
-                public static class Clausement implements ISubSelecting {
+                public static class Clausement implements Selector {
 
                     private String _statement;
 
@@ -319,11 +338,11 @@ public abstract class SelectService {
             }
 
             @Getter
-            public static class Condition implements ISubSelecting {
+            public static class Condition implements Selector {
 
-                private final Field _this;
+                private final DatabaseField _this;
 
-                private final Field _that;
+                private final DatabaseField _that;
 
                 private final Object _thing;
 
@@ -331,7 +350,7 @@ public abstract class SelectService {
 
                 private final Equation _equation;
 
-                public Condition(Field thiz, Equation equation, Field that) {
+                public Condition(DatabaseField thiz, Equation equation, DatabaseField that) {
                     if (thiz == null)
                         throw new NullPointerException("This can't be null for selecting properties!");
                     if (that == null)
@@ -345,7 +364,7 @@ public abstract class SelectService {
                     _thing = null;
                 }
 
-                public Condition(Field thiz, Equation equation, Object thing) {
+                public Condition(DatabaseField thiz, Equation equation, Object thing) {
                     if (thiz == null)
                         throw new NullPointerException("This can't be null for selecting properties!");
                     if (thing == null)
@@ -359,7 +378,7 @@ public abstract class SelectService {
                     _that = null;
                 }
 
-                public Condition(Field thiz, Equation equation) {
+                public Condition(DatabaseField thiz, Equation equation) {
                     if (thiz == null)
                         throw new NullPointerException("this can't be null for selecting properties!");
                     validateEquation(equation, false, false);
@@ -371,7 +390,7 @@ public abstract class SelectService {
                     _thing = null;
                 }
 
-                public Condition(Field thiz, Equation equation, Selection selection) {
+                public Condition(DatabaseField thiz, Equation equation, Selection selection) {
                     if (thiz == null)
                         throw new NullPointerException("this can't be null for selecting properties!");
                     if (selection == null)
@@ -385,27 +404,27 @@ public abstract class SelectService {
                     _thing = null;
                 }
 
-                public static Condition equals(Field thiz, String thing) {
+                public static Condition equals(DatabaseField thiz, String thing) {
                     return of(thiz, EQUALS, thing);
                 }
 
-                public static Condition equals(Field thiz, Field that) {
+                public static Condition equals(DatabaseField thiz, DatabaseField that) {
                     return of(thiz, EQUALS, that);
                 }
 
-                public static Condition of(Field thiz, Equation equation, Field that) {
+                public static Condition of(DatabaseField thiz, Equation equation, DatabaseField that) {
                     return new Condition(thiz, equation, that);
                 }
 
-                public static Condition of(Field thiz, Equation equation) {
+                public static Condition of(DatabaseField thiz, Equation equation) {
                     return new Condition(thiz, equation);
                 }
 
-                public static Condition of(Field thiz, Equation equation, String thing) {
+                public static Condition of(DatabaseField thiz, Equation equation, String thing) {
                     return new Condition(thiz, equation, thing);
                 }
 
-                public static Condition of(Field thiz, Equation equation, Selection selection) {
+                public static Condition of(DatabaseField thiz, Equation equation, Selection selection) {
                     return new Condition(thiz, equation, selection);
                 }
 

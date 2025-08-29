@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.models.identification.CommonIdentity;
 import laustrup.bandwichpersistence.core.models.identification.Signature;
-import laustrup.bandwichpersistence.core.persistence.models.DatabaseEntityConfigurations;
 import laustrup.bandwichpersistence.core.persistence.models.annotations.DatabaseEntity;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
@@ -27,7 +26,7 @@ import static laustrup.bandwichpersistence.core.utilities.collections.Seszt.copy
  */
 @Getter @FieldNameConstants
 @DatabaseEntity(title = "contact_info")
-public class ContactInfo implements DatabaseEntityConfigurations {
+public class ContactInfo {
 
     private Id _id;
 
@@ -125,7 +124,7 @@ public class ContactInfo implements DatabaseEntityConfigurations {
      * Contains values that determines address attributes.
      */
     @Setter @Getter @DatabaseEntity(title = "addresses")
-    public static class Address implements DatabaseEntityConfigurations {
+    public static class Address {
 
         private Id _id;
 
@@ -264,7 +263,7 @@ public class ContactInfo implements DatabaseEntityConfigurations {
      * An object with information about a curtain Country.
      */
     @Getter @ToString @DatabaseEntity(title = "countries")
-    public static class Country implements DatabaseEntityConfigurations {
+    public static class Country {
 
         private Id _id;
 
@@ -353,7 +352,7 @@ public class ContactInfo implements DatabaseEntityConfigurations {
      * Details about phone contacting information.
      */
     @Getter @ToString @DatabaseEntity(title = "phone")
-    public static class Phone implements DatabaseEntityConfigurations {
+    public static class Phone {
 
         /**
          * A country object, that represents the nationality of this PhoneNumber.

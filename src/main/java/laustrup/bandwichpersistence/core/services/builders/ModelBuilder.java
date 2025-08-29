@@ -5,7 +5,7 @@ import laustrup.bandwichpersistence.core.models.Event;
 import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.models.identification.Identity;
 import laustrup.bandwichpersistence.core.models.users.User;
-import laustrup.bandwichpersistence.core.persistence.Field;
+import laustrup.bandwichpersistence.core.persistence.DatabaseField;
 import laustrup.bandwichpersistence.core.services.persistence.JDBCService;
 import laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService.Configurations;
 import lombok.SneakyThrows;
@@ -61,7 +61,7 @@ public class ModelBuilder extends BuilderService<Model<? extends Identity<?>, ?>
     }
 
     @SneakyThrows @Override
-    protected Function<Function<String, Field>, Model<? extends Identity<?>, ?>> logic(ResultSet resultSet) {
+    protected Function<Function<String, DatabaseField>, Model<? extends Identity<?>, ?>> logic(ResultSet resultSet) {
         throw new ExecutionControl.NotImplementedException("Logic in Model builder should not be implemented");
     }
 
@@ -82,7 +82,7 @@ public class ModelBuilder extends BuilderService<Model<? extends Identity<?>, ?>
     private String getZoneId(ResultSet resultSet) {
         return get(
                 new Configurations(
-                        JDBCService.getString(new Field(
+                        JDBCService.getString(new DatabaseField(
                                 Event.class.getSimpleName() + "s",
                                 Event.DTO.Fields.zoneId
                         )),

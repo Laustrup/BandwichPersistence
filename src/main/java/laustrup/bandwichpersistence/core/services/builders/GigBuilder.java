@@ -3,8 +3,7 @@ package laustrup.bandwichpersistence.core.services.builders;
 import laustrup.bandwichpersistence.core.models.Band;
 import laustrup.bandwichpersistence.core.models.Event;
 import laustrup.bandwichpersistence.core.models.Model;
-import laustrup.bandwichpersistence.core.persistence.Field;
-import laustrup.bandwichpersistence.core.services.persistence.JDBCService;
+import laustrup.bandwichpersistence.core.persistence.DatabaseField;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 
 import java.sql.ResultSet;
@@ -14,7 +13,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.logging.Logger;
 
-import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
+import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.getInstant;
+import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.set;
 
 public class GigBuilder extends BuilderService<Event.Gig> {
 
@@ -39,7 +39,7 @@ public class GigBuilder extends BuilderService<Event.Gig> {
     }
 
     @Override
-    protected Function<Function<String, Field>, Event.Gig> logic(ResultSet resultSet) {
+    protected Function<Function<String, DatabaseField>, Event.Gig> logic(ResultSet resultSet) {
         return table -> {
             AtomicReference<UUID> id = new AtomicReference<>();
             AtomicReference<Event> event = new AtomicReference<>();

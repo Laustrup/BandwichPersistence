@@ -4,10 +4,10 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import laustrup.bandwichpersistence.core.models.Model;
+import laustrup.bandwichpersistence.core.models.identification.CommonIdentity;
 import laustrup.bandwichpersistence.core.models.identification.Identity;
 import laustrup.bandwichpersistence.core.models.identification.Signature;
 import laustrup.bandwichpersistence.core.models.users.User;
-import laustrup.bandwichpersistence.core.models.identification.CommonIdentity;
 import laustrup.bandwichpersistence.core.services.ModelService;
 import lombok.Getter;
 import lombok.experimental.FieldNameConstants;
@@ -36,7 +36,7 @@ public class Post extends MessageBase<Post.Id> {
 
     public Post(
             Id id,
-            User<?> author,
+            User<? extends User.Id> author,
             Model<? extends Identity<?>, ?> receiver,
             String content,
             Instant isSent,

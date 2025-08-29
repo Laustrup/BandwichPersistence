@@ -4,7 +4,7 @@ import jdk.jshell.spi.ExecutionControl.NotImplementedException;
 import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.models.Organisation.Employee;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
-import laustrup.bandwichpersistence.core.persistence.Field;
+import laustrup.bandwichpersistence.core.persistence.DatabaseField;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Join;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Properties;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition;
@@ -69,7 +69,7 @@ public class OrganisationEmployeeTestItems {
                         employeeTable,
                         complying()
                                 .which(Condition.of(
-                                        Field.of(
+                                        DatabaseField.of(
                                                 toAlias(contactInfoTable),
                                                 ContactInfo.DTO.Fields.email
                                         ),
@@ -78,8 +78,8 @@ public class OrganisationEmployeeTestItems {
                                 ))
                 )).addJoin(Join.inner(
                         contactInfoTable,
-                        Field.of(toAlias(contactInfoTable), Model.ModelDTO.Fields.id),
-                        Field.of(toAlias(employeeTable), fieldToColumnName(ContactInfo.class.getSimpleName() + "_id"))
+                        DatabaseField.of(toAlias(contactInfoTable), Model.ModelDTO.Fields.id),
+                        DatabaseField.of(toAlias(employeeTable), fieldToColumnName(ContactInfo.class.getSimpleName() + "_id"))
                 ))
         ));
     }

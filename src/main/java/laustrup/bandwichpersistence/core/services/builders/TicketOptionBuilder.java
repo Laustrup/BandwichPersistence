@@ -1,7 +1,7 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.Ticket;
-import laustrup.bandwichpersistence.core.persistence.Field;
+import laustrup.bandwichpersistence.core.persistence.DatabaseField;
 
 import java.sql.ResultSet;
 import java.util.function.Function;
@@ -30,7 +30,7 @@ public class TicketOptionBuilder extends BuilderService<Ticket.Option> {
     }
 
     @Override
-    protected Function<Function<String, Field>, Ticket.Option> logic(ResultSet resultSet) {
+    protected Function<Function<String, DatabaseField>, Ticket.Option> logic(ResultSet resultSet) {
         return null;
     }
 }

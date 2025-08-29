@@ -1,7 +1,8 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
-import laustrup.bandwichpersistence.core.models.*;
-import laustrup.bandwichpersistence.core.persistence.Field;
+import laustrup.bandwichpersistence.core.models.Album;
+import laustrup.bandwichpersistence.core.models.Model;
+import laustrup.bandwichpersistence.core.persistence.DatabaseField;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 
 import java.sql.ResultSet;
@@ -11,7 +12,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.logging.Logger;
 
-import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
+import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.getInstant;
+import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.set;
 
 public class AlbumBuilder extends BuilderService<Album> {
 
@@ -36,7 +38,7 @@ public class AlbumBuilder extends BuilderService<Album> {
     }
 
     @Override
-    protected Function<Function<String, Field>, Album> logic(ResultSet resultSet) {
+    protected Function<Function<String, DatabaseField>, Album> logic(ResultSet resultSet) {
         return table -> {
             AtomicReference<UUID> id = new AtomicReference<>();
             AtomicReference<String> title = new AtomicReference<>();

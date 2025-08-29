@@ -4,7 +4,7 @@ import laustrup.bandwichpersistence.core.models.users.ContactInfo;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo.Address;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo.Country;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo.Phone;
-import laustrup.bandwichpersistence.core.persistence.Field;
+import laustrup.bandwichpersistence.core.persistence.DatabaseField;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Properties;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
@@ -31,7 +31,7 @@ public class ContactInfoTestItems {
                         table,
                         selecting(new Properties(
                                 table,
-                                complying().which(Condition.of(Field.of(toAlias(table), ContactInfo.DTO.Fields.email), EQUALS, email))
+                                complying().which(Condition.of(DatabaseField.of(toAlias(table), ContactInfo.DTO.Fields.email), EQUALS, email))
                         ))
                 )),
                 email,
@@ -68,7 +68,7 @@ public class ContactInfoTestItems {
                 new Address.Id(generateUUID(
                         table,
                         complying().which(Condition.of(
-                                Field.of(table, Address.DTO.Fields.street),
+                                DatabaseField.of(table, Address.DTO.Fields.street),
                                 EQUALS,
                                 street
                         ))
@@ -88,7 +88,7 @@ public class ContactInfoTestItems {
                 new Country.Id(generateUUID(
                         table,
                         complying().which(Condition.of(
-                                Field.of(table, Country.DTO.Fields.title),
+                                DatabaseField.of(table, Country.DTO.Fields.title),
                                 EQUALS,
                                 title
                         ))

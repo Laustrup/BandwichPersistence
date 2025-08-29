@@ -5,7 +5,7 @@ import laustrup.bandwichpersistence.core.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.core.models.chats.Request;
 import laustrup.bandwichpersistence.core.models.chats.messages.Post;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
-import laustrup.bandwichpersistence.core.persistence.Field;
+import laustrup.bandwichpersistence.core.persistence.DatabaseField;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import laustrup.bandwichpersistence.core.utilities.parameters.Truthiness;
 
@@ -48,7 +48,7 @@ public class EventBuilder extends BuilderService<Event> {
     }
 
     @Override
-    protected Function<Function<String, Field>, Event> logic(ResultSet resultSet) {
+    protected Function<Function<String, DatabaseField>, Event> logic(ResultSet resultSet) {
         return table -> {
             AtomicReference<UUID> id = new AtomicReference<>();
             AtomicReference<String>
@@ -123,7 +123,6 @@ public class EventBuilder extends BuilderService<Event> {
                     contactInfo.get(),
                     gigs,
                     organisations,
-                    chatRoom.get(),
                     venue.get(),
                     requests,
                     new Seszt<>(),

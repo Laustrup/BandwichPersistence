@@ -7,7 +7,6 @@ import laustrup.bandwichpersistence.core.models.*;
 import laustrup.bandwichpersistence.core.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.core.models.chats.Request;
 import laustrup.bandwichpersistence.core.models.identification.Signature;
-import laustrup.bandwichpersistence.core.persistence.models.DatabaseEntityConfigurations;
 import laustrup.bandwichpersistence.core.persistence.models.annotations.DatabaseEntity;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
@@ -282,7 +281,7 @@ public class Artist extends BusinessUser<Artist.Id> {
     }
 
     @Getter @DatabaseEntity(title = "band_memberships")
-    public static class Membership implements DatabaseEntityConfigurations {
+    public static class Membership {
 
         private Band _band;
 

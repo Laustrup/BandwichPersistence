@@ -1,15 +1,15 @@
 package laustrup.bandwichpersistence.core.persistence.services;
 
 import laustrup.bandwichpersistence.BandwichTester;
-import laustrup.bandwichpersistence.core.persistence.Field;
+import laustrup.bandwichpersistence.core.persistence.DatabaseField;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Join;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Properties;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition;
 import org.junit.jupiter.api.Test;
 
-import static laustrup.bandwichpersistence.core.persistence.services.SelectService.*;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition.Equation.EQUALS;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.complying;
+import static laustrup.bandwichpersistence.core.persistence.services.SelectService.selecting;
 import static laustrup.bandwichpersistence.quality_assurance.Asserter.asserting;
 
 class SelectServiceTests extends BandwichTester {
@@ -35,7 +35,7 @@ class SelectServiceTests extends BandwichTester {
             Properties properties = arrange(new Properties(
                     _table,
                     complying()
-                            .which(new Condition(Field.of("this", "thing"), EQUALS, Field.of("that", "thing")))
+                            .which(new Condition(DatabaseField.of("this", "thing"), EQUALS, DatabaseField.of("that", "thing")))
             ));
 
             String actual = act(selecting(properties).select());
@@ -52,8 +52,8 @@ class SelectServiceTests extends BandwichTester {
             Properties properties = arrange(new Properties(
                     _table,
                     complying()
-                            .which(new Condition(Field.of("this", "thing"), EQUALS, Field.of("that", "thing")))
-                            .and(new Condition(Field.of("this", "other"), EQUALS, Field.of("that", "other")))
+                            .which(new Condition(DatabaseField.of("this", "thing"), EQUALS, DatabaseField.of("that", "thing")))
+                            .and(new Condition(DatabaseField.of("this", "other"), EQUALS, DatabaseField.of("that", "other")))
             ));
 
             String actual = act(
@@ -77,7 +77,7 @@ class SelectServiceTests extends BandwichTester {
             );
 
             String actual = act(selecting(_table)
-                    .addJoin(Join.inner(joinTable, new Field(alias, row), new Field(_table, row)))
+                    .addJoin(Join.inner(joinTable, new DatabaseField(alias, row), new DatabaseField(_table, row)))
                     .select()
             );
 

@@ -3,7 +3,7 @@ package laustrup.bandwichpersistence.core.services.builders;
 import laustrup.bandwichpersistence.core.models.*;
 import laustrup.bandwichpersistence.core.models.chats.messages.Post;
 import laustrup.bandwichpersistence.core.models.users.User;
-import laustrup.bandwichpersistence.core.persistence.Field;
+import laustrup.bandwichpersistence.core.persistence.DatabaseField;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 
 import java.sql.ResultSet;
@@ -13,7 +13,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.logging.Logger;
 
-import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
+import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.getInstant;
+import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.set;
 
 public class BandBuilder extends BuilderService<Band> {
 
@@ -41,7 +42,7 @@ public class BandBuilder extends BuilderService<Band> {
     }
 
     @Override
-    protected Function<Function<String, Field>, Band> logic(ResultSet resultSet) {
+    protected Function<Function<String, DatabaseField>, Band> logic(ResultSet resultSet) {
         return table -> {
             AtomicReference<UUID> id = new AtomicReference<>();
             AtomicReference<Subscription> subscription = new AtomicReference<>();

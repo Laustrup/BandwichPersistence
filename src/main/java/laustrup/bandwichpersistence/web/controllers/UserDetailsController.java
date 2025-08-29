@@ -18,7 +18,7 @@ public class UserDetailsController {
     private final Logger _logger = Logger.getLogger(UserDetailsController.class.getName());
 
     @PostMapping("login")
-    public ResponseEntity<User> login(@RequestBody Login login) {
+    public ResponseEntity<User<? extends User.Id>> login(@RequestBody Login login) {
         return respond(() -> getUser(login));
     }
 

@@ -4,7 +4,7 @@ import laustrup.bandwichpersistence.core.models.Event;
 import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.models.chats.Request;
 import laustrup.bandwichpersistence.core.models.users.User;
-import laustrup.bandwichpersistence.core.persistence.Field;
+import laustrup.bandwichpersistence.core.persistence.DatabaseField;
 
 import java.sql.ResultSet;
 import java.time.Instant;
@@ -38,7 +38,7 @@ public class RequestBuilder extends BuilderService<Request> {
     }
 
     @Override
-    protected Function<Function<String, Field>, Request> logic(ResultSet resultSet) {
+    protected Function<Function<String, DatabaseField>, Request> logic(ResultSet resultSet) {
         return table -> {
             AtomicReference<UUID>
                     receiverId = new AtomicReference<>(),
@@ -57,8 +57,8 @@ public class RequestBuilder extends BuilderService<Request> {
                         approved.set(getInstant(Request.DTO.Fields.approved));
                         timestamp.set(getInstant(Request.DTO.Fields.timestamp));
                     },
-                    primary -> !getUUID(Field.of("receiver_id")).equals(primary) ||
-                            !getUUID(Field.of("sender_id")).equals(primary),
+                    primary -> !getUUID(DatabaseField.of("receiver_id")).equals(primary) ||
+                            !getUUID(DatabaseField.of("sender_id")).equals(primary),
                     receiverId.get(),
                     senderId.get()
             );

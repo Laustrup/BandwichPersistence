@@ -2,7 +2,7 @@ package laustrup.bandwichpersistence.core.services.persistence;
 
 import laustrup.bandwichpersistence.BandwichTester;
 import laustrup.bandwichpersistence.core.models.Organisation;
-import laustrup.bandwichpersistence.core.persistence.Field;
+import laustrup.bandwichpersistence.core.persistence.DatabaseField;
 import laustrup.bandwichpersistence.core.services.builders.OrganisationBuilder;
 import laustrup.bandwichpersistence.core.services.builders.OrganisationEmployeeBuilder;
 import laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService.Configurations;
@@ -16,12 +16,13 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
-import static laustrup.bandwichpersistence.items.TestItems.*;
-import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
-import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.DatabaseService.*;
-import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService.Configurations.Mode.*;
+import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.DatabaseService.toDatabaseColumn;
+import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService;
+import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService.Configurations.Mode.PEEK;
+import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.build;
+import static laustrup.bandwichpersistence.items.TestItems.generateResultSet;
 import static laustrup.bandwichpersistence.quality_assurance.Asserter.asserting;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class JDBCServiceTests extends BandwichTester {
 
@@ -51,7 +52,7 @@ class JDBCServiceTests extends BandwichTester {
             Consumer<AtomicReference<?>> action = atomicReference ->
                     act(() -> ResultSetService.set(
                             new Configurations(
-                                    Field.of(
+                                    DatabaseField.of(
                                             Organisation.TABLE.title(),
                                             isBinary ? "id" : "title"
                                     ),

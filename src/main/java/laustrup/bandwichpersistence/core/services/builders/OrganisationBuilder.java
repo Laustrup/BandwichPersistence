@@ -4,9 +4,8 @@ import laustrup.bandwichpersistence.core.models.*;
 import laustrup.bandwichpersistence.core.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.core.models.chats.Request;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
-import laustrup.bandwichpersistence.core.persistence.Field;
+import laustrup.bandwichpersistence.core.persistence.DatabaseField;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
-
 
 import java.sql.ResultSet;
 import java.time.Instant;
@@ -45,7 +44,7 @@ public class OrganisationBuilder extends BuilderService<Organisation> {
     }
 
     @Override
-    protected Function<Function<String, Field>, Organisation> logic(ResultSet resultSet) {
+    protected Function<Function<String, DatabaseField>, Organisation> logic(ResultSet resultSet) {
         return table -> {
             AtomicReference<UUID> id = new AtomicReference<>();
             AtomicReference<String> title = new AtomicReference<>();

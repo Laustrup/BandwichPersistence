@@ -16,7 +16,13 @@ public class MethodService {
     @SuppressWarnings("unchecked")
     public static <RETURN> RETURN invoke(Class<?> clazz, String methodName, Object... parameterTypes) {
         try {
-            return (RETURN) get(clazz, methodName, parameterTypes).invoke(clazz, parameterTypes);
+            Method method = get(clazz, methodName, parameterTypes);
+            boolean isAccessible = method.isAccessible();
+            method.setAccessible(true);
+            var value = method.invoke(clazz, parameterTypes);
+            method.setAccessible(isAccessible);
+
+            return (RETURN) value;
         } catch (IllegalAccessException | InvocationTargetException e) {
             throw new RuntimeException(String.format(
                     "Couldn't invoke method %s of %s",

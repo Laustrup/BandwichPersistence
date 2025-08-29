@@ -2,7 +2,7 @@ package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.models.Subscription;
-import laustrup.bandwichpersistence.core.persistence.Field;
+import laustrup.bandwichpersistence.core.persistence.DatabaseField;
 
 import java.sql.ResultSet;
 import java.util.UUID;
@@ -36,7 +36,7 @@ public class SubscriptionBuilder extends BuilderService<Subscription> {
     }
 
     @Override
-    protected Function<Function<String, Field>, Subscription> logic(ResultSet resultSet) {
+    protected Function<Function<String, DatabaseField>, Subscription> logic(ResultSet resultSet) {
         return table -> {
             AtomicReference<UUID> id = new AtomicReference<>();
             AtomicReference<Subscription.Status> status = new AtomicReference<>();

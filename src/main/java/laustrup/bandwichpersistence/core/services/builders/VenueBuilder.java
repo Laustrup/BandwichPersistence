@@ -1,9 +1,12 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
-import laustrup.bandwichpersistence.core.models.*;
+import laustrup.bandwichpersistence.core.models.Album;
+import laustrup.bandwichpersistence.core.models.Model;
+import laustrup.bandwichpersistence.core.models.Organisation;
+import laustrup.bandwichpersistence.core.models.Venue;
 import laustrup.bandwichpersistence.core.models.chats.messages.Post;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
-import laustrup.bandwichpersistence.core.persistence.Field;
+import laustrup.bandwichpersistence.core.persistence.DatabaseField;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 
 import java.sql.ResultSet;
@@ -42,7 +45,7 @@ public class VenueBuilder extends BuilderService<Venue> {
     }
 
     @Override
-    protected Function<Function<String, Field>, Venue> logic(ResultSet resultSet) {
+    protected Function<Function<String, DatabaseField>, Venue> logic(ResultSet resultSet) {
         return table -> {
             AtomicReference<UUID> id = new AtomicReference<>();
             AtomicReference<String>

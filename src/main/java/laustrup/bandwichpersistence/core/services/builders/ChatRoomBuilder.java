@@ -1,10 +1,10 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.Model;
-import laustrup.bandwichpersistence.core.models.users.User;
 import laustrup.bandwichpersistence.core.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.core.models.chats.messages.Message;
-import laustrup.bandwichpersistence.core.persistence.Field;
+import laustrup.bandwichpersistence.core.models.users.User;
+import laustrup.bandwichpersistence.core.persistence.DatabaseField;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 
 import java.sql.ResultSet;
@@ -14,7 +14,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.logging.Logger;
 
-import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
+import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.getInstant;
+import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.set;
 
 public class ChatRoomBuilder extends BuilderService<ChatRoom> {
 
@@ -44,7 +45,7 @@ public class ChatRoomBuilder extends BuilderService<ChatRoom> {
     }
 
     @Override
-    protected Function<Function<String, Field>, ChatRoom> logic(ResultSet resultSet) {
+    protected Function<Function<String, DatabaseField>, ChatRoom> logic(ResultSet resultSet) {
         return table -> {
             AtomicReference<UUID> id = new AtomicReference<>();
             AtomicReference<String> title = new AtomicReference<>();

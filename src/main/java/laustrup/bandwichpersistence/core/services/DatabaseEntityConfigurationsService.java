@@ -1,18 +1,40 @@
 package laustrup.bandwichpersistence.core.services;
 
-import laustrup.bandwichpersistence.core.persistence.models.DTODatabaseConfigurations;
-import laustrup.bandwichpersistence.core.persistence.models.DatabaseEntityConfigurations;
+import laustrup.bandwichpersistence.core.persistence.DatabaseField;
+import laustrup.bandwichpersistence.core.persistence.models.DatabaseEntityData;
 import laustrup.bandwichpersistence.core.persistence.models.annotations.DatabaseEntity;
+import laustrup.bandwichpersistence.core.persistence.models.annotations.DatabaseRow;
+import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.util.function.Supplier;
+import java.lang.reflect.Member;
+import java.util.AbstractMap;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.stream.Collectors;
 
-import static laustrup.bandwichpersistence.core.services.MethodService.invoke;
+import static laustrup.bandwichpersistence.core.persistence.services.DatabaseTableService.defineIdReference;
 
 public class DatabaseEntityConfigurationsService {
 
+    private static DatabaseEntity get_databaseEntityAnnotation(Class<?> clazz) {
+        return ifAnnotationIsPresent(clazz, clazz.getAnnotation(DatabaseEntity.class));
+    }
+
     public static String get_tableTitle(Class<?> clazz) {
-        return ifAnnotationIsPresent(clazz, clazz.getAnnotation(DatabaseEntity.class).title());
+        return get_databaseEntityAnnotation(clazz).title();
+    }
+
+    public static String get_idReference(Class<?> clazz) {
+        return defineIdReference(get_databaseEntityAnnotation(clazz).idReference());
+    }
+
+    public static Seszt<DatabaseRow> get_databaseRows(Class<?> clazz) {
+        return new Seszt<>(Arrays.stream(clazz.getDeclaredFields())
+                .filter(field -> field.isAnnotationPresent(DatabaseRow.class))
+                .map(field -> field.getAnnotation(DatabaseRow.class))
+        );
     }
 
     public static String get_tableTitle(Field field) {
@@ -51,45 +73,25 @@ public class DatabaseEntityConfigurationsService {
         return tableName;
     }
 
-    public static DatabaseEntityConfigurations.Data getDatabaseEntityFromEnum(Class<? extends Enum<?>> clazz) {
-        return ifAnnotationIsPresent(
-                clazz,
-                new DatabaseEntityConfigurations.Data(
-                        new DTODatabaseConfigurations(get_tableTitle(clazz)),
-                        get_tableTitle(clazz)
-                )
-        );
-    }
-
-    public static DatabaseEntityConfigurations.Data get_databaseEntityData(
-            Class<? extends DatabaseEntityConfigurations> configurations
-    ) {
-        return new DatabaseEntityConfigurations.Data(get_configurations(configurations), get_tableTitle(configurations));
-    }
-
-    public static DatabaseEntityConfigurations get_configurations(
-            Class<? extends DatabaseEntityConfigurations> configurations
-    ) {
-        return invoke(configurations, "get_databaseEntityConfigurations");
+    public static DatabaseEntityData getDatabaseEntityFromEnum(Class<? extends Enum<?>> clazz) {
+        return ifAnnotationIsPresent(clazz, new DatabaseEntityData(clazz));
     }
 
     private static <RETURN> RETURN ifAnnotationIsPresent(
             Field field,
-            Supplier<RETURN> logic
+            Class<? extends Annotation> annotation,
+            RETURN element
     ) {
-        if (!field.isAnnotationPresent(DatabaseEntity.class))
+        if (!field.isAnnotationPresent(annotation))
             throw new IllegalStateException(String.format(
                     "Field %s is not annotated with @Table and therefore can't get table!",
                     field.getName()
             ));
 
-        return logic.get();
+        return element;
     }
 
-    private static <RETURN> RETURN ifAnnotationIsPresent(
-            Class<?> clazz,
-            RETURN element
-    ) {
+    private static <RETURN> RETURN ifAnnotationIsPresent(Class<?> clazz, RETURN element) {
         if (!clazz.isAnnotationPresent(DatabaseEntity.class))
             throw new IllegalStateException(String.format(
                     "Class %s is not annotated with @Table and therefore can't get table!",
@@ -97,5 +99,11 @@ public class DatabaseEntityConfigurationsService {
             ));
 
         return element;
+    }
+
+    public static Map<DatabaseField, String> classFieldToDatabaseField(Map<Member, String> fields) {
+        return fields.entrySet().stream()
+                .map(entry -> new AbstractMap.SimpleEntry<>(DatabaseField.of(entry), entry.getValue()))
+                .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
     }
 }

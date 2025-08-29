@@ -1,13 +1,15 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
-import laustrup.bandwichpersistence.core.models.*;
+import laustrup.bandwichpersistence.core.models.History;
+import laustrup.bandwichpersistence.core.models.Organisation;
 import laustrup.bandwichpersistence.core.models.Organisation.Employee.Role;
+import laustrup.bandwichpersistence.core.models.Subscription;
+import laustrup.bandwichpersistence.core.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.core.models.users.Artist;
+import laustrup.bandwichpersistence.core.models.users.ContactInfo;
 import laustrup.bandwichpersistence.core.models.users.User.Participation;
 import laustrup.bandwichpersistence.core.models.users.User.UserDTO;
-import laustrup.bandwichpersistence.core.models.chats.ChatRoom;
-import laustrup.bandwichpersistence.core.models.users.ContactInfo;
-import laustrup.bandwichpersistence.core.persistence.Field;
+import laustrup.bandwichpersistence.core.persistence.DatabaseField;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 
 import java.sql.ResultSet;
@@ -18,7 +20,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.logging.Logger;
 
-import static laustrup.bandwichpersistence.core.models.Model.ModelDTO.*;
+import static laustrup.bandwichpersistence.core.models.Model.ModelDTO.Fields;
 import static laustrup.bandwichpersistence.core.models.Organisation.Employee;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
 
@@ -56,7 +58,7 @@ public class OrganisationEmployeeBuilder extends BuilderService<Employee> {
     }
 
     @Override
-    protected Function<Function<String, Field>, Employee> logic(ResultSet resultSet) {
+    protected Function<Function<String, DatabaseField>, Employee> logic(ResultSet resultSet) {
         return table -> {
             AtomicReference<UUID> id = new AtomicReference<>();
             AtomicReference<String>
@@ -83,11 +85,11 @@ public class OrganisationEmployeeBuilder extends BuilderService<Employee> {
                         set(description, table.apply(UserDTO.Fields.description));
                         _contactInfoBuilder.complete(contactInfo, resultSet);
                         _subscriptionBuilder.complete(subscription, resultSet);
-                        add(roles, Field.of(
+                        add(roles, DatabaseField.of(
                                 Organisation.class.getSimpleName() + "Employments",
                                 Employee.DTO.Fields.roles.replace("s", ""))
                         );
-                        add(authorities, Field.of(Artist.DTO.Fields.authorities, "level"));
+                        add(authorities, DatabaseField.of(Artist.DTO.Fields.authorities, "level"));
                         combine(chatRooms, _chatRoomBuilder.build(resultSet));
                         combine(history.get().get_stories(), _historyBuilder.buildStory(resultSet, history.get()));
                         timestamp.set(getTimestamp(Fields.timestamp, Timestamp::toInstant));

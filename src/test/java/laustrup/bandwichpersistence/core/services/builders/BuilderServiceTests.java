@@ -1,9 +1,9 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.BandwichTester;
-import laustrup.bandwichpersistence.items.TestItems.Instance;
-import laustrup.bandwichpersistence.core.persistence.Field;
+import laustrup.bandwichpersistence.core.persistence.DatabaseField;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
+import laustrup.bandwichpersistence.items.TestItems.Instance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
@@ -11,7 +11,7 @@ import java.sql.ResultSet;
 import java.util.function.Function;
 import java.util.logging.Logger;
 
-import static laustrup.bandwichpersistence.items.TestItems.*;
+import static laustrup.bandwichpersistence.items.TestItems.InstanceCollection;
 import static laustrup.bandwichpersistence.quality_assurance.Asserter.asserting;
 
 class BuilderServiceTests extends BandwichTester {
@@ -26,7 +26,7 @@ class BuilderServiceTests extends BandwichTester {
         }
 
         @Override
-        protected Function<Function<String, Field>, Instance> logic(ResultSet resultSet) {
+        protected Function<Function<String, DatabaseField>, Instance> logic(ResultSet resultSet) {
             return null;
         }
     };

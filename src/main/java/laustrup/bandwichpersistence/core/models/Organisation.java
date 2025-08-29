@@ -10,7 +10,6 @@ import laustrup.bandwichpersistence.core.models.identification.Signature;
 import laustrup.bandwichpersistence.core.models.users.BusinessUser;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
 import laustrup.bandwichpersistence.core.persistence.Table;
-import laustrup.bandwichpersistence.core.persistence.models.DatabaseEntityConfigurations;
 import laustrup.bandwichpersistence.core.persistence.models.annotations.DatabaseEntity;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
@@ -23,7 +22,7 @@ import java.util.Set;
 import static laustrup.bandwichpersistence.core.utilities.collections.Seszt.copy;
 
 @Getter @DatabaseEntity(title = "organisations")
-public class Organisation extends Model<Organisation.Id, Signature.UUID> implements DatabaseEntityConfigurations {
+public class Organisation extends Model<Organisation.Id, Signature.UUID> {
 
     public static final Table TABLE = new Table(Organisation.class.getSimpleName() + "s");
 
@@ -149,9 +148,8 @@ public class Organisation extends Model<Organisation.Id, Signature.UUID> impleme
     @Getter
     @DatabaseEntity(title = "organisation_employees")
     @FieldNameConstants
-    public static class Employee extends BusinessUser<Employee.Id> implements DatabaseEntityConfigurations {
+    public static class Employee extends BusinessUser<Employee.Id> {
 
-        @DatabaseEntity(title = "organisation_employments")
         private Seszt<Role> _roles;
 
         private Seszt<Authority> _authorities;
@@ -206,6 +204,7 @@ public class Organisation extends Model<Organisation.Id, Signature.UUID> impleme
             _authorities = authorities;
         }
 
+        @DatabaseEntity(title = "organisation_employments")
         public enum Role {
             BOOKER,
             PR,

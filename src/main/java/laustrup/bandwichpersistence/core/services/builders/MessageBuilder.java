@@ -1,10 +1,10 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.Model;
-import laustrup.bandwichpersistence.core.models.users.User;
 import laustrup.bandwichpersistence.core.models.chats.messages.Message;
 import laustrup.bandwichpersistence.core.models.chats.messages.MessageBase;
-import laustrup.bandwichpersistence.core.persistence.Field;
+import laustrup.bandwichpersistence.core.models.users.User;
+import laustrup.bandwichpersistence.core.persistence.DatabaseField;
 
 import java.sql.ResultSet;
 import java.time.Instant;
@@ -41,7 +41,7 @@ public class MessageBuilder extends BuilderService<Message> {
     }
 
     @Override
-    protected Function<Function<String, Field>, Message> logic(ResultSet resultSet) {
+    protected Function<Function<String, DatabaseField>, Message> logic(ResultSet resultSet) {
         return table -> {
             AtomicReference<UUID> id = new AtomicReference<>();
             AtomicReference<User<? extends User.Id>> author = new AtomicReference<>();

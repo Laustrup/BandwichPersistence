@@ -4,7 +4,7 @@ import laustrup.bandwichpersistence.core.models.Organisation;
 import laustrup.bandwichpersistence.core.models.Rating;
 import laustrup.bandwichpersistence.core.models.Venue;
 import laustrup.bandwichpersistence.core.models.users.User;
-import laustrup.bandwichpersistence.core.persistence.Field;
+import laustrup.bandwichpersistence.core.persistence.DatabaseField;
 import laustrup.bandwichpersistence.core.services.persistence.JDBCService;
 
 import java.sql.ResultSet;
@@ -40,7 +40,7 @@ public class RatingBuilder extends BuilderService<Rating> {
     }
 
     @Override
-    protected Function<Function<String, Field>, Rating> logic(ResultSet resultSet) {
+    protected Function<Function<String, DatabaseField>, Rating> logic(ResultSet resultSet) {
         return table -> Service.get_instance().generateLogic(resultSet, Service.Implementation.STANDARD, table);
     }
 
@@ -58,7 +58,7 @@ public class RatingBuilder extends BuilderService<Rating> {
         private Service() {
         }
 
-        public Rating generateLogic(ResultSet resultSet, Implementation implementation, Function<String, Field> table) {
+        public Rating generateLogic(ResultSet resultSet, Implementation implementation, Function<String, DatabaseField> table) {
             AtomicReference<Integer> value = new AtomicReference<>();
             AtomicReference<UUID>
                     appointedId = new AtomicReference<>(),
@@ -79,8 +79,8 @@ public class RatingBuilder extends BuilderService<Rating> {
                                 OrganisationBuilder.get_instance().complete(organisation, resultSet);
                             timestamp.set(getInstant(Rating.DTO.Fields.timestamp));
                         },
-                        primary -> !getUUID(Field.of("appointed_id")).equals(primary) ||
-                                !getUUID(Field.of("reviewer_id")).equals(primary),
+                        primary -> !getUUID(DatabaseField.of("appointed_id")).equals(primary) ||
+                                !getUUID(DatabaseField.of("reviewer_id")).equals(primary),
                         appointedId.get(),
                         reviewerId.get()
                 );

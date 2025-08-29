@@ -6,7 +6,7 @@ import laustrup.bandwichpersistence.core.models.ToStringArgument;
 import laustrup.bandwichpersistence.core.models.identification.CommonIdentity;
 import laustrup.bandwichpersistence.core.models.identification.Identity;
 import laustrup.bandwichpersistence.core.models.identification.Signature;
-import laustrup.bandwichpersistence.core.persistence.Field;
+import laustrup.bandwichpersistence.core.persistence.DatabaseField;
 import laustrup.bandwichpersistence.core.persistence.models.Query;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Properties;
@@ -72,7 +72,7 @@ public class TestItems {
 
     public static UUID generateUUID(String table, Clausement that) {
         return get(new Configurations(
-                        Field.of(table, "id"), read(
+                        DatabaseField.of(table, "id"), read(
                                 new Query(selecting(new Properties(table, that)).select())
                         ).get_resultSet(),
                         Configurations.Mode.START
@@ -84,7 +84,7 @@ public class TestItems {
     public static UUID generateUUID(String table, Selecting selecting) {
         return get(
                 new Configurations(
-                        Field.of(table, "id"),
+                        DatabaseField.of(table, "id"),
                         read(new Query(selecting.select())).get_resultSet(),
                         () -> {
                             throw new RuntimeException(String.format(

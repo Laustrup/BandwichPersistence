@@ -1,6 +1,6 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
-import laustrup.bandwichpersistence.core.persistence.Field;
+import laustrup.bandwichpersistence.core.persistence.DatabaseField;
 import laustrup.bandwichpersistence.core.services.ModelService;
 import laustrup.bandwichpersistence.core.services.persistence.JDBCService;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
@@ -82,12 +82,12 @@ abstract class BuilderService<E> {
         printError(_class, id, exception, _logger);
     }
 
-    protected E handle(Function<Function<String, Field>, E> action) {
+    protected E handle(Function<Function<String, DatabaseField>, E> action) {
         return handle(_tableName, action);
     }
 
-    static <E> E handle(String table, Function<Function<String, Field>, E> action) {
-        return action.apply(row -> Field.of(table, row));
+    static <E> E handle(String table, Function<Function<String, DatabaseField>, E> action) {
+        return action.apply(row -> DatabaseField.of(table, row));
     }
 
     static String toTableName(Class<?> clazz) {
@@ -123,7 +123,7 @@ abstract class BuilderService<E> {
 
     protected abstract void completion(E reference, E object);
 
-    protected abstract Function<Function<String, Field>, E> logic(ResultSet resultSet);
+    protected abstract Function<Function<String, DatabaseField>, E> logic(ResultSet resultSet);
 
     protected <M> void combine(Seszt<M> collection, Seszt<M> entities) {
         entities.forEach(entity -> combine(collection, entity));

@@ -2,7 +2,7 @@ package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
-import laustrup.bandwichpersistence.core.persistence.Field;
+import laustrup.bandwichpersistence.core.persistence.DatabaseField;
 
 import java.sql.ResultSet;
 import java.util.UUID;
@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.logging.Logger;
 
-import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
+import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.set;
 
 public class AddressBuilder extends BuilderService<ContactInfo.Address> {
 
@@ -39,7 +39,7 @@ public class AddressBuilder extends BuilderService<ContactInfo.Address> {
     }
 
     @Override
-    protected Function<Function<String, Field>, ContactInfo.Address> logic(ResultSet resultSet) {
+    protected Function<Function<String, DatabaseField>, ContactInfo.Address> logic(ResultSet resultSet) {
         return table -> {
             AtomicReference<UUID> id = new AtomicReference<>();
 

@@ -2,12 +2,15 @@ package laustrup.bandwichpersistence.core.services.persistence;
 
 import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.persistence.DataType;
-import laustrup.bandwichpersistence.core.persistence.Field;
+import laustrup.bandwichpersistence.core.persistence.DatabaseField;
 import laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService.Configurations;
 import laustrup.bandwichpersistence.core.utilities.collections.Liszt;
 
 import javax.naming.NameNotFoundException;
-import java.sql.*;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -18,7 +21,7 @@ import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.DatabaseService.columnOf;
-import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService.Configurations.Mode.*;
+import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService.Configurations.Mode.NEUTRAL;
 
 public class JDBCService {
 
@@ -28,21 +31,21 @@ public class JDBCService {
 
     private static Integer _currentRow = null;
 
-    public static <T> AtomicReference<T> set(AtomicReference<T> reference, Field field) {
+    public static <T> AtomicReference<T> set(AtomicReference<T> reference, DatabaseField databaseField) {
         return ResultSetService.set(
                 new Configurations(
-                        field.get_content(),
+                        databaseField.get_content(),
                         _resultSet
                 ), reference
         );
     }
 
-    public static <T> Collection<T> add(Collection<T> collection, Field field) {
-        return ResultSetService.add(new Configurations(field, _resultSet), collection);
+    public static <T> Collection<T> add(Collection<T> collection, DatabaseField databaseField) {
+        return ResultSetService.add(new Configurations(databaseField, _resultSet), collection);
     }
 
-    public static <T> T get(Field field, Class<T> type) {
-        return get(field.get_content(), type);
+    public static <T> T get(DatabaseField databaseField, Class<T> type) {
+        return get(databaseField.get_content(), type);
     }
 
     public static <T> T get(String field, Class<T> type) {
@@ -53,12 +56,12 @@ public class JDBCService {
         return ResultSetService.getString(new Configurations(column, _resultSet));
     }
 
-    public static String getString(Field field) {
-        return ResultSetService.getString(new Configurations(field, _resultSet));
+    public static String getString(DatabaseField databaseField) {
+        return ResultSetService.getString(new Configurations(databaseField, _resultSet));
     }
 
-    public static UUID getUUID(Field field) {
-        return ResultSetService.getUUID(new Configurations(field.get_content(), _resultSet));
+    public static UUID getUUID(DatabaseField databaseField) {
+        return ResultSetService.getUUID(new Configurations(databaseField.get_content(), _resultSet));
     }
 
     public static UUID getUUID(String column) {
@@ -81,8 +84,8 @@ public class JDBCService {
         return ResultSetService.getTimestamp(new Configurations(column, _resultSet), function);
     }
 
-    public static Instant getInstant(Field field) {
-        return ResultSetService.getInstant(new Configurations(field.get_content(), _resultSet));
+    public static Instant getInstant(DatabaseField databaseField) {
+        return ResultSetService.getInstant(new Configurations(databaseField.get_content(), _resultSet));
     }
 
     public static Instant getInstant(String column) {
@@ -196,12 +199,12 @@ public class JDBCService {
         public static <T> AtomicReference<T> set(Configurations configurations, AtomicReference<T> reference) {
             return handleConfigurations(configurations, () -> {
                 try {
-                    Field field = configurations.getField();
+                    DatabaseField databaseField = configurations.getField();
 
                     return (AtomicReference<T>) reference.getAndSet((T) (
-                            field.is_key() && getType(Configurations.of(configurations, NEUTRAL)) == DataType.BINARY
+                            databaseField.is_key() && getType(Configurations.of(configurations, NEUTRAL)) == DataType.BINARY
                                     ? getUUID(Configurations.of(configurations, NEUTRAL))
-                                    : configurations.resultSet.getObject(field.get_content())
+                                    : configurations.resultSet.getObject(databaseField.get_content())
                     ));
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
@@ -404,20 +407,20 @@ public class JDBCService {
                 this(field, resultSet, mode, Optional.empty());
             }
 
-            public Configurations(Field field, ResultSet resultSet, Mode mode) {
-                this(field.get_content(), resultSet, mode, Optional.empty());
+            public Configurations(DatabaseField databaseField, ResultSet resultSet, Mode mode) {
+                this(databaseField.get_content(), resultSet, mode, Optional.empty());
             }
 
-            public Configurations(Field field, ResultSet resultSet, Mode mode, Runnable logging) {
-                this(field.get_content(), resultSet, mode, Optional.ofNullable(logging));
+            public Configurations(DatabaseField databaseField, ResultSet resultSet, Mode mode, Runnable logging) {
+                this(databaseField.get_content(), resultSet, mode, Optional.ofNullable(logging));
             }
 
-            public Configurations(Field field, ResultSet resultSet) {
-                this(field.get_content(), resultSet, NEUTRAL, Optional.empty());
+            public Configurations(DatabaseField databaseField, ResultSet resultSet) {
+                this(databaseField.get_content(), resultSet, NEUTRAL, Optional.empty());
             }
 
-            public Configurations(Field field, ResultSet resultSet, Runnable logging) {
-                this(field.get_content(), resultSet, NEUTRAL, Optional.ofNullable(logging));
+            public Configurations(DatabaseField databaseField, ResultSet resultSet, Runnable logging) {
+                this(databaseField.get_content(), resultSet, NEUTRAL, Optional.ofNullable(logging));
             }
             
             public Configurations(String field, ResultSet resultSet) {
@@ -428,13 +431,13 @@ public class JDBCService {
                 this(field, resultSet, NEUTRAL, Optional.ofNullable(logging));
             }
 
-            public Configurations(Field field, ResultSet resultSet, Runnable logging, Mode mode) {
-                this(field.get_content(), resultSet, mode, Optional.ofNullable(logging));
+            public Configurations(DatabaseField databaseField, ResultSet resultSet, Runnable logging, Mode mode) {
+                this(databaseField.get_content(), resultSet, mode, Optional.ofNullable(logging));
             }
 
-            public Field getField() {
+            public DatabaseField getField() {
                 String[] content = field.split("\\.");
-                return new Field(content[0], content[1]);
+                return new DatabaseField(content[0], content[1]);
             }
             
             public String field() {

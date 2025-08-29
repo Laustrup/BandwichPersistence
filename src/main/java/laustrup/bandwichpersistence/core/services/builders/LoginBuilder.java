@@ -1,7 +1,7 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.Login;
-import laustrup.bandwichpersistence.core.persistence.Field;
+import laustrup.bandwichpersistence.core.persistence.DatabaseField;
 
 import java.sql.ResultSet;
 import java.util.concurrent.atomic.AtomicReference;
@@ -33,7 +33,7 @@ public class LoginBuilder extends BuilderService<Login> {
     }
 
     @Override
-    protected Function<Function<String, Field>, Login> logic(ResultSet resultSet) {
+    protected Function<Function<String, DatabaseField>, Login> logic(ResultSet resultSet) {
         return table -> {
             AtomicReference<String>
                     username = new AtomicReference<>(),

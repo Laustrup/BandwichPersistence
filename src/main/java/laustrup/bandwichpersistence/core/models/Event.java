@@ -3,17 +3,16 @@ package laustrup.bandwichpersistence.core.models;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import laustrup.bandwichpersistence.core.models.chats.ChatRoom;
+import laustrup.bandwichpersistence.core.models.chats.Request;
+import laustrup.bandwichpersistence.core.models.chats.messages.Post;
 import laustrup.bandwichpersistence.core.models.identification.CommonIdentity;
 import laustrup.bandwichpersistence.core.models.identification.Signature;
+import laustrup.bandwichpersistence.core.models.users.ContactInfo;
 import laustrup.bandwichpersistence.core.models.users.Participant;
 import laustrup.bandwichpersistence.core.utilities.collections.Liszt;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import laustrup.bandwichpersistence.core.utilities.console.Printer;
 import laustrup.bandwichpersistence.core.utilities.parameters.Truthiness;
-import laustrup.bandwichpersistence.core.models.chats.Request;
-import laustrup.bandwichpersistence.core.models.chats.messages.Post;
-import laustrup.bandwichpersistence.core.models.users.ContactInfo;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
@@ -121,8 +120,6 @@ public class Event extends Model<Event.Id, Signature.UUID> {
 
     private Seszt<Organisation> _organisations;
 
-    private ChatRoom _chatRoom;
-
     /**
      * This venue is the ones responsible for the Event,
      * perhaps even the place it is held, but not necessarily.
@@ -173,7 +170,6 @@ public class Event extends Model<Event.Id, Signature.UUID> {
                 new ContactInfo(event.getContactInfo()),
                 copy(event.getGigs(), Gig::new),
                 copy(event.getOrganisations(), Organisation::new),
-                new ChatRoom(event.getChatRoom()),
                 new Venue(event.getVenue()),
                 copy(event.getRequests(), Request::new),
                 copy(event.getParticipations(), Participation::new),
@@ -200,7 +196,6 @@ public class Event extends Model<Event.Id, Signature.UUID> {
             ContactInfo contactInfo,
             Seszt<Gig> gigs,
             Seszt<Organisation> organisations,
-            ChatRoom chatRoom,
             Venue venue,
             Seszt<Request> requests,
             Seszt<Participation> participations,
@@ -225,7 +220,6 @@ public class Event extends Model<Event.Id, Signature.UUID> {
         }
 
         _organisations = organisations;
-        _chatRoom = chatRoom;
 
         if (_start != null && _end != null)
             if (Duration.between(openDoors, _start).toMinutes() >= 0)
@@ -654,8 +648,6 @@ public class Event extends Model<Event.Id, Signature.UUID> {
 
         private Set<Organisation.DTO> organisations;
 
-        private ChatRoom.DTO chatRoom;
-
         /**
          * This venue is the ones responsible for the Event,
          * perhaps even the place it is held, but not necessarily.
@@ -703,7 +695,6 @@ public class Event extends Model<Event.Id, Signature.UUID> {
                 @JsonProperty ContactInfo.DTO contactInfo,
                 @JsonProperty Set<Gig.DTO> gigs,
                 @JsonProperty Set<Organisation.DTO> organisations,
-                @JsonProperty ChatRoom.DTO chatRoom,
                 @JsonProperty Venue.DTO venue,
                 @JsonProperty Set<Request.DTO> requests,
                 @JsonProperty Set<Participation.DTO> participations,
@@ -728,7 +719,6 @@ public class Event extends Model<Event.Id, Signature.UUID> {
             this.contactInfo = contactInfo;
             this.gigs = gigs;
             this.organisations = organisations;
-            this.chatRoom = chatRoom;
             this.venue = venue;
             this.requests = requests;
             this.participations = participations;
@@ -760,7 +750,6 @@ public class Event extends Model<Event.Id, Signature.UUID> {
                     new ContactInfo.DTO(event.get_contactInfo()),
                     Seszt.copy(event.get_gigs(), Gig.DTO::new),
                     toSet(event.get_organisations(), Organisation.DTO::new),
-                    new ChatRoom.DTO(event.get_chatRoom()),
                     new Venue.DTO(event.get_venue()),
                     toSet(event.get_requests(), Request.DTO::new),
                     toSet(event.get_participations(), Participation.DTO::new),

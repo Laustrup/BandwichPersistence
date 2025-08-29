@@ -1,22 +1,24 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
-import laustrup.bandwichpersistence.core.models.*;
+import laustrup.bandwichpersistence.core.models.Login;
 import laustrup.bandwichpersistence.core.models.Organisation.Employee;
 import laustrup.bandwichpersistence.core.models.Subscription.UserType;
 import laustrup.bandwichpersistence.core.models.users.Artist;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
 import laustrup.bandwichpersistence.core.models.users.User;
-import laustrup.bandwichpersistence.core.persistence.Field;
+import laustrup.bandwichpersistence.core.persistence.DatabaseField;
 import laustrup.bandwichpersistence.core.services.persistence.JDBCService;
 
 import java.sql.ResultSet;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
-import static laustrup.bandwichpersistence.core.managers.UserDetailsManager.*;
-import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
+import static laustrup.bandwichpersistence.core.managers.UserDetailsManager.getUserType;
+import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.getString;
 
 public class UserBuilder extends BuilderService<User<?>> {
 
@@ -80,7 +82,7 @@ public class UserBuilder extends BuilderService<User<?>> {
     }
 
     @Override
-    protected Function<Function<String, Field>, User<?>> logic(ResultSet resultSet) {
+    protected Function<Function<String, DatabaseField>, User<?>> logic(ResultSet resultSet) {
         throw new UnsupportedOperationException();
     }
 }

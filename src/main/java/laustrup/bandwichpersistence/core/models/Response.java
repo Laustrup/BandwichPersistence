@@ -20,11 +20,7 @@ public class Response<T> {
     public HttpStatus _httpStatus;
 
     public Response(T object, HttpStatus httpStatus) {
-        this(
-                object,
-                null,
-                httpStatus
-        );
+        this(object, null, httpStatus);
     }
 
     public Response(T object, Situation situation, HttpStatus httpStatus) {

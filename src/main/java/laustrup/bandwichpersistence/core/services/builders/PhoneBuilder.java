@@ -2,7 +2,7 @@ package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
-import laustrup.bandwichpersistence.core.persistence.Field;
+import laustrup.bandwichpersistence.core.persistence.DatabaseField;
 
 import java.sql.ResultSet;
 import java.util.concurrent.atomic.AtomicReference;
@@ -10,7 +10,8 @@ import java.util.function.Function;
 import java.util.logging.Logger;
 
 import static laustrup.bandwichpersistence.core.services.ConvertingService.of;
-import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
+import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.getLong;
+import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.set;
 
 public class PhoneBuilder extends BuilderService<ContactInfo.Phone> {
 
@@ -35,7 +36,7 @@ public class PhoneBuilder extends BuilderService<ContactInfo.Phone> {
     }
 
     @Override
-    protected Function<Function<String, Field>, ContactInfo.Phone> logic(ResultSet resultSet) {
+    protected Function<Function<String, DatabaseField>, ContactInfo.Phone> logic(ResultSet resultSet) {
         return table -> {
             AtomicReference<Integer> firstDigits = new AtomicReference<>();
             AtomicReference<Long> numbers = new AtomicReference<>();
