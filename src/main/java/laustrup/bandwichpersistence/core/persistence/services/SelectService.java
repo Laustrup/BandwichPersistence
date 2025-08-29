@@ -14,8 +14,8 @@ import static java.lang.String.format;
 import static java.lang.String.join;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition.Equation.EQUALS;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition.Equation.IS_NULL;
-import static laustrup.bandwichpersistence.core.services.DatabaseEntityConfigurationsService.classFieldToDatabaseField;
-import static laustrup.bandwichpersistence.core.services.DatabaseEntityConfigurationsService.toAlias;
+import static laustrup.bandwichpersistence.core.services.DatabaseEntityDataService.classFieldToDatabaseField;
+import static laustrup.bandwichpersistence.core.services.DatabaseEntityDataService.toAlias;
 import static laustrup.bandwichpersistence.core.services.EternaryService.stating;
 
 public abstract class SelectService {

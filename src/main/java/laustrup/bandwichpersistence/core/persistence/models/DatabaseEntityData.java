@@ -1,6 +1,6 @@
 package laustrup.bandwichpersistence.core.persistence.models;
 
-import laustrup.bandwichpersistence.core.services.DatabaseEntityConfigurationsService;
+import laustrup.bandwichpersistence.core.services.DatabaseEntityDataService;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
 
@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 import static laustrup.bandwichpersistence.core.persistence.services.DatabaseColumnService.getColumns;
 import static laustrup.bandwichpersistence.core.persistence.services.DatabaseTableService.defineIdReference;
 import static laustrup.bandwichpersistence.core.persistence.services.DatabaseTableService.defineTitle;
-import static laustrup.bandwichpersistence.core.services.DatabaseEntityConfigurationsService.get_tableTitle;
+import static laustrup.bandwichpersistence.core.services.DatabaseEntityDataService.get_tableTitle;
 
 @Getter
 public class DatabaseEntityData {
@@ -31,7 +31,7 @@ public class DatabaseEntityData {
     public DatabaseEntityData(Class<?> clazz) {
         this(
                 get_tableTitle(clazz),
-                DatabaseEntityConfigurationsService.get_idReference(clazz),
+                DatabaseEntityDataService.get_idReference(clazz),
                 getColumns(clazz)
         );
     }

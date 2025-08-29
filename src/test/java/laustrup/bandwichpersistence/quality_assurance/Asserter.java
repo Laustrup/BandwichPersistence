@@ -2,6 +2,7 @@ package laustrup.bandwichpersistence.quality_assurance;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -125,13 +126,17 @@ public class Asserter {
         }
 
         private void assertingEqualsTo(EXPECTED expected, EXPECTED actual) {
-            if (!_negate)
+            if (Collection.class.isAssignableFrom(expected.getClass()))
+                assertTrue(!_negate == ((Collection<?>) expected).stream().anyMatch(actual::equals) || (((Collection<?>) expected).isEmpty()));
+            else if (!_negate)
                 assertEquals(expected, actual);
             else
                 assertNotEquals(expected, actual);
         }
 
         private void assertingNotEqualsTo(EXPECTED expected, EXPECTED actual) {
+            if (Collection.class.isAssignableFrom(expected.getClass()))
+                assertTrue(_negate == ((Collection<?>) expected).stream().anyMatch(actual::equals));
             if (!_negate)
                 assertNotEquals(expected, actual);
             else

@@ -62,6 +62,10 @@ public class EternaryService {
             _success = success;
         }
 
+        public <ITEM> Binder<ITEM> then(Supplier<ITEM> supplier) {
+            return then(supplier.get());
+        }
+
         public <ITEM> Binder<ITEM> then(ITEM item) {
             return new Binder<>(new Operator.Property<>(
                     item,
@@ -91,8 +95,8 @@ public class EternaryService {
             return !_success ? action.apply(_item) : null;
         }
 
-        public <RETURN> RETURN get(Function<ITEM, RETURN> action) {
-            return _success ? thenElseNull(action.apply(_item)) : null;
+        public <RETURN> Optional<RETURN> get(Function<ITEM, RETURN> action) {
+            return _success ? Optional.ofNullable(thenElseNull(action.apply(_item))) : Optional.empty();
         }
 
         public ITEM elseNull() {

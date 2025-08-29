@@ -15,8 +15,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static laustrup.bandwichpersistence.core.persistence.services.DatabaseTableService.defineIdReference;
+import static laustrup.bandwichpersistence.core.services.EternaryService.ifNotEmpty;
 
-public class DatabaseEntityConfigurationsService {
+public class DatabaseEntityDataService {
 
     private static DatabaseEntity get_databaseEntityAnnotation(Class<?> clazz) {
         return ifAnnotationIsPresent(clazz, clazz.getAnnotation(DatabaseEntity.class));
@@ -27,7 +28,10 @@ public class DatabaseEntityConfigurationsService {
     }
 
     public static String get_idReference(Class<?> clazz) {
-        return defineIdReference(get_databaseEntityAnnotation(clazz).idReference());
+        DatabaseEntity databaseEntity = get_databaseEntityAnnotation(clazz);
+
+        return ifNotEmpty(databaseEntity.idReference())
+                .otherwise(defineIdReference(databaseEntity.title(), databaseEntity.idReference()));
     }
 
     public static Seszt<DatabaseRow> get_databaseRows(Class<?> clazz) {

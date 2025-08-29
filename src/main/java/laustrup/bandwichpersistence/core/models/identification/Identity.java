@@ -15,8 +15,11 @@ public interface Identity<SIGNATURE extends Signature<?>> {
         return ifExists(getIdentifier(), Identifier::get_signature);
     }
 
+    @SuppressWarnings("unchecked")
     default <SIGNATURE_VALUE> SIGNATURE_VALUE get_value() {
-        return ifNotNull(getIdentifier()).get(Identifier::get_value);
+        return (SIGNATURE_VALUE) ifNotNull(getIdentifier())
+                .get(Identifier::get_value)
+                .orElse(null);
     }
 
     default boolean classIsSameAs(Class<?> clazz) {

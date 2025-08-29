@@ -1,6 +1,7 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.History;
+import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.models.Organisation;
 import laustrup.bandwichpersistence.core.models.Organisation.Employee.Role;
 import laustrup.bandwichpersistence.core.models.Subscription;
@@ -20,7 +21,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.logging.Logger;
 
-import static laustrup.bandwichpersistence.core.models.Model.ModelDTO.Fields;
 import static laustrup.bandwichpersistence.core.models.Organisation.Employee;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
 
@@ -78,7 +78,7 @@ public class OrganisationEmployeeBuilder extends BuilderService<Employee> {
             interaction(
                     resultSet,
                     () -> {
-                        set(id, table.apply(Fields.id));
+                        set(id, table.apply(Model.ModelDTO.Fields.id));
                         set(username, table.apply(UserDTO.Fields.username));
                         set(firstName, table.apply(UserDTO.Fields.firstName));
                         set(lastName, table.apply(UserDTO.Fields.lastName));
@@ -92,7 +92,7 @@ public class OrganisationEmployeeBuilder extends BuilderService<Employee> {
                         add(authorities, DatabaseField.of(Artist.DTO.Fields.authorities, "level"));
                         combine(chatRooms, _chatRoomBuilder.build(resultSet));
                         combine(history.get().get_stories(), _historyBuilder.buildStory(resultSet, history.get()));
-                        timestamp.set(getTimestamp(Fields.timestamp, Timestamp::toInstant));
+                        timestamp.set(getTimestamp(Model.ModelDTO.Fields.timestamp, Timestamp::toInstant));
                     },
                     id
             );

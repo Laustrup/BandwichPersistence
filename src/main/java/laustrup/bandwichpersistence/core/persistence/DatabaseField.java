@@ -6,7 +6,7 @@ import java.lang.reflect.Member;
 import java.util.Arrays;
 import java.util.Map;
 
-import static laustrup.bandwichpersistence.core.services.DatabaseEntityConfigurationsService.toAlias;
+import static laustrup.bandwichpersistence.core.services.DatabaseEntityDataService.toAlias;
 
 public record DatabaseField(String alias, String row) {
 

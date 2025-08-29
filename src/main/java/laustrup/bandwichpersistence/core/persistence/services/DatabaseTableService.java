@@ -12,6 +12,9 @@ public abstract class DatabaseTableService {
     }
 
     public static String pluralToSingular(String title) {
+        if (title == null || title.length() < 2)
+            throw new IllegalArgumentException("Entity title is empty when trying to make it singular");
+
         String ending = title.substring(title.length() - 3);
         return stating(title.length() > 4 && ending.equals("ies"))
                 .then(title.substring(0, title.length() - 3) + "y")
@@ -23,7 +26,7 @@ public abstract class DatabaseTableService {
     }
 
     public static String defineIdReference(String title) {
-        return defineIdReference(title);
+        return defineIdReference(title, "");
     }
 
     public static String defineIdReference(String title, String idReference) {

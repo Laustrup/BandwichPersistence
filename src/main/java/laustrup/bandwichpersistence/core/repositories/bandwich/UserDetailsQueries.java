@@ -21,8 +21,8 @@ import lombok.Getter;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.complying;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.selecting;
 import static laustrup.bandwichpersistence.core.repositories.bandwich.BandwichCommonQueries.BandwichDatabasePropertiesCollection.CONTACT_INFO;
-import static laustrup.bandwichpersistence.core.services.DatabaseEntityConfigurationsService.get_tableTitle;
-import static laustrup.bandwichpersistence.core.services.DatabaseEntityConfigurationsService.toAlias;
+import static laustrup.bandwichpersistence.core.services.DatabaseEntityDataService.get_tableTitle;
+import static laustrup.bandwichpersistence.core.services.DatabaseEntityDataService.toAlias;
 
 public class UserDetailsQueries extends BandwichCommonQueries {
 

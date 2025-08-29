@@ -20,8 +20,8 @@ import static laustrup.bandwichpersistence.core.persistence.services.DatabaseCol
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition.Equation.EQUALS;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.complying;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.selecting;
-import static laustrup.bandwichpersistence.core.services.DatabaseEntityConfigurationsService.get_tableTitle;
-import static laustrup.bandwichpersistence.core.services.DatabaseEntityConfigurationsService.toAlias;
+import static laustrup.bandwichpersistence.core.services.DatabaseEntityDataService.get_tableTitle;
+import static laustrup.bandwichpersistence.core.services.DatabaseEntityDataService.toAlias;
 import static laustrup.bandwichpersistence.items.OrganisationTestItems.generateIværkstedContactInfo;
 import static laustrup.bandwichpersistence.items.SubscriptionTestItems.generateSubscription;
 import static laustrup.bandwichpersistence.items.TestItems.generateUUID;

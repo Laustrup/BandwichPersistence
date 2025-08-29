@@ -10,7 +10,7 @@ import laustrup.bandwichpersistence.core.models.users.ContactInfo;
 import laustrup.bandwichpersistence.core.persistence.models.DatabaseEntityData;
 import laustrup.bandwichpersistence.core.repositories.common.queries.CommonQueries;
 
-import static laustrup.bandwichpersistence.core.services.DatabaseEntityConfigurationsService.getDatabaseEntityFromEnum;
+import static laustrup.bandwichpersistence.core.services.DatabaseEntityDataService.getDatabaseEntityFromEnum;
 
 public abstract class BandwichCommonQueries extends CommonQueries {
 

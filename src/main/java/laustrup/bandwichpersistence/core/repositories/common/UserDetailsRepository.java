@@ -22,12 +22,10 @@ public class UserDetailsRepository {
     public static ResultSet getUserByEmail(Login login) {
         return read(
                 UserDetailsQueries.selectAllForLogin(login.getUsername()),
-                Stream.of(
-                        new DatabaseParameter(
-                                Parameter.CONTACT_INFO_EMAIL.get_key(),
-                                login.getUsername()
-                        )
-                )
+                Stream.of(new DatabaseParameter(
+                        Parameter.CONTACT_INFO_EMAIL.get_key(),
+                        login.getUsername()
+                ))
         ).get_resultSet();
     }
 }

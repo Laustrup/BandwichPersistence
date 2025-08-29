@@ -13,7 +13,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static laustrup.bandwichpersistence.core.services.DatabaseEntityConfigurationsService.get_databaseRows;
+import static laustrup.bandwichpersistence.core.services.DatabaseEntityDataService.get_databaseRows;
+import static laustrup.bandwichpersistence.core.services.EternaryService.ifNotNull;
 import static laustrup.bandwichpersistence.core.services.EternaryService.stating;
 
 public abstract class DatabaseColumnService {
@@ -42,15 +43,20 @@ public abstract class DatabaseColumnService {
         return field;
     }
 
-    public static AbstractMap.SimpleEntry<Field, String> fieldToColumnEntry(Field field) {
-        return new AbstractMap.SimpleEntry<>(field, fieldToColumnName(field.getName()));
+    public static AbstractMap.SimpleImmutableEntry<Field, String> fieldToColumnEntry(Field field) {
+        return new AbstractMap.SimpleImmutableEntry<>(field, fieldToColumnName(field.getName()));
     }
 
     public static Map<Member, String> getColumns(Class<?> clazz) {
+        if (clazz == null)
+            return null;
+        if (clazz.getDeclaredFields().length == 0)
+            return new HashMap<>();
+
         Function<Field, String> fieldsMapKey = field -> stating(field.isAnnotationPresent(DatabaseRow.class))
-                .then(field.getAnnotation(DatabaseRow.class).title())
+                .then(ifNotNull(field.getAnnotation(DatabaseRow.class)).get(DatabaseRow::title).orElse(null))
                 .orElse(field.getName());
-        Map<String, Field> fields = Arrays.stream(clazz.getFields())
+        Map<String, Field> fields = Arrays.stream(clazz.getDeclaredFields())
                 .collect(Collectors.toMap(fieldsMapKey, Function.identity()));
         Seszt<DatabaseRow> databaseRows = get_databaseRows(clazz);
 
@@ -61,17 +67,17 @@ public abstract class DatabaseColumnService {
                 mappings = new HashMap<>();
 
         Function<Field, Stream<Map.Entry<Field, String>>> mapping = field -> {
-            mappings.entrySet().add(stating(explicits.containsKey(field))
-                    .then(new AbstractMap.SimpleEntry<>(field, explicits.get(field)))
-                    .orElse(fieldToColumnEntry(field))
-            );
+            var entry = stating(explicits.containsKey(field))
+                    .then(new AbstractMap.SimpleImmutableEntry<>(field, explicits.get(field)))
+                    .orElse(fieldToColumnEntry(field));
+            mappings.put(entry.getKey(), entry.getValue());
 
             return mappings.entrySet().stream();
         };
 
         return Arrays.stream(clazz.getDeclaredFields())
-                .filter(filter -> stating(filter.isAnnotationPresent(DatabaseRow.class))
-                        .then(!filter.getAnnotation(DatabaseRow.class).exclude())
+                .filter(field -> stating(field.isAnnotationPresent(DatabaseRow.class))
+                        .then(!ifNotNull(field.getAnnotation(DatabaseRow.class)).get(DatabaseRow::exclude).orElse(false))
                         .orElse(true)
                 ).flatMap(mapping)
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));

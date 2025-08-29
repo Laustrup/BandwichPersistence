@@ -36,7 +36,7 @@ public class UserDetailsManager {
 
     public static Response<User<? extends User.Id>> getUser(Login login) {
         return databaseInteraction(() -> {
-            User user = null;
+            User<? extends User.Id> user = null;
             HttpStatus status = OK;
 
             try {
