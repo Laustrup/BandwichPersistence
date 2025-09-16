@@ -1,12 +1,13 @@
 package laustrup.bandwichpersistence.core.services.persistence;
 
-import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.persistence.DataType;
 import laustrup.bandwichpersistence.core.persistence.DatabaseField;
 import laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService.Configurations;
 import laustrup.bandwichpersistence.core.utilities.collections.Liszt;
 
 import javax.naming.NameNotFoundException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Member;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -31,13 +32,15 @@ public class JDBCService {
 
     private static Integer _currentRow = null;
 
+    public static AtomicReference<?> set(
+            Map<? extends Member, AtomicReference<?>> fields,
+            Map.Entry<? extends Member, DatabaseField> dataEntry
+    ) {
+        return set(fields.get(dataEntry.getKey()), dataEntry.getValue());
+    }
+
     public static <T> AtomicReference<T> set(AtomicReference<T> reference, DatabaseField databaseField) {
-        return ResultSetService.set(
-                new Configurations(
-                        databaseField.get_content(),
-                        _resultSet
-                ), reference
-        );
+        return ResultSetService.set(new Configurations(databaseField, _resultSet), reference);
     }
 
     public static <T> Collection<T> add(Collection<T> collection, DatabaseField databaseField) {
@@ -45,15 +48,7 @@ public class JDBCService {
     }
 
     public static <T> T get(DatabaseField databaseField, Class<T> type) {
-        return get(databaseField.get_content(), type);
-    }
-
-    public static <T> T get(String field, Class<T> type) {
-        return ResultSetService.get(new Configurations(field, _resultSet), type);
-    }
-
-    public static String getString(String column) {
-        return ResultSetService.getString(new Configurations(column, _resultSet));
+        return ResultSetService.get(new Configurations(databaseField, _resultSet), type);
     }
 
     public static String getString(DatabaseField databaseField) {
@@ -61,35 +56,23 @@ public class JDBCService {
     }
 
     public static UUID getUUID(DatabaseField databaseField) {
-        return ResultSetService.getUUID(new Configurations(databaseField.get_content(), _resultSet));
+        return ResultSetService.getUUID(new Configurations(databaseField, _resultSet));
     }
 
-    public static UUID getUUID(String column) {
-        return ResultSetService.getUUID(new Configurations(column, _resultSet));
+    public static Long getLong(DatabaseField databaseField) {
+        return ResultSetService.getLong(new Configurations(databaseField, _resultSet));
     }
 
-    public static Integer getInteger(String column) {
-        return ResultSetService.getInteger(new Configurations(column, _resultSet));
+    public static Boolean getBoolean(DatabaseField databaseField) {
+        return ResultSetService.getBoolean(new Configurations(databaseField, _resultSet));
     }
 
-    public static Long getLong(String column) {
-        return ResultSetService.getLong(new Configurations(column, _resultSet));
-    }
-
-    public static Boolean getBoolean(String column) {
-        return ResultSetService.getBoolean(new Configurations(column, _resultSet));
-    }
-
-    public static <T> T getTimestamp(String column, Function<Timestamp, T> function) {
-        return ResultSetService.getTimestamp(new Configurations(column, _resultSet), function);
+    public static <T> T getTimestamp(DatabaseField databaseField, Function<Timestamp, T> function) {
+        return ResultSetService.getTimestamp(new Configurations(databaseField, _resultSet), function);
     }
 
     public static Instant getInstant(DatabaseField databaseField) {
-        return ResultSetService.getInstant(new Configurations(databaseField.get_content(), _resultSet));
-    }
-
-    public static Instant getInstant(String column) {
-        return ResultSetService.getInstant(new Configurations(column, _resultSet));
+        return ResultSetService.getInstant(new Configurations(databaseField, _resultSet));
     }
 
     public static <T> Stream<T> build(ResultSet resultSet, Supplier<T> supplier) {
@@ -122,19 +105,25 @@ public class JDBCService {
         }
     }
 
-    public static void build(ResultSet resultSet, Runnable runnable, AtomicReference<UUID> primary) throws SQLException {
-        build(resultSet, runnable, primary.get());
+    public static void build(ResultSet resultSet, Runnable runnable, Member primary) throws SQLException {
+        build(resultSet, runnable, primary);
     }
 
-    public static void build(ResultSet resultSet, Runnable runnable, UUID primary) throws SQLException {
+    public static void build(ResultSet resultSet, Runnable runnable, Field primary) throws SQLException {
         build(
                 resultSet,
                 runnable,
-                id -> !ResultSetService.get(
-                        JDBCService::getUUID,
-                        Model.ModelDTO.Fields.id
-                ).equals(id),
+                id -> !getUUID(DatabaseField.of(id)).equals(id),
                 primary
+        );
+    }
+
+    public static void build(ResultSet resultSet, Runnable runnable, Member... primaries) throws SQLException {
+        build(
+                resultSet,
+                runnable,
+                id -> !getUUID(DatabaseField.of(id)).equals(id),
+                primaries
         );
     }
 
@@ -199,12 +188,12 @@ public class JDBCService {
         public static <T> AtomicReference<T> set(Configurations configurations, AtomicReference<T> reference) {
             return handleConfigurations(configurations, () -> {
                 try {
-                    DatabaseField databaseField = configurations.getField();
+                    DatabaseField databaseField = configurations.field();
 
                     return (AtomicReference<T>) reference.getAndSet((T) (
                             databaseField.is_key() && getType(Configurations.of(configurations, NEUTRAL)) == DataType.BINARY
                                     ? getUUID(Configurations.of(configurations, NEUTRAL))
-                                    : configurations.resultSet.getObject(databaseField.get_content())
+                                    : configurations.resultSet.getObject(databaseField.get_tableColumn())
                     ));
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
@@ -216,7 +205,7 @@ public class JDBCService {
         public static <T> Collection<T> add(Configurations configurations, Collection<T> collection) {
             return handleConfigurations(configurations, () -> {
                 try {
-                    collection.add((T) configurations.resultSet.getObject(configurations.field()));
+                    collection.add((T) configurations.resultSet.getObject(configurations.field().get_columnAlias()));
                     return collection;
                 } catch (SQLException exception) {
                     throw new RuntimeException(exception);
@@ -273,7 +262,7 @@ public class JDBCService {
         public static String getString(Configurations configurations) {
             return handleConfigurations(configurations, () -> {
                 try {
-                    return configurations.resultSet.getString(configurations.field());
+                    return configurations.resultSet.getString(configurations.field().get_columnAlias());
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
@@ -283,11 +272,11 @@ public class JDBCService {
         public static UUID getUUID(Configurations configurations) {
             return handleConfigurations(configurations, () -> {
                 try {
-                    Optional<byte[]> bytes = Optional.ofNullable(configurations.resultSet.getBytes(configurations.field()));
+                    Optional<byte[]> bytes = Optional.ofNullable(configurations.resultSet.getBytes(configurations.field().get_columnAlias()));
                     return bytes.isPresent() ? UUID.nameUUIDFromBytes(bytes.orElseThrow()) : null;
                 } catch (SQLException ignored) {
                     try {
-                        Optional<byte[]> bytes = Optional.ofNullable(configurations.resultSet.getBytes(columnOf(configurations.field())));
+                        Optional<byte[]> bytes = Optional.ofNullable(configurations.resultSet.getBytes(columnOf(configurations.field().get_columnAlias())));
                         return bytes.isPresent() ? UUID.nameUUIDFromBytes(bytes.orElseThrow()) : null;
                     } catch (SQLException exception) {
                         throw new RuntimeException(exception);
@@ -299,7 +288,7 @@ public class JDBCService {
         public static Integer getInteger(Configurations configurations) {
             return handleConfigurations(configurations, () -> {
                 try {
-                    return configurations.resultSet.getInt(configurations.field());
+                    return configurations.resultSet.getInt(configurations.field().get_columnAlias());
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
@@ -309,7 +298,7 @@ public class JDBCService {
         public static Long getLong(Configurations configurations) {
             return handleConfigurations(configurations, () -> {
                 try {
-                    return configurations.resultSet.getLong(configurations.field());
+                    return configurations.resultSet.getLong(configurations.field().get_columnAlias());
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
@@ -319,7 +308,7 @@ public class JDBCService {
         public static Boolean getBoolean(Configurations configurations) {
             return handleConfigurations(configurations, () -> {
                 try {
-                    return configurations.resultSet.getBoolean(configurations.field());
+                    return configurations.resultSet.getBoolean(configurations.field().get_columnAlias());
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
@@ -333,7 +322,7 @@ public class JDBCService {
         public static <T> T getTimestamp(Configurations configurations, Function<Timestamp, T> function) {
             return handleConfigurations(configurations, () -> {
                 try {
-                    return get(configurations.resultSet.getTimestamp(configurations.field()), function);
+                    return get(configurations.resultSet.getTimestamp(configurations.field().get_columnAlias()), function);
                 } catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
@@ -382,7 +371,7 @@ public class JDBCService {
                 ResultSetMetaData metaData = configurations.resultSet.getMetaData();
 
                 for (int i = 1; i <= metaData.getColumnCount(); i++)
-                    if ((metaData.getTableName(i) + "." + metaData.getColumnName(i)).equals(configurations.field().toLowerCase()))
+                    if ((metaData.getTableName(i) + "." + metaData.getColumnName(i)).equals(configurations.field().get_columnAlias().toLowerCase()))
                         return i;
 
                 throw new NameNotFoundException(String.format(
@@ -401,47 +390,26 @@ public class JDBCService {
                 while (toStart && resultSet.getRow() > 0 && !resultSet.isBeforeFirst());
         }
 
-        public record Configurations(String field, ResultSet resultSet, Mode mode, Optional<Runnable> logging) {
+        public record Configurations(DatabaseField field, ResultSet resultSet, Mode mode, Optional<Runnable> logging) {
 
-            public Configurations(String field, ResultSet resultSet, Mode mode) {
+            public Configurations(DatabaseField field, ResultSet resultSet, Mode mode) {
                 this(field, resultSet, mode, Optional.empty());
             }
 
-            public Configurations(DatabaseField databaseField, ResultSet resultSet, Mode mode) {
-                this(databaseField.get_content(), resultSet, mode, Optional.empty());
-            }
-
             public Configurations(DatabaseField databaseField, ResultSet resultSet, Mode mode, Runnable logging) {
-                this(databaseField.get_content(), resultSet, mode, Optional.ofNullable(logging));
+                this(databaseField, resultSet, mode, Optional.ofNullable(logging));
             }
 
             public Configurations(DatabaseField databaseField, ResultSet resultSet) {
-                this(databaseField.get_content(), resultSet, NEUTRAL, Optional.empty());
+                this(databaseField, resultSet, NEUTRAL, Optional.empty());
             }
 
             public Configurations(DatabaseField databaseField, ResultSet resultSet, Runnable logging) {
-                this(databaseField.get_content(), resultSet, NEUTRAL, Optional.ofNullable(logging));
-            }
-            
-            public Configurations(String field, ResultSet resultSet) {
-                this(field, resultSet, NEUTRAL, Optional.empty());
-            }
-
-            public Configurations(String field, ResultSet resultSet, Runnable logging) {
-                this(field, resultSet, NEUTRAL, Optional.ofNullable(logging));
+                this(databaseField, resultSet, NEUTRAL, Optional.ofNullable(logging));
             }
 
             public Configurations(DatabaseField databaseField, ResultSet resultSet, Runnable logging, Mode mode) {
-                this(databaseField.get_content(), resultSet, mode, Optional.ofNullable(logging));
-            }
-
-            public DatabaseField getField() {
-                String[] content = field.split("\\.");
-                return new DatabaseField(content[0], content[1]);
-            }
-            
-            public String field() {
-                return DatabaseService.toDatabaseColumn(field);
+                this(databaseField, resultSet, mode, Optional.ofNullable(logging));
             }
             
             public void startResultSet() throws SQLException {

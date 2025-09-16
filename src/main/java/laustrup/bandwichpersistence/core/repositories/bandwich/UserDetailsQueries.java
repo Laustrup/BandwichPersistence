@@ -21,8 +21,7 @@ import lombok.Getter;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.complying;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.selecting;
 import static laustrup.bandwichpersistence.core.repositories.bandwich.BandwichCommonQueries.BandwichDatabasePropertiesCollection.CONTACT_INFO;
-import static laustrup.bandwichpersistence.core.services.DatabaseEntityDataService.get_tableTitle;
-import static laustrup.bandwichpersistence.core.services.DatabaseEntityDataService.toAlias;
+import static laustrup.bandwichpersistence.core.services.ClassFieldService.getDeclared;
 
 public class UserDetailsQueries extends BandwichCommonQueries {
 
@@ -71,12 +70,13 @@ public class UserDetailsQueries extends BandwichCommonQueries {
     }
 
     public static Query selectAllForLogin(String email) {
-        return new Query(selectAll(
-                complying().which(Condition.equals(
-                        DatabaseField.of(toAlias(get_tableTitle(ContactInfo.class)), "email"),
-                        email
-                ))
-        ));
+        return new Query(selectAll(complying().which(Condition.equals(
+                DatabaseField.of(getDeclared(
+                        ContactInfo.class,
+                        ContactInfo.Fields._email
+                )),
+                email
+        ))));
     }
 
     @Getter

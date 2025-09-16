@@ -1,15 +1,9 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
+import laustrup.bandwichpersistence.core.models.Rating;
 import laustrup.bandwichpersistence.core.models.Venue;
-import laustrup.bandwichpersistence.core.persistence.DatabaseField;
-
-import java.sql.ResultSet;
-import java.util.function.Function;
-import java.util.logging.Logger;
 
 public class VenueRatingBuilder extends BuilderService<Venue.Rating> {
-
-    private static final Logger _logger = Logger.getLogger(VenueRatingBuilder.class.getSimpleName());
 
     private static VenueRatingBuilder _instance;
 
@@ -21,20 +15,23 @@ public class VenueRatingBuilder extends BuilderService<Venue.Rating> {
     }
 
     private VenueRatingBuilder() {
-        super(Venue.Rating.class, _logger);
+
+    }
+
+    @Override
+    protected Venue.Rating construct() {
+        return new Venue.Rating(
+                get_field(Rating.Fields._value),
+                get_field(Rating.Fields._appointedId),
+                get_field(Rating.Fields._reviewerId),
+                get_field(Rating.Fields._comment),
+                get_field(Venue.Rating.Fields._organisation),
+                get_field(Rating.Fields._timestamp)
+        );
     }
 
     @Override
     protected void completion(Venue.Rating reference, Venue.Rating object) {
 
-    }
-
-    @Override
-    protected Function<Function<String, DatabaseField>, Venue.Rating> logic(ResultSet resultSet) {
-        return table -> (Venue.Rating) RatingBuilder.Service.get_instance().generateLogic(
-                resultSet,
-                RatingBuilder.Service.Implementation.VENUE,
-                table
-        );
     }
 }

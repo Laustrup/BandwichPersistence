@@ -5,11 +5,15 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target(ElementType.FIELD)
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface DatabaseRow {
+public @interface DatabaseJunction {
 
-    String title() default "";
+    String title();
 
-    boolean exclude() default false;
+    DatabaseEntity.IdReference idReference() default @DatabaseEntity.IdReference;
+
+    DatabaseEntity.Column[] entityColumns();
+
+    DatabaseEntity.Column[] additionalColumns() default {};
 }

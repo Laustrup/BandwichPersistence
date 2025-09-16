@@ -1,19 +1,11 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
+import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
-import laustrup.bandwichpersistence.core.persistence.DatabaseField;
 
-import java.sql.ResultSet;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
-import java.util.logging.Logger;
-
-import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.set;
 
 public class CountryBuilder extends BuilderService<ContactInfo.Country> {
-
-    private static final Logger _logger = Logger.getLogger(CountryBuilder.class.getName());
 
     private static CountryBuilder _instance;
 
@@ -25,12 +17,7 @@ public class CountryBuilder extends BuilderService<ContactInfo.Country> {
     }
 
     private CountryBuilder() {
-        super(ContactInfo.Country.class, _logger);
-    }
 
-    @Override
-    public ContactInfo.Country build(ResultSet resultSet) {
-        return handle(logic(resultSet));
     }
 
     @Override
@@ -39,27 +26,11 @@ public class CountryBuilder extends BuilderService<ContactInfo.Country> {
     }
 
     @Override
-    protected Function<Function<String, DatabaseField>, ContactInfo.Country> logic(ResultSet resultSet) {
-        return table -> {
-            AtomicReference<UUID> id = new AtomicReference<>();
-            AtomicReference<String> title = new AtomicReference<>();
-            AtomicReference<String> code = new AtomicReference<>();
-
-            interaction(
-                    resultSet,
-                    () -> {
-                        set(id, table.apply(ContactInfo.Country.DTO.Fields.id));
-                        set(title, table.apply(ContactInfo.Country.DTO.Fields.title));
-                        set(code, table.apply(ContactInfo.Country.DTO.Fields.code));
-                    },
-                    id
-            );
-
-            return new ContactInfo.Country(
-                    new ContactInfo.Country.Id(id.get()),
-                    title.get(),
-                    code.get()
-            );
-        };
+    protected ContactInfo.Country construct() {
+        return new ContactInfo.Country(
+                new ContactInfo.Country.Id((UUID) get_field(Model.Fields._identity)),
+                get_field(ContactInfo.Country.Fields._title),
+                get_field(ContactInfo.Country.Fields._code)
+        );
     }
 }

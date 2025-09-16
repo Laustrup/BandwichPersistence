@@ -1,24 +1,11 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
-import laustrup.bandwichpersistence.core.models.*;
-import laustrup.bandwichpersistence.core.models.chats.ChatRoom;
-import laustrup.bandwichpersistence.core.models.chats.Request;
-import laustrup.bandwichpersistence.core.models.users.ContactInfo;
-import laustrup.bandwichpersistence.core.persistence.DatabaseField;
-import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
+import laustrup.bandwichpersistence.core.models.Model;
+import laustrup.bandwichpersistence.core.models.Organisation;
 
-import java.sql.ResultSet;
-import java.time.Instant;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
-import java.util.logging.Logger;
-
-import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
 
 public class OrganisationBuilder extends BuilderService<Organisation> {
-
-    private static final Logger _logger = Logger.getLogger(OrganisationBuilder.class.getSimpleName());
 
     private static OrganisationBuilder _instance;
 
@@ -30,7 +17,7 @@ public class OrganisationBuilder extends BuilderService<Organisation> {
     }
 
     private OrganisationBuilder() {
-        super(Organisation.class, _logger);
+
     }
 
     @Override
@@ -44,48 +31,18 @@ public class OrganisationBuilder extends BuilderService<Organisation> {
     }
 
     @Override
-    protected Function<Function<String, DatabaseField>, Organisation> logic(ResultSet resultSet) {
-        return table -> {
-            AtomicReference<UUID> id = new AtomicReference<>();
-            AtomicReference<String> title = new AtomicReference<>();
-            Seszt<Event> events = new Seszt<>();
-            Seszt<Venue> venues = new Seszt<>();
-            Seszt<Request> requests = new Seszt<>();
-            AtomicReference<ContactInfo> contactInfo = new AtomicReference<>();
-            Seszt<ChatRoom.Template> chatRoomTemplates = new Seszt<>();
-            Seszt<Album> albums = new Seszt<>();
-            Seszt<Organisation.Employee> employees = new Seszt<>();
-            AtomicReference<Instant> timestamp = new AtomicReference<>();
-
-            interaction(
-                    resultSet,
-                    () -> {
-                        set(id, table.apply(Model.ModelDTO.Fields.id));
-                        set(title, table.apply(getString(Model.ModelDTO.Fields.title)));
-                        combine(events, EventBuilder.get_instance().build(resultSet));
-                        combine(venues, VenueBuilder.get_instance().build(resultSet));
-                        combine(requests, RequestBuilder.get_instance().build(resultSet));
-                        ContactInfoBuilder.get_instance().complete(contactInfo, resultSet);
-                        combine(chatRoomTemplates, ChatRoomTemplateBuilder.get_instance().build(resultSet));
-                        combine(albums, AlbumBuilder.get_instance().build(resultSet));
-                        combine(employees, OrganisationEmployeeBuilder.get_instance().build(resultSet));
-                        timestamp.set(getInstant(Model.ModelDTO.Fields.timestamp));
-                    },
-                    id
-            );
-
-            return new Organisation(
-                    new Organisation.Id(id.get()),
-                    title.get(),
-                    events,
-                    venues,
-                    requests,
-                    contactInfo.get(),
-                    chatRoomTemplates,
-                    albums,
-                    employees,
-                    timestamp.get()
-            );
-        };
+    protected Organisation construct() {
+        return new Organisation(
+                new Organisation.Id((UUID) get_field(Model.Fields._identity)),
+                get_field(Model.Fields._title),
+                get_field(Organisation.Fields._events),
+                get_field(Organisation.Fields._venues),
+                get_field(Organisation.Fields._requests),
+                get_field(Organisation.Fields._contactInfo),
+                get_field(Organisation.Fields._chatRoomTemplates),
+                get_field(Organisation.Fields._albums),
+                get_field(Organisation.Fields._employees),
+                get_field(Model.Fields._timestamp)
+        );
     }
 }

@@ -2,7 +2,8 @@ package laustrup.bandwichpersistence.core.models.chats;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import laustrup.bandwichpersistence.core.models.*;
+import laustrup.bandwichpersistence.core.models.Event;
+import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.models.users.User;
 import laustrup.bandwichpersistence.core.services.ModelService;
 import lombok.Getter;
@@ -15,7 +16,7 @@ import java.util.UUID;
 /**
  * Determines if a User have approved to be a part of the Event.
  */
-@Getter
+@Getter @FieldNameConstants
 public class Request {
 
     /**

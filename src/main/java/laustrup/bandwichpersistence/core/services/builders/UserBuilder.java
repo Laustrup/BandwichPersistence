@@ -13,16 +13,13 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
-import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 import static laustrup.bandwichpersistence.core.managers.UserDetailsManager.getUserType;
+import static laustrup.bandwichpersistence.core.services.ClassFieldService.getDeclared;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.getString;
 
-public class UserBuilder extends BuilderService<User<?>> {
-
-    private static final Logger _logger = Logger.getLogger(UserBuilder.class.getName());
+public class UserBuilder {
 
     private static final ArtistBuilder _artistBuilder = ArtistBuilder.get_instance();
 
@@ -38,7 +35,7 @@ public class UserBuilder extends BuilderService<User<?>> {
     }
 
     private UserBuilder() {
-        super(User.class.getSimpleName(), _logger);
+
     }
 
     public static Stream<Login> buildLogins(ResultSet resultSet) {
@@ -47,16 +44,15 @@ public class UserBuilder extends BuilderService<User<?>> {
         JDBCService.build(
                 resultSet,
                 () -> logins.add(new Login(
-                        getString(Login.Fields.password),
-                        getString(ContactInfo.DTO.Fields.email)
+                        getString(DatabaseField.of(getDeclared(Login.class, Login.Fields.password))),
+                        getString(DatabaseField.of(getDeclared(ContactInfo.class, ContactInfo.DTO.Fields.email)))
                 ))
         );
 
         return logins.stream();
     }
 
-    @Override
-    public User<?> build(ResultSet resultSet) {
+    public User<? extends User.Id> build(ResultSet resultSet) {
         Optional<String> usertype = Optional.ofNullable(getUserType(resultSet));
 
         if (usertype.isEmpty())
@@ -69,8 +65,7 @@ public class UserBuilder extends BuilderService<User<?>> {
         };
     }
 
-    @Override
-    protected void completion(User<?> collective, User<?> part) {
+    protected void completion(User<? extends User.Id> collective, User<? extends User.Id> part) {
         switch (collective.get_subscription().get_userType()) {
             case ARTIST -> _artistBuilder.completion((Artist) collective, (Artist) part);
             case ORGANISATION_EMPLOYEE -> _organisationEmployeeBuilder.completion(
@@ -79,10 +74,5 @@ public class UserBuilder extends BuilderService<User<?>> {
             );
             default -> throw new IllegalStateException("The type of User to build couldn't be found!");
         }
-    }
-
-    @Override
-    protected Function<Function<String, DatabaseField>, User<?>> logic(ResultSet resultSet) {
-        throw new UnsupportedOperationException();
     }
 }

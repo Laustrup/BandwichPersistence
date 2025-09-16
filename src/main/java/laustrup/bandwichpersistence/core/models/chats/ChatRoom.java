@@ -58,7 +58,7 @@ public class ChatRoom extends Model<ChatRoom.Id, Signature.UUID> {
             Id id,
             String title,
             Seszt<Message> messages,
-            Seszt<User<?>> chatters,
+            Seszt<User<? extends User.Id>> chatters,
             Instant timestamp
     ) {
         super(id, title, timestamp);
@@ -74,7 +74,7 @@ public class ChatRoom extends Model<ChatRoom.Id, Signature.UUID> {
      * @param messages The Mails with relations to this ChatRoom.
      * @param chatters The chatters that are members of this ChatRoom.
      */
-    public ChatRoom(String title, Seszt<Message> messages, Seszt<User<?>> chatters) {
+    public ChatRoom(String title, Seszt<Message> messages, Seszt<User<? extends User.Id>> chatters) {
         super(title);
         _messages = messages;
         _chatters = chatters;
@@ -139,7 +139,7 @@ public class ChatRoom extends Model<ChatRoom.Id, Signature.UUID> {
      * @param chatter A user that is wished to be added as a chatter of the ChatRoom.
      * @return All the chatters of the ChatRoom.
      */
-    public Seszt<User<?>> add(User<?> chatter) {
+    public Seszt<User<? extends User.Id>> add(User<? extends User.Id> chatter) {
         return add(new User[]{chatter});
     }
 
@@ -150,9 +150,9 @@ public class ChatRoom extends Model<ChatRoom.Id, Signature.UUID> {
      * @param chatters A users that is wished to be added as a chatter of the ChatRoom.
      * @return All the chatters of the ChatRoom.
      */
-    public Seszt<User<?>> add(User<?>[] chatters) {
+    public Seszt<User<? extends User.Id>> add(User<? extends User.Id>[] chatters) {
         ifExists(chatters,() -> {
-            for (User<?> chatter : chatters) {
+            for (User<? extends User.Id> chatter : chatters) {
                 _chatters.add(chatter);
                 _title = determineChatRoomTitle();
             }
@@ -166,8 +166,8 @@ public class ChatRoom extends Model<ChatRoom.Id, Signature.UUID> {
      * @param chatter A User, that should be checked, if it already exists in the ChatRoom.
      * @return True if the chatter exists in the ChatRoom.
      */
-    public boolean exists(User<?> chatter) {
-        for (User<?> user : _chatters)
+    public boolean exists(User<? extends User.Id> chatter) {
+        for (User<? extends User.Id> user : _chatters)
             if (
                 user.getClass() == chatter.getClass()
                 && user.get_identity() == chatter.get_identity()
@@ -242,10 +242,10 @@ public class ChatRoom extends Model<ChatRoom.Id, Signature.UUID> {
         );
     }
 
-    @Getter
+    @Getter @FieldNameConstants
     public static class Template extends Model<Template.Id, Signature.UUID> {
 
-        private Seszt<BusinessUser<?>> _chatters;
+        private Seszt<BusinessUser<? extends User.Id>> _chatters;
 
         public Template(DTO settings) {
             this(
@@ -259,7 +259,7 @@ public class ChatRoom extends Model<ChatRoom.Id, Signature.UUID> {
         public Template(
                 Id id,
                 String title,
-                Seszt<BusinessUser<?>> chatters,
+                Seszt<BusinessUser<? extends User.Id>> chatters,
                 Instant timestamp
         ) {
             super(id, title, timestamp);

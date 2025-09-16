@@ -3,10 +3,10 @@ package laustrup.bandwichpersistence.core.models;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import laustrup.bandwichpersistence.core.models.chats.messages.Post;
 import laustrup.bandwichpersistence.core.models.identification.CommonIdentity;
 import laustrup.bandwichpersistence.core.models.identification.Signature;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
-import laustrup.bandwichpersistence.core.models.chats.messages.Post;
 import laustrup.bandwichpersistence.core.models.users.User;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
@@ -219,7 +219,7 @@ public class Venue extends Model<Venue.Id, Signature.UUID> {
         }
     }
 
-    @Getter
+    @Getter @FieldNameConstants
     public static class Rating extends laustrup.bandwichpersistence.core.models.Rating {
 
         private Organisation _organisation;

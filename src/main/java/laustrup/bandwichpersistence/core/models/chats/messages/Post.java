@@ -20,7 +20,7 @@ import static laustrup.bandwichpersistence.core.services.ModelService.from;
 /**
  * A kind of post that can be posted at any Model Object.
  */
-@Getter
+@Getter @FieldNameConstants
 public class Post extends MessageBase<Post.Id> {
 
     public Model<? extends Identity<?>, ?> _receiver;

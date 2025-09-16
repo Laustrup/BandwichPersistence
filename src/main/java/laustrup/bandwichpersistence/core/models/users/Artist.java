@@ -172,7 +172,7 @@ public class Artist extends BusinessUser<Artist.Id> {
     }
 
     @DatabaseEntity(title = "artist_authorities")
-    public enum Authority {
+    public enum Authority implements laustrup.bandwichpersistence.core.models.identification.Authority {
         STANDARD,
         ADMIN
     }

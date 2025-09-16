@@ -2,23 +2,10 @@ package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.models.chats.messages.Message;
-import laustrup.bandwichpersistence.core.models.chats.messages.MessageBase;
-import laustrup.bandwichpersistence.core.models.users.User;
-import laustrup.bandwichpersistence.core.persistence.DatabaseField;
 
-import java.sql.ResultSet;
-import java.time.Instant;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
-import java.util.logging.Logger;
-
-import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.getInstant;
-import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.set;
 
 public class MessageBuilder extends BuilderService<Message> {
-
-    private static final Logger _logger = Logger.getLogger(MessageBuilder.class.getName());
 
     private static MessageBuilder _instance;
 
@@ -29,10 +16,8 @@ public class MessageBuilder extends BuilderService<Message> {
         return _instance;
     }
 
-    private static UserBuilder _userBuilder = UserBuilder.get_instance();
-
     private MessageBuilder() {
-        super(Message.class, _logger);
+
     }
 
     @Override
@@ -41,40 +26,15 @@ public class MessageBuilder extends BuilderService<Message> {
     }
 
     @Override
-    protected Function<Function<String, DatabaseField>, Message> logic(ResultSet resultSet) {
-        return table -> {
-            AtomicReference<UUID> id = new AtomicReference<>();
-            AtomicReference<User<? extends User.Id>> author = new AtomicReference<>();
-            AtomicReference<String> content = new AtomicReference<>();
-            AtomicReference<Instant>
-                    isSent = new AtomicReference<>(),
-                    isRead = new AtomicReference<>(),
-                    timestamp = new AtomicReference<>();
-            AtomicReference<Boolean> isEdited = new AtomicReference<>();
-
-            interaction(
-                    resultSet,
-                    () -> {
-                        set(id, table.apply(Model.ModelDTO.Fields.id));
-                        _userBuilder.complete(author, resultSet);
-                        set(content, table.apply(MessageBase.Fields._content));
-                        set(isSent, table.apply(MessageBase.Fields._sent));
-                        set(isRead, table.apply(MessageBase.Fields._read));
-                        set(isEdited, table.apply(MessageBase.Fields._edited));
-                        timestamp.set(getInstant(table.apply(Model.ModelDTO.Fields.timestamp)));
-                    },
-                    id
-            );
-
-            return new Message(
-                    new Message.Id(id.get()),
-                    author.get(),
-                    content.get(),
-                    isSent.get(),
-                    isEdited.get(),
-                    isRead.get(),
-                    timestamp.get()
-            );
-        };
+    protected Message construct() {
+        return new Message(
+                new Message.Id((UUID) get_field(Model.Fields._identity)),
+                get_field(Message.Fields._author),
+                get_field(Message.Fields._content),
+                get_field(Message.Fields._sent),
+                get_field(Message.Fields._edited),
+                get_field(Message.Fields._read),
+                get_field(Model.Fields._timestamp)
+        );
     }
 }

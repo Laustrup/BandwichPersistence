@@ -1,26 +1,28 @@
 package laustrup.bandwichpersistence.core.services;
 
-import laustrup.bandwichpersistence.core.persistence.DatabaseField;
-import laustrup.bandwichpersistence.core.persistence.models.DatabaseEntityData;
 import laustrup.bandwichpersistence.core.persistence.models.annotations.DatabaseEntity;
-import laustrup.bandwichpersistence.core.persistence.models.annotations.DatabaseRow;
+import laustrup.bandwichpersistence.core.persistence.models.annotations.DatabaseJunction;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
-import java.util.AbstractMap;
 import java.util.Arrays;
-import java.util.Map;
-import java.util.stream.Collectors;
 
-import static laustrup.bandwichpersistence.core.persistence.services.DatabaseTableService.defineIdReference;
 import static laustrup.bandwichpersistence.core.services.EternaryService.ifNotEmpty;
 
-public class DatabaseEntityDataService {
+public class DatabaseDefinitionService {
 
     private static DatabaseEntity get_databaseEntityAnnotation(Class<?> clazz) {
-        return ifAnnotationIsPresent(clazz, clazz.getAnnotation(DatabaseEntity.class));
+        return ifAnnotationIsPresent(clazz, DatabaseEntity.class, clazz.getAnnotation(DatabaseEntity.class));
+    }
+
+    public static DatabaseEntity.Column get_databaseEntityColumn(Member member) {
+        return ifAnnotationIsPresent(member, ((Field) member).getAnnotation(DatabaseEntity.Column.class));
+    }
+
+    public static DatabaseJunction get_databaseJunction(Class<?> clazz) {
+        return ifAnnotationIsPresent(clazz, DatabaseJunction.class, clazz.getAnnotation(DatabaseJunction.class));
     }
 
     public static String get_tableTitle(Class<?> clazz) {
@@ -29,23 +31,26 @@ public class DatabaseEntityDataService {
 
     public static String get_idReference(Class<?> clazz) {
         DatabaseEntity databaseEntity = get_databaseEntityAnnotation(clazz);
+        String idReference = databaseEntity.idReference().title();
 
-        return ifNotEmpty(databaseEntity.idReference())
-                .otherwise(defineIdReference(databaseEntity.title(), databaseEntity.idReference()));
+        return ifNotEmpty(idReference)
+                .otherwise(String.join("_", databaseEntity.title(), "_id"));
     }
 
-    public static Seszt<DatabaseRow> get_databaseRows(Class<?> clazz) {
+    public static Seszt<DatabaseEntity.Column> get_databaseRows(Class<?> clazz) {
         return new Seszt<>(Arrays.stream(clazz.getDeclaredFields())
-                .filter(field -> field.isAnnotationPresent(DatabaseRow.class))
-                .map(field -> field.getAnnotation(DatabaseRow.class))
+                .filter(field -> field.isAnnotationPresent(DatabaseEntity.Column.class))
+                .map(field -> field.getAnnotation(DatabaseEntity.Column.class))
         );
     }
 
-    public static String get_tableTitle(Field field) {
+    public static String get_columnTitle(Member member) {
+        Field field = (Field) member;
+        
         if (!field.isAnnotationPresent(DatabaseEntity.class))
             throw new IllegalStateException(String.format(
                     "Field %s is not annotated with @Table and therefore can't get table!",
-                    field.getName()
+                    member.getName()
             ));
 
         return field.getAnnotation(DatabaseEntity.class).title();
@@ -53,7 +58,7 @@ public class DatabaseEntityDataService {
 
     public static String get_tableTitle(Class<?> clazz, String tableName) {
         try {
-            return get_tableTitle(clazz.getDeclaredField(tableName));
+            return get_columnTitle(clazz.getDeclaredField(tableName));
         } catch (NoSuchFieldException e) {
             throw new RuntimeException(e);
         }
@@ -77,37 +82,26 @@ public class DatabaseEntityDataService {
         return tableName;
     }
 
-    public static DatabaseEntityData getDatabaseEntityFromEnum(Class<? extends Enum<?>> clazz) {
-        return ifAnnotationIsPresent(clazz, new DatabaseEntityData(clazz));
-    }
-
     private static <RETURN> RETURN ifAnnotationIsPresent(
-            Field field,
-            Class<? extends Annotation> annotation,
+            Member member,
             RETURN element
     ) {
-        if (!field.isAnnotationPresent(annotation))
+        if (!((Field) member).isAnnotationPresent(DatabaseEntity.Column.class))
             throw new IllegalStateException(String.format(
                     "Field %s is not annotated with @Table and therefore can't get table!",
-                    field.getName()
+                    ((Field) member).getName()
             ));
 
         return element;
     }
 
-    private static <RETURN> RETURN ifAnnotationIsPresent(Class<?> clazz, RETURN element) {
-        if (!clazz.isAnnotationPresent(DatabaseEntity.class))
+    private static <RETURN> RETURN ifAnnotationIsPresent(Class<?> clazz, Class<? extends Annotation> annotation, RETURN element) {
+        if (!clazz.isAnnotationPresent(annotation))
             throw new IllegalStateException(String.format(
                     "Class %s is not annotated with @Table and therefore can't get table!",
                     clazz.getSimpleName()
             ));
 
         return element;
-    }
-
-    public static Map<DatabaseField, String> classFieldToDatabaseField(Map<Member, String> fields) {
-        return fields.entrySet().stream()
-                .map(entry -> new AbstractMap.SimpleEntry<>(DatabaseField.of(entry), entry.getValue()))
-                .collect(Collectors.toMap(AbstractMap.SimpleEntry::getKey, AbstractMap.SimpleEntry::getValue));
     }
 }

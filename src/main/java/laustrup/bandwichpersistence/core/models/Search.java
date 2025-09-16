@@ -3,7 +3,6 @@ package laustrup.bandwichpersistence.core.models;
 import laustrup.bandwichpersistence.core.models.users.User;
 import laustrup.bandwichpersistence.core.services.UserService;
 import laustrup.bandwichpersistence.core.utilities.collections.Liszt;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -26,7 +25,7 @@ public class Search {
      */
     private Event.DTO[] events;
 
-    public Search(Liszt<User<?>> users, Liszt<Event> events) {
+    public Search(Liszt<User<? extends User.Id>> users, Liszt<Event> events) {
         this.users = new UserDTO[users.size()];
         for (int i = 0; i < this.users.length; i++)
             this.users[i] = UserService.from(users.get(i));

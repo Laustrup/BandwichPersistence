@@ -1,24 +1,11 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
-import laustrup.bandwichpersistence.core.models.Band;
 import laustrup.bandwichpersistence.core.models.Event;
 import laustrup.bandwichpersistence.core.models.Model;
-import laustrup.bandwichpersistence.core.persistence.DatabaseField;
-import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 
-import java.sql.ResultSet;
-import java.time.Instant;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
-import java.util.logging.Logger;
-
-import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.getInstant;
-import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.set;
 
 public class GigBuilder extends BuilderService<Event.Gig> {
-
-    private static final Logger _logger = Logger.getLogger(GigBuilder.class.getName());
 
     private static GigBuilder _instance;
 
@@ -30,7 +17,7 @@ public class GigBuilder extends BuilderService<Event.Gig> {
     }
 
     private GigBuilder() {
-        super(Event.Gig.class, _logger);
+
     }
 
     @Override
@@ -39,37 +26,14 @@ public class GigBuilder extends BuilderService<Event.Gig> {
     }
 
     @Override
-    protected Function<Function<String, DatabaseField>, Event.Gig> logic(ResultSet resultSet) {
-        return table -> {
-            AtomicReference<UUID> id = new AtomicReference<>();
-            AtomicReference<Event> event = new AtomicReference<>();
-            Seszt<Band> act = new Seszt<>();
-            AtomicReference<Instant>
-                    start = new AtomicReference<>(),
-                    end = new AtomicReference<>(),
-                    timestamp = new AtomicReference<>();
-
-            interaction(
-                    resultSet,
-                    () -> {
-                        set(id, table.apply(Model.ModelDTO.Fields.id));
-                        EventBuilder.get_instance().complete(event, resultSet);
-                        combine(act, BandBuilder.get_instance().build(resultSet));
-                        start.set(getInstant(Event.DTO.Fields.start));
-                        end.set(getInstant(Event.DTO.Fields.end));
-                        timestamp.set(getInstant(Model.ModelDTO.Fields.timestamp));
-                    },
-                    id
-            );
-
-            return new Event.Gig(
-                    new Event.Gig.Id(id.get()),
-                    event.get(),
-                    act,
-                    start.get(),
-                    end.get(),
-                    timestamp.get()
-            );
-        };
+    protected Event.Gig construct() {
+        return new Event.Gig(
+                new Event.Gig.Id((UUID) get_field(Model.Fields._identity)),
+                get_field(Event.Gig.Fields._event),
+                get_field(Event.Gig.Fields._act),
+                get_field(Event.Gig.Fields._start),
+                get_field(Event.Gig.Fields._end),
+                get_field(Model.Fields._timestamp)
+        );
     }
 }

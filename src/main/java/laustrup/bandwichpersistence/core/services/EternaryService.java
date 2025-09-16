@@ -142,6 +142,18 @@ public class EternaryService {
             return orElse(action.get());
         }
 
+        public ITEM orElseThrow(Exception exception) throws Exception {
+            Optional<ITEM> item = findSuccessfulProperty();
+
+            return exception != null
+                    ? item.orElseThrow(() -> exception)
+                    : item.orElseThrow();
+        }
+
+        public ITEM orElseThrow() throws Exception {
+            return orElseThrow(null);
+        }
+
         public ITEM orElse(ITEM alternative) {
             return findSuccessfulProperty()
                     .orElse(alternative);

@@ -1,7 +1,7 @@
 package laustrup.bandwichpersistence.core.persistence.services;
 
-import laustrup.bandwichpersistence.core.persistence.models.annotations.DatabaseRow;
-import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
+import laustrup.bandwichpersistence.core.persistence.DatabaseField;
+import laustrup.bandwichpersistence.core.persistence.models.annotations.DatabaseEntity;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
@@ -11,9 +11,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import static laustrup.bandwichpersistence.core.services.DatabaseEntityDataService.get_databaseRows;
+import static laustrup.bandwichpersistence.core.services.DatabaseDefinitionService.get_databaseRows;
 import static laustrup.bandwichpersistence.core.services.EternaryService.ifNotNull;
 import static laustrup.bandwichpersistence.core.services.EternaryService.stating;
 
@@ -43,43 +42,40 @@ public abstract class DatabaseColumnService {
         return field;
     }
 
-    public static AbstractMap.SimpleImmutableEntry<Field, String> fieldToColumnEntry(Field field) {
-        return new AbstractMap.SimpleImmutableEntry<>(field, fieldToColumnName(field.getName()));
+    public static AbstractMap.SimpleImmutableEntry<Field, DatabaseField> memberToColumnEntry(Field field) {
+        return new AbstractMap.SimpleImmutableEntry<>(field, DatabaseField.of(field));
     }
 
-    public static Map<Member, String> getColumns(Class<?> clazz) {
+    public static Map<? extends Member, DatabaseField> get_columns(Class<?> clazz) {
         if (clazz == null)
             return null;
         if (clazz.getDeclaredFields().length == 0)
             return new HashMap<>();
 
-        Function<Field, String> fieldsMapKey = field -> stating(field.isAnnotationPresent(DatabaseRow.class))
-                .then(ifNotNull(field.getAnnotation(DatabaseRow.class)).get(DatabaseRow::title).orElse(null))
-                .orElse(field.getName());
+        Function<Field, String> fieldsMapKey = field -> stating(field.isAnnotationPresent(DatabaseEntity.Column.class))
+                .then(ifNotNull(field.getAnnotation(DatabaseEntity.Column.class))
+                        .get(DatabaseEntity.Column::title)
+                        .orElse(null)
+                ).orElse(field.getName());
         Map<String, Field> fields = Arrays.stream(clazz.getDeclaredFields())
                 .collect(Collectors.toMap(fieldsMapKey, Function.identity()));
-        Seszt<DatabaseRow> databaseRows = get_databaseRows(clazz);
 
-        Map<Field, String>
-                explicits = databaseRows.stream()
-                        .filter(row -> row.title() != null && !row.title().isEmpty())
-                        .collect(Collectors.toMap(row -> fields.get(row.title()), DatabaseRow::title)),
-                mappings = new HashMap<>();
-
-        Function<Field, Stream<Map.Entry<Field, String>>> mapping = field -> {
-            var entry = stating(explicits.containsKey(field))
-                    .then(new AbstractMap.SimpleImmutableEntry<>(field, explicits.get(field)))
-                    .orElse(fieldToColumnEntry(field));
-            mappings.put(entry.getKey(), entry.getValue());
-
-            return mappings.entrySet().stream();
-        };
+        Map<Field, DatabaseField> explicits = get_databaseRows(clazz).stream()
+                .filter(column -> column.title() != null && !column.title().isEmpty())
+                .collect(Collectors.toMap(
+                        column -> fields.get(column.title()),
+                        column -> DatabaseField.of(clazz, column)
+                ));
 
         return Arrays.stream(clazz.getDeclaredFields())
-                .filter(field -> stating(field.isAnnotationPresent(DatabaseRow.class))
-                        .then(!ifNotNull(field.getAnnotation(DatabaseRow.class)).get(DatabaseRow::exclude).orElse(false))
+                .filter(field -> stating(field.isAnnotationPresent(DatabaseEntity.Column.class))
+                        .then(!ifNotNull(field.getAnnotation(DatabaseEntity.ExcludedColumn.class))
+                                .then(true)
+                                .orElse(false))
                         .orElse(true)
-                ).flatMap(mapping)
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                ).map(field -> stating(explicits.containsKey(field))
+                        .then(new AbstractMap.SimpleImmutableEntry<>(field, explicits.get(field)))
+                        .orElse(memberToColumnEntry(field))
+                ).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 }

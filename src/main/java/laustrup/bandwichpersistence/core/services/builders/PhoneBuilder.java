@@ -1,21 +1,8 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
-import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
-import laustrup.bandwichpersistence.core.persistence.DatabaseField;
-
-import java.sql.ResultSet;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
-import java.util.logging.Logger;
-
-import static laustrup.bandwichpersistence.core.services.ConvertingService.of;
-import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.getLong;
-import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.set;
 
 public class PhoneBuilder extends BuilderService<ContactInfo.Phone> {
-
-    private static final Logger _logger = Logger.getLogger(PhoneBuilder.class.getName());
 
     private static PhoneBuilder _instance;
 
@@ -27,7 +14,7 @@ public class PhoneBuilder extends BuilderService<ContactInfo.Phone> {
     }
 
     private PhoneBuilder() {
-        super(ContactInfo.Phone.class, _logger);
+
     }
 
     @Override
@@ -36,31 +23,12 @@ public class PhoneBuilder extends BuilderService<ContactInfo.Phone> {
     }
 
     @Override
-    protected Function<Function<String, DatabaseField>, ContactInfo.Phone> logic(ResultSet resultSet) {
-        return table -> {
-            AtomicReference<Integer> firstDigits = new AtomicReference<>();
-            AtomicReference<Long> numbers = new AtomicReference<>();
-            AtomicReference<Boolean> mobile = new AtomicReference<>();
-            AtomicReference<Boolean> business = new AtomicReference<>();
-
-            interaction(
-                    resultSet,
-                    () -> {
-                        set(firstDigits, table.apply(ContactInfo.Phone.DTO.Fields.countryDigits));
-                        set(numbers, table.apply(ContactInfo.Phone.DTO.Fields.numbers));
-                        set(mobile, table.apply(ContactInfo.Phone.DTO.Fields.isMobile));
-                        set(business, table.apply(ContactInfo.Phone.DTO.Fields.isBusiness));
-                    },
-                    primary -> !getLong(table.apply(Model.ModelDTO.Fields.id).get_content()).equals(primary),
-                    numbers
-            );
-
-            return new ContactInfo.Phone(
-                    of(firstDigits.get()),
-                    of(numbers.get()),
-                    of(mobile.get()),
-                    of(business.get())
-            );
-        };
+    protected ContactInfo.Phone construct() {
+        return new ContactInfo.Phone(
+                get_field(ContactInfo.Phone.Fields._countryDigits),
+                get_field(ContactInfo.Phone.Fields._numbers),
+                get_field(ContactInfo.Phone.Fields._mobile),
+                get_field(ContactInfo.Phone.Fields._business)
+        );
     }
 }

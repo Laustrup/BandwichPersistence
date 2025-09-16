@@ -1,13 +1,11 @@
 package laustrup.bandwichpersistence.core.services;
 
-import laustrup.bandwichpersistence.core.models.Organisation.Employee;
-import laustrup.bandwichpersistence.core.models.users.BusinessUser;
 import laustrup.bandwichpersistence.core.models.Organisation;
-import laustrup.bandwichpersistence.core.models.users.User;
+import laustrup.bandwichpersistence.core.models.Organisation.Employee;
 import laustrup.bandwichpersistence.core.models.users.Artist;
+import laustrup.bandwichpersistence.core.models.users.BusinessUser;
 import laustrup.bandwichpersistence.core.models.users.Participant;
-
-import static laustrup.bandwichpersistence.core.services.EternaryService.*;
+import laustrup.bandwichpersistence.core.models.users.User;
 
 public class UserService {
 
@@ -36,8 +34,8 @@ public class UserService {
         return null;
     }
 
-    public static BusinessUser<?> fromBusinessUser(User.UserDTO<? extends User.Id> user) {
-        return (BusinessUser<?>) from(user);
+    public static BusinessUser<? extends User.Id> fromBusinessUser(User.UserDTO<? extends User.Id> user) {
+        return (BusinessUser<? extends User.Id>) from(user);
     }
 
     public static BusinessUser.BusinessUserDTO<?> fromBusinessUser(User<? extends User.Id> user) {

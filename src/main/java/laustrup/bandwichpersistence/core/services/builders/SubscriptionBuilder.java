@@ -2,20 +2,10 @@ package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.models.Subscription;
-import laustrup.bandwichpersistence.core.persistence.DatabaseField;
 
-import java.sql.ResultSet;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
-import java.util.logging.Logger;
-
-import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.getString;
-import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.set;
 
 public class SubscriptionBuilder extends BuilderService<Subscription> {
-
-    private static final Logger _logger = Logger.getLogger(SubscriptionBuilder.class.getName());
 
     private static SubscriptionBuilder _instance;
 
@@ -27,7 +17,7 @@ public class SubscriptionBuilder extends BuilderService<Subscription> {
     }
 
     private SubscriptionBuilder() {
-        super(Subscription.class, _logger);
+
     }
 
     @Override
@@ -36,30 +26,12 @@ public class SubscriptionBuilder extends BuilderService<Subscription> {
     }
 
     @Override
-    protected Function<Function<String, DatabaseField>, Subscription> logic(ResultSet resultSet) {
-        return table -> {
-            AtomicReference<UUID> id = new AtomicReference<>();
-            AtomicReference<Subscription.Status> status = new AtomicReference<>();
-            AtomicReference<Subscription.Kind> kind = new AtomicReference<>();
-            AtomicReference<Subscription.UserType> userType = new AtomicReference<>();
-
-            interaction(
-                    resultSet,
-                    () -> {
-                        set(id, table.apply(Model.ModelDTO.Fields.id));
-                        status.set(Subscription.Status.valueOf(getString(Subscription.DTO.Fields.status)));
-                        kind.set(Subscription.Kind.valueOf(getString(Subscription.DTO.Fields.kind)));
-                        userType.set(Subscription.UserType.valueOf(getString(Subscription.DTO.Fields.userType)));
-                    },
-                    id
-            );
-
-            return new Subscription(
-                    new Subscription.Id(id.get()),
-                    status.get(),
-                    kind.get(),
-                    userType.get()
-            );
-        };
+    protected Subscription construct() {
+        return new Subscription(
+                new Subscription.Id((UUID) get_field(Model.Fields._identity)),
+                get_field(Subscription.Fields._status),
+                get_field(Subscription.Fields._kind),
+                get_field(Subscription.Fields._userType)
+        );
     }
 }

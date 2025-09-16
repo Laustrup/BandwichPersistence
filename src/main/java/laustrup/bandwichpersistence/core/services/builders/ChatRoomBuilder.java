@@ -2,30 +2,12 @@ package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.models.chats.ChatRoom;
-import laustrup.bandwichpersistence.core.models.chats.messages.Message;
-import laustrup.bandwichpersistence.core.models.users.User;
-import laustrup.bandwichpersistence.core.persistence.DatabaseField;
-import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 
-import java.sql.ResultSet;
-import java.time.Instant;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
-import java.util.logging.Logger;
-
-import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.getInstant;
-import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.set;
 
 public class ChatRoomBuilder extends BuilderService<ChatRoom> {
 
-    private static final Logger _logger = Logger.getLogger(ChatRoomBuilder.class.getSimpleName());
-
     private static ChatRoomBuilder _instance;
-
-    private static final MessageBuilder _messageBuilder = MessageBuilder.get_instance();
-
-    private static final UserBuilder _userBuilder = UserBuilder.get_instance();
 
     public static ChatRoomBuilder get_instance() {
         if (_instance == null)
@@ -35,7 +17,7 @@ public class ChatRoomBuilder extends BuilderService<ChatRoom> {
     }
 
     private ChatRoomBuilder() {
-        super(ChatRoom.class, _logger);
+
     }
 
     @Override
@@ -45,33 +27,13 @@ public class ChatRoomBuilder extends BuilderService<ChatRoom> {
     }
 
     @Override
-    protected Function<Function<String, DatabaseField>, ChatRoom> logic(ResultSet resultSet) {
-        return table -> {
-            AtomicReference<UUID> id = new AtomicReference<>();
-            AtomicReference<String> title = new AtomicReference<>();
-            Seszt<Message> messages = new Seszt<>();
-            Seszt<User<?>> chatters = new Seszt<>();
-            AtomicReference<Instant> timestamp = new AtomicReference<>();
-
-            interaction(
-                    resultSet,
-                    () -> {
-                        set(id, table.apply(Model.ModelDTO.Fields.id));
-                        set(title, table.apply(Model.ModelDTO.Fields.title));
-                        combine(messages, _messageBuilder.build(resultSet));
-                        combine(chatters, _userBuilder.build(resultSet));
-                        timestamp.set(getInstant(table.apply(Model.ModelDTO.Fields.timestamp)));
-                    },
-                    id
-            );
-
-            return new ChatRoom(
-                    new ChatRoom.Id(id.get()),
-                    title.get(),
-                    messages,
-                    chatters,
-                    timestamp.get()
-            );
-        };
+    protected ChatRoom construct() {
+        return new ChatRoom(
+                new ChatRoom.Id((UUID) get_field(Model.Fields._identity)),
+                get_field(Model.Fields._title),
+                get_field(ChatRoom.Fields._messages),
+                get_field(ChatRoom.Fields._chatters),
+                get_field(Model.Fields._timestamp)
+        );
     }
 }

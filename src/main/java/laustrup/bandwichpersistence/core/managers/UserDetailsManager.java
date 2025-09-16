@@ -1,8 +1,11 @@
 package laustrup.bandwichpersistence.core.managers;
 
 import laustrup.bandwichpersistence.core.models.Login;
+import laustrup.bandwichpersistence.core.models.Organisation;
 import laustrup.bandwichpersistence.core.models.Response;
 import laustrup.bandwichpersistence.core.models.Subscription;
+import laustrup.bandwichpersistence.core.models.users.Artist;
+import laustrup.bandwichpersistence.core.models.users.Participant;
 import laustrup.bandwichpersistence.core.models.users.User;
 import laustrup.bandwichpersistence.core.persistence.DatabaseField;
 import laustrup.bandwichpersistence.core.repositories.common.UserDetailsRepository;
@@ -14,6 +17,7 @@ import java.sql.ResultSet;
 import java.util.logging.Logger;
 
 import static laustrup.bandwichpersistence.core.managers.ManagerService.databaseInteraction;
+import static laustrup.bandwichpersistence.core.services.ClassFieldService.getDeclared;
 import static laustrup.bandwichpersistence.core.services.PasswordService.matches;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService.Configurations;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService.Configurations.Mode.PEEK;
@@ -57,8 +61,14 @@ public class UserDetailsManager {
     }
 
     private static ResultSet passwordFits(ResultSet resultSet, String password) {
+        Subscription.UserType userType = Subscription.UserType.valueOf(getUserType(resultSet));
+
         if (matches(password, get(
-                new Configurations(DatabaseField.of(getUserType(resultSet) + "s", "password"), resultSet, PEEK),
+                new Configurations(DatabaseField.of(switch (userType) {
+                    case ARTIST -> getDeclared(Artist.class, User.Fields._password);
+                    case ORGANISATION_EMPLOYEE -> getDeclared(Organisation.Employee.class, User.Fields._password);
+                    case PARTICIPANT -> getDeclared(Participant.class, User.Fields._password);
+                }), resultSet, PEEK),
                 String.class
         )))
             return resultSet;
@@ -69,10 +79,7 @@ public class UserDetailsManager {
     public static String getUserType(ResultSet resultSet) {
         String type = get(
                 new Configurations(
-                        DatabaseField.of(
-                                Subscription.class.getSimpleName() + "s",
-                                Subscription.DTO.Fields.userType
-                        ),
+                        DatabaseField.of(getDeclared(Subscription.class, Subscription.DTO.Fields.userType)),
                         resultSet,
                         PEEK
                 ),

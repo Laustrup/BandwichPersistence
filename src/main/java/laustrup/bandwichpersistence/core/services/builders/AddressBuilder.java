@@ -2,19 +2,10 @@ package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
-import laustrup.bandwichpersistence.core.persistence.DatabaseField;
 
-import java.sql.ResultSet;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
-import java.util.logging.Logger;
-
-import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.set;
 
 public class AddressBuilder extends BuilderService<ContactInfo.Address> {
-
-    private static final Logger _logger = Logger.getLogger(AddressBuilder.class.getName());
 
     private static AddressBuilder _instance;
 
@@ -26,11 +17,6 @@ public class AddressBuilder extends BuilderService<ContactInfo.Address> {
     }
 
     private AddressBuilder() {
-        super(
-                ContactInfo.Address.class,
-                ContactInfo.Address.class.getSimpleName() + "es",
-                _logger
-        );
     }
 
     @Override
@@ -39,38 +25,14 @@ public class AddressBuilder extends BuilderService<ContactInfo.Address> {
     }
 
     @Override
-    protected Function<Function<String, DatabaseField>, ContactInfo.Address> logic(ResultSet resultSet) {
-        return table -> {
-            AtomicReference<UUID> id = new AtomicReference<>();
-
-            AtomicReference<String>
-                    street = new AtomicReference<>(),
-                    floor = new AtomicReference<>(),
-                    municipality = new AtomicReference<>(),
-                    zip = new AtomicReference<>(),
-                    city = new AtomicReference<>();
-
-            interaction(
-                    resultSet,
-                    () -> {
-                        set(id, table.apply(Model.ModelDTO.Fields.id));
-                        set(street, table.apply(ContactInfo.Address.DTO.Fields.street));
-                        set(floor, table.apply(ContactInfo.Address.DTO.Fields.floor));
-                        set(municipality, table.apply(ContactInfo.Address.DTO.Fields.municipality));
-                        set(zip, table.apply(ContactInfo.Address.DTO.Fields.zip));
-                        set(city, table.apply(ContactInfo.Address.DTO.Fields.city));
-                    },
-                    id
-            );
-
-            return new ContactInfo.Address(
-                    new ContactInfo.Address.Id(id.get()),
-                    street.get(),
-                    floor.get(),
-                    municipality.get(),
-                    zip.get(),
-                    city.get()
-            );
-        };
+    protected ContactInfo.Address construct() {
+        return new ContactInfo.Address(
+                new ContactInfo.Address.Id((UUID) get_field(Model.Fields._identity)),
+                get_field(ContactInfo.Address.Fields._street),
+                get_field(ContactInfo.Address.Fields._floor),
+                get_field(ContactInfo.Address.Fields._municipality),
+                get_field(ContactInfo.Address.Fields._zip),
+                get_field(ContactInfo.Address.Fields._city)
+        );
     }
 }

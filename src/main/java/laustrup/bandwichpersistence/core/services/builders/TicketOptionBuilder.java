@@ -1,15 +1,9 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.Ticket;
-import laustrup.bandwichpersistence.core.persistence.DatabaseField;
-
-import java.sql.ResultSet;
-import java.util.function.Function;
-import java.util.logging.Logger;
+import laustrup.bandwichpersistence.core.models.TicketBase;
 
 public class TicketOptionBuilder extends BuilderService<Ticket.Option> {
-
-    private static final Logger _logger = Logger.getLogger(TicketOptionBuilder.class.getSimpleName());
 
     private static TicketOptionBuilder _instance;
 
@@ -21,7 +15,7 @@ public class TicketOptionBuilder extends BuilderService<Ticket.Option> {
     }
 
     protected TicketOptionBuilder() {
-        super(Ticket.Option.class, _logger);
+
     }
 
     @Override
@@ -30,7 +24,17 @@ public class TicketOptionBuilder extends BuilderService<Ticket.Option> {
     }
 
     @Override
-    protected Function<Function<String, DatabaseField>, Ticket.Option> logic(ResultSet resultSet) {
-        return null;
+    protected Ticket.Option construct() {
+        return new Ticket.Option(
+                get_field(Ticket.Option.Fields._id),
+                get_field(Ticket.Option.Fields._eventId),
+                get_field(Ticket.Option.Fields._venueId),
+                get_field(Ticket.Option.Fields._title),
+                get_field(TicketBase.Fields._price),
+                get_field(TicketBase.Fields._valuta),
+                get_field(TicketBase.Fields._sitting),
+                get_field(TicketBase.Fields._areas),
+                get_field(TicketBase.Fields._timestamp)
+        );
     }
 }

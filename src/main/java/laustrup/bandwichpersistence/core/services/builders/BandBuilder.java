@@ -1,24 +1,11 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
-import laustrup.bandwichpersistence.core.models.*;
-import laustrup.bandwichpersistence.core.models.chats.messages.Post;
-import laustrup.bandwichpersistence.core.models.users.User;
-import laustrup.bandwichpersistence.core.persistence.DatabaseField;
-import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
+import laustrup.bandwichpersistence.core.models.Band;
+import laustrup.bandwichpersistence.core.models.Model;
 
-import java.sql.ResultSet;
-import java.time.Instant;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
-import java.util.logging.Logger;
-
-import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.getInstant;
-import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.set;
 
 public class BandBuilder extends BuilderService<Band> {
-
-    private static final Logger _logger = Logger.getLogger(BandBuilder.class.getName());
 
     private static BandBuilder _instance;
 
@@ -30,7 +17,7 @@ public class BandBuilder extends BuilderService<Band> {
     }
 
     private BandBuilder() {
-        super(Band.class, _logger);
+
     }
 
     @Override
@@ -42,50 +29,18 @@ public class BandBuilder extends BuilderService<Band> {
     }
 
     @Override
-    protected Function<Function<String, DatabaseField>, Band> logic(ResultSet resultSet) {
-        return table -> {
-            AtomicReference<UUID> id = new AtomicReference<>();
-            AtomicReference<Subscription> subscription = new AtomicReference<>();
-            AtomicReference<Instant> timestamp = new AtomicReference<>();
-            AtomicReference<String>
-                    name = new AtomicReference<>(),
-                    description = new AtomicReference<>(),
-                    runner = new AtomicReference<>();
-
-            Seszt<Album> albums = new Seszt<>();
-            Seszt<Event> events = new Seszt<>();
-            Seszt<Post> posts = new Seszt<>();
-            Seszt<User<?>> fans = new Seszt<>();
-
-            interaction(
-                    resultSet,
-                    () -> {
-                        set(id, table.apply(Model.ModelDTO.Fields.id));
-                        set(name, table.apply(Band.DTO.Fields.name));
-                        set(description, table.apply(Band.DTO.Fields.description));
-                        set(runner, table.apply(Band.DTO.Fields.runner));
-                        combine(albums, AlbumBuilder.get_instance().build(resultSet));
-                        combine(events, EventBuilder.get_instance().build(resultSet));
-                        combine(posts, PostBuilder.get_instance().build(resultSet));
-                        combine(fans, UserBuilder.get_instance().build(resultSet));
-                        SubscriptionBuilder.get_instance().complete(subscription, resultSet);
-                        timestamp.set(getInstant(Model.ModelDTO.Fields.timestamp));
-                    },
-                    id
-            );
-
-            return new Band(
-                    new Band.Id(id.get()),
-                    name.get(),
-                    description.get(),
-                    albums,
-                    events,
-                    subscription.get(),
-                    posts,
-                    runner.get(),
-                    fans,
-                    timestamp.get()
-            );
-        };
+    protected Band construct() {
+        return new Band(
+                new Band.Id((UUID) get_field(Model.Fields._identity)),
+                get_field(Band.Fields._name),
+                get_field(Band.Fields._description),
+                get_field(Band.Fields._albums),
+                get_field(Band.Fields._events),
+                get_field(Band.Fields._subscription),
+                get_field(Band.Fields._posts),
+                get_field(Band.Fields._runner),
+                get_field(Band.Fields._fans),
+                get_field(Model.Fields._timestamp)
+        );
     }
 }

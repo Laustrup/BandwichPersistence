@@ -11,6 +11,7 @@ import laustrup.bandwichpersistence.core.models.users.BusinessUser;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
 import laustrup.bandwichpersistence.core.persistence.Table;
 import laustrup.bandwichpersistence.core.persistence.models.annotations.DatabaseEntity;
+import laustrup.bandwichpersistence.core.persistence.models.annotations.DatabaseJunction;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
 import lombok.experimental.FieldNameConstants;
@@ -21,7 +22,7 @@ import java.util.Set;
 
 import static laustrup.bandwichpersistence.core.utilities.collections.Seszt.copy;
 
-@Getter @DatabaseEntity(title = "organisations")
+@Getter @DatabaseEntity(title = "organisations") @FieldNameConstants
 public class Organisation extends Model<Organisation.Id, Signature.UUID> {
 
     public static final Table TABLE = new Table(Organisation.class.getSimpleName() + "s");
@@ -227,8 +228,14 @@ public class Organisation extends Model<Organisation.Id, Signature.UUID> {
             }
         }
 
-        @DatabaseEntity(title = "organisation_employee_authorities")
-        public enum Authority {
+        @DatabaseJunction(
+                title = "organisation_employee_authorities",
+                entityColumns = {
+                        @DatabaseEntity.Column(title = "organisation_employee_id"),
+                        @DatabaseEntity.Column(title = "authority_id")
+                }
+        )
+        public enum Authority implements laustrup.bandwichpersistence.core.models.identification.Authority {
             STANDARD,
             ADMIN
         }

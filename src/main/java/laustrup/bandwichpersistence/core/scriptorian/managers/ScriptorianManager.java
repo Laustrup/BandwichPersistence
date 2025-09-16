@@ -1,9 +1,10 @@
 package laustrup.bandwichpersistence.core.scriptorian.managers;
 
-import laustrup.bandwichpersistence.core.libraries.DatabaseLibrary;
 import laustrup.bandwichpersistence.core.libraries.PathLibrary;
+import laustrup.bandwichpersistence.core.persistence.DatabaseField;
 import laustrup.bandwichpersistence.core.persistence.DatabaseParameter;
 import laustrup.bandwichpersistence.core.scriptorian.Scriptorian;
+import laustrup.bandwichpersistence.core.scriptorian.Scriptorian.Scriptory.Fields;
 import laustrup.bandwichpersistence.core.services.FileService;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 
@@ -15,7 +16,10 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.sql.ResultSet;
-import java.time.*;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
@@ -25,9 +29,10 @@ import java.util.logging.Logger;
 
 import static java.lang.Integer.parseInt;
 import static java.nio.file.Files.readAttributes;
-import static laustrup.bandwichpersistence.core.persistence.queries.ScriptorianQueries.Parameter;
 import static laustrup.bandwichpersistence.core.managers.ManagerService.databaseInteraction;
+import static laustrup.bandwichpersistence.core.persistence.queries.ScriptorianQueries.Parameter;
 import static laustrup.bandwichpersistence.core.scriptorian.repositories.ScriptorianRepository.*;
+import static laustrup.bandwichpersistence.core.services.ClassFieldService.getDeclared;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
 
 public class ScriptorianManager {
@@ -305,14 +310,14 @@ public class ScriptorianManager {
         return new Seszt<>(build(
                 resultSet,
                 () -> new Scriptorian.Scriptory(
-                        getString(Scriptorian.Scriptory.Fields._title),
-                        getString(Scriptorian.Scriptory.Fields._fileName),
-                        getString(Scriptorian.Scriptory.Fields._errorMessage),
-                        getString(Scriptorian.Scriptory.Fields._content),
-                        getInstant(Scriptorian.Scriptory.Fields._versionstamp),
-                        getInstant(Scriptorian.Scriptory.Fields._successstamp),
-                        getInstant(Scriptorian.Scriptory.Fields._createdstamp),
-                        getInstant(Scriptorian.Scriptory.Fields._timestamp)
+                        getString(DatabaseField.of(getDeclared(Scriptorian.Scriptory.class, Fields._title))),
+                        getString(DatabaseField.of(getDeclared(Scriptorian.Scriptory.class, Fields._fileName))),
+                        getString(DatabaseField.of(getDeclared(Scriptorian.Scriptory.class, Fields._errorMessage))),
+                        getString(DatabaseField.of(getDeclared(Scriptorian.Scriptory.class, Fields._content))),
+                        getInstant(DatabaseField.of(getDeclared(Scriptorian.Scriptory.class, Fields._versionstamp))),
+                        getInstant(DatabaseField.of(getDeclared(Scriptorian.Scriptory.class, Fields._successstamp))),
+                        getInstant(DatabaseField.of(getDeclared(Scriptorian.Scriptory.class, Fields._createdstamp))),
+                        getInstant(DatabaseField.of(getDeclared(Scriptorian.Scriptory.class, Fields._timestamp)))
                 )
         ));
     }

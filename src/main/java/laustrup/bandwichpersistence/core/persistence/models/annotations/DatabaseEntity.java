@@ -11,5 +11,37 @@ public @interface DatabaseEntity {
 
     String title();
 
-    String idReference() default "";
+    IdReference idReference() default @IdReference;
+
+    @Target(ElementType.FIELD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface Column {
+
+        String title() default "";
+
+        boolean isPrimary() default false;
+    }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface IdReference {
+
+        String title() default "";
+    }
+
+    @Target(ElementType.FIELD)
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface ExcludedColumn {
+
+    }
+
+    @Target(ElementType.TYPE)
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface Enum {
+
+        String title();
+
+        IdReference idReference() default @IdReference;
+
+        Column[] columns();
+    }
 }

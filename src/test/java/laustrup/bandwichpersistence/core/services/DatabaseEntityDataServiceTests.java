@@ -1,6 +1,5 @@
 package laustrup.bandwichpersistence.core.services;
 
-import laustrup.bandwichpersistence.BandwichTester;
 import laustrup.bandwichpersistence.core.models.Album;
 import laustrup.bandwichpersistence.core.models.Organisation;
 import laustrup.bandwichpersistence.core.persistence.models.annotations.DatabaseRow;
@@ -10,10 +9,10 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.stream.Stream;
 
-import static laustrup.bandwichpersistence.core.services.DatabaseEntityDataService.*;
+import static laustrup.bandwichpersistence.core.services.DatabaseDefinition.EntityService.*;
 import static laustrup.bandwichpersistence.quality_assurance.Asserter.asserting;
 
-class DatabaseEntityDataServiceTests extends BandwichTester {
+class DatabaseDefinition.EntityServiceTests extends BandwichTester {
 
     @ParameterizedTest
     @ValueSource(classes = {Organisation.class, Album.Media.class})

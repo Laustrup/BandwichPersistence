@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import laustrup.bandwichpersistence.core.models.*;
+import laustrup.bandwichpersistence.core.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.core.models.identification.CommonIdentity;
 import laustrup.bandwichpersistence.core.models.identification.Identity;
-import laustrup.bandwichpersistence.core.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.core.models.identification.Signature;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
@@ -60,6 +60,9 @@ public abstract class User<IDENTITY extends User.Id> extends Model<IDENTITY, Sig
      * The participation of the Events that this user is included in.
      */
     protected Seszt<Participation> _participations;
+
+    //TODO Implement
+    protected String _password;
 
     /**
      * This subscription defines details of subscription,
@@ -350,7 +353,7 @@ public abstract class User<IDENTITY extends User.Id> extends Model<IDENTITY, Sig
             this.timestamp = timestamp;
         }
 
-        public UserDTO(User<?> user) {
+        public UserDTO(User<? extends User.Id> user) {
             this(
                     user.get_identity().get_value(),
                     user.get_username(),

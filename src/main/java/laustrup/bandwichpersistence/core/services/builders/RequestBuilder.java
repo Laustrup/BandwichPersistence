@@ -1,23 +1,8 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
-import laustrup.bandwichpersistence.core.models.Event;
-import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.models.chats.Request;
-import laustrup.bandwichpersistence.core.models.users.User;
-import laustrup.bandwichpersistence.core.persistence.DatabaseField;
-
-import java.sql.ResultSet;
-import java.time.Instant;
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
-import java.util.logging.Logger;
-
-import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
 
 public class RequestBuilder extends BuilderService<Request> {
-
-    private static final Logger _logger = Logger.getLogger(RequestBuilder.class.getName());
 
     private static RequestBuilder _instance;
 
@@ -29,7 +14,7 @@ public class RequestBuilder extends BuilderService<Request> {
     }
 
     private RequestBuilder() {
-        super(Request.class, _logger);
+
     }
 
     @Override
@@ -38,38 +23,13 @@ public class RequestBuilder extends BuilderService<Request> {
     }
 
     @Override
-    protected Function<Function<String, DatabaseField>, Request> logic(ResultSet resultSet) {
-        return table -> {
-            AtomicReference<UUID>
-                    receiverId = new AtomicReference<>(),
-                    senderId = new AtomicReference<>();
-            AtomicReference<Event> event = new AtomicReference<>();
-            AtomicReference<Instant>
-                    approved = new AtomicReference<>(),
-                    timestamp = new AtomicReference<>();
-
-            interaction(
-                    resultSet,
-                    () -> {
-                        set(receiverId, table.apply(Model.ModelDTO.Fields.id));
-                        set(senderId, table.apply(Model.ModelDTO.Fields.id));
-                        EventBuilder.get_instance().complete(event, resultSet);
-                        approved.set(getInstant(Request.DTO.Fields.approved));
-                        timestamp.set(getInstant(Request.DTO.Fields.timestamp));
-                    },
-                    primary -> !getUUID(DatabaseField.of("receiver_id")).equals(primary) ||
-                            !getUUID(DatabaseField.of("sender_id")).equals(primary),
-                    receiverId.get(),
-                    senderId.get()
-            );
-
-            return new Request(
-                    new User.Id(receiverId.get()),
-                    new User.Id(senderId.get()),
-                    event.get(),
-                    approved.get(),
-                    timestamp.get()
-            );
-        };
+    protected Request construct() {
+        return new Request(
+                get_field(Request.Fields._receiverId),
+                get_field(Request.Fields._senderId),
+                get_field(Request.Fields._event),
+                get_field(Request.Fields._approved),
+                get_field(Request.Fields._timestamp)
+        );
     }
 }

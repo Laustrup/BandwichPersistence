@@ -69,7 +69,7 @@ public class Band extends Model<Band.Id, Signature.UUID> {
             Subscription subscription,
             Seszt<Post> posts,
             String runner,
-            Seszt<User<?>> fans,
+            Seszt<User<? extends User.Id>> fans,
             Instant timestamp
     ) {
         super(id, name + "|" + id, timestamp);
@@ -89,7 +89,7 @@ public class Band extends Model<Band.Id, Signature.UUID> {
      * @param fan An object of Fan, that is wished to be removed.
      * @return The whole Liszt of fans.
      */
-    public Seszt<User<?>> remove(Participant fan) {
+    public Seszt<User<? extends User.Id>> remove(Participant fan) {
         return _fans.remove(new Participant[]{fan});
     }
 

@@ -1,51 +1,43 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
-import laustrup.bandwichpersistence.core.persistence.DatabaseField;
+import laustrup.bandwichpersistence.core.persistence.models.DatabaseDefinition;
+import laustrup.bandwichpersistence.core.repositories.bandwich.BandwichEntityDataCollection;
 import laustrup.bandwichpersistence.core.services.ModelService;
+import laustrup.bandwichpersistence.core.services.TypeService;
 import laustrup.bandwichpersistence.core.services.persistence.JDBCService;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 
+import java.lang.reflect.Member;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.AbstractMap;
 import java.util.Arrays;
-import java.util.UUID;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
-abstract class BuilderService<E> {
+import static laustrup.bandwichpersistence.core.services.ClassFieldService.*;
+import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.set;
 
-    private static String _class;
-
-    private final String _tableName;
+abstract class BuilderService<MODEL> {
 
     private final Logger _logger;
 
-    private static final Seszt<Character> pluralEndingCharacters = new Seszt<>(new Character[]{'y'});
+    private static DatabaseDefinition.Entity _entity;
 
-    protected BuilderService(Class<E> clazz, Logger logger) {
-        this(clazz.getSimpleName(), logger);
-    }
+    protected Map<? extends Member, AtomicReference<?>> _fields;
 
-    protected BuilderService(String clazz, Logger logger) {
-        _class = clazz;
-        _tableName = toTableName(clazz);
-        _logger = logger;
-    }
-
-    protected BuilderService(Class<E> clazz, String tableName, Logger logger) {
-        _class = clazz.getSimpleName();
-        _tableName = toTableName(tableName);
-        _logger = logger;
-    }
-
-    protected BuilderService(Class<E> clazz, Supplier<String> tableName, Logger logger) {
-        _class = clazz.getSimpleName();
-        _tableName = tableName.get();
-        _logger = logger;
+    protected BuilderService() {
+        _logger = Logger.getLogger(new TypeService<MODEL>().getClassOfType().getName());
+        _entity = get_entityData();
+        _fields = _entity.get_columns().keySet().stream()
+                .map(field ->
+                        new AbstractMap.SimpleImmutableEntry<>(field, new AtomicReference<>())
+                ).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     protected static String classToTableName(Class<?>... classes) {
@@ -56,80 +48,70 @@ abstract class BuilderService<E> {
         return String.join("", titles);
     }
 
-    static <M> void printError(Class<?> origin, AtomicReference<M> id, Exception exception, Logger logger) throws RuntimeException {
-        printError(origin, id.get(), exception, logger);
-    }
-
-    static <M> void printError(Class<?> origin, M id, Exception exception, Logger logger) throws RuntimeException {
-        printError(origin.getSimpleName(), id, exception, logger);
-    }
-
-    static <M> void printError(String _simpleClassName, M id, Exception exception, Logger logger) {
-        logger.warning(String.format(
-                "Could not build %s of %s:\n%s",
-                _simpleClassName,
-                id,
+    void printError(Member id, Exception exception) {
+        _logger.warning(String.format(
+                "Could not build object with id %s:\n%s",
+                id.getDeclaringClass().getSimpleName(),
                 exception.getMessage()
         ));
         throw new RuntimeException(exception);
     }
 
-    protected <M> void printError(AtomicReference<M> id, Exception exception) throws RuntimeException {
-        printError(id.get(), exception);
+    static <MODEL> DatabaseDefinition.Entity get_entityData() {
+        return (DatabaseDefinition.Entity) BandwichEntityDataCollection.get_instance()
+                .get(new TypeService<MODEL>().getClassOfType());
     }
 
-    protected <M> void printError(M id, Exception exception) throws RuntimeException {
-        printError(_class, id, exception, _logger);
-    }
-
-    protected E handle(Function<Function<String, DatabaseField>, E> action) {
-        return handle(_tableName, action);
-    }
-
-    static <E> E handle(String table, Function<Function<String, DatabaseField>, E> action) {
-        return action.apply(row -> DatabaseField.of(table, row));
-    }
-
-    static String toTableName(Class<?> clazz) {
-        return toTableName(clazz.getSimpleName());
-    }
-
-    static String toTableName(String table) {
-        if (table == null)
-            throw new IllegalArgumentException("Table name cannot be null");
-
-        return table.charAt(table.length() - 1) == 's' ? table : (
-                pluralEndingCharacters.contains(table.charAt(table.length() - 1))
-                        ? table.substring(0, table.length() - 1) + "ies" : table + "s"
+    public MODEL build(ResultSet resultSet) {
+        interaction(
+                resultSet,
+                () -> _entity.get_columns().entrySet().forEach(column -> {
+                    if (memberIsCollection(column.getKey()))
+                        combine(
+                                get_field(column.getKey().getName()),
+                                get_BuilderService(column.getKey().getDeclaringClass()).build(resultSet)
+                        );
+                    else if (memberIsPartOfEntity(column.getKey()))
+                        get_BuilderService(column.getKey().getDeclaringClass()).complete(
+                                get_field(column.getKey().getName()),
+                                resultSet
+                        );
+                    else
+                        set(_fields, column);
+                }),
+                _entity.get_primaries().get_data()
         );
+
+        return construct();
     }
 
-    public E build(ResultSet resultSet) {
-        return handle(logic(resultSet));
+    private BuilderService<?> get_BuilderService(Class<?> clazz) {
+        return BandwichBuilderServiceCollection.getInstance()
+                .get_builderService(clazz);
     }
 
-    public void complete(AtomicReference<E> reference, ResultSet resultSet) {
+    public void complete(AtomicReference<MODEL> reference, ResultSet resultSet) {
         this.complete(reference, this.build(resultSet));
     }
 
-    public void complete(AtomicReference<E> reference, E object) {
+    public void complete(AtomicReference<MODEL> reference, MODEL model) {
         if (reference.get() == null) {
-            reference.set(object);
+            reference.set(model);
             return ;
         }
 
-        completion(reference.get(), object);
+        completion(reference.get(), model);
     }
 
-    protected abstract void completion(E reference, E object);
+    protected abstract void completion(MODEL reference, MODEL object);
 
-    protected abstract Function<Function<String, DatabaseField>, E> logic(ResultSet resultSet);
+    protected abstract MODEL construct();
 
-    protected <M> void combine(Seszt<M> collection, Seszt<M> entities) {
+    protected <COMBINED> void combine(Seszt<COMBINED> collection, Seszt<COMBINED> entities) {
         entities.forEach(entity -> combine(collection, entity));
     }
 
-    public <M> Seszt<M> combine(Seszt<M> collection, M entity) {
+    public <COMBINED> Seszt<COMBINED> combine(Seszt<COMBINED> collection, COMBINED entity) {
         AtomicBoolean isIdentical = new AtomicBoolean(true);
         AtomicInteger counter = new AtomicInteger(0);
 
@@ -147,24 +129,20 @@ abstract class BuilderService<E> {
         return collection;
     }
 
-    protected void interaction(ResultSet resultSet, Runnable action, AtomicReference<UUID> id) {
-        interaction(resultSet, action, id.get());
-    }
-
-    protected void interaction(ResultSet resultSet, Runnable action, UUID id) {
+    protected void interaction(ResultSet resultSet, Runnable action, Member... primaries) {
         try {
-            JDBCService.build(resultSet, action, id);
+            JDBCService.build(resultSet, action, primaries);
         } catch (SQLException exception) {
-            printError(id, exception);
+            printError(primaries[0], exception);
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public <M> void interaction(ResultSet resultSet, Runnable action, Function<M, Boolean> breaker, M... id) {
+    public void interaction(ResultSet resultSet, Runnable action, Function<Member, Boolean> breaker, Member... ids) {
         try {
-            JDBCService.build(resultSet, action, breaker, id);
+            JDBCService.build(resultSet, action, breaker, ids);
         } catch (SQLException exception) {
-            printError(id, exception);
+            for (Member id : ids)
+                printError(id, exception);
         }
     }
 
@@ -173,5 +151,10 @@ abstract class BuilderService<E> {
             action.run();
             return null;
         });
+    }
+
+    @SuppressWarnings("unchecked")
+    protected <FIELD> FIELD get_field(String name) {
+        return (FIELD) _fields.get(getDeclared(new TypeService<MODEL>().getClassOfType(), name));
     }
 }

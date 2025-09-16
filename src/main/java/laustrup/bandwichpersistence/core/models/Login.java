@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import laustrup.bandwichpersistence.core.models.users.User;
 import lombok.experimental.FieldNameConstants;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
@@ -37,7 +36,7 @@ public class Login implements UserDetails {
         return List.of();
     }
 
-    public User<?> setUser(User<?> user) {
+    public User<? extends User.Id> setUser(User<? extends User.Id> user) {
         if (user != null && user.get_contactInfo() != null && user.get_contactInfo().get_email().equals(username))
             this.user = user;
 

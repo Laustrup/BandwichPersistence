@@ -28,6 +28,7 @@ import static laustrup.bandwichpersistence.core.utilities.collections.Seszt.copy
 @DatabaseEntity(title = "contact_info")
 public class ContactInfo {
 
+    @DatabaseEntity.Column(isPrimary = true)
     private Id _id;
 
     /**
@@ -123,7 +124,7 @@ public class ContactInfo {
     /**
      * Contains values that determines address attributes.
      */
-    @Setter @Getter @DatabaseEntity(title = "addresses")
+    @Setter @Getter @DatabaseEntity(title = "addresses") @FieldNameConstants
     public static class Address {
 
         private Id _id;
@@ -262,7 +263,7 @@ public class ContactInfo {
     /**
      * An object with information about a curtain Country.
      */
-    @Getter @ToString @DatabaseEntity(title = "countries")
+    @Getter @ToString @DatabaseEntity(title = "countries") @FieldNameConstants
     public static class Country {
 
         private Id _id;
@@ -351,7 +352,7 @@ public class ContactInfo {
     /**
      * Details about phone contacting information.
      */
-    @Getter @ToString @DatabaseEntity(title = "phone")
+    @Getter @ToString @DatabaseEntity(title = "phone") @FieldNameConstants
     public static class Phone {
 
         /**
@@ -466,11 +467,11 @@ public class ContactInfo {
 
         @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
         public DTO(
-                @JsonProperty(Fields.id) java.util.UUID id,
-                @JsonProperty(Fields.email) String email,
-                @JsonProperty(Fields.phones) Set<Phone.DTO> phones,
-                @JsonProperty(Fields.address) Address.DTO address,
-                @JsonProperty(Fields.country) Country.DTO country
+                @JsonProperty(Model.ModelDTO.Fields.id) java.util.UUID id,
+                @JsonProperty(ContactInfo.DTO.Fields.email) String email,
+                @JsonProperty(ContactInfo.DTO.Fields.phones) Set<Phone.DTO> phones,
+                @JsonProperty(ContactInfo.DTO.Fields.address) Address.DTO address,
+                @JsonProperty(ContactInfo.DTO.Fields.country) Country.DTO country
         ) {
             this.id = id;
             this.email = email;

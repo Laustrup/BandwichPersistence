@@ -1,7 +1,7 @@
 package laustrup.bandwichpersistence.core.persistence.services;
 
 import laustrup.bandwichpersistence.core.persistence.DatabaseField;
-import laustrup.bandwichpersistence.core.persistence.models.DatabaseEntityData;
+import laustrup.bandwichpersistence.core.persistence.models.DatabaseDefinition;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Clause.Clausement;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
@@ -9,13 +9,14 @@ import lombok.Getter;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.lang.String.format;
 import static java.lang.String.join;
+import static laustrup.bandwichpersistence.core.persistence.DatabaseField.toSelections;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition.Equation.EQUALS;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition.Equation.IS_NULL;
-import static laustrup.bandwichpersistence.core.services.DatabaseEntityDataService.classFieldToDatabaseField;
-import static laustrup.bandwichpersistence.core.services.DatabaseEntityDataService.toAlias;
+import static laustrup.bandwichpersistence.core.services.DatabaseDefinitionService.toAlias;
 import static laustrup.bandwichpersistence.core.services.EternaryService.stating;
 
 public abstract class SelectService {
@@ -138,19 +139,18 @@ public abstract class SelectService {
                     _groupings = groupings;
                 }
 
-                public Selections(DatabaseEntityData configurationData) {
-                    _groupings = new HashMap<>(classFieldToDatabaseField(configurationData.get_columns()));
+                public Selections(DatabaseDefinition.Entity configurationData) {
+                    _groupings = new HashMap<>(toSelections(configurationData.get_columns()));
                 }
 
                 public static Selections asterisk() {
                     return new Selections(new HashMap<>());
                 }
 
-                @SafeVarargs
                 public static Selections of(Class<?>... classes) {
                     return new Selections(new HashMap<>(Arrays.stream(classes)
                             .flatMap(clazz ->
-                                    classFieldToDatabaseField(new DatabaseEntityData(clazz).get_columns()).entrySet().stream()
+                                    toSelections(new DatabaseDefinition.Entity(clazz).get_columns()).entrySet().stream()
                             ).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))));
                 }
 
@@ -204,6 +204,21 @@ public abstract class SelectService {
 
             public static Join left(String table, Condition... conditions) {
                 return new Join(Area.LEFT, table, new Seszt<>(Product.of(conditions)));
+            }
+
+            public static Join left(String table, Stream<Condition> conditions) {
+                return left(table, conditions.toArray(Condition[]::new));
+            }
+
+            public static Join left(DatabaseDefinition external, DatabaseDefinition... internals) {
+                Seszt<DatabaseDefinition> data = new Seszt<>(external);
+                data.addAll(Arrays.asList(internals));
+
+                return left(
+                        external.get_title(),
+                        data.stream()
+                                .map(datum -> datum.joinOf(external))
+                );
             }
 
             public static Join left(String table, Product... products) {
@@ -465,7 +480,7 @@ public abstract class SelectService {
 
                     return format(
                             "%s%s%s",
-                            _this.get_content(),
+                            _this.get_tableColumn(),
                             equation.get_statement(),
                             product.map(String::valueOf).orElse("")
                     );
@@ -473,7 +488,7 @@ public abstract class SelectService {
 
                 private Optional<Object> get_product() {
                     return Optional.ofNullable(_that)
-                            .map(that -> (Object) that.get_content())
+                            .map(that -> (Object) that.get_tableColumn())
                             .or(() -> Optional.ofNullable(_thing)
                                     .or(() -> Optional.ofNullable(_selection)
                                             .map(Selection::apply)

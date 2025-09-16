@@ -1,42 +1,15 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
-import laustrup.bandwichpersistence.core.models.History;
 import laustrup.bandwichpersistence.core.models.Model;
-import laustrup.bandwichpersistence.core.models.Organisation;
-import laustrup.bandwichpersistence.core.models.Organisation.Employee.Role;
-import laustrup.bandwichpersistence.core.models.Subscription;
-import laustrup.bandwichpersistence.core.models.chats.ChatRoom;
-import laustrup.bandwichpersistence.core.models.users.Artist;
-import laustrup.bandwichpersistence.core.models.users.ContactInfo;
-import laustrup.bandwichpersistence.core.models.users.User.Participation;
-import laustrup.bandwichpersistence.core.models.users.User.UserDTO;
-import laustrup.bandwichpersistence.core.persistence.DatabaseField;
-import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
+import laustrup.bandwichpersistence.core.models.Organisation.Employee;
+import laustrup.bandwichpersistence.core.models.users.BusinessUser;
+import laustrup.bandwichpersistence.core.models.users.User;
 
-import java.sql.ResultSet;
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
-import java.util.logging.Logger;
-
-import static laustrup.bandwichpersistence.core.models.Organisation.Employee;
-import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
 
 public class OrganisationEmployeeBuilder extends BuilderService<Employee> {
 
-    private static final Logger _logger = Logger.getLogger(OrganisationEmployeeBuilder.class.getSimpleName());
-
     private static OrganisationEmployeeBuilder _instance;
-
-    private static final ChatRoomBuilder _chatRoomBuilder = ChatRoomBuilder.get_instance();
-
-    private static final ContactInfoBuilder _contactInfoBuilder = ContactInfoBuilder.get_instance();
-
-    private static final SubscriptionBuilder _subscriptionBuilder = SubscriptionBuilder.get_instance();
-
-    private static final HistoryBuilder _historyBuilder = HistoryBuilder.get_instance();
 
     public static OrganisationEmployeeBuilder get_instance() {
         if (_instance == null)
@@ -46,7 +19,7 @@ public class OrganisationEmployeeBuilder extends BuilderService<Employee> {
     }
 
     private OrganisationEmployeeBuilder() {
-        super(Employee.class, classToTableName(Organisation.class, Employee.class), _logger);
+
     }
 
     @Override
@@ -58,60 +31,21 @@ public class OrganisationEmployeeBuilder extends BuilderService<Employee> {
     }
 
     @Override
-    protected Function<Function<String, DatabaseField>, Employee> logic(ResultSet resultSet) {
-        return table -> {
-            AtomicReference<UUID> id = new AtomicReference<>();
-            AtomicReference<String>
-                    username = new AtomicReference<>(),
-                    firstName = new AtomicReference<>(),
-                    lastName = new AtomicReference<>(),
-                    description = new AtomicReference<>();
-            AtomicReference<ContactInfo> contactInfo = new AtomicReference<>();
-            AtomicReference<Subscription> subscription = new AtomicReference<>();
-            Seszt<Role> roles = new Seszt<>();
-            Seszt<Employee.Authority> authorities = new Seszt<>();
-            Seszt<ChatRoom> chatRooms = new Seszt<>();
-            Seszt<Participation> participations = new Seszt<>();
-            AtomicReference<History> history = new AtomicReference<>(new History(History.JoinTableDetails.ORGANISATION_EMPLOYEE));
-            AtomicReference<Instant> timestamp = new AtomicReference<>();
-
-            interaction(
-                    resultSet,
-                    () -> {
-                        set(id, table.apply(Model.ModelDTO.Fields.id));
-                        set(username, table.apply(UserDTO.Fields.username));
-                        set(firstName, table.apply(UserDTO.Fields.firstName));
-                        set(lastName, table.apply(UserDTO.Fields.lastName));
-                        set(description, table.apply(UserDTO.Fields.description));
-                        _contactInfoBuilder.complete(contactInfo, resultSet);
-                        _subscriptionBuilder.complete(subscription, resultSet);
-                        add(roles, DatabaseField.of(
-                                Organisation.class.getSimpleName() + "Employments",
-                                Employee.DTO.Fields.roles.replace("s", ""))
-                        );
-                        add(authorities, DatabaseField.of(Artist.DTO.Fields.authorities, "level"));
-                        combine(chatRooms, _chatRoomBuilder.build(resultSet));
-                        combine(history.get().get_stories(), _historyBuilder.buildStory(resultSet, history.get()));
-                        timestamp.set(getTimestamp(Model.ModelDTO.Fields.timestamp, Timestamp::toInstant));
-                    },
-                    id
-            );
-
-            return new Employee(
-                    new Employee.Id(id.get()),
-                    username.get(),
-                    firstName.get(),
-                    lastName.get(),
-                    description.get(),
-                    contactInfo.get(),
-                    subscription.get(),
-                    roles,
-                    authorities,
-                    chatRooms,
-                    participations,
-                    history.get(),
-                    timestamp.get()
-            );
-        };
+    protected Employee construct() {
+        return new Employee(
+                new Employee.Id((UUID) get_field(Model.Fields._identity)),
+                get_field(User.Fields._username),
+                get_field(User.Fields._firstName),
+                get_field(User.Fields._lastName),
+                get_field(User.Fields._description),
+                get_field(User.Fields._contactInfo),
+                get_field(User.Fields._subscription),
+                get_field(Employee.Fields._roles),
+                get_field(Employee.Fields._authorities),
+                get_field(BusinessUser.Fields._chatRooms),
+                get_field(User.Fields._participations),
+                get_field(User.Fields._history),
+                get_field(Model.Fields._timestamp)
+        );
     }
 }
