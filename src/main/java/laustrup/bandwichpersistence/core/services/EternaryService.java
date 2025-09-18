@@ -21,8 +21,8 @@ public class EternaryService {
         return stating(element == null, element);
     }
 
-    public static Itemernary<String> ifEmpty(String string) {
-        return stating(string == null || string.isEmpty(), string);
+    public static Eternary ifEmpty(String string) {
+        return stating(string == null || string.isEmpty());
     }
 
     public static Itemernary<String> ifNotEmpty(String string) {
@@ -88,11 +88,7 @@ public class EternaryService {
         }
 
         public ITEM otherwise(ITEM item) {
-            return otherwise(origin -> item);
-        }
-
-        public <RETURN> RETURN otherwise(Function<ITEM, RETURN> action) {
-            return !_success ? action.apply(_item) : null;
+            return _success ? _item : item;
         }
 
         public <RETURN> Optional<RETURN> get(Function<ITEM, RETURN> action) {

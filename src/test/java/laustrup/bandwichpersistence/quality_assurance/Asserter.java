@@ -188,10 +188,8 @@ public class Asserter {
                     fail(String.format("Expected %s but actual was null!", _expected));
                 if (_expected == null && actual != null)
                     fail("Expected null but actual was not null!");
-            } else {
-                if (_expected == null && actual == null)
-                    fail("Expected and actual was not suppose to both be null!");
-            }
+            } else if (_expected == null && actual == null)
+                fail("Expected and actual was not suppose to both be null!");
 
             return !(_expected == null && actual == null) ? action.get() : null;
         }

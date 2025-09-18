@@ -2,8 +2,8 @@ package laustrup.bandwichpersistence.core.services;
 
 import laustrup.bandwichpersistence.BandwichTester;
 import laustrup.bandwichpersistence.core.services.EternaryService.Operator.Property;
+import lombok.Getter;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 
 import static laustrup.bandwichpersistence.core.services.EternaryService.*;
@@ -36,19 +36,48 @@ class EternaryServiceTests extends BandwichTester {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"empty", "not empty", "null"}, delimiter = _delimiter)
-    void canCheckIfIsEmpty(String scenario) {
+    @EnumSource(EmptinessScenario.class)
+    void canCheckIfIsEmpty(EmptinessScenario scenario) {
         test(() -> {
-            String expected = arrange(switch (scenario) {
-                case "empty" -> "";
-                case "not empty" -> "not empty";
-                case "null"-> null;
-                default -> throw new IllegalArgumentException("scenario " + scenario);
-            });
+            String
+                    then = "then",
+                    orElse = "orElse",
+                    arrangement = arrange(scenario.get_arrangement());
 
-            String actual = act(EternaryService.ifEmpty(expected)
-                    .otherwise(expected != null && expected.equals("not empty") ? "Not expected" : expected)
-            );
+            String expected;
+
+            if (arrangement == null)
+                expected = then;
+            else
+                expected = arrangement.equals(EmptinessScenario.EMPTY.get_arrangement())
+                        ? then
+                        : orElse;
+
+            String actual = act(EternaryService.ifEmpty(arrangement).then(then).orElse(orElse));
+
+            asserting(actual)
+                    .is(expected);
+        });
+    }
+
+    @ParameterizedTest
+    @EnumSource(EmptinessScenario.class)
+    void canCheckIfIsNotEmpty(EmptinessScenario scenario) {
+        test(() -> {
+            String
+                    otherwise = "otherwise",
+                    arrangement = arrange(scenario.get_arrangement());
+
+            String expected;
+
+            if (arrangement == null)
+                expected = otherwise;
+            else
+                expected = arrangement.equals(EmptinessScenario.NOT_EMPTY.get_arrangement())
+                        ? arrangement
+                        : otherwise;
+
+            String actual = act(EternaryService.ifNotEmpty(arrangement).otherwise(otherwise));
 
             asserting(actual)
                     .is(expected);
@@ -109,5 +138,18 @@ class EternaryServiceTests extends BandwichTester {
         THEN,
         OR,
         OR_ELSE
+    }
+
+    public enum EmptinessScenario {
+        EMPTY(""),
+        NOT_EMPTY("not empty"),
+        NULL(null);
+
+        @Getter
+        private final String _arrangement;
+
+        EmptinessScenario(String arrangement) {
+            _arrangement = arrangement;
+        }
     }
 }
