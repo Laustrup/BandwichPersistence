@@ -12,7 +12,7 @@ import java.time.Instant;
 /**
  * A Message that are sent in a ChatRoom.
  */
-@Getter @DatabaseEntity(title = "messages")
+@Getter @DatabaseEntity(value = "messages")
 public class Message extends MessageBase<Message.Id> {
 
     /**

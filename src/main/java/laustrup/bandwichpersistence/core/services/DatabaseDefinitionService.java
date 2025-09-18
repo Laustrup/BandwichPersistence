@@ -9,6 +9,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.util.Arrays;
 
+import static laustrup.bandwichpersistence.core.persistence.services.DatabaseColumnService.fieldToColumnName;
+import static laustrup.bandwichpersistence.core.persistence.services.DatabaseTableService.defineTitle;
 import static laustrup.bandwichpersistence.core.services.EternaryService.ifNotEmpty;
 
 public class DatabaseDefinitionService {
@@ -26,7 +28,8 @@ public class DatabaseDefinitionService {
     }
 
     public static String get_tableTitle(Class<?> clazz) {
-        return get_databaseEntityAnnotation(clazz).title();
+        return ifNotEmpty(get_databaseEntityAnnotation(clazz).value())
+                .otherwise(defineTitle(clazz.getSimpleName()));
     }
 
     public static String get_idReference(Class<?> clazz) {
@@ -34,10 +37,10 @@ public class DatabaseDefinitionService {
         String idReference = databaseEntity.idReference().title();
 
         return ifNotEmpty(idReference)
-                .otherwise(String.join("_", databaseEntity.title(), "_id"));
+                .otherwise(String.join("_", databaseEntity.value(), "_id"));
     }
 
-    public static Seszt<DatabaseEntity.Column> get_databaseRows(Class<?> clazz) {
+    public static Seszt<DatabaseEntity.Column> get_databaseColumns(Class<?> clazz) {
         return new Seszt<>(Arrays.stream(clazz.getDeclaredFields())
                 .filter(field -> field.isAnnotationPresent(DatabaseEntity.Column.class))
                 .map(field -> field.getAnnotation(DatabaseEntity.Column.class))
@@ -53,7 +56,7 @@ public class DatabaseDefinitionService {
                     member.getName()
             ));
 
-        return field.getAnnotation(DatabaseEntity.class).title();
+        return field.getAnnotation(DatabaseEntity.class).value();
     }
 
     public static String get_tableTitle(Class<?> clazz, String tableName) {
@@ -87,10 +90,22 @@ public class DatabaseDefinitionService {
             RETURN element
     ) {
         if (!((Field) member).isAnnotationPresent(DatabaseEntity.Column.class))
-            throw new IllegalStateException(String.format(
-                    "Field %s is not annotated with @Table and therefore can't get table!",
-                    ((Field) member).getName()
-            ));
+            new DatabaseEntity.Column() {
+                @Override
+                public Class<? extends Annotation> annotationType() {
+                    return DatabaseEntity.Column.class;
+                }
+
+                @Override
+                public String value() {
+                    return fieldToColumnName(member.getName());
+                }
+
+                @Override
+                public boolean isPrimary() {
+                    return false;
+                }
+            };
 
         return element;
     }

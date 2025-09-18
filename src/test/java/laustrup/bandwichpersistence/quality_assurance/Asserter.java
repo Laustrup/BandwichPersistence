@@ -60,12 +60,12 @@ public class Asserter {
 
         @Override
         public AssertionChecker<EXPECTED> is(EXPECTED actual) {
-            return check(() -> _equalToChecked = handleEqualing(() -> assertingEqualsTo(_expected, actual), true));
+            return check(() -> _equalToChecked = handleEqualing(actual, () -> assertingEqualsTo(_expected, actual), true));
         }
 
         @Override
         public AssertionChecker<EXPECTED> isNot(EXPECTED actual) {
-            return check(() -> _notEqualToChecked = handleEqualing(() -> assertingNotEqualsTo(_expected, actual), false));
+            return check(() -> _notEqualToChecked = handleEqualing(actual, () -> assertingNotEqualsTo(_expected, actual), false));
         }
 
         @Override
@@ -165,11 +165,35 @@ public class Asserter {
                 assertNotNull(expected);
         }
 
-        private boolean handleEqualing(Runnable action, boolean isEqualTo) {
-            if ((_notEqualToChecked && isEqualTo) || (_equalToChecked && !isEqualTo))
-                throw new AssertionError("Already checked if " + _expected + " was " + (isEqualTo ? "" : "not") + " equal!");
-            action.run();
-            return true;
+        private boolean handleEqualing(EXPECTED actual, Runnable action, boolean isEqualTo) {
+            Boolean handled = handleNull(
+                    actual,
+                    () -> {
+                        if ((_notEqualToChecked && isEqualTo) || (_equalToChecked && !isEqualTo))
+                            throw new AssertionError("Already checked if " + _expected + " was " + (isEqualTo ? "" : "not") + " equal!");
+
+                        action.run();
+
+                        return true;
+                    },
+                    isEqualTo
+            );
+
+            return handled == null || handled;
+        }
+
+        private <SUPPLYMENT> SUPPLYMENT handleNull(EXPECTED actual, Supplier<SUPPLYMENT> action, boolean isEqualTo) {
+            if (isEqualTo) {
+                if (_expected != null && actual == null)
+                    fail(String.format("Expected %s but actual was null!", _expected));
+                if (_expected == null && actual != null)
+                    fail("Expected null but actual was not null!");
+            } else {
+                if (_expected == null && actual == null)
+                    fail("Expected and actual was not suppose to both be null!");
+            }
+
+            return !(_expected == null && actual == null) ? action.get() : null;
         }
     }
 }

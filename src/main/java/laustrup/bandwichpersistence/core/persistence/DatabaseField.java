@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static laustrup.bandwichpersistence.core.services.ClassFieldService.getDeclared;
 import static laustrup.bandwichpersistence.core.services.DatabaseDefinitionService.*;
 import static laustrup.bandwichpersistence.core.services.EternaryService.ifNotEmpty;
 import static laustrup.bandwichpersistence.core.services.EternaryService.ifNotNull;
@@ -18,6 +19,10 @@ public record DatabaseField(Table table, Column column) {
 
         boolean contains(String value);
         String getKey();
+    }
+
+    private DatabaseField(Configuration configuration) {
+        this(configuration.get_table(), configuration.get_column());
     }
 
     private static final String[] _idIndicators = new String[]{"id", "_id"};
@@ -36,8 +41,12 @@ public record DatabaseField(Table table, Column column) {
         return new DatabaseField(new Table(clazz), new Column("id"));
     }
 
-    public static DatabaseField of(Class<?> entity, DatabaseEntity.Column columnEntity) {
-        return new DatabaseField(new Table(entity), Column.of(columnEntity));
+    public static DatabaseField of(Class<?> entity, DatabaseEntity.Column column) {
+        return new DatabaseField(new Configuration(entity, column));
+    }
+
+    public static DatabaseField of(Configuration configuration) {
+        return new DatabaseField(configuration);
     }
 
     public String get_tableColumn() {
@@ -56,6 +65,21 @@ public record DatabaseField(Table table, Column column) {
         return Arrays.stream(_idIndicators).anyMatch(column::contains);
     }
 
+    public record Configuration(Class<?> entity, DatabaseEntity.Column columnEntity) {
+
+        public Configuration(Class<?> entity, String columnName) {
+            this(entity, get_databaseEntityColumn(getDeclared(entity, columnName)));
+        }
+
+        public Table get_table() {
+            return new Table(entity);
+        }
+
+        public Column get_column() {
+            return Column.of(columnEntity);
+        }
+    }
+
     public record Column(String title, String alias) implements Unit {
 
         public Column(Member member) {
@@ -63,7 +87,7 @@ public record DatabaseField(Table table, Column column) {
         }
 
         public Column(DatabaseEntity.Column column) {
-            this(column.title());
+            this(column.value());
         }
 
         private Column(String title) {
@@ -71,13 +95,13 @@ public record DatabaseField(Table table, Column column) {
         }
 
         public static Column of(Member member, DatabaseEntity.Column columnEntity) {
-            return new Column(ifNotEmpty(columnEntity.title())
+            return new Column(ifNotEmpty(columnEntity.value())
                     .otherwise(get_columnTitle(member))
             );
         }
 
         public static Column of(DatabaseEntity.Column columnEntity) {
-            return new Column(columnEntity.title());
+            return new Column(columnEntity.value());
         }
 
         @Override
@@ -98,14 +122,11 @@ public record DatabaseField(Table table, Column column) {
         }
         
         public Table(DatabaseEntity entity) {
-            this(entity.title(), toAlias(entity.title()));
+            this(entity.value(), toAlias(entity.value()));
         }
 
         public Table(Class<?> clazz) {
-            this(
-                    get_tableTitle(clazz),
-                    toAlias(get_tableTitle(clazz))
-            );
+            this(get_tableTitle(clazz), toAlias(get_tableTitle(clazz)));
         }
 
         @Override

@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static laustrup.bandwichpersistence.core.services.DatabaseDefinitionService.get_databaseRows;
+import static laustrup.bandwichpersistence.core.services.DatabaseDefinitionService.get_databaseColumns;
 import static laustrup.bandwichpersistence.core.services.EternaryService.ifNotNull;
 import static laustrup.bandwichpersistence.core.services.EternaryService.stating;
 
@@ -54,16 +54,16 @@ public abstract class DatabaseColumnService {
 
         Function<Field, String> fieldsMapKey = field -> stating(field.isAnnotationPresent(DatabaseEntity.Column.class))
                 .then(ifNotNull(field.getAnnotation(DatabaseEntity.Column.class))
-                        .get(DatabaseEntity.Column::title)
+                        .get(DatabaseEntity.Column::value)
                         .orElse(null)
                 ).orElse(field.getName());
         Map<String, Field> fields = Arrays.stream(clazz.getDeclaredFields())
                 .collect(Collectors.toMap(fieldsMapKey, Function.identity()));
 
-        Map<Field, DatabaseField> explicits = get_databaseRows(clazz).stream()
-                .filter(column -> column.title() != null && !column.title().isEmpty())
+        Map<Field, DatabaseField> explicits = get_databaseColumns(clazz).stream()
+                .filter(column -> column.value() != null && !column.value().isEmpty())
                 .collect(Collectors.toMap(
-                        column -> fields.get(column.title()),
+                        column -> fields.get(column.value()),
                         column -> DatabaseField.of(clazz, column)
                 ));
 

@@ -8,6 +8,7 @@ import laustrup.bandwichpersistence.core.models.identification.Identity;
 import laustrup.bandwichpersistence.core.models.identification.Signature;
 import laustrup.bandwichpersistence.core.persistence.DatabaseField;
 import laustrup.bandwichpersistence.core.persistence.models.Query;
+import laustrup.bandwichpersistence.core.persistence.models.annotations.DatabaseEntity;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Properties;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Clause.Clausement;
@@ -18,6 +19,7 @@ import laustrup.bandwichpersistence.core.utilities.parameters.Truthiness;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.FieldNameConstants;
 
 import java.math.BigDecimal;
 import java.sql.ResultSet;
@@ -70,10 +72,10 @@ public class TestItems {
         return read(selectOrganizationQuery(OrganisationTestItems.OrganisationTitle.ARENA.get_naming())).get_resultSet();
     }
 
-    public static UUID generateUUID(String table, Clausement that) {
+    public static UUID generateUUID(Class<?> clazz, Clausement that) {
         return get(new Configurations(
-                        DatabaseField.of(table, "id"), read(
-                                new Query(selecting(new Properties(table, that)).select())
+                        DatabaseField.of(new DatabaseField.Configuration(clazz, Model.ModelDTO.Fields.id)), read(
+                                new Query(selecting(new Properties(clazz.getSimpleName(), that)).select())
                         ).get_resultSet(),
                         Configurations.Mode.START
                 ),
@@ -81,10 +83,10 @@ public class TestItems {
         );
     }
 
-    public static UUID generateUUID(String table, Selecting selecting) {
+    public static UUID generateUUID(Class<?> table, Selecting selecting) {
         return get(
                 new Configurations(
-                        DatabaseField.of(table, "id"),
+                        DatabaseField.of(new DatabaseField.Configuration(table, "id")),
                         read(new Query(selecting.select())).get_resultSet(),
                         () -> {
                             throw new RuntimeException(String.format(
@@ -101,6 +103,8 @@ public class TestItems {
     @Getter
     @Setter
     @AllArgsConstructor
+    @FieldNameConstants
+    @DatabaseEntity("test_instances")
     public static class Instance {
 
         private Id _id;

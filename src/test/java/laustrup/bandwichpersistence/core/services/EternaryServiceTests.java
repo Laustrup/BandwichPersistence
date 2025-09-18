@@ -3,6 +3,7 @@ package laustrup.bandwichpersistence.core.services;
 import laustrup.bandwichpersistence.BandwichTester;
 import laustrup.bandwichpersistence.core.services.EternaryService.Operator.Property;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 
 import static laustrup.bandwichpersistence.core.services.EternaryService.*;
@@ -32,6 +33,26 @@ class EternaryServiceTests extends BandwichTester {
         test(() -> delegate(arrange(isSame(string, string, string)), scenario, _then));
         test(() -> delegate(arrange(isSame(string, "Not String")), scenario, notExpectations));
         test(() -> delegate(arrange(isSame(string, string, "Not String")), scenario, notExpectations));
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {"empty", "not empty", "null"}, delimiter = _delimiter)
+    void canCheckIfIsEmpty(String scenario) {
+        test(() -> {
+            String expected = arrange(switch (scenario) {
+                case "empty" -> "";
+                case "not empty" -> "not empty";
+                case "null"-> null;
+                default -> throw new IllegalArgumentException("scenario " + scenario);
+            });
+
+            String actual = act(EternaryService.ifEmpty(expected)
+                    .otherwise(expected != null && expected.equals("not empty") ? "Not expected" : expected)
+            );
+
+            asserting(actual)
+                    .is(expected);
+        });
     }
 
     private void delegate(Eternary eternary, Scenario scenario, String expected) {

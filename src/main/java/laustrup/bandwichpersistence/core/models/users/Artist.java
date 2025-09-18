@@ -18,7 +18,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Getter @FieldNameConstants @DatabaseEntity(title = "artists")
+@Getter @FieldNameConstants @DatabaseEntity(value = "artists")
 public class Artist extends BusinessUser<Artist.Id> {
 
     /**
@@ -171,7 +171,7 @@ public class Artist extends BusinessUser<Artist.Id> {
             });
     }
 
-    @DatabaseEntity(title = "artist_authorities")
+    @DatabaseEntity(value = "artist_authorities")
     public enum Authority implements laustrup.bandwichpersistence.core.models.identification.Authority {
         STANDARD,
         ADMIN
@@ -280,7 +280,7 @@ public class Artist extends BusinessUser<Artist.Id> {
         }
     }
 
-    @Getter @DatabaseEntity(title = "band_memberships")
+    @Getter @DatabaseEntity(value = "band_memberships")
     public static class Membership {
 
         private Band _band;

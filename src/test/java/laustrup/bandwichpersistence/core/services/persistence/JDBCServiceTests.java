@@ -1,6 +1,7 @@
 package laustrup.bandwichpersistence.core.services.persistence;
 
 import laustrup.bandwichpersistence.BandwichTester;
+import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.models.Organisation;
 import laustrup.bandwichpersistence.core.persistence.DatabaseField;
 import laustrup.bandwichpersistence.core.services.builders.OrganisationBuilder;
@@ -46,16 +47,16 @@ class JDBCServiceTests extends BandwichTester {
     void canSetReference(boolean isBinary) {
         mocked(() -> {
             ResultSet resultSet = generateResultSet();
-            AtomicReference<String> reference = isBinary ? null : arrange(AtomicReference::new);
+            AtomicReference<String> reference = isBinary ? null : arrange(new AtomicReference<>());
             AtomicReference<UUID> uuidReference = isBinary ? arrange(AtomicReference::new) : null;
 
             Consumer<AtomicReference<?>> action = atomicReference ->
                     act(() -> ResultSetService.set(
                             new Configurations(
-                                    DatabaseField.of(
-                                            Organisation.TABLE.title(),
-                                            isBinary ? "id" : "title"
-                                    ),
+                                    DatabaseField.of(new DatabaseField.Configuration(
+                                            Organisation.class,
+                                            isBinary ? Model.Fields._identity : Model.Fields._title
+                                    )),
                                     resultSet,
                                     PEEK
                             ),

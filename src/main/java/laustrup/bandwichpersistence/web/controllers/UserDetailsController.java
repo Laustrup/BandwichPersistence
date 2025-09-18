@@ -13,11 +13,12 @@ import static laustrup.bandwichpersistence.web.services.WebService.respond;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @RestController
+@RequestMapping("/user_details")
 public class UserDetailsController {
 
     private final Logger _logger = Logger.getLogger(UserDetailsController.class.getName());
 
-    @PostMapping("login")
+    @PostMapping("/login")
     public ResponseEntity<User<? extends User.Id>> login(@RequestBody Login login) {
         return respond(() -> getUser(login));
     }

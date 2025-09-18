@@ -13,7 +13,11 @@ public class ClassFieldService {
         try {
             return clazz.getDeclaredField(fieldName);
         } catch (NoSuchFieldException exception) {
-            throw new RuntimeException(exception);
+            throw new RuntimeException(String.format("Could not find field %s with class of %s!\n%s",
+                    fieldName,
+                    clazz.getSimpleName(),
+                    exception.getMessage()
+            ));
         }
     }
 

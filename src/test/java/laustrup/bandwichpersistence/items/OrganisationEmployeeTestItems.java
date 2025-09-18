@@ -20,8 +20,6 @@ import static laustrup.bandwichpersistence.core.persistence.services.DatabaseCol
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition.Equation.EQUALS;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.complying;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.selecting;
-import static laustrup.bandwichpersistence.core.services.DatabaseDefinition.EntityService.get_tableTitle;
-import static laustrup.bandwichpersistence.core.services.DatabaseDefinition.EntityService.toAlias;
 import static laustrup.bandwichpersistence.items.OrganisationTestItems.generateIværkstedContactInfo;
 import static laustrup.bandwichpersistence.items.SubscriptionTestItems.generateSubscription;
 import static laustrup.bandwichpersistence.items.TestItems.generateUUID;
@@ -59,27 +57,26 @@ public class OrganisationEmployeeTestItems {
     }
 
     private static Employee.Id generateEmployeeId(String email) {
-        String
-                employeeTable = get_tableTitle(Employee.class),
-                contactInfoTable = get_tableTitle(ContactInfo.class);
+        Class<?> employeeClass = Employee.class,
+                ContactInfoClass = ContactInfo.class;
 
         return new Employee.Id(generateUUID(
-                employeeTable,
+                employeeClass,
                 selecting(new Properties(
-                        employeeTable,
+                        employeeClass.getSimpleName(),
                         complying()
                                 .which(Condition.of(
-                                        DatabaseField.of(
-                                                toAlias(contactInfoTable),
-                                                ContactInfo.DTO.Fields.email
-                                        ),
+                                        DatabaseField.of(new DatabaseField.Configuration(
+                                                ContactInfoClass,
+                                                ContactInfo.Fields._email
+                                        )),
                                         EQUALS,
                                         email
                                 ))
                 )).addJoin(Join.inner(
-                        contactInfoTable,
-                        DatabaseField.of(toAlias(contactInfoTable), Model.ModelDTO.Fields.id),
-                        DatabaseField.of(toAlias(employeeTable), fieldToColumnName(ContactInfo.class.getSimpleName() + "_id"))
+                        ContactInfoClass.getSimpleName(),
+                        DatabaseField.of(new DatabaseField.Configuration(ContactInfoClass, Model.ModelDTO.Fields.id)),
+                        DatabaseField.of(new DatabaseField.Configuration(employeeClass, fieldToColumnName(ContactInfo.class.getSimpleName() + "_id")))
                 ))
         ));
     }

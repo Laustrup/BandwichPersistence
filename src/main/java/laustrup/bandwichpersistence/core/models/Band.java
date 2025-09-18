@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 /**
  * Extends performer and contains Artists as members
  */
-@Getter @FieldNameConstants @DatabaseEntity(title = "bands")
+@Getter @FieldNameConstants @DatabaseEntity(value = "bands")
 public class Band extends Model<Band.Id, Signature.UUID> {
 
     private String _description;
@@ -179,7 +179,7 @@ public class Band extends Model<Band.Id, Signature.UUID> {
         }
     }
 
-    @Getter @DatabaseEntity(title = "band_memberships")
+    @Getter @DatabaseEntity(value = "band_memberships")
     public static class Membership {
 
         private Artist _member;

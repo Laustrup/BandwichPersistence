@@ -11,6 +11,10 @@ public abstract class DatabaseTableService {
         return String.join("_", List.of(pluralToSingular(target), common));
     }
 
+    public static String defineTitle(String entity) {
+        return entity.replaceAll("([A-Z])", "_$1").toLowerCase();
+    }
+
     public static String pluralToSingular(String title) {
         if (title == null || title.length() < 2)
             throw new IllegalArgumentException("Entity title is empty when trying to make it singular");

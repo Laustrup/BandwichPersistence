@@ -12,8 +12,6 @@ import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition.Equation.EQUALS;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.complying;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.selecting;
-import static laustrup.bandwichpersistence.core.services.DatabaseDefinition.EntityService.get_tableTitle;
-import static laustrup.bandwichpersistence.core.services.DatabaseDefinition.EntityService.toAlias;
 import static laustrup.bandwichpersistence.items.TestItems.generateUUID;
 
 public class ContactInfoTestItems {
@@ -24,14 +22,18 @@ public class ContactInfoTestItems {
             Address address,
             Country country
     ) {
-        String table = get_tableTitle(ContactInfo.class);
+        Class<?> clazz = ContactInfo.class;
 
         return new ContactInfo(
                 new ContactInfo.Id(generateUUID(
-                        table,
+                        clazz,
                         selecting(new Properties(
-                                table,
-                                complying().which(Condition.of(DatabaseField.of(toAlias(table), ContactInfo.DTO.Fields.email), EQUALS, email))
+                                clazz.getSimpleName(),
+                                complying().which(Condition.of(DatabaseField.of(
+                                        new DatabaseField.Configuration(ContactInfo.class, ContactInfo.DTO.Fields.email)),
+                                        EQUALS,
+                                        email
+                                ))
                         ))
                 )),
                 email,
@@ -62,13 +64,13 @@ public class ContactInfoTestItems {
             String zip,
             String city
     ) {
-        String table = get_tableTitle(Address.class);
+        Class<?> clazz = Address.class;
 
         return new Address(
                 new Address.Id(generateUUID(
-                        table,
+                        clazz,
                         complying().which(Condition.of(
-                                DatabaseField.of(table, Address.DTO.Fields.street),
+                                DatabaseField.of(new DatabaseField.Configuration(clazz, Address.DTO.Fields.street)),
                                 EQUALS,
                                 street
                         ))
@@ -82,13 +84,13 @@ public class ContactInfoTestItems {
     }
 
     public static Country generateCountry(String title, String code) {
-        String table = get_tableTitle(Country.class);
+        Class<?> clazz = Country.class;
 
         return new Country(
                 new Country.Id(generateUUID(
-                        table,
+                        clazz,
                         complying().which(Condition.of(
-                                DatabaseField.of(table, Country.DTO.Fields.title),
+                                DatabaseField.of(new DatabaseField.Configuration(clazz, Country.DTO.Fields.title)),
                                 EQUALS,
                                 title
                         ))

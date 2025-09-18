@@ -109,6 +109,10 @@ public abstract class SelectService {
                 this(Selections.asterisk(), table, where, false);
             }
 
+            public Properties(Class<?> table, Clausement where) {
+                this(Selections.asterisk(), table.getSimpleName(), where, false);
+            }
+
             public Properties(String table, boolean distinct, Clausement where) {
                 this(Selections.asterisk(), table, where, distinct);
             }

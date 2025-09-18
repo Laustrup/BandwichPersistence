@@ -17,7 +17,7 @@ public class CommonMember implements Member {
 
     public CommonMember(Class<?> declaringClass, DatabaseEntity.Column column) {
         _declaringClass = declaringClass;
-        _name = column.title();
+        _name = column.value();
     }
 
     public CommonMember(Class<?> clazz, DatabaseField field) {

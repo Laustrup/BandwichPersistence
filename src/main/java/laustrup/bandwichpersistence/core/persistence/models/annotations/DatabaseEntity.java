@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface DatabaseEntity {
 
-    String title();
+    String value() default "";
 
     IdReference idReference() default @IdReference;
 
@@ -17,7 +17,7 @@ public @interface DatabaseEntity {
     @Retention(RetentionPolicy.RUNTIME)
     @interface Column {
 
-        String title() default "";
+        String value() default "";
 
         boolean isPrimary() default false;
     }

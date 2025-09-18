@@ -1,18 +1,17 @@
 package laustrup.bandwichpersistence.core.services;
 
+import laustrup.bandwichpersistence.BandwichTester;
 import laustrup.bandwichpersistence.core.models.Album;
 import laustrup.bandwichpersistence.core.models.Organisation;
-import laustrup.bandwichpersistence.core.persistence.models.annotations.DatabaseRow;
+import laustrup.bandwichpersistence.core.persistence.models.annotations.DatabaseEntity;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import java.util.stream.Stream;
-
-import static laustrup.bandwichpersistence.core.services.DatabaseDefinition.EntityService.*;
+import static laustrup.bandwichpersistence.core.services.DatabaseDefinitionService.*;
 import static laustrup.bandwichpersistence.quality_assurance.Asserter.asserting;
 
-class DatabaseDefinition.EntityServiceTests extends BandwichTester {
+class DatabaseDefinitionServiceTests extends BandwichTester {
 
     @ParameterizedTest
     @ValueSource(classes = {Organisation.class, Album.Media.class})
@@ -50,14 +49,14 @@ class DatabaseDefinition.EntityServiceTests extends BandwichTester {
     @ParameterizedTest
     @ValueSource(classes = {Organisation.class})
     //TODO Make more detailed
-    void canGetDatabaseRows(Class<?> clazz) {
+    void canGetDatabaseColumns(Class<?> clazz) {
         test(() -> {
-            Seszt<DatabaseRow> expectations = arrange(switch (clazz.getSimpleName()) {
-                case "Organisation" -> new Seszt<>(Stream.of());
+            Seszt<DatabaseEntity.Column> expectations = arrange(switch (clazz.getSimpleName()) {
+                case "OrganisationTitle" -> new Seszt<DatabaseEntity.Column>();
                 default -> throw new IllegalStateException("Unexpected value: " + clazz.getSimpleName());
             });
 
-            Seszt<DatabaseRow> actual = act(get_databaseRows(clazz));
+            Seszt<DatabaseEntity.Column> actual = act(get_databaseColumns(clazz));
 
             asserting(expectations)
                     .is(actual);

@@ -25,7 +25,7 @@ import static laustrup.bandwichpersistence.core.utilities.collections.Seszt.copy
  * Contains information that people need in order to contact the User.
  */
 @Getter @FieldNameConstants
-@DatabaseEntity(title = "contact_info")
+@DatabaseEntity(value = "contact_info")
 public class ContactInfo {
 
     @DatabaseEntity.Column(isPrimary = true)
@@ -124,7 +124,7 @@ public class ContactInfo {
     /**
      * Contains values that determines address attributes.
      */
-    @Setter @Getter @DatabaseEntity(title = "addresses") @FieldNameConstants
+    @Setter @Getter @DatabaseEntity(value = "addresses") @FieldNameConstants
     public static class Address {
 
         private Id _id;
@@ -263,7 +263,7 @@ public class ContactInfo {
     /**
      * An object with information about a curtain Country.
      */
-    @Getter @ToString @DatabaseEntity(title = "countries") @FieldNameConstants
+    @Getter @ToString @DatabaseEntity(value = "countries") @FieldNameConstants
     public static class Country {
 
         private Id _id;
@@ -352,7 +352,7 @@ public class ContactInfo {
     /**
      * Details about phone contacting information.
      */
-    @Getter @ToString @DatabaseEntity(title = "phone") @FieldNameConstants
+    @Getter @ToString @DatabaseEntity(value = "phone") @FieldNameConstants
     public static class Phone {
 
         /**
