@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface DatabaseEntity {
+public @interface Table {
 
     String value() default "";
 
@@ -25,7 +25,7 @@ public @interface DatabaseEntity {
     @Retention(RetentionPolicy.RUNTIME)
     @interface IdReference {
 
-        String title() default "";
+        String value() default "";
     }
 
     @Target(ElementType.FIELD)

@@ -1,4 +1,4 @@
-package laustrup.bandwichpersistence.core.persistence.services;
+package laustrup.bandwichpersistence.core.persistence.worm.services;
 
 import java.util.List;
 
@@ -7,12 +7,20 @@ import static laustrup.bandwichpersistence.core.services.EternaryService.stating
 
 public abstract class DatabaseTableService {
 
-    public static String defineTitle(String target, String common) {
+    public static String defineTableTitle(String target, String common) {
         return String.join("_", List.of(pluralToSingular(target), common));
     }
 
-    public static String defineTitle(String entity) {
-        String title = entity.replaceAll("([A-Z])", "_$1");
+    public static String defineTableTitle(String title) {
+        return handleDefineTitle(title, true);
+    }
+
+    public static String defineColumnTitle(String title) {
+        return handleDefineTitle(title, false);
+    }
+
+    private static String handleDefineTitle(String title, boolean isTable) {
+        title = title.replaceAll("([A-Z])", "_$1");
 
         for (char c : title.toCharArray()) {
             if (c == '_')
@@ -21,7 +29,19 @@ public abstract class DatabaseTableService {
                 break;
         }
 
-        return title.toLowerCase();
+        title = title.toLowerCase();
+
+        return isTable ? singularToPlural(title) : title;
+    }
+
+    public static String singularToPlural(String title) {
+        if (title == null || (title.endsWith("s") && !title.endsWith("ss")) || title.endsWith("info") || title.endsWith("data"))
+            return title;
+
+        return stating(title.endsWith("y"))
+                .then(title.substring(0, title.length() - 1) + "ies")
+                .or(title + "es", ignored -> title.endsWith("ss"))
+                .orElse(title + "s");
     }
 
     public static String pluralToSingular(String title) {

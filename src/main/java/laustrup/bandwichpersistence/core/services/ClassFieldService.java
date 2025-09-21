@@ -1,12 +1,18 @@
 package laustrup.bandwichpersistence.core.services;
 
 import laustrup.bandwichpersistence.core.persistence.models.members.InheritanceField;
+import laustrup.bandwichpersistence.core.persistence.worm.annotations.Table;
 import laustrup.bandwichpersistence.core.utilities.Coollection;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 import java.lang.reflect.Member;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Optional;
+
+import static laustrup.bandwichpersistence.core.persistence.services.DatabaseColumnService.fieldIsEqualToColumn;
 
 public class ClassFieldService {
 
@@ -52,5 +58,11 @@ public class ClassFieldService {
 
     public static boolean memberIsPartOfEntity(Member member) {
         return member.getDeclaringClass().getDeclaredFields().length > 0;
+    }
+
+    public static Optional<Field> getField(Class<?> clazz, Table.Column column) {
+        return Arrays.stream(clazz.getDeclaredFields())
+                .filter(field -> fieldIsEqualToColumn(field, column))
+                .findFirst();
     }
 }

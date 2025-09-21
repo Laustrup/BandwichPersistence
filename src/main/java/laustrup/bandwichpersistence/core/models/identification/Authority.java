@@ -1,10 +1,10 @@
 package laustrup.bandwichpersistence.core.models.identification;
 
-import laustrup.bandwichpersistence.core.persistence.worm.annotations.DatabaseEntity;
+import laustrup.bandwichpersistence.core.persistence.worm.annotations.Table;
 
-@DatabaseEntity.Enum(title = "authorities", columns = {
-        @DatabaseEntity.Column(value = "id"),
-        @DatabaseEntity.Column(value = "level")
+@Table.Enum(title = "authorities", columns = {
+        @Table.Column(value = "id"),
+        @Table.Column(value = "level")
 })
 public interface Authority {
 }

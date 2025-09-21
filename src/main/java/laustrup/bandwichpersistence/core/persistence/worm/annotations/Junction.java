@@ -7,13 +7,13 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface DatabaseJunction {
+public @interface Junction {
 
     String title();
 
-    DatabaseEntity.IdReference idReference() default @DatabaseEntity.IdReference;
+    Table.IdReference idReference() default @Table.IdReference;
 
-    DatabaseEntity.Column[] entityColumns();
+    Table.Column[] entityColumns();
 
-    DatabaseEntity.Column[] additionalColumns() default {};
+    Table.Column[] additionalColumns() default {};
 }

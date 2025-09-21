@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.models.identification.CommonIdentity;
 import laustrup.bandwichpersistence.core.models.identification.Signature;
-import laustrup.bandwichpersistence.core.persistence.worm.annotations.DatabaseEntity;
+import laustrup.bandwichpersistence.core.persistence.worm.annotations.Table;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,10 +25,10 @@ import static laustrup.bandwichpersistence.core.utilities.collections.Seszt.copy
  * Contains information that people need in order to contact the User.
  */
 @Getter @FieldNameConstants
-@DatabaseEntity
+@Table
 public class ContactInfo {
 
-    @DatabaseEntity.Column(isPrimary = true)
+    @Table.Column(isPrimary = true)
     private Id _id;
 
     /**
@@ -124,7 +124,7 @@ public class ContactInfo {
     /**
      * Contains values that determines address attributes.
      */
-    @Setter @Getter @DatabaseEntity(value = "addresses") @FieldNameConstants
+    @Setter @Getter @Table @FieldNameConstants
     public static class Address {
 
         private Id _id;
@@ -263,7 +263,7 @@ public class ContactInfo {
     /**
      * An object with information about a curtain Country.
      */
-    @Getter @ToString @DatabaseEntity(value = "countries") @FieldNameConstants
+    @Getter @ToString @Table @FieldNameConstants
     public static class Country {
 
         private Id _id;
@@ -352,7 +352,7 @@ public class ContactInfo {
     /**
      * Details about phone contacting information.
      */
-    @Getter @ToString @DatabaseEntity(value = "phone") @FieldNameConstants
+    @Getter @ToString @Table @FieldNameConstants
     public static class Phone {
 
         /**

@@ -4,6 +4,7 @@ import laustrup.bandwichpersistence.core.persistence.DatabaseField;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Clause.Clausement;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition;
 import laustrup.bandwichpersistence.core.persistence.worm.models.DatabaseDefinition;
+import laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
 
@@ -16,7 +17,6 @@ import static java.lang.String.join;
 import static laustrup.bandwichpersistence.core.persistence.DatabaseField.toSelections;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition.Equation.EQUALS;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition.Equation.IS_NULL;
-import static laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService.get_tableTitle;
 import static laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService.toAlias;
 import static laustrup.bandwichpersistence.core.services.EternaryService.stating;
 
@@ -106,12 +106,8 @@ public abstract class SelectService {
                 this(selections, table, null, distinct);
             }
 
-            public Properties(String table, Clausement where) {
-                this(Selections.asterisk(), table, where, false);
-            }
-
             public Properties(Class<?> table, Clausement where) {
-                this(Selections.asterisk(), table.getSimpleName(), where, false);
+                this(Selections.asterisk(), DatabaseDefinitionService.getTableTitle(table), where, false);
             }
 
             public Properties(String table, boolean distinct, Clausement where) {
@@ -235,7 +231,7 @@ public abstract class SelectService {
             }
 
             public static Join inner(Class<?> table, DatabaseField internal, DatabaseField external) {
-                return new Join(Area.INNER, get_tableTitle(table), Condition.equals(internal, external));
+                return new Join(Area.INNER, DatabaseDefinitionService.getTableTitle(table), Condition.equals(internal, external));
             }
 
             @Override

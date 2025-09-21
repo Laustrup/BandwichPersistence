@@ -272,15 +272,10 @@ public class JDBCService {
         public static UUID getUUID(Configurations configurations) {
             return handleConfigurations(configurations, () -> {
                 try {
-                    Optional<byte[]> bytes = Optional.ofNullable(configurations.resultSet.getBytes(configurations.field().get_columnAlias()));
+                    Optional<byte[]> bytes = Optional.ofNullable(configurations.resultSet.getBytes(columnOf(configurations.field().get_tableColumn())));
                     return bytes.isPresent() ? UUID.nameUUIDFromBytes(bytes.orElseThrow()) : null;
-                } catch (SQLException ignored) {
-                    try {
-                        Optional<byte[]> bytes = Optional.ofNullable(configurations.resultSet.getBytes(columnOf(configurations.field().get_columnAlias())));
-                        return bytes.isPresent() ? UUID.nameUUIDFromBytes(bytes.orElseThrow()) : null;
-                    } catch (SQLException exception) {
-                        throw new RuntimeException(exception);
-                    }
+                } catch (SQLException exception) {
+                    throw new RuntimeException(exception);
                 }
             });
         }

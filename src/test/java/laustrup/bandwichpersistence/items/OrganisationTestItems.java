@@ -43,7 +43,7 @@ public class OrganisationTestItems {
         );
     }
 
-    public static ContactInfo generateIværkstedContactInfo(String email) throws NotImplementedException {
+    public static ContactInfo generateIværkstedContactInfo(String email) {
         return generateContactInfo(
                 email,
                 new Seszt<>(

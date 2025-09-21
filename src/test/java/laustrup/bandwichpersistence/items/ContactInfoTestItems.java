@@ -28,7 +28,7 @@ public class ContactInfoTestItems {
                 new ContactInfo.Id(generateUUID(
                         clazz,
                         selecting(new Properties(
-                                clazz.getSimpleName(),
+                                clazz,
                                 complying().which(Condition.equals(
                                         DatabaseField.of(databaseFieldConfiguration(ContactInfo.class, ContactInfo.DTO.Fields.email)),
                                         email
@@ -69,7 +69,7 @@ public class ContactInfoTestItems {
                 new Address.Id(generateUUID(
                         clazz,
                         complying().which(Condition.equals(
-                                DatabaseField.of(databaseFieldConfiguration(clazz, Address.DTO.Fields.street)),
+                                DatabaseField.of(databaseFieldConfiguration(clazz, Address.Fields._street)),
                                 street
                         ))
                 )),

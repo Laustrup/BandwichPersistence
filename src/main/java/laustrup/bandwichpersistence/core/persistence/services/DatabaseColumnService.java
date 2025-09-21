@@ -1,7 +1,8 @@
 package laustrup.bandwichpersistence.core.persistence.services;
 
 import laustrup.bandwichpersistence.core.persistence.DatabaseField;
-import laustrup.bandwichpersistence.core.persistence.worm.annotations.DatabaseEntity;
+import laustrup.bandwichpersistence.core.persistence.worm.annotations.Table;
+import laustrup.bandwichpersistence.core.persistence.worm.models.TableColumnData;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
@@ -12,11 +13,17 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService.get_databaseColumns;
+import static laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService.getTableColumn;
+import static laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService.getTableColumns;
 import static laustrup.bandwichpersistence.core.services.EternaryService.ifNotNull;
 import static laustrup.bandwichpersistence.core.services.EternaryService.stating;
 
 public abstract class DatabaseColumnService {
+
+    public static boolean fieldIsEqualToColumn(Field field, Table.Column column) {
+        return field.isAnnotationPresent(Table.Column.class) &&
+                getTableColumn(field.getDeclaringClass(), field.getName()).equals(column);
+    }
 
     public static String fieldToColumnName(String... fields) {
         return fieldToColumnName(String.join("_", fields));
@@ -52,24 +59,24 @@ public abstract class DatabaseColumnService {
         if (clazz.getDeclaredFields().length == 0)
             return new HashMap<>();
 
-        Function<Field, String> fieldsMapKey = field -> stating(field.isAnnotationPresent(DatabaseEntity.Column.class))
-                .then(ifNotNull(field.getAnnotation(DatabaseEntity.Column.class))
-                        .get(DatabaseEntity.Column::value)
+        Function<Field, String> fieldsMapKey = field -> stating(field.isAnnotationPresent(Table.Column.class))
+                .then(ifNotNull(field.getAnnotation(Table.Column.class))
+                        .get(Table.Column::value)
                         .orElse(null)
                 ).orElse(field.getName());
         Map<String, Field> fields = Arrays.stream(clazz.getDeclaredFields())
                 .collect(Collectors.toMap(fieldsMapKey, Function.identity()));
 
-        Map<Field, DatabaseField> explicits = get_databaseColumns(clazz).stream()
+        Map<Field, DatabaseField> explicits = getTableColumns(clazz).stream()
                 .filter(column -> column.value() != null && !column.value().isEmpty())
                 .collect(Collectors.toMap(
                         column -> fields.get(column.value()),
-                        column -> DatabaseField.of(clazz, column)
+                        column -> DatabaseField.of(TableColumnData.of(clazz, column).member())
                 ));
 
         return Arrays.stream(clazz.getDeclaredFields())
-                .filter(field -> stating(field.isAnnotationPresent(DatabaseEntity.Column.class))
-                        .then(!ifNotNull(field.getAnnotation(DatabaseEntity.ExcludedColumn.class))
+                .filter(field -> stating(field.isAnnotationPresent(Table.Column.class))
+                        .then(!ifNotNull(field.getAnnotation(Table.ExcludedColumn.class))
                                 .then(true)
                                 .orElse(false))
                         .orElse(true)

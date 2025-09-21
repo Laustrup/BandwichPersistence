@@ -11,7 +11,7 @@ import laustrup.bandwichpersistence.core.models.identification.Signature;
 import laustrup.bandwichpersistence.core.models.users.BusinessUser;
 import laustrup.bandwichpersistence.core.models.users.BusinessUser.BusinessUserDTO;
 import laustrup.bandwichpersistence.core.models.users.User;
-import laustrup.bandwichpersistence.core.persistence.worm.annotations.DatabaseEntity;
+import laustrup.bandwichpersistence.core.persistence.worm.annotations.Table;
 import laustrup.bandwichpersistence.core.services.UserService;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
@@ -27,7 +27,7 @@ import static laustrup.bandwichpersistence.core.services.ObjectService.ifExists;
 /**
  * This is used for multiple Users to communicate with each other through Mails.
  */
-@Getter @FieldNameConstants @DatabaseEntity(value = "chat_rooms")
+@Getter @FieldNameConstants @Table(value = "chat_rooms")
 public class ChatRoom extends Model<ChatRoom.Id, Signature.UUID> {
 
     /**

@@ -1,7 +1,7 @@
 package laustrup.bandwichpersistence.core.persistence.models.members;
 
 import laustrup.bandwichpersistence.core.persistence.DatabaseField;
-import laustrup.bandwichpersistence.core.persistence.worm.annotations.DatabaseEntity;
+import laustrup.bandwichpersistence.core.persistence.worm.annotations.Table;
 
 import java.lang.reflect.Member;
 
@@ -15,7 +15,7 @@ public class SimpleField implements Member {
         _name = name;
     }
 
-    public SimpleField(Class<?> declaringClass, DatabaseEntity.Column column) {
+    public SimpleField(Class<?> declaringClass, Table.Column column) {
         this(declaringClass, column.value());
     }
 

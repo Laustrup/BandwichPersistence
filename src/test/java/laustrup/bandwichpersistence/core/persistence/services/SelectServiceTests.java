@@ -46,7 +46,7 @@ class SelectServiceTests extends BandwichTester {
                     _alias
             );
             Properties properties = arrange(new Properties(
-                    _table,
+                    TestItems.Instance.class,
                     complying()
                             .which(Condition.equals(
                                     DatabaseField.of(databaseFieldConfiguration(
@@ -79,7 +79,7 @@ class SelectServiceTests extends BandwichTester {
                     _alias
             );
             Properties properties = arrange(new Properties(
-                    _table,
+                    TestItems.Instance.class,
                     complying()
                             .which(Condition.equals(
                                     DatabaseField.of(databaseFieldConfiguration(

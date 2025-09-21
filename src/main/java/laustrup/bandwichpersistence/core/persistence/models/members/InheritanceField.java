@@ -1,7 +1,7 @@
 package laustrup.bandwichpersistence.core.persistence.models.members;
 
 import laustrup.bandwichpersistence.core.persistence.DatabaseField;
-import laustrup.bandwichpersistence.core.persistence.worm.annotations.DatabaseEntity;
+import laustrup.bandwichpersistence.core.persistence.worm.annotations.Table;
 import lombok.Getter;
 
 import java.lang.reflect.Field;
@@ -22,7 +22,7 @@ public class InheritanceField extends CommonField {
         _entityClass = entityClass;
     }
 
-    public InheritanceField(Class<?> entityClass, Class<?> declaringClass, DatabaseEntity.Column column, Field field) {
+    public InheritanceField(Class<?> entityClass, Class<?> declaringClass, Table.Column column, Field field) {
         super(declaringClass, column, field);
         _entityClass = entityClass;
     }

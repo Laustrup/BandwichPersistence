@@ -33,7 +33,7 @@ public class OrganisationEmployeeTestItems {
         };
     }
 
-    private static Employee generateJensJensen() throws NotImplementedException {
+    private static Employee generateJensJensen() {
         String email = "jens@ivaerkstedet.dk";
         Employee.Id id = generateEmployeeId(email);
 
@@ -58,7 +58,7 @@ public class OrganisationEmployeeTestItems {
         return new Employee.Id(generateUUID(
                 Employee.class,
                 selecting(new Properties(
-                        Employee.class.getSimpleName(),
+                        Employee.class,
                         complying()
                                 .which(Condition.equals(
                                         DatabaseField.of(databaseFieldConfiguration(

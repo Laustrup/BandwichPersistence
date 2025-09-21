@@ -3,7 +3,7 @@ package laustrup.bandwichpersistence.core.models;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import laustrup.bandwichpersistence.core.models.identification.Identity;
 import laustrup.bandwichpersistence.core.models.identification.Signature;
-import laustrup.bandwichpersistence.core.persistence.worm.annotations.DatabaseEntity;
+import laustrup.bandwichpersistence.core.persistence.worm.annotations.Table;
 import laustrup.bandwichpersistence.core.services.ModelService;
 import laustrup.bandwichpersistence.core.utilities.Coollection;
 import lombok.Getter;
@@ -25,7 +25,7 @@ import static laustrup.bandwichpersistence.core.services.ObjectService.ifExists;
 @ToString(of = {"_identity", "_title", "_timestamp"})
 public abstract class Model<IDENTITY extends Identity<SIGNATURE>, SIGNATURE extends Signature<?>> {
 
-    @DatabaseEntity.Column(value = "id")
+    @Table.Column(value = "id")
     protected IDENTITY _identity;
 
     /**
@@ -34,7 +34,7 @@ public abstract class Model<IDENTITY extends Identity<SIGNATURE>, SIGNATURE exte
      * such as username or simply for naming a unit.
      */
     @Setter
-    @DatabaseEntity.ExcludedColumn
+    @Table.ExcludedColumn
     protected String _title;
 
     /**
@@ -47,7 +47,7 @@ public abstract class Model<IDENTITY extends Identity<SIGNATURE>, SIGNATURE exte
      * Useful to identify an incident or change.
      * Is added to the Response entity class when answering.
      */
-    @DatabaseEntity.ExcludedColumn
+    @Table.ExcludedColumn
     protected Situation _situation = Situation.NONE;
 
     /**

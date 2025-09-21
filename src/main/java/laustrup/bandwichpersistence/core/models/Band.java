@@ -7,7 +7,7 @@ import laustrup.bandwichpersistence.core.models.identification.Signature;
 import laustrup.bandwichpersistence.core.models.users.Artist;
 import laustrup.bandwichpersistence.core.models.users.Participant;
 import laustrup.bandwichpersistence.core.models.users.User;
-import laustrup.bandwichpersistence.core.persistence.worm.annotations.DatabaseEntity;
+import laustrup.bandwichpersistence.core.persistence.worm.annotations.Table;
 import laustrup.bandwichpersistence.core.services.UserService;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 /**
  * Extends performer and contains Artists as members
  */
-@Getter @FieldNameConstants @DatabaseEntity(value = "bands")
+@Getter @FieldNameConstants @Table(value = "bands")
 public class Band extends Model<Band.Id, Signature.UUID> {
 
     private String _description;
@@ -179,7 +179,7 @@ public class Band extends Model<Band.Id, Signature.UUID> {
         }
     }
 
-    @Getter @DatabaseEntity(value = "band_memberships")
+    @Getter @Table(value = "band_memberships")
     public static class Membership {
 
         private Artist _member;

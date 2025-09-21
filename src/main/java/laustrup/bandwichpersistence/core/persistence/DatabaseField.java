@@ -1,6 +1,6 @@
 package laustrup.bandwichpersistence.core.persistence;
 
-import laustrup.bandwichpersistence.core.persistence.worm.annotations.DatabaseEntity;
+import laustrup.bandwichpersistence.core.persistence.worm.models.TableColumnData;
 
 import java.lang.reflect.Member;
 import java.util.Arrays;
@@ -40,16 +40,8 @@ public record DatabaseField(Table table, Column column) {
         return new DatabaseField(new Table(clazz), new Column("id"));
     }
 
-    public static DatabaseField of(Class<?> entity, DatabaseEntity.Column column) {
-        return new DatabaseField(new Configuration(entity, column));
-    }
-
     public static DatabaseField referenceOf(Class<?> entity, Class<?> target) {
-        return referenceOf(get_databaseEntity(entity), get_databaseEntity(target));
-    }
-
-    public static DatabaseField referenceOf(DatabaseEntity entity, DatabaseEntity target) {
-        return new DatabaseField(new Table(entity), new Column(get_idReference(target)));
+        return new DatabaseField(new Table(entity), new Column(getIdReference(target)));
     }
 
     public static DatabaseField of(Configuration configuration) {
@@ -75,18 +67,18 @@ public record DatabaseField(Table table, Column column) {
     public static class Configuration {
 
         private final Class<?> _declaringClass;
-        private final DatabaseEntity _entity;
-        private final DatabaseEntity.Column _column;
+        private final laustrup.bandwichpersistence.core.persistence.worm.annotations.Table _table;
+        private final TableColumnData _column;
 
-        private Configuration(Class<?> entity, DatabaseEntity.Column column) {
+        private Configuration(Class<?> entity, TableColumnData column) {
             if (entity == null)
                 throw new IllegalArgumentException("Entity of database field configuration is null");
             if (column == null)
                 throw new IllegalArgumentException("Column of database field configuration is null");
 
-            _entity = get_databaseEntity(entity);
+            _table = getTable(entity);
 
-            if (_entity == null)
+            if (_table == null)
                 throw new IllegalArgumentException(String.format(
                         "Could not define metadata from entity of %s in database field configuration!",
                         entity.getSimpleName()
@@ -97,11 +89,14 @@ public record DatabaseField(Table table, Column column) {
         }
 
         private Configuration(Class<?> entity, String columnName) {
-            this(entity, get_entityColumn(entity, columnName));
+            this(entity, getTableColumnData(entity, columnName));
         }
 
-        public static Configuration databaseFieldConfiguration(Class<?> entity, DatabaseEntity.Column columnEntity) {
-            return new Configuration(entity, columnEntity);
+        public static Configuration databaseFieldConfiguration(
+                Class<?> entity,
+                laustrup.bandwichpersistence.core.persistence.worm.annotations.Table.Column columnEntity
+        ) {
+            return new Configuration(entity, getTableColumnData(entity, columnEntity));
         }
 
         public static Configuration databaseFieldConfiguration(Class<?> entity, String columnName) {
@@ -120,25 +115,24 @@ public record DatabaseField(Table table, Column column) {
     public record Column(String title, String alias) implements Unit {
 
         public Column(Member member) {
-            this(get_columnTitle(member));
-        }
-
-        public Column(DatabaseEntity.Column column) {
-            this(column.value());
+            this(getColumnTitle(member));
         }
 
         private Column(String title) {
             this(title, toAlias(title));
         }
 
-        public static Column of(Member member, DatabaseEntity.Column columnEntity) {
+        public static Column of(
+                Member member,
+                laustrup.bandwichpersistence.core.persistence.worm.annotations.Table.Column columnEntity
+        ) {
             return new Column(ifNotEmpty(columnEntity.value())
-                    .otherwise(get_columnTitle(member))
+                    .otherwise(getColumnTitle(member))
             );
         }
 
-        public static Column of(DatabaseEntity.Column columnEntity) {
-            return new Column(columnEntity.value());
+        public static Column of(TableColumnData columnData) {
+            return new Column(columnData.member());
         }
 
         @Override
@@ -158,12 +152,12 @@ public record DatabaseField(Table table, Column column) {
             this(title, toAlias(title));
         }
         
-        public Table(DatabaseEntity entity) {
+        public Table(laustrup.bandwichpersistence.core.persistence.worm.annotations.Table entity) {
             this(entity.value(), toAlias(entity.value()));
         }
 
         public Table(Class<?> clazz) {
-            this(get_tableTitle(clazz), toAlias(get_tableTitle(clazz)));
+            this(getTableTitle(clazz), toAlias(getTableTitle(clazz)));
         }
 
         @Override

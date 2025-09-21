@@ -9,8 +9,8 @@ import laustrup.bandwichpersistence.core.models.identification.CommonIdentity;
 import laustrup.bandwichpersistence.core.models.identification.Signature;
 import laustrup.bandwichpersistence.core.models.users.BusinessUser;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
-import laustrup.bandwichpersistence.core.persistence.worm.annotations.DatabaseEntity;
-import laustrup.bandwichpersistence.core.persistence.worm.annotations.DatabaseJunction;
+import laustrup.bandwichpersistence.core.persistence.worm.annotations.Junction;
+import laustrup.bandwichpersistence.core.persistence.worm.annotations.Table;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
 import lombok.experimental.FieldNameConstants;
@@ -21,7 +21,7 @@ import java.util.Set;
 
 import static laustrup.bandwichpersistence.core.utilities.collections.Seszt.copy;
 
-@Getter @DatabaseEntity(value = "organisations") @FieldNameConstants
+@Getter @Table(value = "organisations") @FieldNameConstants
 public class Organisation extends Model<Organisation.Id, Signature.UUID> {
 
     private Seszt<Request> _requests;
@@ -144,7 +144,7 @@ public class Organisation extends Model<Organisation.Id, Signature.UUID> {
     }
 
     @Getter
-    @DatabaseEntity(value = "organisation_employees")
+    @Table(value = "organisation_employees")
     @FieldNameConstants
     public static class Employee extends BusinessUser<Employee.Id> {
 
@@ -202,7 +202,7 @@ public class Organisation extends Model<Organisation.Id, Signature.UUID> {
             _authorities = authorities;
         }
 
-        @DatabaseEntity(value = "organisation_employments")
+        @Table(value = "organisation_employments")
         public enum Role {
             BOOKER,
             PR,
@@ -225,11 +225,11 @@ public class Organisation extends Model<Organisation.Id, Signature.UUID> {
             }
         }
 
-        @DatabaseJunction(
+        @Junction(
                 title = "organisation_employee_authorities",
                 entityColumns = {
-                        @DatabaseEntity.Column(value = "organisation_employee_id"),
-                        @DatabaseEntity.Column(value = "authority_id")
+                        @Table.Column(value = "organisation_employee_id"),
+                        @Table.Column(value = "authority_id")
                 }
         )
         public enum Authority implements laustrup.bandwichpersistence.core.models.identification.Authority {

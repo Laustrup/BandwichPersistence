@@ -1,7 +1,7 @@
 package laustrup.bandwichpersistence.core.models;
 
 import laustrup.bandwichpersistence.BandwichTester;
-import laustrup.bandwichpersistence.core.persistence.services.DatabaseTableService;
+import laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseTableService;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
@@ -24,7 +24,7 @@ public class DatabaseTableServiceTests extends BandwichTester {
                 default -> throw new IllegalStateException("Unexpected value for define title test: " + target);
             });
 
-            String actual = act(() -> DatabaseTableService.defineTitle(target, common));
+            String actual = act(() -> DatabaseTableService.defineTableTitle(target, common));
 
             asserting(expected)
                     .is(actual);

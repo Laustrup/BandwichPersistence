@@ -11,7 +11,7 @@ import laustrup.bandwichpersistence.core.persistence.models.Query;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Properties;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Clause.Clausement;
-import laustrup.bandwichpersistence.core.persistence.worm.annotations.DatabaseEntity;
+import laustrup.bandwichpersistence.core.persistence.worm.annotations.Table;
 import laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService.Configurations;
 import laustrup.bandwichpersistence.core.utilities.Coollection;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
@@ -75,8 +75,11 @@ public class TestItems {
 
     public static UUID generateUUID(Class<?> clazz, Clausement that) {
         return get(new Configurations(
-                        DatabaseField.of(databaseFieldConfiguration(clazz, Model.ModelDTO.Fields.id)), read(
-                                new Query(selecting(new Properties(clazz.getSimpleName(), that)).select())
+                        DatabaseField.of(databaseFieldConfiguration(
+                                clazz,
+                                (clazz.isAssignableFrom(Model.class)) ? Model.Fields._identity : "_id")),
+                        read(
+                                new Query(selecting(new Properties(clazz, that)).select())
                         ).get_resultSet(),
                         Configurations.Mode.START
                 ),
@@ -105,7 +108,7 @@ public class TestItems {
     @Setter
     @AllArgsConstructor
     @FieldNameConstants
-    @DatabaseEntity("test_instances")
+    @Table("test_instances")
     public static class Instance {
 
         private Id _id;

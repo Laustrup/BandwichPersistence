@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import laustrup.bandwichpersistence.core.models.identification.CommonIdentity;
 import laustrup.bandwichpersistence.core.models.identification.Signature;
-import laustrup.bandwichpersistence.core.persistence.worm.annotations.DatabaseEntity;
+import laustrup.bandwichpersistence.core.persistence.worm.annotations.Table;
 import laustrup.bandwichpersistence.core.utilities.collections.Liszt;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
@@ -17,7 +17,7 @@ import java.util.Set;
  * Contains objects that are describing data of either photos or music.
  * The items contain the link to the file source.
  */
-@Getter @FieldNameConstants @DatabaseEntity(value = "albums")
+@Getter @FieldNameConstants @Table(value = "albums")
 public class Album extends Model<Album.Id, Signature.UUID> {
 
     /**
@@ -167,7 +167,7 @@ public class Album extends Model<Album.Id, Signature.UUID> {
      * An item of an album that can be either a photos or music.
      * Has a link to the endpoint of the file source.
      */
-    @Getter @FieldNameConstants @DatabaseEntity(value = "album_media")
+    @Getter @FieldNameConstants @Table(value = "album_media")
     public static class Media extends Model<Media.Id, Signature.UUID> {
 
         /** The endpoint for a URL, that is used to get the file of the item. */

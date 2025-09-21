@@ -6,8 +6,8 @@ import laustrup.bandwichpersistence.core.persistence.models.EntityDataCollection
 import laustrup.bandwichpersistence.core.persistence.models.members.SimpleField;
 import laustrup.bandwichpersistence.core.persistence.services.DatabaseColumnService;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where;
-import laustrup.bandwichpersistence.core.persistence.worm.annotations.DatabaseEntity;
-import laustrup.bandwichpersistence.core.persistence.worm.annotations.DatabaseJunction;
+import laustrup.bandwichpersistence.core.persistence.worm.annotations.Junction;
+import laustrup.bandwichpersistence.core.persistence.worm.annotations.Table;
 import laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService;
 import laustrup.bandwichpersistence.core.utilities.collections.Liszt;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
@@ -19,8 +19,8 @@ import java.util.Arrays;
 import java.util.Map;
 
 import static laustrup.bandwichpersistence.core.persistence.models.EntityDataCollection.Key.conjunctionKey;
-import static laustrup.bandwichpersistence.core.persistence.services.DatabaseTableService.defineTitle;
 import static laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService.*;
+import static laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseTableService.defineTableTitle;
 import static laustrup.bandwichpersistence.core.services.ClassFieldService.getDeclared;
 import static laustrup.bandwichpersistence.core.services.collections.MapService.collectMap;
 
@@ -45,7 +45,7 @@ public interface DatabaseDefinition {
     String get_idReference();
 
     default DatabaseField get_databaseFieldWithReference(Member member) {
-        String idReference = DatabaseDefinitionService.get_idReference(member.getDeclaringClass());
+        String idReference = DatabaseDefinitionService.getIdReference(member.getDeclaringClass());
         DatabaseField databaseField = get_databaseField(member);
 
         return new DatabaseField(databaseField.table(), new DatabaseField.Column(idReference, toAlias(idReference)));
@@ -74,20 +74,20 @@ public interface DatabaseDefinition {
         public Entity(Class<?> clazz) {
             this(
                     clazz,
-                    get_tableTitle(clazz),
-                    DatabaseDefinitionService.get_idReference(clazz),
+                    getTableTitle(clazz),
+                    DatabaseDefinitionService.getIdReference(clazz),
                     DatabaseColumnService.get_columns(clazz)
             );
         }
 
         public Seszt<Member> get_primaries() {
             return new Seszt<>(_columns.keySet().stream()
-                    .filter(member -> get_entityColumn(member).isPrimary())
+                    .filter(member -> getTableColumn(member).isPrimary())
             );
         }
 
         public static DatabaseDefinition.Entity of(DatabaseDefinition.Entity target, DatabaseDefinition.Entity common, Member... members) {
-            String title = defineTitle(target.get_title(), common.get_title());
+            String title = defineTableTitle(target.get_title(), common.get_title());
 
             return new DatabaseDefinition.Entity(
                     null,
@@ -123,15 +123,15 @@ public interface DatabaseDefinition {
             return new Conjunction(new Entity(target), new Entity(common));
         }
 
-        private DatabaseJunction get_metaData() {
-            return get_databaseJunction(common.get_class());
+        private Junction get_metaData() {
+            return get_junction(common.get_class());
         }
 
-        private DatabaseEntity.Column[] get_metaDataColumns() {
-            DatabaseJunction metaData = get_metaData();
+        private Table.Column[] get_metaDataColumns() {
+            Junction metaData = get_metaData();
             return Liszt.of(metaData.entityColumns())
                     .Add(metaData.additionalColumns())
-                    .toArray(DatabaseEntity.Column[]::new);
+                    .toArray(Table.Column[]::new);
         }
 
         @Override
@@ -149,17 +149,17 @@ public interface DatabaseDefinition {
             return collectMap(Arrays.stream(get_metaDataColumns())
                     .map(column -> new DatabaseField(
                             new DatabaseField.Table(get_title(), toAlias(get_title())),
-                            new DatabaseField.Column(column)
+                            new DatabaseField.Column(TableColumnData.of(get_class(), column).member())
                     )).map(field -> new AbstractMap.SimpleImmutableEntry<>(new SimpleField(get_class(), field), field))
             );
         }
 
         @Override
         public Seszt<Member> get_primaries() {
-            DatabaseEntity.Column[] columns = get_metaDataColumns();
+            Table.Column[] columns = get_metaDataColumns();
 
             return new Seszt<>(Arrays.stream(columns)
-                    .filter(DatabaseEntity.Column::isPrimary)
+                    .filter(Table.Column::isPrimary)
                     .map(column -> new SimpleField(get_class(), column))
             );
         }
@@ -179,7 +179,7 @@ public interface DatabaseDefinition {
 
         @Override
         public String get_idReference() {
-            return String.join("_", get_title(), "id");
+            return String.join(get_title(), "id");
         }
 
         public EntityDataCollection.Key get_collectionKey() {

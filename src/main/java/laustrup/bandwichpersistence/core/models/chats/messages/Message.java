@@ -4,7 +4,7 @@ import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.models.identification.CommonIdentity;
 import laustrup.bandwichpersistence.core.models.identification.Signature;
 import laustrup.bandwichpersistence.core.models.users.User;
-import laustrup.bandwichpersistence.core.persistence.worm.annotations.DatabaseEntity;
+import laustrup.bandwichpersistence.core.persistence.worm.annotations.Table;
 import lombok.Getter;
 
 import java.time.Instant;
@@ -12,7 +12,7 @@ import java.time.Instant;
 /**
  * A Message that are sent in a ChatRoom.
  */
-@Getter @DatabaseEntity(value = "messages")
+@Getter @Table(value = "messages")
 public class Message extends MessageBase<Message.Id> {
 
     /**
