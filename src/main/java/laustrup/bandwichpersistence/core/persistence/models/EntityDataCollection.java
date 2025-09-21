@@ -1,5 +1,6 @@
 package laustrup.bandwichpersistence.core.persistence.models;
 
+import laustrup.bandwichpersistence.core.persistence.worm.models.DatabaseDefinition;
 import lombok.Getter;
 
 import java.util.Map;

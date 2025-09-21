@@ -1,7 +1,9 @@
 package laustrup.bandwichpersistence.quality_assurance.inheritances.aaa;
 
-import laustrup.bandwichpersistence.core.utilities.console.Printer;
+import lombok.extern.slf4j.Slf4j;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -9,6 +11,7 @@ import java.util.function.Supplier;
  * Is used for acting of tests. Will also print the performances of arrangement and act after an act,
  * also saves the print of the action.
  */
+@Slf4j
 public abstract class Actor extends Arranger {
 
     /** The performance of an act that has been calculated. */
@@ -22,8 +25,7 @@ public abstract class Actor extends Arranger {
      * @return The generated output.
      */
     private String generateActualPrint() {
-        new Printer();
-        return "The acting performance " + Printer.get_instance().measurePerformance(_performance);
+        return "The acting performance " + measurePerformance(_performance);
     }
 
     /**
@@ -33,7 +35,12 @@ public abstract class Actor extends Arranger {
      * @return The generated output.
      */
     private String generateActualPrint(String title) {
-        return "The acting performance" + (!title.isEmpty() ? " of " : "") + title + Printer.get_instance().measurePerformance(_performance);
+        return String.format(
+                "The acting performance %s %s %s",
+                (!title.isEmpty() ? "of " : ""),
+                title,
+                measurePerformance(_performance)
+        );
     }
 
     /**
@@ -41,7 +48,7 @@ public abstract class Actor extends Arranger {
      * @return The generated output.
      */
     private String generateArrangementPrint() {
-        return "The arrangement performance of current test" + Printer.get_instance().measurePerformance(_arrangement);
+        return "The arrangement performance of current test " + measurePerformance(_arrangement);
     }
 
     protected <T> T act(T supply) {
@@ -139,5 +146,97 @@ public abstract class Actor extends Arranger {
             generateActualPrint(title)
         );
         return actual;
+    }
+
+    /**
+     * Calculates and measures a performance from the start to now.
+     * @param performance The performance measured in milliseconds.
+     * @return The calculated and measured performance in writing.
+     */
+    private static String measurePerformance(long performance) {
+        long milliseconds = performance >= 1000 ? performance%1000 : performance,
+                seconds = performance >= 1000 ? (performance%60000)/1000 : 0,
+                minutes = performance >= 3600000 ? (performance%3600000)/60000 : performance/60000,
+                hours = performance/3600000;
+
+        return measurePerformance(milliseconds, seconds, minutes, hours);
+    }
+
+    /**
+     * Calculates and measures a performance from the start to now.
+     * @param milliseconds The performance in milliseconds.
+     * @param seconds The performance in seconds.
+     * @param minutes The performance in minutes.
+     * @param hours The performance in hours.
+     * @return A String with the result written as a statement.
+     */
+    private static String measurePerformance(long milliseconds, long seconds, long minutes, long hours) {
+        String hour = hours > 0 ? measurementStatement(hours, "hour", new boolean[] {
+                minutes > 0 && (seconds > 0 || milliseconds > 0),
+                minutes > 0 || seconds > 0 || milliseconds > 0
+        }) : "",
+                minute = minutes > 0 ? measurementStatement(minutes, "minute", new boolean[] {
+                        seconds > 0 && milliseconds > 0,
+                        seconds > 0 || milliseconds > 0
+                }) : "",
+                second = seconds > 0 ? measurementStatement(seconds, "second", new boolean[] {
+                        milliseconds > 0
+                }) : "",
+                millisecond = milliseconds > 0 ? measurementStatement(milliseconds, "millisecond", new boolean[]{}) : "";
+
+        return milliseconds < 0
+                ? "...\nPerformance is negative..."
+                : milliseconds == 0 && seconds == 0 && minutes == 0 && hours == 0
+                ? " took less than a millisecond!"
+                : " took " +
+                (hours > 0
+                        ? hour + minute + second + millisecond
+                        : minutes > 0
+                        ? minute + second + millisecond
+                        : seconds > 0
+                        ? second + millisecond
+                        : milliseconds > 0
+                        ? millisecond
+                        : "...\n Couldn't measure performance..."
+                );
+    }
+
+    public static String measurePerformance(LocalDateTime start) {
+        return measurePerformance(Duration.between(start,LocalDateTime.now()).toMillis());
+    }
+
+    /**
+     * Will insert values into isPlural and splitter statement, to create a statement for measuring.
+     * @param amount The amount of the first mentioning unit.
+     * @param word The title of the first mentioning unit.
+     * @param statements boolean statements needed to determine amount of measurements.
+     * @return The generated measuring statement.
+     */
+    private static String measurementStatement(long amount, String word, boolean[] statements) {
+        return isPlural(amount, word) + splitter(statements);
+    }
+
+    /**
+     * Will decide whether to put a , or and between statements as a splitter.
+     * @param statements boolean statements needed to determine amount of measurements.
+     * @return , or and.
+     */
+    private static String splitter(boolean[] statements) {
+        return statements.length == 0 ? "!"
+                : statements.length == 1 ? (statements[0] ? " and " : "!")
+                : statements.length == 2 ? (statements[0] ? ", " : statements[1] ? " and " : "!")
+                : ""
+                ;
+    }
+
+    /**
+     * Will determine if the amount is more than one
+     * and in that case will change the word into plural.
+     * @param amount The amount of the word.
+     * @param word The name of the amount that will occur.
+     * @return The amount followed by the word in singular or plural.
+     */
+    private static String isPlural(long amount, String word) {
+        return amount + (amount > 1 ? " " + word + "s" : " " + word);
     }
 }

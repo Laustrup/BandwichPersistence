@@ -1,7 +1,7 @@
 package laustrup.bandwichpersistence.core.persistence.services;
 
 import laustrup.bandwichpersistence.core.persistence.DatabaseField;
-import laustrup.bandwichpersistence.core.persistence.models.annotations.DatabaseEntity;
+import laustrup.bandwichpersistence.core.persistence.worm.annotations.DatabaseEntity;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static laustrup.bandwichpersistence.core.services.DatabaseDefinitionService.get_databaseColumns;
+import static laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService.get_databaseColumns;
 import static laustrup.bandwichpersistence.core.services.EternaryService.ifNotNull;
 import static laustrup.bandwichpersistence.core.services.EternaryService.stating;
 

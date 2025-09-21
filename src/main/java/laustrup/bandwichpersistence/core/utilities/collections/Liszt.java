@@ -3,8 +3,8 @@ package laustrup.bandwichpersistence.core.utilities.collections;
 import jdk.jshell.spi.ExecutionControl;
 import laustrup.bandwichpersistence.core.utilities.Coollection;
 import laustrup.bandwichpersistence.core.utilities.ICoollection;
-import laustrup.bandwichpersistence.core.utilities.console.Printer;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -12,8 +12,6 @@ import java.util.function.IntFunction;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
-
-import static laustrup.bandwichpersistence.core.utilities.console.Printer.print;
 
 /**
  * Implements a List of element E in an append way of adding elements.
@@ -25,6 +23,7 @@ import static laustrup.bandwichpersistence.core.utilities.console.Printer.print;
  * letter starts with 1 instead 0 in the parameters.
  * @param <E> The type of element that are wished to be used in this class.
  */
+@Slf4j
 public class Liszt<E> extends Coollection<E> implements ILiszt<E>, List<E>, ICoollection<E> {
 
     /** Creates the Liszt with empty data and a hash type of map. */
@@ -97,8 +96,9 @@ public class Liszt<E> extends Coollection<E> implements ILiszt<E>, List<E>, ICoo
         try { handleAdd(elements); }
         catch (Exception e) {
             if (elements.length>1)
-                print("Couldn't add elements of " + Arrays.toString(elements) + " to Liszt...", e);
-            else print("Couldn't add element of " + Arrays.toString(elements) + " to Liszt...", e);
+                log.warn("Couldn't add elements of {} to Liszt...", Arrays.toString(elements), e);
+            else
+                log.warn("Couldn't add element of {} to Liszt...", Arrays.toString(elements), e);
             return false;
         }
 
@@ -201,7 +201,7 @@ public class Liszt<E> extends Coollection<E> implements ILiszt<E>, List<E>, ICoo
                 remove(element);
         }
         catch (Exception e) {
-            Printer.get_instance().print("Couldn't remove object in remove multiple elements...", e);
+            log.warn("Couldn't remove object in remove multiple elements...", e);
         }
 
         return this;
@@ -231,7 +231,7 @@ public class Liszt<E> extends Coollection<E> implements ILiszt<E>, List<E>, ICoo
                 return true;
             }
             catch (Exception e) {
-                Printer.get_instance().print("Couldn't remove " + object + "...", e);
+                log.warn("Couldn't remove {}...", object, e);
             }
 
         return false;
@@ -284,7 +284,7 @@ public class Liszt<E> extends Coollection<E> implements ILiszt<E>, List<E>, ICoo
             handleAdd(convert(collection.toArray()));
             return true;
         } catch (Exception e) {
-            Printer.get_instance().print("Couldn't add all items...",e);
+            log.warn("Couldn't add all items...", e);
             return false;
         }
     }
@@ -320,7 +320,7 @@ public class Liszt<E> extends Coollection<E> implements ILiszt<E>, List<E>, ICoo
 
             _data = convert(storage);
         } catch (Exception e) {
-            Printer.get_instance().print("Couldn't retain all of collection...",e);
+            log.warn("Couldn't retain all of collection...", e);
             return false;
         }
         return true;

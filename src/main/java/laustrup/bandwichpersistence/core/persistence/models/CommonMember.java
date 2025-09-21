@@ -1,7 +1,7 @@
 package laustrup.bandwichpersistence.core.persistence.models;
 
 import laustrup.bandwichpersistence.core.persistence.DatabaseField;
-import laustrup.bandwichpersistence.core.persistence.models.annotations.DatabaseEntity;
+import laustrup.bandwichpersistence.core.persistence.worm.annotations.DatabaseEntity;
 
 import java.lang.reflect.Member;
 

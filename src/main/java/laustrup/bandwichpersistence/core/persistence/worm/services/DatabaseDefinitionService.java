@@ -1,7 +1,7 @@
-package laustrup.bandwichpersistence.core.services;
+package laustrup.bandwichpersistence.core.persistence.worm.services;
 
-import laustrup.bandwichpersistence.core.persistence.models.annotations.DatabaseEntity;
-import laustrup.bandwichpersistence.core.persistence.models.annotations.DatabaseJunction;
+import laustrup.bandwichpersistence.core.persistence.worm.annotations.DatabaseEntity;
+import laustrup.bandwichpersistence.core.persistence.worm.annotations.DatabaseJunction;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 
 import java.lang.annotation.Annotation;

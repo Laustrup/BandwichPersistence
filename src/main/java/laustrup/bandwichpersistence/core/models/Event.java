@@ -11,11 +11,11 @@ import laustrup.bandwichpersistence.core.models.users.ContactInfo;
 import laustrup.bandwichpersistence.core.models.users.Participant;
 import laustrup.bandwichpersistence.core.utilities.collections.Liszt;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
-import laustrup.bandwichpersistence.core.utilities.console.Printer;
 import laustrup.bandwichpersistence.core.utilities.parameters.Truthiness;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -30,7 +30,7 @@ import static laustrup.bandwichpersistence.core.utilities.services.UtilityServic
 /**
  * An Event is a place for gigs, where a venue is having bands playing at specific times.
  */
-@Getter @FieldNameConstants
+@Getter @FieldNameConstants @Slf4j
 public class Event extends Model<Event.Id, Signature.UUID> {
 
     /**
@@ -212,7 +212,7 @@ public class Event extends Model<Event.Id, Signature.UUID> {
             try {
                 calculateTime();
             } catch (InputMismatchException e) {
-                Printer.print("End date is before beginning date of " + _title + "...", e);
+                log.warn("End date is before beginning date of {}...", _title, e);
             }
         else {
             _openDoors = openDoors;

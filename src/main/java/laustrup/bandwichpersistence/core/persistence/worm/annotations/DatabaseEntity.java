@@ -1,4 +1,4 @@
-package laustrup.bandwichpersistence.core.persistence.models.annotations;
+package laustrup.bandwichpersistence.core.persistence.worm.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -1,12 +1,14 @@
-package laustrup.bandwichpersistence.core.persistence.models;
+package laustrup.bandwichpersistence.core.persistence.worm.models;
 
 import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.persistence.DatabaseField;
-import laustrup.bandwichpersistence.core.persistence.models.annotations.DatabaseEntity;
-import laustrup.bandwichpersistence.core.persistence.models.annotations.DatabaseJunction;
+import laustrup.bandwichpersistence.core.persistence.models.CommonMember;
+import laustrup.bandwichpersistence.core.persistence.models.EntityDataCollection;
 import laustrup.bandwichpersistence.core.persistence.services.DatabaseColumnService;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where;
-import laustrup.bandwichpersistence.core.services.DatabaseDefinitionService;
+import laustrup.bandwichpersistence.core.persistence.worm.annotations.DatabaseEntity;
+import laustrup.bandwichpersistence.core.persistence.worm.annotations.DatabaseJunction;
+import laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService;
 import laustrup.bandwichpersistence.core.utilities.collections.Liszt;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
@@ -18,8 +20,8 @@ import java.util.Map;
 
 import static laustrup.bandwichpersistence.core.persistence.models.EntityDataCollection.Key.conjunctionKey;
 import static laustrup.bandwichpersistence.core.persistence.services.DatabaseTableService.defineTitle;
+import static laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService.*;
 import static laustrup.bandwichpersistence.core.services.ClassFieldService.getDeclared;
-import static laustrup.bandwichpersistence.core.services.DatabaseDefinitionService.*;
 import static laustrup.bandwichpersistence.core.services.collections.MapService.collectMap;
 
 public interface DatabaseDefinition {

@@ -1,8 +1,8 @@
 package laustrup.bandwichpersistence.quality_assurance;
 
 import laustrup.bandwichpersistence.quality_assurance.inheritances.aaa.Actor;
-import laustrup.bandwichpersistence.core.utilities.console.Printer;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 
 import java.util.Random;
@@ -14,7 +14,7 @@ import java.util.function.Supplier;
  * Includes a random generated password, that will be random generated beforeEach,
  * along with other attributes such as expected, a random and other.
  */
-@NoArgsConstructor
+@NoArgsConstructor @Slf4j
 public abstract class Tester extends Actor {
 
     /**
@@ -138,7 +138,7 @@ public abstract class Tester extends Actor {
             print(supplier.get());
         } catch (Exception e) {
             addToPrint("An exception was caught in the main test method...");
-            Printer.print(_print, e);
+            log.warn(_print, e);
             throw e;
         }
     }
@@ -154,7 +154,7 @@ public abstract class Tester extends Actor {
             print();
         } catch (Exception e) {
             addToPrint("An exception was caught in the main test method...");
-            Printer.print(_print, e);
+            log.warn(_print, e);
             throw e;
         }
     }
@@ -174,8 +174,8 @@ public abstract class Tester extends Actor {
         String message = response + "\n\n" + _print;
 
         if (response.equals(TestMessage.SUCCESS.get_content()))
-            Printer.print(message);
+            log.warn(message);
         else
-            Printer.print(message, new Exception());
+            log.warn(message, new Exception());
     }
 }

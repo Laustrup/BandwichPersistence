@@ -1,8 +1,8 @@
 package laustrup.bandwichpersistence.core.utilities;
 
 import laustrup.bandwichpersistence.core.utilities.collections.Liszt;
-import laustrup.bandwichpersistence.core.utilities.console.Printer;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
 import java.util.function.Function;
@@ -11,6 +11,7 @@ import java.util.function.Function;
  * A Utility that contains collections of data such as a Map and an array.
  * @param <E> The type of element that are wished to be used in this class.
  */
+@Slf4j
 public abstract class Coollection<E> extends Utility<E> implements java.util.Collection<E>, ICoollection<E> {
 
     /** Contains all the elements that are inside the Liszt. */
@@ -52,8 +53,13 @@ public abstract class Coollection<E> extends Utility<E> implements java.util.Col
             try {
                 function.apply(convert(item));
             } catch (Exception e) {
-                Printer.get_instance().print(item.toString() + " couldn't " + action +
-                        " of " + getClass() + ", probably because the type is different than its generic...",e);
+                log.warn(
+                        "{} couldn't {} of {}, probably because the type is different than its generic...",
+                        item.toString(),
+                        action,
+                        getClass(),
+                        e
+                );
             }
         }
 
@@ -189,8 +195,7 @@ public abstract class Coollection<E> extends Utility<E> implements java.util.Col
 
                 return _map.containsKey(element.toString()) ? _map.get(element.toString()) : _data[index];
             } catch (IndexOutOfBoundsException e) {
-                Printer.get_instance().print("At setting " + element + " in Liszt, the index " + index +
-                        " was out of bounce of size " + _data.length + "...",e);
+                log.warn("At setting {} in Liszt, the index {} was out of bounce of size {}...", element, index, _data.length, e);
             }
 
         return null;

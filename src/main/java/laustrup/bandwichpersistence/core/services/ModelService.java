@@ -1,13 +1,13 @@
 package laustrup.bandwichpersistence.core.services;
 
 import laustrup.bandwichpersistence.core.models.Event;
-import laustrup.bandwichpersistence.core.models.identification.Identity;
 import laustrup.bandwichpersistence.core.models.Model;
+import laustrup.bandwichpersistence.core.models.identification.Identity;
 import laustrup.bandwichpersistence.core.models.identification.Signature;
 import laustrup.bandwichpersistence.core.models.users.User;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
-import laustrup.bandwichpersistence.core.utilities.console.Printer;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,6 +18,7 @@ import java.util.stream.Stream;
 import static laustrup.bandwichpersistence.core.services.ObjectService.ifTrue;
 import static laustrup.bandwichpersistence.core.services.StringService.containsAny;
 
+@Slf4j
 public class ModelService {
 
     /** For the defineToString of how it should be split. */
@@ -76,7 +77,7 @@ public class ModelService {
                 throw new IllegalArgumentException("Content couldn't be generated, since there are less attributes than values");
         } catch (Exception e) {
             String message = title + " had an error when trying to define its ToString.";
-            Printer.print(message, e);
+            log.warn(message, e);
             content = new StringBuilder(primaryId != null ? String.valueOf(primaryId) : message);
             content.append(secondaryId != null ? String.valueOf(secondaryId) : message);
         }

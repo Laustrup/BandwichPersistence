@@ -3,12 +3,12 @@ package laustrup.bandwichpersistence.core.services;
 import laustrup.bandwichpersistence.BandwichTester;
 import laustrup.bandwichpersistence.core.models.Album;
 import laustrup.bandwichpersistence.core.models.Organisation;
-import laustrup.bandwichpersistence.core.persistence.models.annotations.DatabaseEntity;
+import laustrup.bandwichpersistence.core.persistence.worm.annotations.DatabaseEntity;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import static laustrup.bandwichpersistence.core.services.DatabaseDefinitionService.*;
+import static laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService.*;
 import static laustrup.bandwichpersistence.quality_assurance.Asserter.asserting;
 
 class DatabaseDefinitionServiceTests extends BandwichTester {

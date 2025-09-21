@@ -2,7 +2,7 @@ package laustrup.bandwichpersistence.core.utilities.collections;
 
 import laustrup.bandwichpersistence.core.utilities.Coollection;
 import laustrup.bandwichpersistence.core.utilities.ICoollection;
-import laustrup.bandwichpersistence.core.utilities.console.Printer;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -22,6 +22,7 @@ import java.util.stream.Stream;
  * letter starts with 1 instead 0 in the parameters.
  * @param <E> The type of element that are wished to be used in this class.
  */
+@Slf4j
 public class Seszt<E> extends Coollection<E> implements ISeszt<E>, Set<E>, ICoollection<E> {
 
     /** Default constructor that will build the Seszt without containing any data and the map as linked. */
@@ -165,7 +166,7 @@ public class Seszt<E> extends Coollection<E> implements ISeszt<E>, Set<E>, ICool
         try {
             return set(indexOf(original), replacement);
         } catch (ClassNotFoundException e) { //TODO Remove space when Printer can print double newline
-            Printer.get_instance().print("Couldn't set " + replacement + " of " + original + " in\n " + this.toString());
+            log.warn("Couldn't set {} of {} in\n {}", replacement, original, this.toString());
             return this;
         }
     }
@@ -320,8 +321,7 @@ public class Seszt<E> extends Coollection<E> implements ISeszt<E>, Set<E>, ICool
             for (E element : removes)
                 remove(element);
         } catch (Exception e) {
-            Printer.get_instance().print(Printer.get_instance().arrayContent(elements) +
-                    " couldn't be contained, since it is of different type that E...",e);
+            log.warn("{} couldn't be contained, since it is of different type that E...", elements, e);
         }
 
         return this;

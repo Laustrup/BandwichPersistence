@@ -134,13 +134,13 @@ class EternaryServiceTests extends BandwichTester {
         };
     }
 
-    public enum Scenario {
+    private enum Scenario {
         THEN,
         OR,
         OR_ELSE
     }
 
-    public enum EmptinessScenario {
+    private enum EmptinessScenario {
         EMPTY(""),
         NOT_EMPTY("not empty"),
         NULL(null);

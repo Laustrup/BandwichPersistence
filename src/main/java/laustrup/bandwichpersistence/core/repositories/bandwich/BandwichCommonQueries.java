@@ -8,7 +8,7 @@ import laustrup.bandwichpersistence.core.models.chats.messages.Message;
 import laustrup.bandwichpersistence.core.models.identification.Authority;
 import laustrup.bandwichpersistence.core.models.users.Artist;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
-import laustrup.bandwichpersistence.core.persistence.models.DatabaseDefinition;
+import laustrup.bandwichpersistence.core.persistence.worm.models.DatabaseDefinition;
 import laustrup.bandwichpersistence.core.repositories.common.queries.CommonQueries;
 
 public abstract class BandwichCommonQueries extends CommonQueries {

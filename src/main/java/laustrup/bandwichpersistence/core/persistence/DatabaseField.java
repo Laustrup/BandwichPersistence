@@ -1,6 +1,6 @@
 package laustrup.bandwichpersistence.core.persistence;
 
-import laustrup.bandwichpersistence.core.persistence.models.annotations.DatabaseEntity;
+import laustrup.bandwichpersistence.core.persistence.worm.annotations.DatabaseEntity;
 
 import java.lang.reflect.Member;
 import java.util.Arrays;
@@ -8,8 +8,8 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService.*;
 import static laustrup.bandwichpersistence.core.services.ClassFieldService.getDeclared;
-import static laustrup.bandwichpersistence.core.services.DatabaseDefinitionService.*;
 import static laustrup.bandwichpersistence.core.services.EternaryService.ifNotEmpty;
 import static laustrup.bandwichpersistence.core.services.EternaryService.ifNotNull;
 
