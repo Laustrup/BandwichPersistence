@@ -139,7 +139,8 @@ public class EternaryService {
         }
 
         public ITEM orElseThrow(Exception exception) throws Exception {
-            Optional<ITEM> item = findSuccessfulProperty();
+            Optional<ITEM> item = findSuccessfulProperty()
+                    .orElse(Optional.empty());
 
             return exception != null
                     ? item.orElseThrow(() -> exception)
@@ -152,10 +153,11 @@ public class EternaryService {
 
         public ITEM orElse(ITEM alternative) {
             return findSuccessfulProperty()
-                    .orElse(alternative);
+                    .orElse(Optional.of(alternative))
+                    .orElse(null);
         }
 
-        private Optional<ITEM> findSuccessfulProperty() {
+        private Optional<Optional<ITEM>> findSuccessfulProperty() {
             return _properties.stream()
                     .filter(Property::is_success)
                     .map(Property::get_option)
@@ -180,6 +182,10 @@ public class EternaryService {
 
             public static <M> Property<M> of(M option, boolean condition) {
                 return new Property<>(option, condition);
+            }
+
+            public Optional<ELEMENT> get_option() {
+                return Optional.ofNullable(_option);
             }
         }
     }

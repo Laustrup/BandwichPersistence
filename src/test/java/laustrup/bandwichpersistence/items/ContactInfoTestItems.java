@@ -9,7 +9,7 @@ import laustrup.bandwichpersistence.core.persistence.services.SelectService.Sele
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 
-import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition.Equation.EQUALS;
+import static laustrup.bandwichpersistence.core.persistence.DatabaseField.Configuration.databaseFieldConfiguration;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.complying;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.selecting;
 import static laustrup.bandwichpersistence.items.TestItems.generateUUID;
@@ -29,9 +29,8 @@ public class ContactInfoTestItems {
                         clazz,
                         selecting(new Properties(
                                 clazz.getSimpleName(),
-                                complying().which(Condition.of(DatabaseField.of(
-                                        new DatabaseField.Configuration(ContactInfo.class, ContactInfo.DTO.Fields.email)),
-                                        EQUALS,
+                                complying().which(Condition.equals(
+                                        DatabaseField.of(databaseFieldConfiguration(ContactInfo.class, ContactInfo.DTO.Fields.email)),
                                         email
                                 ))
                         ))
@@ -69,9 +68,8 @@ public class ContactInfoTestItems {
         return new Address(
                 new Address.Id(generateUUID(
                         clazz,
-                        complying().which(Condition.of(
-                                DatabaseField.of(new DatabaseField.Configuration(clazz, Address.DTO.Fields.street)),
-                                EQUALS,
+                        complying().which(Condition.equals(
+                                DatabaseField.of(databaseFieldConfiguration(clazz, Address.DTO.Fields.street)),
                                 street
                         ))
                 )),
@@ -89,9 +87,8 @@ public class ContactInfoTestItems {
         return new Country(
                 new Country.Id(generateUUID(
                         clazz,
-                        complying().which(Condition.of(
-                                DatabaseField.of(new DatabaseField.Configuration(clazz, Country.DTO.Fields.title)),
-                                EQUALS,
+                        complying().which(Condition.equals(
+                                DatabaseField.of(databaseFieldConfiguration(clazz, Country.DTO.Fields.title)),
                                 title
                         ))
                 )),

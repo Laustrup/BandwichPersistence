@@ -53,7 +53,7 @@ public abstract class Coollection<E> extends Utility<E> implements java.util.Col
             try {
                 function.apply(convert(item));
             } catch (Exception e) {
-                log.warn(
+                log.error(
                         "{} couldn't {} of {}, probably because the type is different than its generic...",
                         item.toString(),
                         action,
@@ -195,7 +195,7 @@ public abstract class Coollection<E> extends Utility<E> implements java.util.Col
 
                 return _map.containsKey(element.toString()) ? _map.get(element.toString()) : _data[index];
             } catch (IndexOutOfBoundsException e) {
-                log.warn("At setting {} in Liszt, the index {} was out of bounce of size {}...", element, index, _data.length, e);
+                log.error("At setting {} in Liszt, the index {} was out of bounce of size {}...", element, index, _data.length, e);
             }
 
         return null;

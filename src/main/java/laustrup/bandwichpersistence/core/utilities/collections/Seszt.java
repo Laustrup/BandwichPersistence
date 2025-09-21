@@ -166,7 +166,7 @@ public class Seszt<E> extends Coollection<E> implements ISeszt<E>, Set<E>, ICool
         try {
             return set(indexOf(original), replacement);
         } catch (ClassNotFoundException e) { //TODO Remove space when Printer can print double newline
-            log.warn("Couldn't set {} of {} in\n {}", replacement, original, this.toString());
+            log.error("Couldn't set {} of {} in\n {}", replacement, original, this.toString());
             return this;
         }
     }
@@ -321,7 +321,7 @@ public class Seszt<E> extends Coollection<E> implements ISeszt<E>, Set<E>, ICool
             for (E element : removes)
                 remove(element);
         } catch (Exception e) {
-            log.warn("{} couldn't be contained, since it is of different type that E...", elements, e);
+            log.error("{} couldn't be contained, since it is of different type that E...", elements, e);
         }
 
         return this;

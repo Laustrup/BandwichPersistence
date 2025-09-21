@@ -25,7 +25,7 @@ import static laustrup.bandwichpersistence.core.utilities.collections.Seszt.copy
  * Contains information that people need in order to contact the User.
  */
 @Getter @FieldNameConstants
-@DatabaseEntity(value = "contact_info")
+@DatabaseEntity
 public class ContactInfo {
 
     @DatabaseEntity.Column(isPrimary = true)

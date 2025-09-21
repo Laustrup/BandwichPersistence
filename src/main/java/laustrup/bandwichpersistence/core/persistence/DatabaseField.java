@@ -9,7 +9,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService.*;
-import static laustrup.bandwichpersistence.core.services.ClassFieldService.getDeclared;
 import static laustrup.bandwichpersistence.core.services.EternaryService.ifNotEmpty;
 import static laustrup.bandwichpersistence.core.services.EternaryService.ifNotNull;
 
@@ -45,6 +44,14 @@ public record DatabaseField(Table table, Column column) {
         return new DatabaseField(new Configuration(entity, column));
     }
 
+    public static DatabaseField referenceOf(Class<?> entity, Class<?> target) {
+        return referenceOf(get_databaseEntity(entity), get_databaseEntity(target));
+    }
+
+    public static DatabaseField referenceOf(DatabaseEntity entity, DatabaseEntity target) {
+        return new DatabaseField(new Table(entity), new Column(get_idReference(target)));
+    }
+
     public static DatabaseField of(Configuration configuration) {
         return new DatabaseField(configuration);
     }
@@ -65,18 +72,48 @@ public record DatabaseField(Table table, Column column) {
         return Arrays.stream(_idIndicators).anyMatch(column::contains);
     }
 
-    public record Configuration(Class<?> entity, DatabaseEntity.Column columnEntity) {
+    public static class Configuration {
 
-        public Configuration(Class<?> entity, String columnName) {
-            this(entity, get_databaseEntityColumn(getDeclared(entity, columnName)));
+        private final Class<?> _declaringClass;
+        private final DatabaseEntity _entity;
+        private final DatabaseEntity.Column _column;
+
+        private Configuration(Class<?> entity, DatabaseEntity.Column column) {
+            if (entity == null)
+                throw new IllegalArgumentException("Entity of database field configuration is null");
+            if (column == null)
+                throw new IllegalArgumentException("Column of database field configuration is null");
+
+            _entity = get_databaseEntity(entity);
+
+            if (_entity == null)
+                throw new IllegalArgumentException(String.format(
+                        "Could not define metadata from entity of %s in database field configuration!",
+                        entity.getSimpleName()
+                ));
+
+            _declaringClass = entity;
+            _column = column;
+        }
+
+        private Configuration(Class<?> entity, String columnName) {
+            this(entity, get_entityColumn(entity, columnName));
+        }
+
+        public static Configuration databaseFieldConfiguration(Class<?> entity, DatabaseEntity.Column columnEntity) {
+            return new Configuration(entity, columnEntity);
+        }
+
+        public static Configuration databaseFieldConfiguration(Class<?> entity, String columnName) {
+            return new Configuration(entity, columnName);
         }
 
         public Table get_table() {
-            return new Table(entity);
+            return new Table(_declaringClass);
         }
 
         public Column get_column() {
-            return Column.of(columnEntity);
+            return Column.of(_column);
         }
     }
 

@@ -212,7 +212,7 @@ public class Event extends Model<Event.Id, Signature.UUID> {
             try {
                 calculateTime();
             } catch (InputMismatchException e) {
-                log.warn("End date is before beginning date of {}...", _title, e);
+                log.error("End date is before beginning date of {}...", _title, e);
             }
         else {
             _openDoors = openDoors;

@@ -17,6 +17,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
+import static laustrup.bandwichpersistence.core.persistence.DatabaseField.Configuration.databaseFieldConfiguration;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.DatabaseService.toDatabaseColumn;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService.Configurations.Mode.PEEK;
@@ -53,7 +54,7 @@ class JDBCServiceTests extends BandwichTester {
             Consumer<AtomicReference<?>> action = atomicReference ->
                     act(() -> ResultSetService.set(
                             new Configurations(
-                                    DatabaseField.of(new DatabaseField.Configuration(
+                                    DatabaseField.of(databaseFieldConfiguration(
                                             Organisation.class,
                                             isBinary ? Model.Fields._identity : Model.Fields._title
                                     )),

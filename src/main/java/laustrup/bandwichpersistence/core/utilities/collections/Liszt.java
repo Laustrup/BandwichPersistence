@@ -96,9 +96,9 @@ public class Liszt<E> extends Coollection<E> implements ILiszt<E>, List<E>, ICoo
         try { handleAdd(elements); }
         catch (Exception e) {
             if (elements.length>1)
-                log.warn("Couldn't add elements of {} to Liszt...", Arrays.toString(elements), e);
+                log.error("Couldn't add elements of {} to Liszt...", Arrays.toString(elements), e);
             else
-                log.warn("Couldn't add element of {} to Liszt...", Arrays.toString(elements), e);
+                log.error("Couldn't add element of {} to Liszt...", Arrays.toString(elements), e);
             return false;
         }
 
@@ -201,7 +201,7 @@ public class Liszt<E> extends Coollection<E> implements ILiszt<E>, List<E>, ICoo
                 remove(element);
         }
         catch (Exception e) {
-            log.warn("Couldn't remove object in remove multiple elements...", e);
+            log.error("Couldn't remove object in remove multiple elements...", e);
         }
 
         return this;
@@ -231,7 +231,7 @@ public class Liszt<E> extends Coollection<E> implements ILiszt<E>, List<E>, ICoo
                 return true;
             }
             catch (Exception e) {
-                log.warn("Couldn't remove {}...", object, e);
+                log.error("Couldn't remove {}...", object, e);
             }
 
         return false;
@@ -284,7 +284,7 @@ public class Liszt<E> extends Coollection<E> implements ILiszt<E>, List<E>, ICoo
             handleAdd(convert(collection.toArray()));
             return true;
         } catch (Exception e) {
-            log.warn("Couldn't add all items...", e);
+            log.error("Couldn't add all items...", e);
             return false;
         }
     }
@@ -320,7 +320,7 @@ public class Liszt<E> extends Coollection<E> implements ILiszt<E>, List<E>, ICoo
 
             _data = convert(storage);
         } catch (Exception e) {
-            log.warn("Couldn't retain all of collection...", e);
+            log.error("Couldn't retain all of collection...", e);
             return false;
         }
         return true;

@@ -1,5 +1,6 @@
 package laustrup.bandwichpersistence.core.services;
 
+import laustrup.bandwichpersistence.core.persistence.models.members.InheritanceField;
 import laustrup.bandwichpersistence.core.utilities.Coollection;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 
@@ -13,12 +14,35 @@ public class ClassFieldService {
         try {
             return clazz.getDeclaredField(fieldName);
         } catch (NoSuchFieldException exception) {
-            throw new RuntimeException(String.format("Could not find field %s with class of %s!\n%s",
-                    fieldName,
-                    clazz.getSimpleName(),
-                    exception.getMessage()
-            ));
+            Member member = getDeclaredFromSuperClass(clazz, fieldName);
+
+            if (member == null)
+                throw new RuntimeException(String.format(
+                        "Could not find field %s with class of %s!",
+                        fieldName,
+                        clazz.getSimpleName()
+                ), exception);
+            else
+                return member;
         }
+    }
+
+    private static InheritanceField getDeclaredFromSuperClass(Class<?> clazz, String fieldName) {
+        if (clazz == Object.class)
+            return null;
+
+        Class<?> superClass = clazz.getSuperclass();
+        InheritanceField member = null;
+
+        while (superClass != null && (member != null || !superClass.equals(Object.class))) {
+            try {
+                member = new InheritanceField(clazz, superClass.getDeclaredField(fieldName));
+            } catch (NoSuchFieldException ignored) {}
+
+            superClass = superClass.getSuperclass();
+        }
+
+        return member;
     }
 
     public static boolean memberIsCollection(Member member) {

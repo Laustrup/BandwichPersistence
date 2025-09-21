@@ -138,7 +138,7 @@ public abstract class Tester extends Actor {
             print(supplier.get());
         } catch (Exception e) {
             addToPrint("An exception was caught in the main test method...");
-            log.warn(_print, e);
+            log.error(_print, e);
             throw e;
         }
     }
@@ -154,7 +154,7 @@ public abstract class Tester extends Actor {
             print();
         } catch (Exception e) {
             addToPrint("An exception was caught in the main test method...");
-            log.warn(_print, e);
+            log.error(_print, e);
             throw e;
         }
     }
@@ -174,8 +174,8 @@ public abstract class Tester extends Actor {
         String message = response + "\n\n" + _print;
 
         if (response.equals(TestMessage.SUCCESS.get_content()))
-            log.warn(message);
+            log.error(message);
         else
-            log.warn(message, new Exception());
+            log.error(message, new Exception());
     }
 }

@@ -77,7 +77,7 @@ public class ModelService {
                 throw new IllegalArgumentException("Content couldn't be generated, since there are less attributes than values");
         } catch (Exception e) {
             String message = title + " had an error when trying to define its ToString.";
-            log.warn(message, e);
+            log.error(message, e);
             content = new StringBuilder(primaryId != null ? String.valueOf(primaryId) : message);
             content.append(secondaryId != null ? String.valueOf(secondaryId) : message);
         }

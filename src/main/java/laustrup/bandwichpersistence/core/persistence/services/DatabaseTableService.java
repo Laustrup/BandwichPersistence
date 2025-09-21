@@ -12,7 +12,16 @@ public abstract class DatabaseTableService {
     }
 
     public static String defineTitle(String entity) {
-        return entity.replaceAll("([A-Z])", "_$1").toLowerCase();
+        String title = entity.replaceAll("([A-Z])", "_$1");
+
+        for (char c : title.toCharArray()) {
+            if (c == '_')
+                title = title.substring(1);
+            else
+                break;
+        }
+
+        return title.toLowerCase();
     }
 
     public static String pluralToSingular(String title) {

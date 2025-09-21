@@ -1,7 +1,6 @@
 package laustrup.bandwichpersistence.items;
 
 import jdk.jshell.spi.ExecutionControl.NotImplementedException;
-import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.models.Organisation.Employee;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
 import laustrup.bandwichpersistence.core.persistence.DatabaseField;
@@ -16,8 +15,7 @@ import static laustrup.bandwichpersistence.core.models.Organisation.Employee.Rol
 import static laustrup.bandwichpersistence.core.models.Subscription.Kind.PAYING;
 import static laustrup.bandwichpersistence.core.models.Subscription.Status.ACCEPTED;
 import static laustrup.bandwichpersistence.core.models.Subscription.UserType.ORGANISATION_EMPLOYEE;
-import static laustrup.bandwichpersistence.core.persistence.services.DatabaseColumnService.fieldToColumnName;
-import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition.Equation.EQUALS;
+import static laustrup.bandwichpersistence.core.persistence.DatabaseField.Configuration.databaseFieldConfiguration;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.complying;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.selecting;
 import static laustrup.bandwichpersistence.items.OrganisationTestItems.generateIværkstedContactInfo;
@@ -57,26 +55,22 @@ public class OrganisationEmployeeTestItems {
     }
 
     private static Employee.Id generateEmployeeId(String email) {
-        Class<?> employeeClass = Employee.class,
-                ContactInfoClass = ContactInfo.class;
-
         return new Employee.Id(generateUUID(
-                employeeClass,
+                Employee.class,
                 selecting(new Properties(
-                        employeeClass.getSimpleName(),
+                        Employee.class.getSimpleName(),
                         complying()
-                                .which(Condition.of(
-                                        DatabaseField.of(new DatabaseField.Configuration(
-                                                ContactInfoClass,
+                                .which(Condition.equals(
+                                        DatabaseField.of(databaseFieldConfiguration(
+                                                ContactInfo.class,
                                                 ContactInfo.Fields._email
                                         )),
-                                        EQUALS,
                                         email
                                 ))
                 )).addJoin(Join.inner(
-                        ContactInfoClass.getSimpleName(),
-                        DatabaseField.of(new DatabaseField.Configuration(ContactInfoClass, Model.ModelDTO.Fields.id)),
-                        DatabaseField.of(new DatabaseField.Configuration(employeeClass, fieldToColumnName(ContactInfo.class.getSimpleName() + "_id")))
+                        ContactInfo.class,
+                        DatabaseField.of(databaseFieldConfiguration(ContactInfo.class, ContactInfo.Fields._id)),
+                        DatabaseField.referenceOf(Employee.class, ContactInfo.class)
                 ))
         ));
     }

@@ -16,6 +16,7 @@ import static java.lang.String.join;
 import static laustrup.bandwichpersistence.core.persistence.DatabaseField.toSelections;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition.Equation.EQUALS;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition.Equation.IS_NULL;
+import static laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService.get_tableTitle;
 import static laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService.toAlias;
 import static laustrup.bandwichpersistence.core.services.EternaryService.stating;
 
@@ -52,8 +53,8 @@ public abstract class SelectService {
 
         private String defineSelectStatement() {
             return /*language=MySQL*/ format(
-                    "select%s%sfrom %s %s",
-                    _properties.is_distinct() ? " distinct " : " ",
+                    "select %s%s from %s %s",
+                    _properties.is_distinct() ? "distinct " : "",
                     _properties.get_selections().apply(),
                     _properties.get_table(),
                     toAlias(_properties.get_table())
@@ -233,8 +234,8 @@ public abstract class SelectService {
                 return new Join(Area.LEFT, table, Condition.equals(internal, external));
             }
 
-            public static Join inner(String table, DatabaseField internal, DatabaseField external) {
-                return new Join(Area.INNER, table, Condition.equals(internal, external));
+            public static Join inner(Class<?> table, DatabaseField internal, DatabaseField external) {
+                return new Join(Area.INNER, get_tableTitle(table), Condition.equals(internal, external));
             }
 
             @Override

@@ -1,24 +1,24 @@
 package laustrup.bandwichpersistence.core.persistence;
 
-import laustrup.bandwichpersistence.ProgramInitializer;
 import laustrup.bandwichpersistence.core.libraries.DatabaseLibrary;
 import laustrup.bandwichpersistence.core.persistence.models.DatabaseResponse;
 import laustrup.bandwichpersistence.core.persistence.models.Query;
+import lombok.extern.slf4j.Slf4j;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static java.sql.ResultSet.*;
+import static java.sql.ResultSet.CONCUR_READ_ONLY;
+import static java.sql.ResultSet.TYPE_SCROLL_INSENSITIVE;
 
+@Slf4j
 public class DatabaseManager {
-
-    private static final Logger _logger = Logger.getLogger(ProgramInitializer.class.getSimpleName());
-
 
     public static DatabaseResponse read(Query query) {
         return handle(query, Action.READ);
@@ -157,7 +157,7 @@ public class DatabaseManager {
 
                     if (parameter == null) {
                         String message = "Unknown parameter: " + key;
-                        _logger.log(Level.WARNING, message);
+                        log.error(message);
                         throw new IllegalArgumentException(message);
                     }
 
