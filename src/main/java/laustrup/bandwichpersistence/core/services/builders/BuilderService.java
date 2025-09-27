@@ -3,11 +3,11 @@ package laustrup.bandwichpersistence.core.services.builders;
 import laustrup.bandwichpersistence.core.persistence.worm.models.DatabaseDefinition;
 import laustrup.bandwichpersistence.core.repositories.bandwich.BandwichEntityDataCollection;
 import laustrup.bandwichpersistence.core.services.ModelService;
-import laustrup.bandwichpersistence.core.services.TypeService;
 import laustrup.bandwichpersistence.core.services.persistence.JDBCService;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 
 import java.lang.reflect.Member;
+import java.lang.reflect.ParameterizedType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.AbstractMap;
@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 import static laustrup.bandwichpersistence.core.services.ClassFieldService.*;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.set;
 
-abstract class BuilderService<MODEL> {
+public abstract class BuilderService<MODEL> {
 
     private final Logger _logger;
 
@@ -32,12 +32,17 @@ abstract class BuilderService<MODEL> {
     protected Map<? extends Member, AtomicReference<?>> _fields;
 
     protected BuilderService() {
-        _logger = Logger.getLogger(new TypeService<MODEL>().getClassOfType().getName());
+        _logger = Logger.getLogger(getGeneric().getName());
         _entity = get_entityData();
         _fields = _entity.get_columns().keySet().stream()
                 .map(field ->
                         new AbstractMap.SimpleImmutableEntry<>(field, new AtomicReference<>())
                 ).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    @SuppressWarnings("unchecked")
+    private Class<MODEL> getGeneric() {
+        return (Class<MODEL>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
     }
 
     protected static String classToTableName(Class<?>... classes) {
@@ -57,9 +62,9 @@ abstract class BuilderService<MODEL> {
         throw new RuntimeException(exception);
     }
 
-    static <MODEL> DatabaseDefinition.Entity get_entityData() {
+    private DatabaseDefinition.Entity get_entityData() {
         return (DatabaseDefinition.Entity) BandwichEntityDataCollection.get_instance()
-                .get(new TypeService<MODEL>().getClassOfType());
+                .get(getGeneric());
     }
 
     public MODEL build(ResultSet resultSet) {
@@ -155,6 +160,6 @@ abstract class BuilderService<MODEL> {
 
     @SuppressWarnings("unchecked")
     protected <FIELD> FIELD get_field(String name) {
-        return (FIELD) _fields.get(getDeclared(new TypeService<MODEL>().getClassOfType(), name));
+        return (FIELD) _fields.get(getDeclared(getGeneric(), name));
     }
 }

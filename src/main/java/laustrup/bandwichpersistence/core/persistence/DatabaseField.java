@@ -7,8 +7,10 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService.*;
+import static laustrup.bandwichpersistence.core.services.ClassFieldService.getDeclared;
 import static laustrup.bandwichpersistence.core.services.EternaryService.ifNotEmpty;
 import static laustrup.bandwichpersistence.core.services.EternaryService.ifNotNull;
 
@@ -101,6 +103,33 @@ public record DatabaseField(Table table, Column column) {
 
         public static Configuration databaseFieldConfiguration(Class<?> entity, String columnName) {
             return new Configuration(entity, columnName);
+        }
+
+        public static Configuration databaseFieldConfigurationOfId(Class<?> entity) {
+            if (entity == null)
+                throw new IllegalArgumentException("Entity of database field configuration is null");
+
+            return new Configuration(
+                    entity,
+                    Stream.of("id", "_id", "identity", "_identity")
+                            .filter(field -> isId(entity, field))
+                            .findFirst()
+                            .orElseThrow(() -> new RuntimeException(String.format(
+                                    "Could not find database field id in database field configuration! Class was %s",
+                                    entity.getSimpleName()
+                            )))
+            );
+        }
+
+        private static boolean isId(Class<?> entity, String column) {
+            if (column == null)
+                return false;
+
+            try {
+                return getDeclared(entity, column).getName().equals(column);
+            } catch (Exception e) {
+                return false;
+            }
         }
 
         public Table get_table() {

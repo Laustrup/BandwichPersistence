@@ -31,6 +31,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 
 import static laustrup.bandwichpersistence.core.persistence.DatabaseField.Configuration.databaseFieldConfiguration;
+import static laustrup.bandwichpersistence.core.persistence.DatabaseField.Configuration.databaseFieldConfigurationOfId;
 import static laustrup.bandwichpersistence.core.persistence.DatabaseManager.read;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.selecting;
 import static laustrup.bandwichpersistence.core.services.StringService.randomString;
@@ -90,7 +91,7 @@ public class TestItems {
     public static UUID generateUUID(Class<?> table, Selecting selecting) {
         return get(
                 new Configurations(
-                        DatabaseField.of(databaseFieldConfiguration(table, Model.Fields._identity)),
+                        DatabaseField.of(databaseFieldConfigurationOfId(table)),
                         read(new Query(selecting.select())).get_resultSet(),
                         () -> {
                             throw new RuntimeException(String.format(

@@ -30,7 +30,7 @@ public class ContactInfoTestItems {
                         selecting(new Properties(
                                 clazz,
                                 complying().which(Condition.equals(
-                                        DatabaseField.of(databaseFieldConfiguration(ContactInfo.class, ContactInfo.DTO.Fields.email)),
+                                        DatabaseField.of(databaseFieldConfiguration(ContactInfo.class, ContactInfo.Fields._email)),
                                         email
                                 ))
                         ))
@@ -88,7 +88,7 @@ public class ContactInfoTestItems {
                 new Country.Id(generateUUID(
                         clazz,
                         complying().which(Condition.equals(
-                                DatabaseField.of(databaseFieldConfiguration(clazz, Country.DTO.Fields.title)),
+                                DatabaseField.of(databaseFieldConfiguration(clazz, Country.Fields._title)),
                                 title
                         ))
                 )),
