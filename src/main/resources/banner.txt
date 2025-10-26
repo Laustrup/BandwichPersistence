@@ -1,40 +1,26 @@
 
-+---------------------------------------------+
-|:::::::::::::::::::::::::::::::::::::::::::::|
-|::._______________________________________.::|
-|::|      ___________     ___________      |::|
-|::|     / BBBBBBBBB \   / BBBBBBBBBB\     |::|
-|::|    / BBB/     BB \_/ BB/      BBB\    |::|
-|::|   / BBB/       BBBBBBB/        BBB\   |::|
-|::|  | BBB/________ BBBBB/_________ BBB|  |::|
-|::|  | BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB|  |::|
-|::|  | BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB|  |::|
-|::|  |_________________________________|  |::|
-|::|     _____     ___   ____  _______     |::|
-|::|    /AAAAAA   /NNN  /NNNN | DDDDDDDD   |::|
-|::|   / AA__ AA  | NNN |  NN | DD___  DD  |::|
-|::|   | AA  | AA | NNNN|  NN | DD   \ DD  |::|
-|::|   | AAAAAAAA | NN\NN  NN | DD    |DD  |::|
-|::|   | AA__  AA | NN \NN NN | DD    |DD  |::|
-|::|   | AA  | AA | NN  \NNNN | DDDDDDDD/  |::|
-|::|   |__/  |__/ |__/   \__/ |________/   |::|
-|::|    __  __  _  _________     ______    |::|
-|::|  / WW  WW  W |  IIIIIII|  / CCCCCC\   |::|
-|::|  | WW  WW  W |___ II___| | CC-----_)  |::|
-|::|  | WW W  W W     |II     | CC         |::|
-|::|  | WWWW  WWW     |II     | CC         |::|
-|::|  |  WW    WW  ___|II___  | CC    ,_   |::|
-|::|   \   /\   / |  IIIIIII| |  CCCCCC )  |::|
-|::|    \_/  \_/  |_________|  \_______/   |::|
-|::|   _________________________________   |::|
-|::|  |  HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH|  |::|
-|::|  |_______________  HH _____________|  |::|
-|::|                  | HH|                |::|
-|::|                  | HH|                |::|
-|::|   _______________| HH|_____________   |::|
-|::|  |  HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH|  |::|
-|::|  |_________________________________|  |::|
-|::|_______________________________________|::|
-|:::::::::::::::::::::::::::::::::::::::::::::|
-+---------------------------------------------+
+                                                                                                                                dddddddd            dddddddd
+DDDDDDDDDDDDD                                 tttt                            BBBBBBBBBBBBBBBBB                                 d::::::d            d::::::d
+D::::::::::::DDD                           ttt:::t                            B::::::::::::::::B                                d::::::d            d::::::d
+D:::::::::::::::DD                         t:::::t                            B::::::BBBBBB:::::B                               d::::::d            d::::::d
+DDD:::::DDDDD:::::D                        t:::::t                            BB:::::B     B:::::B                              d:::::d             d:::::d
+  D:::::D    D:::::D  aaaaaaaaaaaaa  ttttttt:::::ttttttt      aaaaaaaaaaaaa     B::::B     B:::::Buuuuuu    uuuuuu      ddddddddd:::::d     ddddddddd:::::dyyyyyyy           yyyyyyy
+  D:::::D     D:::::D a::::::::::::a t:::::::::::::::::t      a::::::::::::a    B::::B     B:::::Bu::::u    u::::u    dd::::::::::::::d   dd::::::::::::::d y:::::y         y:::::y
+  D:::::D     D:::::D aaaaaaaaa:::::at:::::::::::::::::t      aaaaaaaaa:::::a   B::::BBBBBB:::::B u::::u    u::::u   d::::::::::::::::d  d::::::::::::::::d  y:::::y       y:::::y
+  D:::::D     D:::::D          a::::atttttt:::::::tttttt               a::::a   B:::::::::::::BB  u::::u    u::::u  d:::::::ddddd:::::d d:::::::ddddd:::::d   y:::::y     y:::::y
+  D:::::D     D:::::D   aaaaaaa:::::a      t:::::t              aaaaaaa:::::a   B::::BBBBBB:::::B u::::u    u::::u  d::::::d    d:::::d d::::::d    d:::::d    y:::::y   y:::::y
+  D:::::D     D:::::D aa::::::::::::a      t:::::t            aa::::::::::::a   B::::B     B:::::Bu::::u    u::::u  d:::::d     d:::::d d:::::d     d:::::d     y:::::y y:::::y
+  D:::::D     D:::::Da::::aaaa::::::a      t:::::t           a::::aaaa::::::a   B::::B     B:::::Bu::::u    u::::u  d:::::d     d:::::d d:::::d     d:::::d      y:::::y:::::y
+  D:::::D    D:::::Da::::a    a:::::a      t:::::t    tttttta::::a    a:::::a   B::::B     B:::::Bu:::::uuuu:::::u  d:::::d     d:::::d d:::::d     d:::::d       y:::::::::y
+DDD:::::DDDDD:::::D a::::a    a:::::a      t::::::tttt:::::ta::::a    a:::::a BB:::::BBBBBB::::::Bu:::::::::::::::uud::::::ddddd::::::ddd::::::ddddd::::::dd       y:::::::y
+D:::::::::::::::DD  a:::::aaaa::::::a      tt::::::::::::::ta:::::aaaa::::::a B:::::::::::::::::B  u:::::::::::::::u d:::::::::::::::::d d:::::::::::::::::d        y:::::y
+D::::::::::::DDD     a::::::::::aa:::a       tt:::::::::::tt a::::::::::aa:::aB::::::::::::::::B    uu::::::::uu:::u  d:::::::::ddd::::d  d:::::::::ddd::::d       y:::::y
+DDDDDDDDDDDDD         aaaaaaaaaa  aaaa         ttttttttttt    aaaaaaaaaa  aaaaBBBBBBBBBBBBBBBBB       uuuuuuuu  uuuu   ddddddddd   ddddd   ddddddddd   ddddd      y:::::y
+                                                                                                                                                                 y:::::y
+____________________________________________________________________________________________________________________________________________________________    y:::::y
+------------------------------------------------------------------------------------------------------------------------------------------------------------   y:::::y
+                                                                                                                                                              y:::::y
+                                                                                                                                                             yyyyyyy
+
+-- ASCII art generated by patorjk.com
 
