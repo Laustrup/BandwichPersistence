@@ -149,7 +149,7 @@ public class EternaryService {
 
     public ELEMENT orElse(ELEMENT alternative) {
       return findSuccessfulProperty()
-          .orElse(Optional.of(alternative))
+          .orElse(Optional.ofNullable(alternative))
           .orElse(null);
     }
 

@@ -12,6 +12,7 @@ import laustrup.bandwichpersistence.core.persistence.services.SelectService.Sele
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Properties;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Clause.Clausement;
 import laustrup.bandwichpersistence.core.persistence.worm.annotations.Table;
+import laustrup.bandwichpersistence.core.services.ModelService;
 import laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService.Configurations;
 import laustrup.bandwichpersistence.core.utilities.Coollection;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
@@ -34,218 +35,227 @@ import static laustrup.bandwichpersistence.core.persistence.DatabaseField.Config
 import static laustrup.bandwichpersistence.core.persistence.DatabaseField.Configuration.databaseFieldConfigurationOfId;
 import static laustrup.bandwichpersistence.core.persistence.DatabaseManager.read;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.selecting;
-import static laustrup.bandwichpersistence.core.services.StringService.randomString;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService.get;
 
 public class TestItems {
 
-    private static Query selectQuery(String table, String title) {
-        return new Query(String.format(/*language=mysql*/ """
-                select * from %s
-                     inner join contact_info contactInfo
-                         on %s.contact_info_id = contactInfo.id
-                     inner join addresses
-                         on contactInfo.address_id = addresses.id
-                     inner join countries
-                         on contactInfo.country_id = countries.id
-                     inner join phones
-                         on contactInfo.id = phones.contact_info_id
-                     left join organisation_venues organisationVenues
-                         on %s.id = organisationVenues.organisation_id
-                     left join venues
-                         on organisationVenues.venue_id = venues.id
-                     left join organisation_employments organisationEmployments
-                         on %s.id = organisationEmployments.organisation_id
-                     left join organisation_employees organisationEmployees
-                         on organisationEmployments.organisation_employee_id = organisationEmployees.id
-                where
-                    %s.title = '%s'
-                """,
-                table, table, table, table, table,
-                title
-        ));
+  private static Query selectQuery(String table, String title) {
+    return new Query(String.format(/*language=mysql*/ """
+            select * from %s
+                 inner join contact_info contactInfo
+                     on %s.contact_info_id = contactInfo.id
+                 inner join addresses
+                     on contactInfo.address_id = addresses.id
+                 inner join countries
+                     on contactInfo.country_id = countries.id
+                 inner join phones
+                     on contactInfo.id = phones.contact_info_id
+                 left join organisation_venues organisationVenues
+                     on %s.id = organisationVenues.organisation_id
+                 left join venues
+                     on organisationVenues.venue_id = venues.id
+                 left join organisation_employments organisationEmployments
+                     on %s.id = organisationEmployments.organisation_id
+                 left join organisation_employees organisationEmployees
+                     on organisationEmployments.organisation_employee_id = organisationEmployees.id
+            where
+                %s.title = '%s'
+            """,
+        table, table, table, table, table,
+        title
+    ));
+  }
+
+  private static Query selectOrganizationQuery(String title) {
+    return selectQuery("organisations", title);
+  }
+
+  public static ResultSet generateResultSet() {
+    return read(selectOrganizationQuery(OrganisationTestItems.OrganisationTitle.ARENA.get_naming())).get_resultSet();
+  }
+
+  public static UUID generateUUID(Class<?> clazz, Clausement that) {
+    return get(new Configurations(
+            DatabaseField.of(databaseFieldConfiguration(
+                clazz,
+                (clazz.isAssignableFrom(Model.class)) ? Model.Fields._identity : "_id"
+            )),
+            read(
+                new Query(selecting(new Properties(clazz, that)).select())
+            ).get_resultSet(),
+            Configurations.Mode.START
+        ),
+        UUID.class
+    );
+  }
+
+  public static UUID generateUUID(Class<?> table, Selecting selecting) {
+    return get(
+        new Configurations(
+            DatabaseField.of(databaseFieldConfigurationOfId(table)),
+            read(new Query(selecting.select())).get_resultSet(),
+            () -> {
+              throw new RuntimeException(String.format(
+                  "Couldn't generate UUID for table '%s' with selecting '%s'",
+                  table,
+                  Optional.of(selecting).map(Selecting::select).orElse("<null>")
+              ));
+            },
+            Configurations.Mode.START
+        ),
+        UUID.class
+    );
+  }
+
+  @Getter
+  @Setter
+  @AllArgsConstructor
+  @FieldNameConstants
+  @Table("test_instances")
+  public static class Instance {
+
+    private Id _id;
+
+    private String _title;
+
+    private boolean _active;
+
+    private int _amount;
+
+    public Instance(Id id) {
+      this(id, UUID.randomUUID().toString(), true, randomAmount());
     }
 
-    private static Query selectOrganizationQuery(String title) {
-        return selectQuery("organisations", title);
+    public Instance(String title) {
+      this(title, 0);
     }
 
-    public static ResultSet generateResultSet() {
-        return read(selectOrganizationQuery(OrganisationTestItems.OrganisationTitle.ARENA.get_naming())).get_resultSet();
+    public Instance(String title, int amount) {
+      this(Id.randomize(), title, true, amount);
     }
 
-    public static UUID generateUUID(Class<?> clazz, Clausement that) {
-        return get(new Configurations(
-                        DatabaseField.of(databaseFieldConfiguration(
-                                clazz,
-                                (clazz.isAssignableFrom(Model.class)) ? Model.Fields._identity : "_id")),
-                        read(
-                                new Query(selecting(new Properties(clazz, that)).select())
-                        ).get_resultSet(),
-                        Configurations.Mode.START
-                ),
-                UUID.class
-        );
+    public static Instance initialise() {
+      return new Instance(UUID.randomUUID().toString(), randomAmount());
     }
 
-    public static UUID generateUUID(Class<?> table, Selecting selecting) {
-        return get(
-                new Configurations(
-                        DatabaseField.of(databaseFieldConfigurationOfId(table)),
-                        read(new Query(selecting.select())).get_resultSet(),
-                        () -> {
-                            throw new RuntimeException(String.format(
-                                    "Couldn't generate UUID for table '%s' with selecting '%s'",
-                                    table,
-                                    Optional.of(selecting).map(Selecting::select).orElse("<null>")
-                        ));},
-                        Configurations.Mode.START
-                ),
-                UUID.class
-        );
+    public static Instance initialise(Instance instance) {
+      return instance == null ? initialise() : new Instance(instance.get_id());
     }
 
-    @Getter
-    @Setter
-    @AllArgsConstructor
-    @FieldNameConstants
-    @Table("test_instances")
-    public static class Instance {
-
-        private Id _id;
-
-        private String _title;
-
-        private boolean _active;
-
-        private int _amount;
-
-        public Instance(Id id) {
-            this(id, randomString(), true, randomAmount());
-        }
-
-        public Instance(String title) {
-            this(title, 0);
-        }
-
-        public Instance(String title, int amount) {
-            this(Id.randomize(), title, true, amount);
-        }
-
-        public static Instance initialise() {
-            return new Instance(randomString(), randomAmount());
-        }
-
-        public static Instance initialise(Instance instance) {
-            return instance == null ? initialise() : new Instance(instance.get_id());
-        }
-
-        public boolean isSameAs(Instance instance) {
-            return hasTruthinessOf(instance).is_totallyTrue();
-        }
-
-        public Truthiness hasTruthinessOf(Instance instance) {
-            Truthiness truthiness = new Truthiness();
-
-            if (instance.get_id().equals(_id)) {
-                AtomicInteger
-                        equals = new AtomicInteger(),
-                        count = new AtomicInteger();
-
-                BiConsumer<Object, Object> compare = (field, comparison) -> {
-                    boolean isEqual = field == comparison;
-                    if (isEqual)
-                        equals.incrementAndGet();
-                    count.incrementAndGet();
-                };
-
-                compare.accept(_title, instance.get_title());
-                compare.accept(_active, instance.is_active());
-                compare.accept(_amount, instance.get_amount());
-
-                truthiness.set_argument(BigDecimal.valueOf(count.get() / equals.get()));
-            }
-
-            return truthiness;
-        }
-
-        public static <IDENTITY extends Identity<Signature.UUID>> Model<IDENTITY, Signature.UUID> toModel(Instance instance) {
-            return new Model<>() {
-
-                @Override
-                public IDENTITY get_identity() {
-                    return super.get_identity();
-                }
-
-                @Override
-                public String get_title() {
-                    return instance.get_title();
-                }
-
-                @Override
-                public Instant get_timestamp() {
-                    return Instant.now();
-                }
-
-                @Override
-                public Situation get_situation() {
-                    return super.get_situation();
-                }
-
-                @Override
-                public String toString() {
-                    return super.toString();
-                }
-
-                @Override
-                public void set_title(String _title) {
-                    super.set_title(_title);
-                }
-
-                @Override
-                public Situation set_situation(Situation situation) {
-                    return super.set_situation(situation);
-                }
-
-                @Override
-                @SuppressWarnings("unchecked")
-                protected String defineToString(String title, Coollection<ToStringArgument> arguments) {
-                    return super.defineToString(title, arguments);
-                }
-
-                @Override
-                protected String defineToString(String title, String[][] values) {
-                    return super.defineToString(title, values);
-                }
-
-                @Override
-                protected String defineToString(String title, String[] keys, String[] values) {
-                    return super.defineToString(title, keys, values);
-                }
-            };
-        }
-
-        private static int randomAmount() {
-            return new Random().nextInt(100);
-        }
-
-        public static class Id extends CommonIdentity<Signature.UUID> {
-
-            public Id(Signature.UUID identifier) {
-                super(identifier);
-            }
-
-            public static Id randomize() {
-                return new Id(new Signature.UUID(UUID.randomUUID()));
-            }
-
-            @Override
-            public Class<Instance> getOwnerClassType() {
-                return Instance.class;
-            }
-        }
+    public boolean isSameAs(Instance instance) {
+      return hasTruthinessOf(instance).is_totallyTrue();
     }
 
-    public record InstanceCollection(Seszt<Instance> collection, Instance entity) {}
-    public record Instances(Instance expected, Instance actual) {}
+    public Truthiness hasTruthinessOf(Instance instance) {
+      Truthiness truthiness = new Truthiness();
+
+      if (instance.get_id().equals(_id)) {
+        AtomicInteger
+            equals = new AtomicInteger(),
+            count = new AtomicInteger();
+
+        BiConsumer<Object, Object> compare = (field, comparison) -> {
+          boolean isEqual = field == comparison;
+          if (isEqual)
+            equals.incrementAndGet();
+          count.incrementAndGet();
+        };
+
+        compare.accept(_title, instance.get_title());
+        compare.accept(_active, instance.is_active());
+        compare.accept(_amount, instance.get_amount());
+
+        truthiness.set_argument(BigDecimal.valueOf(count.get() / equals.get()));
+      }
+
+      return truthiness;
+    }
+
+    public static <IDENTITY extends Identity<Signature.UUID>> Model<IDENTITY, Signature.UUID> toModel(Instance instance) {
+      return new Model<>() {
+
+        @SuppressWarnings("unchecked")
+        @Override
+        public IDENTITY get_identity() {
+          return (IDENTITY) instance.get_id();
+        }
+
+        @Override
+        public String get_title() {
+          return instance.get_title();
+        }
+
+        @Override
+        public Instant get_timestamp() {
+          return Instant.now();
+        }
+
+        @Override
+        public Situation get_situation() {
+          return super.get_situation();
+        }
+
+        @Override
+        public void set_title(String _title) {
+          super.set_title(_title);
+        }
+
+        @Override
+        public Situation set_situation(Situation situation) {
+          return super.set_situation(situation);
+        }
+
+        @Override
+        protected String defineToString(String title, Coollection<ToStringArgument> arguments) {
+          return super.defineToString(title, arguments);
+        }
+
+        @Override
+        protected String defineToString(String title, String[][] values) {
+          return super.defineToString(title, values);
+        }
+
+        @Override
+        protected String defineToString(String title, String[] keys, String[] values) {
+          return super.defineToString(title, keys, values);
+        }
+
+        @Override
+        public String toString() {
+          return ModelService.defineToString(
+              instance.getClass().getSimpleName(),
+              instance.get_id(),
+              new String[]{"id"},
+              new String[]{((Optional<UUID>) instance.get_id().get_value()).get().toString()}
+          );
+        }
+      };
+    }
+
+    private static int randomAmount() {
+      return new Random().nextInt(100);
+    }
+
+    public static class Id extends CommonIdentity<Signature.UUID> {
+
+      public Id(Signature.UUID identifier) {
+        super(identifier);
+      }
+
+      public static Id randomize() {
+        return new Id(new Signature.UUID(UUID.randomUUID()));
+      }
+
+      @Override
+      public Class<Instance> getOwnerClassType() {
+        return Instance.class;
+      }
+    }
+  }
+
+  public record InstanceCollection(Seszt<Instance> collection, Instance entity) {
+  }
+
+  public record Instances(Instance expected, Instance actual) {
+  }
 }
