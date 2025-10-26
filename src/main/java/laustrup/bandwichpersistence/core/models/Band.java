@@ -25,13 +25,13 @@ import java.util.stream.Collectors;
 @Getter @FieldNameConstants @Table(value = "bands")
 public class Band extends Model<Band.Id, Signature.UUID> {
 
-    private String _description;
+  private String _description;
 
-    private Subscription _subscription;
+  private Subscription _subscription;
 
-    private Seszt<Album> _albums;
+  private Seszt<Album> _albums;
 
-    private Seszt<Event> _events;
+  private Seszt<Event> _events;
 
     private Seszt<User<? extends User.Id>> _fans;
 

@@ -17,10 +17,11 @@ import java.lang.reflect.Member;
 import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Optional;
 
 import static laustrup.bandwichpersistence.core.persistence.models.EntityDataCollection.Key.conjunctionKey;
+import static laustrup.bandwichpersistence.core.persistence.services.DatabaseColumnService.getIdColumnOf;
 import static laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService.*;
-import static laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseTableService.defineTableTitle;
 import static laustrup.bandwichpersistence.core.services.ClassFieldService.getDeclared;
 import static laustrup.bandwichpersistence.core.services.collections.MapService.collectMap;
 
@@ -65,6 +66,9 @@ public interface DatabaseDefinition {
                 String idReference,
                 Map<? extends Member, DatabaseField> columns
         ) {
+            if (clazz == null)
+                throw new IllegalArgumentException(String.format("clazz cannot be null in %s!", getClass().getName()));
+
             _class = clazz;
             _title = title;
             _idReference = idReference;
@@ -82,28 +86,22 @@ public interface DatabaseDefinition {
 
         public Seszt<Member> get_primaries() {
             return new Seszt<>(_columns.keySet().stream()
-                    .filter(member -> getTableColumn(member).isPrimary())
+                    .filter(member -> Optional.ofNullable(getTableColumn(member))
+                            .map(Table.Column::isPrimary)
+                            .orElse(false)
+                    )
             );
         }
 
-        public static DatabaseDefinition.Entity of(DatabaseDefinition.Entity target, DatabaseDefinition.Entity common, Member... members) {
-            String title = defineTableTitle(target.get_title(), common.get_title());
-
-            return new DatabaseDefinition.Entity(
-                    null,
-                    title,
-                    title + "_id",
-                    collectMap(Arrays.stream(members)
-                            .map(member -> new AbstractMap.SimpleImmutableEntry<>(member, DatabaseField.of(member)))
-                    )
-            );
+        public static DatabaseDefinition.Conjunction of(DatabaseDefinition.Entity target, DatabaseDefinition.Entity common) {
+            return new DatabaseDefinition.Conjunction(target, common);
         }
 
         @Override
         public Where.Condition joinOf(DatabaseDefinition external) {
             return Where.Condition.equals(
-                    get_databaseFieldWithReference(getDeclared(get_class(), Model.ModelDTO.Fields.id)),
-                    external.get_databaseFieldWithReference(getDeclared(external.get_class(), Model.ModelDTO.Fields.id))
+                    get_databaseFieldWithReference(getDeclared(get_class(), getIdColumnOf(get_class()))),
+                    external.get_databaseFieldWithReference(getDeclared(external.get_class(), getIdColumnOf(external.get_class())))
             );
         }
 
@@ -120,6 +118,9 @@ public interface DatabaseDefinition {
         }
 
         public static Conjunction of(Class<?> target, Class<?> common) {
+            if (target == null || common == null)
+                throw new IllegalArgumentException("Neither target nor common class is allowed to be null!");
+
             return new Conjunction(new Entity(target), new Entity(common));
         }
 

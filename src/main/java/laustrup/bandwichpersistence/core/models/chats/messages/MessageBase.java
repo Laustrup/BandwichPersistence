@@ -1,7 +1,7 @@
 package laustrup.bandwichpersistence.core.models.chats.messages;
 
-import laustrup.bandwichpersistence.core.models.identification.Identity;
 import laustrup.bandwichpersistence.core.models.Model;
+import laustrup.bandwichpersistence.core.models.identification.Identity;
 import laustrup.bandwichpersistence.core.models.identification.Signature;
 import laustrup.bandwichpersistence.core.models.users.User;
 import laustrup.bandwichpersistence.core.services.UserService;
@@ -20,58 +20,58 @@ import static laustrup.bandwichpersistence.core.models.users.User.UserDTO;
 @Getter @FieldNameConstants
 public abstract class MessageBase<IDENTITY extends Identity<Signature.UUID>> extends Model<IDENTITY, Signature.UUID> {
 
-    /**
-     * The User that wrote the Message.
-     */
-    @Getter
-    protected User<? extends User.Id> _author;
+  /**
+   * The User that wrote the Message.
+   */
+  @Getter
+  protected User<? extends User.Id> _author;
 
-    /**
-     * The content of the written Message.
-     */
-    @Setter
-    protected String _content;
+  /**
+   * The content of the written Message.
+   */
+  @Setter
+  protected String _content;
 
-    /**
-     * If null it has not been sent, otherwise it has at the time it has.
-     */
-    @Setter
-    protected Instant _sent;
+  /**
+   * If null it has not been sent, otherwise it has at the time it has.
+   */
+  @Setter
+  protected Instant _sent;
 
-    /**
-     * Can be null in case that it have never been edited, otherwise it will be the time that it was edited.
-     */
-    protected boolean _edited;
+  /**
+   * Can be null in case that it have never been edited, otherwise it will be the time that it was edited.
+   */
+  protected boolean _edited;
 
-    protected Instant _read;
+  protected Instant _read;
 
-    /**
-     * Converts a Data Transport Object into this object.
-     * @param message The Data Transport Object that will be converted.
-     */
-    public MessageBase(DTO<IDENTITY> message, IDENTITY id) {
-        this(
-                id,
-                UserService.from(message.getAuthor()),
-                message.getContent(),
-                message.getSent(),
-                message.isEdited(),
-                message.getRead(),
-                message.getTimestamp()
-        );
-    }
+  /**
+   * Converts a Data Transport Object into this object.
+   * @param message The Data Transport Object that will be converted.
+   */
+  public MessageBase(DTO<IDENTITY> message, IDENTITY id) {
+    this(
+        id,
+        UserService.from(message.getAuthor()),
+        message.getContent(),
+        message.getSent(),
+        message.isEdited(),
+        message.getRead(),
+        message.getTimestamp()
+    );
+  }
 
-    public MessageBase(
-            IDENTITY id,
-            User<? extends User.Id> author,
-            String content,
-            Instant sent,
-            boolean isEdited,
-            Instant read,
-            Instant timestamp
-    ) {
-        super(id, "Message-"+id, timestamp);
-        _author = author;
+  public MessageBase(
+      IDENTITY id,
+      User<? extends User.Id> author,
+      String content,
+      Instant sent,
+      boolean isEdited,
+      Instant read,
+      Instant timestamp
+  ) {
+    super(id, "Message-"+id, timestamp);
+    _author = author;
         _content = content;
         _sent = sent;
         _edited = isEdited;

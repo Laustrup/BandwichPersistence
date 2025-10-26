@@ -19,69 +19,69 @@ import java.util.UUID;
 @Getter @FieldNameConstants
 public class Request {
 
-    /**
-     * The User that needs to approve the Event.
-     */
-    private User.Id _receiverId;
+  /**
+   * The User that needs to approve the Event.
+   */
+  private User.Id _receiverId;
 
-    private User.Id _senderId;
+  private User.Id _senderId;
 
-    /**
-     * The Event that has been requested for.
-     */
-    private Event _event;
+  /**
+   * The Event that has been requested for.
+   */
+  private Event _event;
 
-    /**
-     * The value that indicates if the request for the Event has been approved.
-     * From the first date that isn't null, this has been approved.
-     */
-    @Setter
-    private Instant _approved;
+  /**
+   * The value that indicates if the request for the Event has been approved.
+   * From the first date that isn't null, this has been approved.
+   */
+  @Setter
+  private Instant _approved;
 
-    /**
-     * Will set the approved to now and therefore approve from now on.
-     * In case that it is already approved, nothing will happen.
-     */
-    public void approve() {
-        if (_approved == null)
-            _approved = Instant.now();
-    }
+  /**
+   * Will set the approved to now and therefore approve from now on.
+   * In case that it is already approved, nothing will happen.
+   */
+  public void approve() {
+    if (_approved == null)
+      _approved = Instant.now();
+  }
 
-    /**
-     * Will tell if the Request is approved, by whether the time is approved was null.
-     * @return True if the approved is null.
-     */
-    public boolean isApproved() {
-        return _approved != null;
-    }
+  /**
+   * Will tell if the Request is approved, by whether the time is approved was null.
+   * @return True if the approved is null.
+   */
+  public boolean isApproved() {
+    return _approved != null;
+  }
 
-    /**
-     * Will set the approved to null and therefore not approved.
-     */
-    public void deny() {
-        _approved = null;
-    }
+  /**
+   * Will set the approved to null and therefore not approved.
+   */
+  public void deny() {
+    _approved = null;
+  }
 
-    private Instant _timestamp;
+  private Instant _timestamp;
 
-    /**
-     * Will translate a transport object of this object into a construct of this object.
-     * @param request The transport object to be transformed.
-     */
-    public Request(DTO request) {
-        this(
-                new User.Id(request.getReceiverId()),
-                new User.Id(request.getSenderId()),
-                new Event(request.getEvent()),
-                request.getApproved(),
-                request.getTimestamp()
-        );
-    }
+  /**
+   * Will translate a transport object of this object into a construct of this object.
+   * @param request The transport object to be transformed.
+   */
+  public Request(DTO request) {
+    this(
+        new User.Id(request.getReceiverId()),
+        new User.Id(request.getSenderId()),
+        new Event(request.getEvent()),
+        request.getApproved(),
+        request.getTimestamp()
+    );
+  }
 
-    public Request(
-            User.Id receiver,
-            User.Id sender,
-            Event event,
+  public Request(
+      User.Id receiver,
+      User.Id sender,
+      Event event,
             Instant approved,
             Instant timestamp
     ) {

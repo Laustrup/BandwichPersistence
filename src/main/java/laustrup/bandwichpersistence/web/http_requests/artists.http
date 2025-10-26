@@ -5,6 +5,6 @@ Accept: application/json
 {
   "username": "test",
   "contactInfo": {
-    "email": "testmail"
+  "email": "testmail"
   }
 }

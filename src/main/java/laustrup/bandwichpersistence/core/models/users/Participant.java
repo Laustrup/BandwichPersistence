@@ -19,44 +19,44 @@ import java.util.stream.Collectors;
 @Getter @FieldNameConstants
 public class Participant extends User<Participant.Id> {
 
-    /**
-     * These are the Users that the Participant can follow,
-     * indicating that new content will be shared with the Participant.
-     */
-    private Seszt<Follow> _follows;
+  /**
+   * These are the Users that the Participant can follow,
+   * indicating that new content will be shared with the Participant.
+   */
+  private Seszt<Follow> _follows;
 
-    /**
-     * Ratings made from other users on this user based on a value.
-     */
-    protected Seszt<Rating> _ratings;
+  /**
+   * Ratings made from other users on this user based on a value.
+   */
+  protected Seszt<Rating> _ratings;
 
-    /**
-     * Will translate a transport object of this object into a construct of this object.
-     * @param participant The transport object to be transformed.
-     */
-    public Participant(DTO participant) {
-        this(
-                new Participant.Id(participant.getId()),
-                participant.getUsername(),
-                participant.getFirstName(),
-                participant.getLastName(),
-                participant.getDescription(),
-                new ContactInfo(participant.getContactInfo()),
-                new Seszt<>(participant.getParticipations().stream().map(Participation::new)),
-                new Seszt<>(participant.getRatings().stream().map(Rating::new)),
-                new Subscription(participant.getSubscription()),
-                new Seszt<>(participant.getFollows().stream().map(Follow::new)),
-                participant.getHistory(),
-                participant.getTimestamp()
-        );
-    }
+  /**
+   * Will translate a transport object of this object into a construct of this object.
+   * @param participant The transport object to be transformed.
+   */
+  public Participant(DTO participant) {
+    this(
+        new Participant.Id(participant.getId()),
+        participant.getUsername(),
+        participant.getFirstName(),
+        participant.getLastName(),
+        participant.getDescription(),
+        new ContactInfo(participant.getContactInfo()),
+        new Seszt<>(participant.getParticipations().stream().map(Participation::new)),
+        new Seszt<>(participant.getRatings().stream().map(Rating::new)),
+        new Subscription(participant.getSubscription()),
+        new Seszt<>(participant.getFollows().stream().map(Follow::new)),
+        participant.getHistory(),
+        participant.getTimestamp()
+    );
+  }
 
-    public Participant(
-            Id id,
-            String username,
-            String firstName,
-            String lastName,
-            String description,
+  public Participant(
+      Id id,
+      String username,
+      String firstName,
+      String lastName,
+          String description,
             ContactInfo contactInfo,
             Seszt<Participation> participations,
             Seszt<Rating> ratings,

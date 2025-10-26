@@ -13,180 +13,193 @@ import java.util.stream.Stream;
 
 public class EternaryService {
 
-    public static <ELEMENT> Itemernary<ELEMENT> ifNotNull(ELEMENT element) {
-        return stating(element != null, element);
+  public static <ITEM> Itemernary<ITEM> ifNotNull(ITEM item) {
+    return stating(item != null, item);
+  }
+
+  public static <ITEM> Itemernary<ITEM> ifNull(ITEM item) {
+    return stating(item == null, item);
+  }
+
+  public static Eternary ifEmpty(String string) {
+    return stating(string == null || string.isEmpty());
+  }
+
+  public static Itemernary<String> ifNotEmpty(String string) {
+    return stating(string != null && !string.isEmpty(), string);
+  }
+
+  public static <ITEM> Itemernary<ITEM> stating(boolean success, ITEM item) {
+    return new Itemernary<>(success, item);
+  }
+
+  @SafeVarargs
+  public static <CANDIDATE> Eternary isSame(CANDIDATE candidate, CANDIDATE other, CANDIDATE... candidates) {
+    return stating(Stream.of(candidates)
+        .allMatch(candidate::equals) && other.equals(candidate)
+    );
+  }
+
+  public static Eternary stating(boolean success) {
+    return new Eternary(success);
+  }
+
+  static <ELEMENT> boolean nextCondition(boolean isSuccess, Operator.Property<ELEMENT> properties) {
+    return nextCondition(isSuccess, Liszt.of(properties));
+  }
+
+  static <ELEMENT> boolean nextCondition(boolean isSuccess, Coollection<Operator.Property<ELEMENT>> properties) {
+    return isSuccess && properties.stream()
+        .filter(Operator.Property::is_success)
+        .toList()
+        .size() <= 1;
+  }
+
+  @FieldNameConstants
+  public static class Eternary {
+
+    protected boolean _success;
+
+    public Eternary(boolean success) {
+      _success = success;
     }
 
-    public static <ELEMENT> Itemernary<ELEMENT> ifNull(ELEMENT element) {
-        return stating(element == null, element);
+    public <CANDIDATE> Binder<CANDIDATE> then(CANDIDATE candidate) {
+      return new Binder<>(new Operator.Property<>(candidate, _success));
     }
 
-    public static Eternary ifEmpty(String string) {
-        return stating(string == null || string.isEmpty());
+    public <CANDIDATE> CANDIDATE thenElseNull(CANDIDATE element) {
+      return then(element)
+          .orElseNull();
+    }
+  }
+
+  public static class Itemernary<ITEM> extends Eternary {
+
+    private final ITEM _item;
+
+    public Itemernary(boolean success, ITEM item) {
+      super(success);
+      _item = item;
     }
 
-    public static Itemernary<String> ifNotEmpty(String string) {
-        return stating(string != null && !string.isEmpty(), string);
+    public ITEM otherwise(ITEM item) {
+      return _success ? _item : item;
     }
 
-    public static <ITEM> Itemernary<ITEM> stating(boolean success, ITEM item) {
-        return new Itemernary<>(success, item);
+    public <RETURN> Optional<RETURN> get(Function<ITEM, RETURN> action) {
+      return _success
+          ? Optional.ofNullable(thenElseNull(action.apply(_item)))
+          : Optional.empty();
     }
+
+    public ITEM elseNull() {
+      return _success ? _item : null;
+    }
+  }
+
+  @FieldNameConstants
+  public static class Binder<ELEMENT> extends Operator<ELEMENT> {
 
     @SafeVarargs
-    public static <ELEMENT> Eternary isSame(ELEMENT element, ELEMENT other, ELEMENT... elements) {
-        return stating(Stream.of(elements)
-                .allMatch(element::equals) && other.equals(element)
-        );
+    public Binder(Operator.Property<ELEMENT>... properties) {
+      super(properties);
     }
 
-    public static Eternary stating(boolean success) {
-        return new Eternary(success);
+    public Binder(Liszt<Operator.Property<ELEMENT>> properties) {
+      super(properties);
     }
+
+    public Binder<ELEMENT> or(Property<ELEMENT> property) {
+      return new Binder<>(_properties.Add(property));
+    }
+  }
+
+  @FieldNameConstants
+  @Getter
+  public static class Operator<ELEMENT> {
+
+    protected Liszt<Property<ELEMENT>> _properties;
 
     @SafeVarargs
-    static <ELEMENT> boolean nextCondition(boolean current, Operator.Property<ELEMENT>... properties) {
-        return nextCondition(current, new Liszt<>(properties));
+    public Operator(Property<ELEMENT>... properties) {
+      this(Liszt.of(properties));
     }
 
-    static <ELEMENT> boolean nextCondition(boolean current, Coollection<Operator.Property<ELEMENT>> properties) {
-        return properties.stream().filter(Operator.Property::is_success).toList().size() <= 1 && current;
+    public Operator(Liszt<Property<ELEMENT>> properties) {
+      _properties = properties;
     }
 
-    @FieldNameConstants
-    public static class Eternary {
-
-        protected boolean _success;
-
-        public Eternary(boolean success) {
-            _success = success;
-        }
-
-        public <ITEM> Binder<ITEM> then(Supplier<ITEM> supplier) {
-            return then(supplier.get());
-        }
-
-        public <ITEM> Binder<ITEM> then(ITEM item) {
-            return new Binder<>(new Operator.Property<>(
-                    item,
-                    nextCondition(_success, new Operator.Property<>(item, _success))
-            ));
-        }
-
-        public <ITEM> ITEM thenElseNull(ITEM element) {
-            return then(element).orElseNull();
-        }
+    public ELEMENT orElse(Supplier<ELEMENT> action) {
+      return orElse(action.get());
     }
 
-    public static class Itemernary<ITEM> extends Eternary {
+    public ELEMENT orElseThrow(Exception exception) throws Exception {
+      Optional<ELEMENT> item = findSuccessfulProperty()
+          .orElse(Optional.empty());
 
-        private ITEM _item;
+      return exception != null
+          ? item.orElseThrow(() -> exception)
+          : item.orElseThrow();
+    }
 
-        public Itemernary(boolean success, ITEM item) {
-            super(success);
-            _item = item;
-        }
+    public ELEMENT orElseThrow() throws Exception {
+      return orElseThrow(null);
+    }
 
-        public ITEM otherwise(ITEM item) {
-            return _success ? _item : item;
-        }
+    public ELEMENT orElse(ELEMENT alternative) {
+      return findSuccessfulProperty()
+          .orElse(Optional.of(alternative))
+          .orElse(null);
+    }
 
-        public <RETURN> Optional<RETURN> get(Function<ITEM, RETURN> action) {
-            return _success ? Optional.ofNullable(thenElseNull(action.apply(_item))) : Optional.empty();
-        }
+    private Optional<Optional<ELEMENT>> findSuccessfulProperty() {
+      return _properties.stream()
+          .filter(Property::is_success)
+          .map(Property::get_option)
+          .findFirst();
+    }
 
-        public ITEM elseNull() {
-            return _success ? _item : null;
-        }
+    public ELEMENT orElseNull() {
+      return orElse(() -> null);
     }
 
     @FieldNameConstants
-    public static class Binder<ELEMENT> extends Operator<ELEMENT>{
+    public static class Property<ELEMENT> {
 
-        @SafeVarargs
-        public Binder(Operator.Property<ELEMENT>... properties) {
-            super(properties);
-        }
+      private final Supplier<ELEMENT> _option;
+      private final Predicate<ELEMENT> _success;
 
-        public Binder(Liszt<Operator.Property<ELEMENT>> properties) {
-            super(properties);
-        }
+      public Property(Supplier<ELEMENT> option, Predicate<ELEMENT> success) {
+        _option = option;
+        _success = success;
+      }
 
-        public Binder<ELEMENT> or(ELEMENT element, Predicate<ELEMENT> predicate) {
-            _properties.add(new Property<>(element, nextCondition(predicate.test(element), _properties)));
+      Property(ELEMENT option, boolean success) {
+        this(() -> option, ignored -> success);
+      }
 
-            return new Binder<>(_properties);
-        }
+      public boolean is_success() {
+        return _success.test(_option.get());
+      }
+
+      public static <STATIC_ELEMENT> Property<STATIC_ELEMENT> of(
+          STATIC_ELEMENT option,
+          boolean condition
+      ) {
+        return new Property<>(() -> option, ignored -> condition);
+      }
+
+      public static <STATIC_ELEMENT> Property<STATIC_ELEMENT> of(
+          STATIC_ELEMENT option,
+          Predicate<STATIC_ELEMENT> condition
+      ) {
+        return new Property<>(() -> option, condition);
+      }
+
+      public Optional<ELEMENT> get_option() {
+        return Optional.ofNullable(_option.get());
+      }
     }
-
-    @FieldNameConstants
-    @Getter
-    public static class Operator<ITEM> {
-
-        protected Liszt<Property<ITEM>> _properties;
-
-        @SafeVarargs
-        public Operator(Property<ITEM>... properties) {
-            this(new Liszt<>(properties));
-        }
-
-        public Operator(Liszt<Property<ITEM>> properties) {
-            _properties = properties;
-        }
-
-        public ITEM orElse(Supplier<ITEM> action) {
-            return orElse(action.get());
-        }
-
-        public ITEM orElseThrow(Exception exception) throws Exception {
-            Optional<ITEM> item = findSuccessfulProperty()
-                    .orElse(Optional.empty());
-
-            return exception != null
-                    ? item.orElseThrow(() -> exception)
-                    : item.orElseThrow();
-        }
-
-        public ITEM orElseThrow() throws Exception {
-            return orElseThrow(null);
-        }
-
-        public ITEM orElse(ITEM alternative) {
-            return findSuccessfulProperty()
-                    .orElse(Optional.of(alternative))
-                    .orElse(null);
-        }
-
-        private Optional<Optional<ITEM>> findSuccessfulProperty() {
-            return _properties.stream()
-                    .filter(Property::is_success)
-                    .map(Property::get_option)
-                    .findFirst();
-        }
-
-        public ITEM orElseNull() {
-            return orElse((ITEM) null);
-        }
-
-        @Getter
-        @FieldNameConstants
-        public static class Property<ELEMENT> {
-
-            private ELEMENT _option;
-            private boolean _success;
-
-            public Property(ELEMENT option, boolean success) {
-                _option = option;
-                _success = success;
-            }
-
-            public static <M> Property<M> of(M option, boolean condition) {
-                return new Property<>(option, condition);
-            }
-
-            public Optional<ELEMENT> get_option() {
-                return Optional.ofNullable(_option);
-            }
-        }
-    }
+  }
 }

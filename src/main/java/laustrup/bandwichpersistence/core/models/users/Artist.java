@@ -21,53 +21,53 @@ import java.util.stream.Collectors;
 @Getter @FieldNameConstants @Table(value = "artists")
 public class Artist extends BusinessUser<Artist.Id> {
 
-    /**
-     * The Bands that the Artist is a member of.
-     */
-    private Seszt<Membership> _bandMemberships;
+  /**
+   * The Bands that the Artist is a member of.
+   */
+  private Seszt<Membership> _bandMemberships;
 
-    /**
-     * The Requests requested for this Artist.
-     */
-    private Seszt<Request> _requests;
+  /**
+   * The Requests requested for this Artist.
+   */
+  private Seszt<Request> _requests;
 
-    private Seszt<Album> _albums;
+  private Seszt<Album> _albums;
 
-    private Seszt<Follow> _follows;
+  private Seszt<Follow> _follows;
 
-    private Seszt<Event.Gig> _gigs;
+  private Seszt<Event.Gig> _gigs;
 
-    private Seszt<Rating> _ratings;
+  private Seszt<Rating> _ratings;
 
-    private Seszt<Authority> _authorities;
+  private Seszt<Authority> _authorities;
 
-    /**
-     * A description of the gear, that the Artist possesses and what they require for an Event.
-     */
-    @Setter
-    private String _runner;
+  /**
+   * A description of the gear, that the Artist possesses and what they require for an Event.
+   */
+  @Setter
+  private String _runner;
 
-    /**
-     * Will translate a transport object of this object into a construct of this object.
-     * @param artist The transport object to be transformed.
-     */
-    public Artist(DTO artist) {
-        this(
-                new Artist.Id(artist.getId()),
-                artist.getUsername(),
-                artist.getFirstName(),
-                artist.getLastName(),
-                artist.getDescription(),
-                new ContactInfo(artist.getContactInfo()),
-                new Seszt<>(artist.getAlbums().stream().map(Album::new)),
-                new Subscription(artist.getSubscription()),
-                new Seszt<>(artist.getAuthorities().stream()),
-                new Seszt<>(artist.getChatRooms().stream().map(ChatRoom::new)),
-                new Seszt<>(artist.getParticipations().stream().map(Participation::new)),
-                new Seszt<>(artist.getBandMemberships().stream().map(Artist.Membership::new)),
-                new Seszt<>(artist.getGigs().stream().map(Event.Gig::new)),
-                artist.getRunner(),
-                new Seszt<>(artist.getFollows().stream().map(Follow::new)),
+  /**
+   * Will translate a transport object of this object into a construct of this object.
+   * @param artist The transport object to be transformed.
+   */
+  public Artist(DTO artist) {
+    this(
+        new Artist.Id(artist.getId()),
+        artist.getUsername(),
+        artist.getFirstName(),
+        artist.getLastName(),
+        artist.getDescription(),
+        new ContactInfo(artist.getContactInfo()),
+        new Seszt<>(artist.getAlbums().stream().map(Album::new)),
+        new Subscription(artist.getSubscription()),
+        new Seszt<>(artist.getAuthorities().stream()),
+        new Seszt<>(artist.getChatRooms().stream().map(ChatRoom::new)),
+        new Seszt<>(artist.getParticipations().stream().map(Participation::new)),
+        new Seszt<>(artist.getBandMemberships().stream().map(Artist.Membership::new)),
+        new Seszt<>(artist.getGigs().stream().map(Event.Gig::new)),
+        artist.getRunner(),
+              new Seszt<>(artist.getFollows().stream().map(Follow::new)),
                 new Seszt<>(artist.getRequests().stream().map(Request::new)),
                 new Seszt<>(artist.getRatings().stream().map(Rating::new)),
                 artist.getHistory(),

@@ -21,40 +21,40 @@ import java.util.logging.Logger;
 @EnableWebSecurity
 public class SecurityConfiguration {
 
-    private final Logger _logger = Logger.getLogger(SecurityConfiguration.class.getName());
+  private final Logger _logger = Logger.getLogger(SecurityConfiguration.class.getName());
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http
-                .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(SecurityConfiguration::configureRequests)
-//                .logout(Customizer.withDefaults())
-//                .httpBasic(Customizer.withDefaults())
-                .sessionManagement(SecurityConfiguration::configureSessionManagement)
-                .build();
-    }
+  @Bean
+  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    return http
+        .csrf(AbstractHttpConfigurer::disable)
+        .authorizeHttpRequests(SecurityConfiguration::configureRequests)
+//        .logout(Customizer.withDefaults())
+//        .httpBasic(Customizer.withDefaults())
+        .sessionManagement(SecurityConfiguration::configureSessionManagement)
+        .build();
+  }
 
-    private static <T extends HttpSecurityBuilder<T>> void configureRequests(
-            AuthorizeHttpRequestsConfigurer<T>.AuthorizationManagerRequestMatcherRegistry registry
-    ) {
-        registry
-                .anyRequest()
-                .permitAll();
-    }
+  private static <T extends HttpSecurityBuilder<T>> void configureRequests(
+      AuthorizeHttpRequestsConfigurer<T>.AuthorizationManagerRequestMatcherRegistry registry
+  ) {
+    registry
+        .anyRequest()
+        .permitAll();
+  }
 
-    private static <T extends HttpSecurityBuilder<T>> void configureSessionManagement(
-            SessionManagementConfigurer<T> configurer
-    ) {
-        configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-    }
+  private static <T extends HttpSecurityBuilder<T>> void configureSessionManagement(
+      SessionManagementConfigurer<T> configurer
+  ) {
+    configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+  }
 
-    @Bean
-    public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+  @Bean
+  public AuthenticationProvider authenticationProvider() {
+    DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
 
-        authenticationProvider.setUserDetailsService(UserDetailsManager::getUserDetails);
-        authenticationProvider.setPasswordEncoder(new PasswordEncoder());
+    authenticationProvider.setUserDetailsService(UserDetailsManager::getUserDetails);
+    authenticationProvider.setPasswordEncoder(new PasswordEncoder());
 
-        return authenticationProvider;
-    }
+    return authenticationProvider;
+  }
 }

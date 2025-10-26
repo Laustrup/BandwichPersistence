@@ -28,64 +28,64 @@ import static laustrup.bandwichpersistence.core.utilities.collections.Seszt.copy
 @Table
 public class ContactInfo {
 
-    @Table.Column(isPrimary = true)
-    private Id _id;
+  @Table.Column(isPrimary = true)
+  private Id _id;
 
-    /**
-     * The email that the User wants to be contacted through outside the application.
-     */
-    @Setter
-    private String _email;
+  /**
+   * The email that the User wants to be contacted through outside the application.
+   */
+  @Setter
+  private String _email;
 
-    /**
-     * A Phone object that is used to have information about how to contact the User through Phone.
-     */
-    private Seszt<Phone> _phones;
+  /**
+   * A Phone object that is used to have information about how to contact the User through Phone.
+   */
+  private Seszt<Phone> _phones;
 
-    /**
-     * An Address object with info about the location of the User.
-     */
-    @Setter
-    private Address _address;
+  /**
+   * An Address object with info about the location of the User.
+   */
+  @Setter
+  private Address _address;
 
-    /**
-     * A Country object for the information of which Country the User is living in.
-     */
-    private Country _country;
+  /**
+   * A Country object for the information of which Country the User is living in.
+   */
+  private Country _country;
 
-    /**
-     * Will translate a transport object of this object into a construct of this object.
-     * @param contactInfo The transport object to be transformed.
-     */
-    public ContactInfo(DTO contactInfo) {
-        this(
-                new Id(contactInfo.getId()),
-                contactInfo.getEmail(),
-                copy(contactInfo.getPhones(), Phone::new),
-                new Address(contactInfo.getAddress()),
-                new Country(contactInfo.getCountry())
-        );
-    }
+  /**
+   * Will translate a transport object of this object into a construct of this object.
+   * @param contactInfo The transport object to be transformed.
+   */
+  public ContactInfo(DTO contactInfo) {
+    this(
+        new Id(contactInfo.getId()),
+        contactInfo.getEmail(),
+        copy(contactInfo.getPhones(), Phone::new),
+        new Address(contactInfo.getAddress()),
+        new Country(contactInfo.getCountry())
+    );
+  }
 
-    public ContactInfo(Id id, String email, Seszt<Phone> phones, Address address, Country country) {
-        _id = id;
-        _email = email;
-        _phones = phones;
-        _address = address;
-        _country = country;
-    }
+  public ContactInfo(Id id, String email, Seszt<Phone> phones, Address address, Country country) {
+    _id = id;
+    _email = email;
+    _phones = phones;
+    _address = address;
+    _country = country;
+  }
 
-    /**
-     * Collects the details of the Address as a one liner String.
-     * @return The collected one liner String of the Address.
-     */
-    public String getAddressInfo() {
-        return _address.toString();
-    }
+  /**
+   * Collects the details of the Address as a one liner String.
+   * @return The collected one liner String of the Address.
+   */
+  public String getAddressInfo() {
+    return _address.toString();
+  }
 
-    public static class Id extends CommonIdentity<Signature.UUID> {
+  public static class Id extends CommonIdentity<Signature.UUID> {
 
-        public Id(Signature.UUID signature) {
+      public Id(Signature.UUID signature) {
             super(signature);
         }
 

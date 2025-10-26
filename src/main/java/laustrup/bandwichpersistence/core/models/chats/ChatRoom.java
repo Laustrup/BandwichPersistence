@@ -30,67 +30,67 @@ import static laustrup.bandwichpersistence.core.services.ObjectService.ifExists;
 @Getter @FieldNameConstants @Table(value = "chat_rooms")
 public class ChatRoom extends Model<ChatRoom.Id, Signature.UUID> {
 
-    /**
-     * All the Mails that has been sent will be stored here.
-     */
-    private Seszt<Message> _messages;
+  /**
+   * All the Mails that has been sent will be stored here.
+   */
+  private Seszt<Message> _messages;
 
-    /**
-     * The Users, except the responsible, that can write with each other.
-     */
-    private Seszt<User<? extends User.Id>> _chatters;
+  /**
+   * The Users, except the responsible, that can write with each other.
+   */
+  private Seszt<User<? extends User.Id>> _chatters;
 
-    public ChatRoom(ChatRoom.DTO chatRoom) {
-        super(chatRoom, new Id(chatRoom.getId()));
-        _messages = Seszt.copy(chatRoom.getMails(), Message::new);
-        _chatters = Seszt.copy(chatRoom.getChatters(), UserService::from);
-    }
+  public ChatRoom(ChatRoom.DTO chatRoom) {
+    super(chatRoom, new Id(chatRoom.getId()));
+    _messages = Seszt.copy(chatRoom.getMails(), Message::new);
+    _chatters = Seszt.copy(chatRoom.getChatters(), UserService::from);
+  }
 
-    /**
-     * Containing all attributes of this object.
-     * @param id The primary id.
-     * @param title The title of the ChatRoom, if it is null or empty, it will be the usernames of the chatters.
-     * @param messages The Mails with relations to this ChatRoom.
-     * @param chatters The chatters that are members of this ChatRoom.
-     * @param timestamp The time this ChatRoom was created.
-     */
-    public ChatRoom(
-            Id id,
-            String title,
-            Seszt<Message> messages,
-            Seszt<User<? extends User.Id>> chatters,
-            Instant timestamp
-    ) {
-        super(id, title, timestamp);
-        _chatters = chatters;
-        _title = determineChatRoomTitle(_title);
-        _messages = messages;
-    }
+  /**
+   * Containing all attributes of this object.
+   * @param id The primary id.
+   * @param title The title of the ChatRoom, if it is null or empty, it will be the usernames of the chatters.
+   * @param messages The Mails with relations to this ChatRoom.
+   * @param chatters The chatters that are members of this ChatRoom.
+   * @param timestamp The time this ChatRoom was created.
+   */
+  public ChatRoom(
+      Id id,
+      String title,
+      Seszt<Message> messages,
+      Seszt<User<? extends User.Id>> chatters,
+      Instant timestamp
+  ) {
+    super(id, title, timestamp);
+    _chatters = chatters;
+    _title = determineChatRoomTitle(_title);
+    _messages = messages;
+  }
 
-    /**
-     * Will generate a new ChatRoom.
-     * Timestamp will be of now.
-     * @param title The title of the ChatRoom, if it is null or empty, it will be the usernames of the chatters.
-     * @param messages The Mails with relations to this ChatRoom.
-     * @param chatters The chatters that are members of this ChatRoom.
-     */
-    public ChatRoom(String title, Seszt<Message> messages, Seszt<User<? extends User.Id>> chatters) {
-        super(title);
-        _messages = messages;
-        _chatters = chatters;
-    }
+  /**
+   * Will generate a new ChatRoom.
+   * Timestamp will be of now.
+   * @param title The title of the ChatRoom, if it is null or empty, it will be the usernames of the chatters.
+   * @param messages The Mails with relations to this ChatRoom.
+   * @param chatters The chatters that are members of this ChatRoom.
+   */
+  public ChatRoom(String title, Seszt<Message> messages, Seszt<User<? extends User.Id>> chatters) {
+    super(title);
+    _messages = messages;
+    _chatters = chatters;
+  }
 
-    /**
-     * Will generate a title of the chatters of this ChatRoom
-     * but only if the title isn't default set yet.
-     * @return The generated Title.
-     */
-    private String determineChatRoomTitle() {
-        String title = determineChatRoomTitle(null);
-        return _title.equals(title) ? _title : title;
-    }
+  /**
+   * Will generate a title of the chatters of this ChatRoom
+   * but only if the title isn't default set yet.
+   * @return The generated Title.
+   */
+  private String determineChatRoomTitle() {
+    String title = determineChatRoomTitle(null);
+    return _title.equals(title) ? _title : title;
+  }
 
-    /**
+  /**
      * Will make the title of this ChatRoom be of custom title or chatters' usernames.
      * @param title The custom title.
      * @return The determined title.

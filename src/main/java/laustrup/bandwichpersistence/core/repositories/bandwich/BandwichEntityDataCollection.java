@@ -10,6 +10,7 @@ import laustrup.bandwichpersistence.core.models.users.Artist;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
 import laustrup.bandwichpersistence.core.persistence.models.EntityDataCollection;
 import laustrup.bandwichpersistence.core.persistence.worm.models.DatabaseDefinition;
+import laustrup.bandwichpersistence.core.services.EternaryService.Operator.Property;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 
 import java.util.Arrays;
@@ -20,65 +21,68 @@ import static laustrup.bandwichpersistence.core.services.collections.MapService.
 
 public class BandwichEntityDataCollection implements EntityDataCollection {
 
-    public static BandwichEntityDataCollection _instance;
+  public static BandwichEntityDataCollection _instance;
 
-    public static BandwichEntityDataCollection get_instance() {
-        if (_instance == null)
-            _instance = new BandwichEntityDataCollection();
+  public static BandwichEntityDataCollection get_instance() {
+    if (_instance == null)
+      _instance = new BandwichEntityDataCollection();
 
-        return _instance;
-    }
+    return _instance;
+  }
 
-    private BandwichEntityDataCollection() {
+  private BandwichEntityDataCollection() {
 
-    }
+  }
 
-    public static final Map<Key, DatabaseDefinition> DEFINITIONS = defineDefinitions(
-            ClassDatabaseDefinition.of(ContactInfo.class),
-            ClassDatabaseDefinition.of(ContactInfo.Phone.class),
-            ClassDatabaseDefinition.of(ContactInfo.Address.class),
-            ClassDatabaseDefinition.of(ContactInfo.Country.class),
-            ClassDatabaseDefinition.of(Artist.class),
-            ClassDatabaseDefinition.of(Band.class),
-            ClassDatabaseDefinition.of(Organisation.Employee.class),
-            ClassDatabaseDefinition.of(Organisation.Employee.Role.class),
-            ClassDatabaseDefinition.of(Organisation.Employee.Authority.class),
-            ClassDatabaseDefinition.of(Artist.Authority.class),
-            ClassDatabaseDefinition.of(Authority.class),
-            ClassDatabaseDefinition.of(Subscription.class),
-            ClassDatabaseDefinition.of(ChatRoom.class),
-            ClassDatabaseDefinition.of(Organisation.Employee.class, ChatRoom.class),
-            ClassDatabaseDefinition.of(Artist.class, ChatRoom.class),
-            ClassDatabaseDefinition.of(Message.class),
-            ClassDatabaseDefinition.of(Band.Membership.class)
+  public static final Map<Key, DatabaseDefinition> DEFINITIONS = defineDefinitions(
+      ClassDatabaseDefinition.of(ContactInfo.class),
+      ClassDatabaseDefinition.of(ContactInfo.Phone.class),
+      ClassDatabaseDefinition.of(ContactInfo.Address.class),
+      ClassDatabaseDefinition.of(ContactInfo.Country.class),
+      ClassDatabaseDefinition.of(Artist.class),
+      ClassDatabaseDefinition.of(Band.class),
+      ClassDatabaseDefinition.of(Organisation.Employee.class),
+      ClassDatabaseDefinition.of(Organisation.Employee.Role.class),
+      ClassDatabaseDefinition.of(Organisation.Employee.Authority.class),
+      ClassDatabaseDefinition.of(Artist.Authority.class),
+      ClassDatabaseDefinition.of(Authority.class),
+      ClassDatabaseDefinition.of(Subscription.class),
+      ClassDatabaseDefinition.of(ChatRoom.class),
+      ClassDatabaseDefinition.of(Organisation.Employee.class, ChatRoom.class),
+      ClassDatabaseDefinition.of(Artist.class, ChatRoom.class),
+      ClassDatabaseDefinition.of(Message.class),
+      ClassDatabaseDefinition.of(Band.Membership.class)
+  );
+
+  private static Map<Key, DatabaseDefinition> defineDefinitions(ClassDatabaseDefinition... classDatabaseDefinitions) {
+    return collectMap(Arrays.stream(classDatabaseDefinitions)
+        .map(databaseDefinition -> databaseDefinition.toDatabaseDefinition().toEntry())
     );
+  }
 
-    private static Map<Key, DatabaseDefinition> defineDefinitions(ClassDatabaseDefinition... classDatabaseDefinitions) {
-        return collectMap(Arrays.stream(classDatabaseDefinitions)
-                .map(databaseDefinition -> databaseDefinition.toDatabaseDefinition().toEntry())
-        );
+  @Override
+  public Map<Key, DatabaseDefinition> getAll() {
+    return DEFINITIONS;
+  }
+
+  private record ClassDatabaseDefinition(Seszt<Class<?>> classes) {
+
+    public static ClassDatabaseDefinition of(Class<?>... classes) {
+      return new ClassDatabaseDefinition(new Seszt<>(classes));
     }
 
-    @Override
-    public Map<Key, DatabaseDefinition> getAll() {
-        return DEFINITIONS;
+    public DatabaseDefinition toDatabaseDefinition() {
+      try {
+        return stating(classes.size() == 1)
+            .then((DatabaseDefinition) new DatabaseDefinition.Entity(classes.Get(1)))
+            .or(Property.of(
+                DatabaseDefinition.Conjunction.of(classes.Get(1), classes.Get(2)),
+                entity -> classes.size() == 2
+            ))
+            .orElseThrow(new IllegalArgumentException("Database definition is only allowed to have from 1 -> 2 classes!"));
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
     }
-
-    private record ClassDatabaseDefinition(Seszt<Class<?>> classes) {
-
-        public static ClassDatabaseDefinition of(Class<?>... classes) {
-            return new ClassDatabaseDefinition(new Seszt<>(classes));
-        }
-
-        public DatabaseDefinition toDatabaseDefinition() {
-            try {
-                return stating(classes.size() == 1)
-                        .then((DatabaseDefinition) new DatabaseDefinition.Entity(classes.Get(1)))
-                        .or(DatabaseDefinition.Conjunction.of(classes.Get(1), classes.Get(2)), entity -> classes.size() == 2)
-                        .orElseThrow(new IllegalArgumentException("Database definition is only allow to have from 1 -> 2 classes!"));
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
+  }
 }

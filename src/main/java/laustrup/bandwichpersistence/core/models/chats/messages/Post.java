@@ -23,57 +23,57 @@ import static laustrup.bandwichpersistence.core.services.ModelService.from;
 @Getter @FieldNameConstants
 public class Post extends MessageBase<Post.Id> {
 
-    public Model<? extends Identity<?>, ?> _receiver;
+  public Model<? extends Identity<?>, ?> _receiver;
 
-    /**
-     * Will translate a transport object of this object into a construct of this object.
-     * @param post The transport object to be transformed.
-     */
-    public Post(DTO post) {
-        super(post, new Id(new Signature.UUID(post.getId())));
-        _receiver = from(post);
+  /**
+   * Will translate a transport object of this object into a construct of this object.
+   * @param post The transport object to be transformed.
+   */
+  public Post(DTO post) {
+    super(post, new Id(new Signature.UUID(post.getId())));
+    _receiver = from(post);
+  }
+
+  public Post(
+      Id id,
+      User<? extends User.Id> author,
+      Model<? extends Identity<?>, ?> receiver,
+      String content,
+      Instant isSent,
+      boolean isEdited,
+      Instant read,
+      Instant timestamp
+  ) {
+    super(id, author, content, isSent, isEdited, read, timestamp);
+    _receiver = receiver;
+  }
+
+  public static class Id extends CommonIdentity<Signature.UUID> {
+
+    public Id(Signature.UUID signature) {
+      super(signature);
     }
 
-    public Post(
-            Id id,
-            User<? extends User.Id> author,
-            Model<? extends Identity<?>, ?> receiver,
-            String content,
-            Instant isSent,
-            boolean isEdited,
-            Instant read,
-            Instant timestamp
-    ) {
-        super(id, author, content, isSent, isEdited, read, timestamp);
-        _receiver = receiver;
-    }
-
-    public static class Id extends CommonIdentity<Signature.UUID> {
-
-        public Id(Signature.UUID signature) {
-            super(signature);
-        }
-
-        public Id(java.util.UUID id) {
-            super(new Signature.UUID(id));
-        }
-
-        @Override
-        public Class<?> getOwnerClassType() {
-            return Post.class;
-        }
+    public Id(java.util.UUID id) {
+      super(new Signature.UUID(id));
     }
 
     @Override
-    public String toString() {
-        return defineToString(
-            getClass().getSimpleName(),
-            new String[]{
-                Model.Fields._identity,
-                MessageBase.Fields._content,
-                MessageBase.Fields._sent,
-                MessageBase.Fields._edited,
-                Model.Fields._timestamp
+    public Class<?> getOwnerClassType() {
+      return Post.class;
+    }
+  }
+
+  @Override
+  public String toString() {
+    return defineToString(
+      getClass().getSimpleName(),
+      new String[]{
+        Model.Fields._identity,
+        MessageBase.Fields._content,
+        MessageBase.Fields._sent,
+        MessageBase.Fields._edited,
+          Model.Fields._timestamp
             },
             new String[]{
                 String.valueOf(_identity),

@@ -15,59 +15,59 @@ import java.time.Instant;
 @Getter @Table(value = "messages")
 public class Message extends MessageBase<Message.Id> {
 
-    /**
-     * Will translate a transport object of this object into a construct of this object.
-     * @param mail The transport object to be transformed.
-     */
-    public Message(DTO mail) {
-        super(mail, new Id(new Signature.UUID(mail.getId())));
+  /**
+   * Will translate a transport object of this object into a construct of this object.
+   * @param mail The transport object to be transformed.
+   */
+  public Message(DTO mail) {
+    super(mail, new Id(new Signature.UUID(mail.getId())));
+  }
+
+  public Message(
+      Id id,
+      User<? extends User.Id> author,
+      String content,
+      Instant isSent,
+      boolean isEdited,
+      Instant isRead,
+      Instant timestamp
+  ) {
+    super(id, author, content, isSent, isEdited, isRead, timestamp);
+  }
+
+  @Override
+  public String toString() {
+    return defineToString(
+      getClass().getSimpleName(),
+      new String[] {
+        Model.Fields._identity,
+        MessageBase.Fields._author,
+        MessageBase.Fields._content,
+        MessageBase.Fields._sent,
+        Model.Fields._timestamp
+      }, new String[] {
+        String.valueOf(_identity),
+        _author != null ? _author.toString() : null,
+        _content,
+        String.valueOf(_sent),
+        String.valueOf(_timestamp)
+      }
+    );
+  }
+
+  public static class Id extends CommonIdentity<Signature.UUID> {
+
+    public Id(Signature.UUID signature) {
+      super(signature);
     }
 
-    public Message(
-            Id id,
-            User<? extends User.Id> author,
-            String content,
-            Instant isSent,
-            boolean isEdited,
-            Instant isRead,
-            Instant timestamp
-    ) {
-        super(id, author, content, isSent, isEdited, isRead, timestamp);
+    public Id(java.util.UUID signature) {
+      super(new Signature.UUID(signature));
     }
 
     @Override
-    public String toString() {
-        return defineToString(
-            getClass().getSimpleName(),
-            new String[] {
-                Model.Fields._identity,
-                MessageBase.Fields._author,
-                MessageBase.Fields._content,
-                MessageBase.Fields._sent,
-                Model.Fields._timestamp
-            }, new String[] {
-                String.valueOf(_identity),
-                _author != null ? _author.toString() : null,
-                _content,
-                String.valueOf(_sent),
-                String.valueOf(_timestamp)
-            }
-        );
-    }
-
-    public static class Id extends CommonIdentity<Signature.UUID> {
-
-        public Id(Signature.UUID signature) {
-            super(signature);
-        }
-
-        public Id(java.util.UUID signature) {
-            super(new Signature.UUID(signature));
-        }
-
-        @Override
-        public Class<Message> getOwnerClassType() {
-            return Message.class;
+    public Class<Message> getOwnerClassType() {
+          return Message.class;
         }
     }
 

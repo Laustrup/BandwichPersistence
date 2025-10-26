@@ -26,69 +26,69 @@ import java.util.Set;
 @Getter @FieldNameConstants
 public abstract class User<IDENTITY extends User.Id> extends Model<IDENTITY, Signature.UUID> {
 
-    /**
-     * The title of the user, that the user uses to use as a title for the profile.
-     */
-    @Setter
-    protected String _username;
+  /**
+   * The title of the user, that the user uses to use as a title for the profile.
+   */
+  @Setter
+  protected String _username;
 
-    /**
-     * The real first name of the user's name.
-     */
-    @Setter
-    protected String _firstName;
+  /**
+   * The real first name of the user's name.
+   */
+  @Setter
+  protected String _firstName;
 
-    /**
-     * The real last name of the user's name.
-     */
-    @Setter
-    protected String _lastName;
+  /**
+   * The real last name of the user's name.
+   */
+  @Setter
+  protected String _lastName;
 
-    /**
-     * This is what the user uses to describe itself.
-     */
-    @Setter
-    protected String _description;
+  /**
+   * This is what the user uses to describe itself.
+   */
+  @Setter
+  protected String _description;
 
-    /**
-     * An object that has the different attributes,
-     * that can be used to contact this user.
-     */
-    protected ContactInfo _contactInfo;
+  /**
+   * An object that has the different attributes,
+   * that can be used to contact this user.
+   */
+  protected ContactInfo _contactInfo;
 
-    /**
-     * The participation of the Events that this user is included in.
-     */
-    protected Seszt<Participation> _participations;
+  /**
+   * The participation of the Events that this user is included in.
+   */
+  protected Seszt<Participation> _participations;
 
-    //TODO Implement
-    protected String _password;
+  //TODO Implement
+  protected String _password;
 
-    /**
-     * This subscription defines details of subscription,
-     * including its status.
-     * Only Artists and Bands can have a premium membership,
-     * since they are the only paying users.
-     */
-    protected Subscription _subscription;
+  /**
+   * This subscription defines details of subscription,
+   * including its status.
+   * Only Artists and Bands can have a premium membership,
+   * since they are the only paying users.
+   */
+  protected Subscription _subscription;
 
-    protected History _history;
+  protected History _history;
 
-    /**
-     * Will translate a transport object of this object into a construct of this object.
-     * @param user The transport object to be transformed.
-     */
-    public User(UserDTO<IDENTITY> user, IDENTITY identity) {
-        this(
-                identity,
-                user.getUsername(),
-                user.getFirstName(),
-                user.getLastName(),
-                user.getDescription(),
-                new ContactInfo(user.getContactInfo()),
-                Seszt.copy(user.getParticipations(), User.Participation::new),
-                new Subscription(user.getSubscription()),
-                user.getHistory(),
+  /**
+   * Will translate a transport object of this object into a construct of this object.
+   * @param user The transport object to be transformed.
+   */
+  public User(UserDTO<IDENTITY> user, IDENTITY identity) {
+    this(
+        identity,
+        user.getUsername(),
+        user.getFirstName(),
+        user.getLastName(),
+        user.getDescription(),
+        new ContactInfo(user.getContactInfo()),
+        Seszt.copy(user.getParticipations(), User.Participation::new),
+        new Subscription(user.getSubscription()),
+            user.getHistory(),
                 user.getTimestamp()
         );
     }

@@ -25,6 +25,9 @@ import static laustrup.bandwichpersistence.core.services.EternaryService.stating
 public abstract class DatabaseDefinitionService {
 
     public static Table getTable(Class<?> clazz) {
+        if (clazz == null)
+            throw new NullPointerException("Can't get table since its class is null!");
+
         return ifAnnotationIsPresent(clazz, Table.class, clazz.getAnnotation(Table.class));
     }
 

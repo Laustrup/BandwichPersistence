@@ -12,9 +12,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService.getTableColumn;
 import static laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService.getTableColumns;
+import static laustrup.bandwichpersistence.core.services.ClassFieldService.getDeclared;
 import static laustrup.bandwichpersistence.core.services.EternaryService.ifNotNull;
 import static laustrup.bandwichpersistence.core.services.EternaryService.stating;
 
@@ -84,5 +86,26 @@ public abstract class DatabaseColumnService {
                         .then(new AbstractMap.SimpleImmutableEntry<>(field, explicits.get(field)))
                         .orElse(memberToColumnEntry(field))
                 ).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    public static String getIdColumnOf(Class<?> entity) {
+        return Stream.of("id", "_id", "identity", "_identity")
+                .filter(field -> isId(entity, field))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException(String.format(
+                        "Could not find database field id in database field configuration! Class was %s",
+                        entity.getSimpleName()
+                )));
+    }
+
+    private static boolean isId(Class<?> entity, String column) {
+        if (column == null)
+            return false;
+
+        try {
+            return getDeclared(entity, column).getName().equals(column);
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

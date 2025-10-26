@@ -14,8 +14,8 @@ import static laustrup.bandwichpersistence.web.services.WebService.respond;
 @RequestMapping("/artist/")
 public class ArtistController {
 
-    @PostMapping("upsert")
-    public ResponseEntity<Artist.DTO> upsert(@RequestBody Artist.DTO artist) {
-        return respond(() -> ArtistManager.upsert(new Artist(artist)));
-    }
+  @PostMapping("upsert")
+  public ResponseEntity<Artist.DTO> upsert(@RequestBody Artist.DTO artist) {
+    return respond(() -> ArtistManager.upsert(new Artist(artist)));
+  }
 }

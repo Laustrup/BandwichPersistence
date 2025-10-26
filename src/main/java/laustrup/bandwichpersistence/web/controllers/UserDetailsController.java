@@ -16,16 +16,16 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 @RequestMapping("/user_details")
 public class UserDetailsController {
 
-    private final Logger _logger = Logger.getLogger(UserDetailsController.class.getName());
+  private final Logger _logger = Logger.getLogger(UserDetailsController.class.getName());
 
-    @PostMapping("/login")
-    public ResponseEntity<User<? extends User.Id>> login(@RequestBody Login login) {
-        return respond(() -> getUser(login));
-    }
+  @PostMapping("/login")
+  public ResponseEntity<User<? extends User.Id>> login(@RequestBody Login login) {
+    return respond(() -> getUser(login));
+  }
 
-    @ResponseStatus(value = BAD_REQUEST, reason = "Instantiation exception for login!")
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    public void handleException(HttpMessageNotReadableException ex) {
-        _logger.warning(ex.getMessage());
-    }
+  @ResponseStatus(value = BAD_REQUEST, reason = "Instantiation exception for login!")
+  @ExceptionHandler(HttpMessageNotReadableException.class)
+  public void handleException(HttpMessageNotReadableException ex) {
+    _logger.warning(ex.getMessage());
+  }
 }
