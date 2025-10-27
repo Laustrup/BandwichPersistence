@@ -64,8 +64,12 @@ public class EternaryService {
       _success = success;
     }
 
-    public <CANDIDATE> Binder<CANDIDATE> then(CANDIDATE candidate) {
+    public <CANDIDATE> Binder<CANDIDATE> then(Supplier<CANDIDATE> candidate) {
       return new Binder<>(new Operator.Property<>(candidate, _success));
+    }
+
+    public <CANDIDATE> Binder<CANDIDATE> then(CANDIDATE candidate) {
+      return then(() -> candidate);
     }
 
     public <CANDIDATE> CANDIDATE thenElseNull(CANDIDATE element) {
@@ -175,8 +179,8 @@ public class EternaryService {
         _success = success;
       }
 
-      Property(ELEMENT option, boolean success) {
-        this(() -> option, ignored -> success);
+      Property(Supplier<ELEMENT> option, boolean success) {
+        this(option, ignored -> success);
       }
 
       public boolean is_success() {

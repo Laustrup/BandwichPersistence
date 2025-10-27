@@ -6,58 +6,86 @@ import laustrup.bandwichpersistence.core.models.identification.Identity;
 import laustrup.bandwichpersistence.core.models.identification.Signature;
 import laustrup.bandwichpersistence.items.TestItems.Instance;
 import laustrup.bandwichpersistence.items.TestItems.Instances;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
-import java.util.List;
-
-import static laustrup.bandwichpersistence.core.services.ModelService.defineToString;
-import static laustrup.bandwichpersistence.core.services.ModelService.getIds;
 import static laustrup.bandwichpersistence.quality_assurance.Asserter.asserting;
 
 class ModelServiceTests extends BandwichTester {
 
-  @Test
-  void canGetIdsFromToString() {
+  @ParameterizedTest
+  @EnumSource(EqualScenario.class)
+  void canEqual(EqualScenario scenario) {
     test(() -> {
-      List<Instance.Id> expectations = arrange(() -> List.of(
-          Instance.Id.randomize(),
-          Instance.Id.randomize()
-      ));
-      Instance.Id
-          first = expectations.getFirst(),
-          second = expectations.getLast();
-      String toString = defineToString(
-          "Test",
-          first,
-          second,
-          new String[]{"first", "second"},
-          new String[]{first.toString(), second.toString()}
-      );
+      Instance instance = Instance.initialise();
+      Instances instances = arrange(new Instances(instance.Set_active(true), instance.Set_active(false)));
+      Model<Identity<Signature.UUID>, Signature.UUID>
+          first = define(instances.expected(), scenario, 0),
+          second = define(instances.actual(), scenario, 1);
+      boolean expected = scenario.is_expectedTrue();
 
-      List<Instance.Id> actual = act(() -> getIds(toString)
-          .map(id -> new Instance.Id(id.get_value()))
-          .toList()
-      );
+      boolean actual = act(() -> ModelService.equals(first, second));
 
-      for (int i = 0; i < expectations.size(); i++)
-        asserting(actual.get(i))
-            .is(expectations.get(i));
+      asserting(expected)
+          .is(actual);
     });
   }
 
   @Test
-  void canBeEqual() {
+  void canToStringify() {
+    Instance.Id uuid = Instance.Id.randomize();
+    String title = "testTitle";
+    boolean isActive = true;
+    int amount = 9;
+
     test(() -> {
-      Instance instance = Instance.initialise();
-      Instances instances = arrange(new Instances(instance, instance));
-      Model<Identity<Signature.UUID>, Signature.UUID>
-          first = Instance.toModel(instances.expected()),
-          second = Instance.toModel(instances.actual());
+      Instance instance = arrange(new Instance(uuid, title, isActive, amount));
+      String expected = String.format("\n" + """
+          Instance{
+              ids(
+                  _id: %s
+              ), elements(
+                  _title: %s,
+                  _active: %s,
+                  _amount: %s
+              )
+          }""",
+          uuid,
+          title,
+          isActive,
+          amount
+      );
 
-      boolean actual = act(() -> ModelService.equals(first, second));
+      String actual = act(ModelService.toStringify(instance))
+          .replace("\t", "    ");
 
-      asserting(actual)
-          .isTrue();
+      asserting(expected)
+          .is(actual);
     });
+  }
+
+  private Model<Identity<Signature.UUID>, Signature.UUID> define(Instance instance, EqualScenario scenario, int index) {
+    return switch (scenario) {
+      case EQUALS -> Instance.toModel(instance);
+      case NOT_EQUALS -> Instance.toModel(new Instance("Not an Instance"));
+      case FIRST_NULL -> index == 0 ? null : Instance.toModel(instance);
+      case SECOND_NULL -> index == 1 ? null : Instance.toModel(instance);
+      case BOTH_NULL -> null;
+    };
+  }
+
+  @AllArgsConstructor
+  @Getter
+  private enum EqualScenario {
+    EQUALS(true),
+    NOT_EQUALS(false),
+    FIRST_NULL(false),
+    SECOND_NULL(false),
+    BOTH_NULL(true);
+
+    private final boolean _expectedTrue;
   }
 }

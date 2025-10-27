@@ -35,7 +35,10 @@ public interface Signature<VALUE> {
       return _value;
     }
 
-
+    @Override
+    public String toString() {
+      return _value.toString();
+    }
   }
 
   @Slf4j

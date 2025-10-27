@@ -114,6 +114,7 @@ public class TestItems {
   @Table("test_instances")
   public static class Instance {
 
+    @Table.Column(isPrimary = true)
     private Id _id;
 
     private String _title;
@@ -140,6 +141,11 @@ public class TestItems {
 
     public static Instance initialise(Instance instance) {
       return instance == null ? initialise() : new Instance(instance.get_id());
+    }
+
+    public Instance Set_active(boolean active) {
+      _active = active;
+      return this;
     }
 
     public boolean isSameAs(Instance instance) {

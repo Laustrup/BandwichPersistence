@@ -5,15 +5,20 @@ import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.models.identification.Identity;
 import laustrup.bandwichpersistence.core.models.identification.Signature;
 import laustrup.bandwichpersistence.core.models.users.User;
+import laustrup.bandwichpersistence.core.persistence.worm.annotations.Table;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
+import java.lang.reflect.Field;
 import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
+import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService.getTableColumn;
+import static laustrup.bandwichpersistence.core.services.ClassFieldService.getValue;
 import static laustrup.bandwichpersistence.core.services.ObjectService.ifTrue;
 
 @Slf4j
@@ -55,6 +60,32 @@ public class ModelService {
     return defineToString(title, id, null, keys, values);
   }
 
+  public static String toStringify(Object object) {
+    if (object == null)
+      return null;
+
+    return "\n" + object.getClass().getSimpleName() + toStringContent(object, object.getClass().getDeclaredFields());
+  }
+
+  private static String toStringContent(Object object, Field[] fields) {
+    if (fields == null || fields.length == 0)
+      return "{}";
+
+    BiFunction<Table.Column, Boolean, Boolean> filtering = (column, filterPrimary) ->
+        column != null && column.isPrimary() == filterPrimary;
+
+    Function<Boolean, String> build = (isPrimary) -> Arrays.stream(fields)
+      .filter(field -> filtering.apply(getTableColumn(field), isPrimary))
+      .map(field -> String.format("%s: %s", field.getName(), getValue(object, field).orElse("null")))
+      .collect(Collectors.joining(",\n\t\t"));
+
+    return String.format(
+        "{\n\tids(\n\t\t%s\n\t), elements(\n\t\t%s\n\t)\n}",
+        build.apply(true),
+        build.apply(false)
+    );
+  }
+
   public static <SIGNATURE extends Signature<?>> String defineToString(
       String title,
       Identity<SIGNATURE> primaryId,
@@ -85,18 +116,8 @@ public class ModelService {
     return title + "(\n \t" + content + "\n)";
   }
 
-  public static <IDENTITY extends Identity<SIGNATURE>, SIGNATURE extends Signature<?>> Identity.Identifier<Signature<UUID>> getId(Model<IDENTITY, SIGNATURE> model) {
-    return getId(model.toString());
-  }
-
   public static <IDENTITY extends Identity<SIGNATURE>, SIGNATURE extends Signature<?>> Stream<Identity.Identifier<Signature<UUID>>> getIds(Model<IDENTITY, SIGNATURE> model) {
     return getIds(model.toString());
-  }
-
-  public static Identity.Identifier<Signature<UUID>> getId(String toString) {
-    return handleGetIds(toString, false)
-        .findFirst()
-        .orElse(null);
   }
 
   public static Stream<Identity.Identifier<Signature<UUID>>> getIds(String toString) {
@@ -104,7 +125,9 @@ public class ModelService {
   }
 
   public static Stream<Identity.Identifier<Signature<UUID>>> handleGetIds(String toString, boolean isPlural) {
-    if (toString == null || toString.contains("identity=null,"))
+    Stream<String> idlessIndicators = Stream.of("identity: null,", "id: null,");
+
+    if (toString == null || idlessIndicators.anyMatch(toString::contains))
       return Stream.empty();
 
     boolean isValue = false;
@@ -128,6 +151,8 @@ public class ModelService {
         isValue = false;
         if (!isPlural)
           break;
+
+        value.append(separator);
       }
 
       if (isValue)
@@ -140,15 +165,11 @@ public class ModelService {
   }
 
   public static boolean equals(Object object, Object other) {
-    List<Identity.Identifier<Signature<UUID>>>
-        objectIds = getIds(object.toString()).toList(),
-        otherIds = getIds(other.toString()).toList();
+    if (object == null && other == null)
+      return true;
+    if (object == null || other == null)
+      return false;
 
-    return objectIds.stream()
-        .allMatch(id -> otherIds.stream()
-            .anyMatch(identity -> otherIds.stream()
-                .anyMatch(otherId -> otherId.get_signature().get_value().equals(id.get_signature().get_value()))
-            )
-        );
+    return toStringify(object).equals(toStringify(other));
   }
 }
