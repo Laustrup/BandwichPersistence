@@ -43,9 +43,8 @@ public class BandwichEntityDataCollection implements EntityDataCollection {
       ClassDatabaseDefinition.of(Band.class),
       ClassDatabaseDefinition.of(Organisation.Employee.class),
       ClassDatabaseDefinition.of(Organisation.Employee.Role.class),
-      ClassDatabaseDefinition.of(Organisation.Employee.Authority.class),
-      ClassDatabaseDefinition.of(Artist.Authority.class),
-      ClassDatabaseDefinition.of(Authority.class),
+      ClassDatabaseDefinition.of(Organisation.Employee.class, Organisation.Employee.Authority.class, Authority.class),
+      ClassDatabaseDefinition.of(Artist.class, Artist.Authority.class, Authority.class),
       ClassDatabaseDefinition.of(Subscription.class),
       ClassDatabaseDefinition.of(ChatRoom.class),
       ClassDatabaseDefinition.of(Organisation.Employee.class, ChatRoom.class),
@@ -74,12 +73,11 @@ public class BandwichEntityDataCollection implements EntityDataCollection {
     public DatabaseDefinition toDatabaseDefinition() {
       try {
         return stating(classes.size() == 1)
-            .then((DatabaseDefinition) new DatabaseDefinition.Entity(classes.Get(1)))
+            .then(() -> (DatabaseDefinition) new DatabaseDefinition.Entity(classes.Get(1)))
             .or(Property.of(
-                DatabaseDefinition.Conjunction.of(classes.Get(1), classes.Get(2)),
-                entity -> classes.size() == 2
-            ))
-            .orElseThrow(new IllegalArgumentException("Database definition is only allowed to have from 1 -> 2 classes!"));
+                () -> DatabaseDefinition.Conjunction.of(classes.Get(1), classes.Get(2), classes.Get(3)),
+                classes.size() >= 3
+            )).orElseThrow(new IllegalArgumentException("Database definition is only allowed to have from 1 -> 2 classes!"));
       } catch (Exception e) {
         throw new RuntimeException(e);
       }

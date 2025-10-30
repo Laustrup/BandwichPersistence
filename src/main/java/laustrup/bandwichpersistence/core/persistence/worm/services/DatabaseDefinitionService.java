@@ -6,6 +6,7 @@ import laustrup.bandwichpersistence.core.persistence.worm.annotations.Junction;
 import laustrup.bandwichpersistence.core.persistence.worm.annotations.Table;
 import laustrup.bandwichpersistence.core.persistence.worm.models.TableColumnData;
 import laustrup.bandwichpersistence.core.services.ClassFieldService;
+import laustrup.bandwichpersistence.core.services.EternaryService.Operator.Property;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.extern.slf4j.Slf4j;
 
@@ -13,6 +14,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.util.Arrays;
+import java.util.Optional;
 
 import static laustrup.bandwichpersistence.core.persistence.services.DatabaseColumnService.fieldToColumnName;
 import static laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseTableService.*;
@@ -23,7 +25,16 @@ import static laustrup.bandwichpersistence.core.services.EternaryService.stating
 @Slf4j
 public abstract class DatabaseDefinitionService {
 
-  public static Table getTable(Class<?> clazz) {
+  public static Optional<Annotation> get_databaseDefinition(Class<?> clazz) {
+    return stating(clazz.isAnnotationPresent(Table.class))
+        .then(() -> (Annotation) get_table(clazz))
+        .or(Property.of(
+            () -> get_junction(clazz),
+            clazz.isAnnotationPresent(Junction.class)
+        )).orEmpty();
+  }
+
+  public static Table get_table(Class<?> clazz) {
     if (clazz == null)
       throw new NullPointerException("Can't get table since its class is null!");
 
@@ -66,19 +77,37 @@ public abstract class DatabaseDefinitionService {
     return ifAnnotationIsPresent(clazz, Junction.class, clazz.getAnnotation(Junction.class));
   }
 
-  public static String getTableTitle(Class<?> clazz) {
-    return ifNotEmpty(getTable(clazz).value())
+  public static String get_databaseDefinitionTitle(Class<?> clazz) {
+    return ifNotEmpty(handleTitle(clazz))
         .otherwise(defineTableTitle(clazz.getSimpleName()));
+  }
+
+  private static String handleTitle(Class<?> clazz) {
+    Annotation annotation = get_databaseDefinition(clazz)
+        .orElseThrow(() -> new IllegalStateException("Couldn't define database definition for " + clazz.getSimpleName()));
+
+    return stating(annotation.annotationType().equals(Table.class))
+        .then(() -> ((Table) annotation).value())
+        .orElse(() -> ((Junction) annotation).title());
+  }
+
+  private static Table.IdReference handleIdReference(Class<?> clazz) {
+    Annotation annotation = get_databaseDefinition(clazz)
+        .orElseThrow(() -> new IllegalStateException("Couldn't define database definition for " + clazz.getSimpleName()));
+
+    return stating(annotation.annotationType().equals(Table.class))
+        .then(() -> ((Table) annotation).idReference())
+        .orElse(() -> ((Junction) annotation).idReference());
   }
 
   public static String getIdReference(Class<?> entity) {
     if (entity == null)
       return null;
 
-    String idReference = getTable(entity).idReference().value();
+    String idReference = handleIdReference(entity).value();
 
     return defineColumnTitle(ifNotEmpty(idReference)
-        .otherwise(String.join("_", pluralToSingular(getTableTitle(entity)), "id"))
+        .otherwise(String.join("_", pluralToSingular(get_databaseDefinitionTitle(entity)), "id"))
     );
   }
 
@@ -169,8 +198,9 @@ public abstract class DatabaseDefinitionService {
   private static <RETURN> RETURN ifAnnotationIsPresent(Class<?> clazz, Class<? extends Annotation> annotation, RETURN element) {
     if (!clazz.isAnnotationPresent(annotation))
       throw new IllegalStateException(String.format(
-          "Class %s is not annotated with @Table and therefore can't get table!",
-          clazz.getSimpleName()
+          "Class %s is not annotated with @%s and therefore can't get table!",
+          clazz.getSimpleName(),
+          annotation.getSimpleName()
       ));
 
     return element;

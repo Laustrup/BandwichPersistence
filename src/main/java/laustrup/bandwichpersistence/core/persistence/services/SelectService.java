@@ -107,7 +107,7 @@ public abstract class SelectService {
             }
 
             public Properties(Class<?> table, Clausement where) {
-                this(Selections.asterisk(), DatabaseDefinitionService.getTableTitle(table), where, false);
+                this(Selections.asterisk(), DatabaseDefinitionService.get_databaseDefinitionTitle(table), where, false);
             }
 
             public Properties(String table, boolean distinct, Clausement where) {
@@ -231,7 +231,7 @@ public abstract class SelectService {
             }
 
             public static Join inner(Class<?> table, DatabaseField internal, DatabaseField external) {
-                return new Join(Area.INNER, DatabaseDefinitionService.getTableTitle(table), Condition.equals(internal, external));
+                return new Join(Area.INNER, DatabaseDefinitionService.get_databaseDefinitionTitle(table), Condition.equals(internal, external));
             }
 
             @Override

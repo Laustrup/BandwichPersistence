@@ -2,6 +2,8 @@ package laustrup.bandwichpersistence.core.services;
 
 import laustrup.bandwichpersistence.core.utilities.Coollection;
 import laustrup.bandwichpersistence.core.utilities.collections.Liszt;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.experimental.FieldNameConstants;
 
@@ -134,13 +136,23 @@ public class EternaryService {
       _properties = properties;
     }
 
+    public ELEMENT orElse(ELEMENT alternative) {
+      return orElse(() ->  alternative);
+    }
+
     public ELEMENT orElse(Supplier<ELEMENT> action) {
-      return orElse(action.get());
+      return orEmpty()
+          .orElseGet(action);
+    }
+
+    public Optional<ELEMENT> orEmpty() {
+      return findSuccessfulPropertyOption()
+          .map(Supplier::get);
     }
 
     public ELEMENT orElseThrow(Exception exception) throws Exception {
-      Optional<ELEMENT> item = findSuccessfulProperty()
-          .orElse(Optional.empty());
+      Optional<ELEMENT> item = findSuccessfulPropertyOption()
+          .map(Supplier::get);
 
       return exception != null
           ? item.orElseThrow(() -> exception)
@@ -151,13 +163,7 @@ public class EternaryService {
       return orElseThrow(null);
     }
 
-    public ELEMENT orElse(ELEMENT alternative) {
-      return findSuccessfulProperty()
-          .orElse(Optional.ofNullable(alternative))
-          .orElse(null);
-    }
-
-    private Optional<Optional<ELEMENT>> findSuccessfulProperty() {
+    private Optional<Supplier<ELEMENT>> findSuccessfulPropertyOption() {
       return _properties.stream()
           .filter(Property::is_success)
           .map(Property::get_option)
@@ -169,29 +175,42 @@ public class EternaryService {
     }
 
     @FieldNameConstants
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
     public static class Property<ELEMENT> {
 
+      @Getter
       private final Supplier<ELEMENT> _option;
-      private final Predicate<ELEMENT> _success;
+      private final Boolean _success;
+      private final Predicate<ELEMENT> _condition;
 
-      public Property(Supplier<ELEMENT> option, Predicate<ELEMENT> success) {
-        _option = option;
-        _success = success;
+      Property(Supplier<ELEMENT> option, Boolean success) {
+        this(option, success, null);
       }
 
-      Property(Supplier<ELEMENT> option, boolean success) {
-        this(option, ignored -> success);
+      Property(Supplier<ELEMENT> option, Predicate<ELEMENT> condition) {
+        this(option, null, condition);
       }
 
       public boolean is_success() {
-        return _success.test(_option.get());
+        return get_success().orElse(
+            get_condition().map(predication -> predication.test(_option.get()))
+                .orElse(false)
+            );
+      }
+
+      private Optional<Boolean> get_success() {
+        return Optional.ofNullable(_success);
+      }
+
+      private Optional<Predicate<ELEMENT>> get_condition() {
+        return Optional.ofNullable(_condition);
       }
 
       public static <STATIC_ELEMENT> Property<STATIC_ELEMENT> of(
-          STATIC_ELEMENT option,
+          Supplier<STATIC_ELEMENT> option,
           boolean condition
       ) {
-        return new Property<>(() -> option, ignored -> condition);
+        return new Property<>(option, ignored -> condition);
       }
 
       public static <STATIC_ELEMENT> Property<STATIC_ELEMENT> of(
@@ -199,10 +218,6 @@ public class EternaryService {
           Predicate<STATIC_ELEMENT> condition
       ) {
         return new Property<>(() -> option, condition);
-      }
-
-      public Optional<ELEMENT> get_option() {
-        return Optional.ofNullable(_option.get());
       }
     }
   }

@@ -7,6 +7,7 @@ import laustrup.bandwichpersistence.core.models.*;
 import laustrup.bandwichpersistence.core.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.core.models.chats.Request;
 import laustrup.bandwichpersistence.core.models.identification.Signature;
+import laustrup.bandwichpersistence.core.persistence.worm.annotations.Junction;
 import laustrup.bandwichpersistence.core.persistence.worm.annotations.Table;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
@@ -171,7 +172,13 @@ public class Artist extends BusinessUser<Artist.Id> {
             });
     }
 
-    @Table(value = "artist_authorities")
+    @Junction(
+        title = "artist_authorities",
+        entityColumns = {
+            @Table.Column(value = "artist_id"),
+            @Table.Column(value = "authority_id")
+        }
+    )
     public enum Authority implements laustrup.bandwichpersistence.core.models.identification.Authority {
         STANDARD,
         ADMIN

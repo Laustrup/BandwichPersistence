@@ -126,10 +126,8 @@ class EternaryServiceTests extends BandwichTester {
 
   private Property<String> getPropertyFromOption(Binder<String> actual, String option) {
     return actual.get_properties().stream()
-        .filter(property -> property.get_option()
-            .map(propertyOption -> propertyOption.equals(option))
-            .orElse(false)
-        ).findFirst()
+        .filter(property -> property.get_option().get().equals(option))
+        .findFirst()
         .orElseThrow();
   }
 

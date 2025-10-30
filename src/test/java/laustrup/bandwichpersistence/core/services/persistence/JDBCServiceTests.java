@@ -28,64 +28,64 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class JDBCServiceTests extends BandwichTester {
 
-    @ParameterizedTest
-    @CsvSource(value = {
-            "Table.Column" + _delimiter + "table.column",
-            "Table.ColumnTest" + _delimiter + "table.column_test"
-    }, delimiter = _delimiter)
-    void canTranslateToDatabaseColumn(String field, String expectation) {
-        mocked(() -> {
-            arrange(() -> field);
+  @ParameterizedTest
+  @CsvSource(value = {
+      "Table.Column" + _delimiter + "table.column",
+      "Table.ColumnTest" + _delimiter + "table.column_test"
+  }, delimiter = _delimiter)
+  void canTranslateToDatabaseColumn(String field, String expectation) {
+    mocked(() -> {
+      arrange(() -> field);
 
-            String actual = act(() -> toDatabaseColumn(field));
+      String actual = act(() -> toDatabaseColumn(field));
 
-            assertEquals(expectation, actual);
-        });
-    }
+      assertEquals(expectation, actual);
+    });
+  }
 
-    @ParameterizedTest
-    @CsvSource(value = {"true", "false"})
-    void canSetReference(boolean isBinary) {
-        mocked(() -> {
-            ResultSet resultSet = generateResultSet();
-            AtomicReference<String> reference = isBinary ? null : arrange(new AtomicReference<>());
-            AtomicReference<UUID> uuidReference = isBinary ? arrange(AtomicReference::new) : null;
+  @ParameterizedTest
+  @CsvSource(value = {"true", "false"})
+  void canSetReference(boolean isBinary) {
+    mocked(() -> {
+      ResultSet resultSet = generateResultSet();
+      AtomicReference<String> reference = isBinary ? null : arrange(new AtomicReference<>());
+      AtomicReference<UUID> uuidReference = isBinary ? arrange(AtomicReference::new) : null;
 
-            Consumer<AtomicReference<?>> action = atomicReference ->
-                    act(() -> ResultSetService.set(
-                            new Configurations(
-                                    DatabaseField.of(databaseFieldConfiguration(
-                                            Organisation.class,
-                                            isBinary ? Model.Fields._identity : Model.Fields._title
-                                    )),
-                                    resultSet,
-                                    PEEK
-                            ),
-                            atomicReference
-                    ));
-            action.accept(isBinary ? uuidReference : reference);
+      Consumer<AtomicReference<?>> action = atomicReference ->
+          act(() -> ResultSetService.set(
+              new Configurations(
+                  DatabaseField.of(databaseFieldConfiguration(
+                      Organisation.class,
+                      isBinary ? Model.Fields._identity : Model.Fields._title
+                  )),
+                  resultSet,
+                  PEEK
+              ),
+              atomicReference
+          ));
+      action.accept(isBinary ? uuidReference : reference);
 
-            asserting((isBinary ? uuidReference : reference).get())
-                    .isNotNull();
-        });
-    }
+      asserting((isBinary ? uuidReference : reference).get())
+          .isNotNull();
+    });
+  }
 
-    @Test
-    void canBuildMultiple() {
-        mocked(() -> {
-            ResultSet resultSet = generateResultSet();
+  @Test
+  void canBuildMultiple() {
+    mocked(() -> {
+      ResultSet resultSet = generateResultSet();
 
-            var actual = act(build(
-                    resultSet,
-                    () -> OrganisationBuilder.get_instance().combine(
-                            new Seszt<>(),
-                            OrganisationEmployeeBuilder.get_instance().build(resultSet)
-                    )
-            )).findFirst()
-            .orElseThrow();
+      var actual = act(build(
+          resultSet,
+          () -> OrganisationBuilder.get_instance().combine(
+              new Seszt<>(),
+              OrganisationEmployeeBuilder.get_instance().build(resultSet)
+          )
+      )).findFirst()
+          .orElseThrow();
 
-            asserting(actual)
-                    .is(employees -> employees.size() > 1);
-        });
-    }
+      asserting(actual)
+          .is(employees -> employees.size() > 1);
+    });
+  }
 }

@@ -1,6 +1,7 @@
 package laustrup.bandwichpersistence.core.persistence;
 
 import laustrup.bandwichpersistence.core.persistence.worm.models.TableColumnData;
+import laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService;
 
 import java.lang.reflect.Member;
 import java.util.Arrays;
@@ -77,7 +78,7 @@ public record DatabaseField(Table table, Column column) {
             if (column == null)
                 throw new IllegalArgumentException("Column of database field configuration is null");
 
-            _table = getTable(entity);
+            _table = DatabaseDefinitionService.get_table(entity);
 
             if (_table == null)
                 throw new IllegalArgumentException(String.format(
@@ -165,7 +166,7 @@ public record DatabaseField(Table table, Column column) {
         }
 
         public Table(Class<?> clazz) {
-            this(getTableTitle(clazz), toAlias(getTableTitle(clazz)));
+            this(get_databaseDefinitionTitle(clazz), toAlias(get_databaseDefinitionTitle(clazz)));
         }
 
         @Override
