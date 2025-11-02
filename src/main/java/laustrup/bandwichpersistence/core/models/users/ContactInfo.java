@@ -13,18 +13,17 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.FieldNameConstants;
 
-import java.util.Arrays;
-import java.util.Objects;
 import java.util.Set;
 
-import static laustrup.bandwichpersistence.core.services.ModelService.defineToString;
+import static laustrup.bandwichpersistence.core.services.ModelService.toStringify;
 import static laustrup.bandwichpersistence.core.services.ObjectService.ifExists;
 import static laustrup.bandwichpersistence.core.utilities.collections.Seszt.copy;
 
 /**
  * Contains information that people need in order to contact the User.
  */
-@Getter @FieldNameConstants
+@Getter
+@FieldNameConstants
 @Table
 public class ContactInfo {
 
@@ -55,6 +54,7 @@ public class ContactInfo {
 
   /**
    * Will translate a transport object of this object into a construct of this object.
+   *
    * @param contactInfo The transport object to be transformed.
    */
   public ContactInfo(DTO contactInfo) {
@@ -77,6 +77,7 @@ public class ContactInfo {
 
   /**
    * Collects the details of the Address as a one liner String.
+   *
    * @return The collected one liner String of the Address.
    */
   public String getAddressInfo() {
@@ -85,413 +86,454 @@ public class ContactInfo {
 
   public static class Id extends CommonIdentity<Signature.UUID> {
 
+    public Id(Signature.UUID signature) {
+      super(signature);
+    }
+
+    public Id(java.util.UUID signature) {
+      super(new Signature.UUID(signature));
+    }
+
+    @Override
+    public Class<?> getOwnerClassType() {
+      return ContactInfo.class;
+    }
+  }
+
+  @Override
+  public String toString() {
+    return toStringify(this);
+  }
+
+  /**
+   * Contains values that determines address attributes.
+   */
+  @Setter
+  @Getter
+  @Table
+  @FieldNameConstants
+  public static class Address {
+
+    private Id _id;
+
+    /**
+     * The street and street number.
+     */
+    private String _street;
+
+    /**
+     * The floor, if in an apartment, also include left or right.
+     */
+    private String _floor;
+
+    private String _municipality;
+
+    /**
+     * Some digits describing the city.
+     */
+    private String _zip;
+
+    /**
+     * The city of the postal.
+     */
+    private String _city;
+
+    /**
+     * Converts into this DTO Object.
+     *
+     * @param address The Object to be converted.
+     */
+    public Address(DTO address) {
+      this(
+          new Id(ifExists(address, DTO::getId)),
+          ifExists(address, DTO::getStreet),
+          ifExists(address, DTO::getFloor),
+          ifExists(address, DTO::getMunicipality),
+          ifExists(address, DTO::getZip),
+          ifExists(address, DTO::getCity)
+      );
+    }
+
+    public Address(Id id, String street, String floor, String municipality, String zip, String city) {
+      _id = id;
+      _street = street;
+      _floor = floor;
+      _municipality = municipality;
+      _zip = zip;
+      _city = city;
+    }
+
+    public static class Id extends CommonIdentity<Signature.UUID> {
+
       public Id(Signature.UUID signature) {
-            super(signature);
-        }
+        super(signature);
+      }
 
-        public Id(java.util.UUID signature) {
-            super(new Signature.UUID(signature));
-        }
+      public Id(java.util.UUID signature) {
+        super(new Signature.UUID(signature));
+      }
 
-        @Override
-        public Class<?> getOwnerClassType() {
-            return ContactInfo.class;
-        }
+      @Override
+      public Class<?> getOwnerClassType() {
+        return Address.class;
+      }
     }
 
     @Override
     public String toString() {
-        return defineToString(
-            getClass().getSimpleName(),
-            get_id(),
-            new String[] {
-                Model.Fields._identity,
-                Fields._email,
-                Fields._address,
-                Fields._phones,
-                Fields._country
-            },
-            new String[] {
-                String.valueOf(get_id()),
-                get_email(),
-                get_address().toString(),
-                get_phones().toString(),
-                get_country().toString()
-            }
-        );
+      return toStringify(this);
     }
-
-    /**
-     * Contains values that determines address attributes.
-     */
-    @Setter @Getter @Table @FieldNameConstants
-    public static class Address {
-
-        private Id _id;
-
-        /**
-         * The street and street number.
-         */
-        private String _street;
-
-        /**
-         * The floor, if in an apartment, also include left or right.
-         */
-        private String _floor;
-
-        private String _municipality;
-
-        /**
-         * Some digits describing the city.
-         */
-        private String _zip;
-
-        /**
-         * The city of the postal.
-         */
-        private String _city;
-
-        /**
-         * Converts into this DTO Object.
-         * @param address The Object to be converted.
-         */
-        public Address(DTO address) {
-            this(
-                    new Id(ifExists(address, DTO::getId)),
-                    ifExists(address, DTO::getStreet),
-                    ifExists(address, DTO::getFloor),
-                    ifExists(address, DTO::getMunicipality),
-                    ifExists(address, DTO::getZip),
-                    ifExists(address, DTO::getCity)
-            );
-        }
-
-        public Address(Id id, String street, String floor, String municipality, String zip, String city) {
-            _id = id;
-            _street = street;
-            _floor = floor;
-            _municipality = municipality;
-            _zip = zip;
-            _city = city;
-        }
-
-        public static class Id extends CommonIdentity<Signature.UUID> {
-
-            public Id(Signature.UUID signature) {
-                super(signature);
-            }
-
-            public Id(java.util.UUID signature) {
-                super(new Signature.UUID(signature));
-            }
-
-            @Override
-            public Class<?> getOwnerClassType() {
-                return Address.class;
-            }
-        }
-
-        @Override
-        public String toString() {
-            return String.join(", ", Arrays.stream(new String[] {
-                    get_street(),
-                    get_floor(),
-                    get_municipality(),
-                    get_zip(),
-                    get_city()
-            }).filter(Objects::nonNull).toList());
-        }
-
-        /**
-         * The Data Transfer Object.
-         * Is meant to be used as having common fields and be the body of Requests and Responses.
-         * Doesn't have any logic.
-         */
-        @Getter @FieldNameConstants
-        public static class DTO {
-
-            private java.util.UUID id;
-
-            /** The street and street number. */
-            private String street;
-
-            /** The floor, if in an apartment, also include left or right. */
-            private String floor;
-
-            private String municipality;
-
-            /** Some digits describing the city. */
-            private String zip;
-
-            /** The city of the postal. */
-            private String city;
-
-            @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
-            public DTO(
-                    @JsonProperty java.util.UUID id,
-                    @JsonProperty String street,
-                    @JsonProperty String floor,
-                    @JsonProperty String municipality,
-                    @JsonProperty String zip,
-                    @JsonProperty String city
-            ) {
-                this.id = id;
-                this.street = street;
-                this.floor = floor;
-                this.municipality = municipality;
-                this.zip = zip;
-                this.city = city;
-            }
-
-            /**
-             * Converts into this DTO Object.
-             * @param address The Object to be converted.
-             */
-            public DTO(Address address) {
-                this(
-                        address.get_id().get_value(),
-                        address.get_street(),
-                        address.get_floor(),
-                        address.get_municipality(),
-                        address.get_zip(),
-                        address.get_city()
-                );
-            }
-        }
-    }
-
-    /**
-     * An object with information about a curtain Country.
-     */
-    @Getter @ToString @Table @FieldNameConstants
-    public static class Country {
-
-        private Id _id;
-
-        /**
-         * The name of the Country.
-         */
-        private String _title;
-
-        /**
-         * The value of the first few digits of a phone number.
-         */
-        private String _code;
-
-        /**
-         * Will translate a transport object of this object into a construct of this object.
-         * @param country The transport object to be transformed.
-         */
-        public Country(Country.DTO country) {
-            this(new Id(country.getId()), country.getTitle(), country.getCode());
-        }
-
-        public Country(Id id, String title, String code) {
-            _id = id;
-            _title = title;
-            _code = code;
-        }
-
-        public static class Id extends CommonIdentity<Signature.UUID> {
-
-            public Id(Signature.UUID signature) {
-                super(signature);
-            }
-
-            public Id(java.util.UUID signature) {
-                super(new Signature.UUID(signature));
-            }
-
-            @Override
-            public Class<Country> getOwnerClassType() {
-                return Country.class;
-            }
-        }
-
-        /**
-         * The Data Transfer Object.
-         * Is meant to be used as having common fields and be the body of Requests and Responses.
-         * Doesn't have any logic.
-         */
-        @Getter @Setter @FieldNameConstants
-        public static class DTO {
-
-            private java.util.UUID id;
-
-            /** The name of the Country. */
-            private String title;
-
-            /** The value of the first few digits of a phone number. */
-            private String code;
-
-            @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
-            public DTO(
-                    @JsonProperty java.util.UUID id,
-                    @JsonProperty String title,
-                    @JsonProperty String code
-            ) {
-                this.id = id;
-                this.title = title;
-                this.code = code;
-            }
-
-            /**
-             * Converts into this DTO Object.
-             * @param country The Object to be converted.
-             */
-            public DTO(Country country) {
-                this(
-                        country.get_id().get_value(),
-                        country.get_title(),
-                        country.get_code()
-                );
-            }
-        }
-    }
-
-    /**
-     * Details about phone contacting information.
-     */
-    @Getter @ToString @Table @FieldNameConstants
-    public static class Phone {
-
-        /**
-         * A country object, that represents the nationality of this PhoneNumber.
-         */
-        @Setter
-        private int _countryDigits;
-
-        /**
-         * The contact numbers for the Phone.
-         */
-        @Setter
-        private long _numbers;
-
-        /**
-         * True if the number is for a mobile.
-         */
-        private boolean _mobile;
-
-        private boolean _business;
-
-        /**
-         * Will translate a transport object of this object into a construct of this object.
-         * @param phone The transport object to be transformed.
-         */
-        public Phone(DTO phone) {
-            this(
-                    phone.getCountryDigits(),
-                    phone.getNumbers(),
-                    phone.isMobile(),
-                    phone.isBusiness()
-            );
-        }
-
-        public Phone(int countryDigits, long numbers, boolean mobile, boolean business) {
-            _countryDigits = countryDigits;
-            _numbers = numbers;
-            _mobile = mobile;
-            _business = business;
-        }
-
-        /**
-         * The Data Transfer Object.
-         * Is meant to be used as having common fields and be the body of Requests and Responses.
-         * Doesn't have any logic.
-         */
-        @Getter @Setter @FieldNameConstants
-        public static class DTO {
-
-            /** A country object, that represents the nationality of this PhoneNumber. */
-            private int countryDigits;
-
-            /** The contact numbers for the Phone. */
-            private long numbers;
-
-            /** True if the number is for a mobile. */
-            private boolean isMobile;
-
-            private boolean isBusiness;
-
-            @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
-            public DTO(
-                    @JsonProperty int countryDigits,
-                    @JsonProperty long numbers,
-                    @JsonProperty boolean isMobile,
-                    @JsonProperty boolean isBusiness
-            ) {
-                this.countryDigits = countryDigits;
-                this.numbers = numbers;
-                this.isMobile = isMobile;
-                this.isBusiness = isBusiness;
-            }
-
-            /**
-             * Converts into this DTO Object.
-             * @param phone The Object to be converted.
-             */
-            public DTO(Phone phone) {
-                this(
-                        phone.get_countryDigits(),
-                        phone.get_numbers(),
-                        phone.is_mobile(),
-                        phone.is_business()
-                );
-            }
-        }
-    }
-
 
     /**
      * The Data Transfer Object.
      * Is meant to be used as having common fields and be the body of Requests and Responses.
      * Doesn't have any logic.
      */
-    @Getter @Setter @FieldNameConstants
-    @JsonIgnoreProperties(ignoreUnknown = true)
+    @Getter
+    @FieldNameConstants
     public static class DTO {
 
-        private java.util.UUID id;
+      private java.util.UUID id;
 
-        /** The email that the User wants to be contacted through outside the application. */
-        private String email;
+      /**
+       * The street and street number.
+       */
+      private String street;
 
-        /** A Phone object that is used to have information about how to contact the User through Phone. */
-        private Set<Phone.DTO> phones;
+      /**
+       * The floor, if in an apartment, also include left or right.
+       */
+      private String floor;
 
-        /** An Address object with info about the location of the User. */
-        private Address.DTO address;
+      private String municipality;
 
-        /** A Country object for the information of which Country the User is living in. */
-        private Country.DTO country;
+      /**
+       * Some digits describing the city.
+       */
+      private String zip;
 
-        @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
-        public DTO(
-                @JsonProperty(Model.ModelDTO.Fields.id) java.util.UUID id,
-                @JsonProperty(ContactInfo.DTO.Fields.email) String email,
-                @JsonProperty(ContactInfo.DTO.Fields.phones) Set<Phone.DTO> phones,
-                @JsonProperty(ContactInfo.DTO.Fields.address) Address.DTO address,
-                @JsonProperty(ContactInfo.DTO.Fields.country) Country.DTO country
-        ) {
-            this.id = id;
-            this.email = email;
-            this.phones = phones;
-            this.address = address;
-            this.country = country;
-        }
+      /**
+       * The city of the postal.
+       */
+      private String city;
 
-        /**
-         * Converts into this DTO Object.
-         * @param contactInfo The Object to be converted.
-         */
-        public DTO(ContactInfo contactInfo) {
-            this(
-                    contactInfo.get_id().get_value(),
-                    contactInfo.get_email(),
-                    contactInfo.get_phones().asSet(Phone.DTO::new),
-                    new Address.DTO(contactInfo.get_address()),
-                    new Country.DTO(contactInfo.get_country())
-            );
-        }
+      @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
+      public DTO(
+          @JsonProperty java.util.UUID id,
+          @JsonProperty String street,
+          @JsonProperty String floor,
+          @JsonProperty String municipality,
+          @JsonProperty String zip,
+          @JsonProperty String city
+      ) {
+        this.id = id;
+        this.street = street;
+        this.floor = floor;
+        this.municipality = municipality;
+        this.zip = zip;
+        this.city = city;
+      }
+
+      /**
+       * Converts into this DTO Object.
+       *
+       * @param address The Object to be converted.
+       */
+      public DTO(Address address) {
+        this(
+            address.get_id().get_value(),
+            address.get_street(),
+            address.get_floor(),
+            address.get_municipality(),
+            address.get_zip(),
+            address.get_city()
+        );
+      }
     }
+  }
+
+  /**
+   * An object with information about a curtain Country.
+   */
+  @Getter
+  @ToString
+  @Table
+  @FieldNameConstants
+  public static class Country {
+
+    private Id _id;
+
+    /**
+     * The name of the Country.
+     */
+    private String _title;
+
+    /**
+     * The value of the first few digits of a phone number.
+     */
+    private String _code;
+
+    /**
+     * Will translate a transport object of this object into a construct of this object.
+     *
+     * @param country The transport object to be transformed.
+     */
+    public Country(Country.DTO country) {
+      this(new Id(country.getId()), country.getTitle(), country.getCode());
+    }
+
+    public Country(Id id, String title, String code) {
+      _id = id;
+      _title = title;
+      _code = code;
+    }
+
+    public static class Id extends CommonIdentity<Signature.UUID> {
+
+      public Id(Signature.UUID signature) {
+        super(signature);
+      }
+
+      public Id(java.util.UUID signature) {
+        super(new Signature.UUID(signature));
+      }
+
+      @Override
+      public Class<Country> getOwnerClassType() {
+        return Country.class;
+      }
+    }
+
+    /**
+     * The Data Transfer Object.
+     * Is meant to be used as having common fields and be the body of Requests and Responses.
+     * Doesn't have any logic.
+     */
+    @Getter
+    @Setter
+    @FieldNameConstants
+    public static class DTO {
+
+      private java.util.UUID id;
+
+      /**
+       * The name of the Country.
+       */
+      private String title;
+
+      /**
+       * The value of the first few digits of a phone number.
+       */
+      private String code;
+
+      @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
+      public DTO(
+          @JsonProperty java.util.UUID id,
+          @JsonProperty String title,
+          @JsonProperty String code
+      ) {
+        this.id = id;
+        this.title = title;
+        this.code = code;
+      }
+
+      /**
+       * Converts into this DTO Object.
+       *
+       * @param country The Object to be converted.
+       */
+      public DTO(Country country) {
+        this(
+            country.get_id().get_value(),
+            country.get_title(),
+            country.get_code()
+        );
+      }
+    }
+  }
+
+  /**
+   * Details about phone contacting information.
+   */
+  @Getter
+  @ToString
+  @Table
+  @FieldNameConstants
+  public static class Phone {
+
+    @Table.Column(isPrimary = true)
+    public Id _id;
+
+    /**
+     * A country object, that represents the nationality of this PhoneNumber.
+     */
+    @Setter
+    private int _countryDigits;
+
+    /**
+     * The contact numbers for the Phone.
+     */
+    @Setter
+    private long _numbers;
+
+    /**
+     * True if the number is for a mobile.
+     */
+    private boolean _mobile;
+
+    private boolean _business;
+
+    /**
+     * Will translate a transport object of this object into a construct of this object.
+     *
+     * @param phone The transport object to be transformed.
+     */
+    public Phone(DTO phone) {
+      this(
+          phone.getCountryDigits(),
+          phone.getNumbers(),
+          phone.isMobile(),
+          phone.isBusiness()
+      );
+    }
+
+    public Phone(int countryDigits, long numbers, boolean mobile, boolean business) {
+      _countryDigits = countryDigits;
+      _numbers = numbers;
+      _mobile = mobile;
+      _business = business;
+    }
+
+    public static class Id extends CommonIdentity<Signature.UUID> {
+
+      public Id(Signature.UUID identifier) {
+        super(identifier);
+      }
+
+      @Override
+      public Class<?> getOwnerClassType() {
+        return Phone.class;
+      }
+    }
+
+    /**
+     * The Data Transfer Object.
+     * Is meant to be used as having common fields and be the body of Requests and Responses.
+     * Doesn't have any logic.
+     */
+    @Getter
+    @Setter
+    @FieldNameConstants
+    public static class DTO {
+
+      /**
+       * A country object, that represents the nationality of this PhoneNumber.
+       */
+      private int countryDigits;
+
+      /**
+       * The contact numbers for the Phone.
+       */
+      private long numbers;
+
+      /**
+       * True if the number is for a mobile.
+       */
+      private boolean isMobile;
+
+      private boolean isBusiness;
+
+      @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
+      public DTO(
+          @JsonProperty int countryDigits,
+          @JsonProperty long numbers,
+          @JsonProperty boolean isMobile,
+          @JsonProperty boolean isBusiness
+      ) {
+        this.countryDigits = countryDigits;
+        this.numbers = numbers;
+        this.isMobile = isMobile;
+        this.isBusiness = isBusiness;
+      }
+
+      /**
+       * Converts into this DTO Object.
+       *
+       * @param phone The Object to be converted.
+       */
+      public DTO(Phone phone) {
+        this(
+            phone.get_countryDigits(),
+            phone.get_numbers(),
+            phone.is_mobile(),
+            phone.is_business()
+        );
+      }
+    }
+  }
+
+
+  /**
+   * The Data Transfer Object.
+   * Is meant to be used as having common fields and be the body of Requests and Responses.
+   * Doesn't have any logic.
+   */
+  @Getter
+  @Setter
+  @FieldNameConstants
+  @JsonIgnoreProperties(ignoreUnknown = true)
+  public static class DTO {
+
+    private java.util.UUID id;
+
+    /**
+     * The email that the User wants to be contacted through outside the application.
+     */
+    private String email;
+
+    /**
+     * A Phone object that is used to have information about how to contact the User through Phone.
+     */
+    private Set<Phone.DTO> phones;
+
+    /**
+     * An Address object with info about the location of the User.
+     */
+    private Address.DTO address;
+
+    /**
+     * A Country object for the information of which Country the User is living in.
+     */
+    private Country.DTO country;
+
+    @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
+    public DTO(
+        @JsonProperty(Model.ModelDTO.Fields.id) java.util.UUID id,
+        @JsonProperty(ContactInfo.DTO.Fields.email) String email,
+        @JsonProperty(ContactInfo.DTO.Fields.phones) Set<Phone.DTO> phones,
+        @JsonProperty(ContactInfo.DTO.Fields.address) Address.DTO address,
+        @JsonProperty(ContactInfo.DTO.Fields.country) Country.DTO country
+    ) {
+      this.id = id;
+      this.email = email;
+      this.phones = phones;
+      this.address = address;
+      this.country = country;
+    }
+
+    /**
+     * Converts into this DTO Object.
+     *
+     * @param contactInfo The Object to be converted.
+     */
+    public DTO(ContactInfo contactInfo) {
+      this(
+          contactInfo.get_id().get_value(),
+          contactInfo.get_email(),
+          contactInfo.get_phones().asSet(Phone.DTO::new),
+          new Address.DTO(contactInfo.get_address()),
+          new Country.DTO(contactInfo.get_country())
+      );
+    }
+  }
 }

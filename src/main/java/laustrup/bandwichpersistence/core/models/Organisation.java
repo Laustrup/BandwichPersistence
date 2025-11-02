@@ -11,6 +11,7 @@ import laustrup.bandwichpersistence.core.models.users.BusinessUser;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
 import laustrup.bandwichpersistence.core.persistence.worm.annotations.Junction;
 import laustrup.bandwichpersistence.core.persistence.worm.annotations.Table;
+import laustrup.bandwichpersistence.core.services.ModelService;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
 import lombok.experimental.FieldNameConstants;
@@ -152,9 +153,9 @@ public class Organisation extends Model<Organisation.Id, Signature.UUID> {
   @FieldNameConstants
   public static class Employee extends BusinessUser<Employee.Id> {
 
-    private Seszt<Role> _roles;
+    private final Seszt<Role> _roles;
 
-    private Seszt<Authority> _authorities;
+    private final Seszt<Authority> _authorities;
 
     public Employee(DTO employee) {
       this(
@@ -239,6 +240,11 @@ public class Organisation extends Model<Organisation.Id, Signature.UUID> {
     public enum Authority implements laustrup.bandwichpersistence.core.models.identification.Authority {
       STANDARD,
       ADMIN
+    }
+
+    @Override
+    public String toString() {
+      return ModelService.toStringify(this);
     }
 
     @Getter

@@ -15,61 +15,61 @@ import java.util.List;
 @FieldNameConstants
 public class Login implements UserDetails {
 
-    private String username;
+  private String username;
 
-    private String password;
+  private String password;
 
-    private User<? extends User.Id> user;
+  private User<? extends User.Id> user;
 
-    @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
-    public Login(
-            @JsonProperty String username,
-            @JsonProperty String password
-    ) {
-        this.username = username;
-        this.password = password;
-    }
+  @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
+  public Login(
+      @JsonProperty String username,
+      @JsonProperty String password
+  ) {
+    this.username = username;
+    this.password = password;
+  }
 
-    @Override
-    //TODO Create service to get authorities
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
-    }
+  @Override
+  //TODO Create service to get authorities
+  public Collection<? extends GrantedAuthority> getAuthorities() {
+    return List.of();
+  }
 
-    public User<? extends User.Id> setUser(User<? extends User.Id> user) {
-        if (user != null && user.get_contactInfo() != null && user.get_contactInfo().get_email().equals(username))
-            this.user = user;
+  public User<? extends User.Id> setUser(User<? extends User.Id> user) {
+    if (user != null && user.get_contactInfo() != null && user.get_contactInfo().get_email().equals(username))
+      this.user = user;
 
-        return this.user;
-    }
+    return this.user;
+  }
 
-    @Override
-    public String getPassword() {
-        return password;
-    }
+  @Override
+  public String getPassword() {
+    return password;
+  }
 
-    @Override
-    public String getUsername() {
-        return username;
-    }
+  @Override
+  public String getUsername() {
+    return username;
+  }
 
-    @Override
-    public boolean isAccountNonExpired() {
-        return UserDetails.super.isAccountNonExpired();
-    }
+  @Override
+  public boolean isAccountNonExpired() {
+    return UserDetails.super.isAccountNonExpired();
+  }
 
-    @Override
-    public boolean isAccountNonLocked() {
-        return UserDetails.super.isAccountNonLocked();
-    }
+  @Override
+  public boolean isAccountNonLocked() {
+    return UserDetails.super.isAccountNonLocked();
+  }
 
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return UserDetails.super.isCredentialsNonExpired();
-    }
+  @Override
+  public boolean isCredentialsNonExpired() {
+    return UserDetails.super.isCredentialsNonExpired();
+  }
 
-    @Override
-    public boolean isEnabled() {
-        return UserDetails.super.isEnabled();
-    }
+  @Override
+  public boolean isEnabled() {
+    return UserDetails.super.isEnabled();
+  }
 }

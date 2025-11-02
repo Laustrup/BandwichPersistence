@@ -109,6 +109,10 @@ public abstract class DatabaseDefinitionService {
     )).orElseNull();
   }
 
+  public static boolean isIdless(Class<?> clazz) {
+    return ifAnnotationIsPresent(clazz, Table.class, clazz.getAnnotation(Table.class).idLess());
+  }
+
   private static Table.IdReference handleIdReference(Class<?> clazz) {
     Annotation annotation = get_databaseDefinition(clazz)
         .orElseThrow(() -> new IllegalStateException("Couldn't define database definition for " + clazz.getSimpleName()));

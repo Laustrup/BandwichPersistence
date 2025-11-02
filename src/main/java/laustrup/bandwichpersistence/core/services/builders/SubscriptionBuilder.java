@@ -7,31 +7,31 @@ import java.util.UUID;
 
 public class SubscriptionBuilder extends BuilderService<Subscription> {
 
-    private static SubscriptionBuilder _instance;
+  private static SubscriptionBuilder _instance;
 
-    public static SubscriptionBuilder get_instance() {
-        if (_instance == null)
-            _instance = new SubscriptionBuilder();
+  public static SubscriptionBuilder get_instance() {
+    if (_instance == null)
+      _instance = new SubscriptionBuilder();
 
-        return _instance;
-    }
+    return _instance;
+  }
 
-    private SubscriptionBuilder() {
+  private SubscriptionBuilder() {
 
-    }
+  }
 
-    @Override
-    protected void completion(Subscription reference, Subscription object) {
+  @Override
+  protected void completion(Subscription reference, Subscription object) {
 
-    }
+  }
 
-    @Override
-    protected Subscription construct() {
-        return new Subscription(
-                new Subscription.Id((UUID) get_field(Model.Fields._identity)),
-                get_field(Subscription.Fields._status),
-                get_field(Subscription.Fields._kind),
-                get_field(Subscription.Fields._userType)
-        );
-    }
+  @Override
+  protected Subscription construct() {
+    return new Subscription(
+        new Subscription.Id((UUID) get_field(Model.Fields._identity)),
+        get_field(Subscription.Fields._status),
+        get_field(Subscription.Fields._kind),
+        get_field(Subscription.Fields._userType)
+    );
+  }
 }

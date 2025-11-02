@@ -148,7 +148,7 @@ public class EternaryService {
     }
 
     public ELEMENT orElse(ELEMENT alternative) {
-      return orElse(() ->  alternative);
+      return orElse(() -> alternative);
     }
 
     public ELEMENT orElse(Supplier<ELEMENT> action) {
@@ -206,7 +206,7 @@ public class EternaryService {
         return get_success().orElse(
             get_condition().map(predication -> predication.test(_option.get()))
                 .orElse(false)
-            );
+        );
       }
 
       private Optional<Boolean> get_success() {

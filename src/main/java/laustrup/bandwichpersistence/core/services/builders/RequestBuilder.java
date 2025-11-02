@@ -4,32 +4,32 @@ import laustrup.bandwichpersistence.core.models.chats.Request;
 
 public class RequestBuilder extends BuilderService<Request> {
 
-    private static RequestBuilder _instance;
+  private static RequestBuilder _instance;
 
-    public static RequestBuilder get_instance() {
-        if (_instance == null)
-            _instance = new RequestBuilder();
+  public static RequestBuilder get_instance() {
+    if (_instance == null)
+      _instance = new RequestBuilder();
 
-        return _instance;
-    }
+    return _instance;
+  }
 
-    private RequestBuilder() {
+  private RequestBuilder() {
 
-    }
+  }
 
-    @Override
-    protected void completion(Request reference, Request object) {
+  @Override
+  protected void completion(Request reference, Request object) {
 
-    }
+  }
 
-    @Override
-    protected Request construct() {
-        return new Request(
-                get_field(Request.Fields._receiverId),
-                get_field(Request.Fields._senderId),
-                get_field(Request.Fields._event),
-                get_field(Request.Fields._approved),
-                get_field(Request.Fields._timestamp)
-        );
-    }
+  @Override
+  protected Request construct() {
+    return new Request(
+        get_field(Request.Fields._receiverId),
+        get_field(Request.Fields._senderId),
+        get_field(Request.Fields._event),
+        get_field(Request.Fields._approved),
+        get_field(Request.Fields._timestamp)
+    );
+  }
 }

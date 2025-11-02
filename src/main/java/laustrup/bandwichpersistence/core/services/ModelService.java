@@ -75,9 +75,9 @@ public class ModelService {
         column != null && column.isPrimary() == filterPrimary;
 
     Function<Boolean, String> build = (isPrimary) -> Arrays.stream(fields)
-      .filter(field -> filtering.apply(getTableColumn(field), isPrimary))
-      .map(field -> String.format("%s: %s", field.getName(), getValue(object, field).orElse("null")))
-      .collect(Collectors.joining(",\n\t\t"));
+        .filter(field -> filtering.apply(getTableColumn(field), isPrimary))
+        .map(field -> String.format("%s: %s", field.getName(), getValue(object, field).orElse("null")))
+        .collect(Collectors.joining(",\n\t\t"));
 
     return String.format(
         "{\n\tids(\n\t\t%s\n\t), elements(\n\t\t%s\n\t)\n}",
@@ -160,7 +160,7 @@ public class ModelService {
     }
 
     return Arrays.stream(value.toString()
-        .split(separator))
+            .split(separator))
         .map(string -> Identity.Identifier.of(Signature.UUID.fromString(string)));
   }
 

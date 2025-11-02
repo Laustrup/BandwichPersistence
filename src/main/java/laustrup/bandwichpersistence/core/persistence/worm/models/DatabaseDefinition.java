@@ -34,7 +34,7 @@ public interface DatabaseDefinition {
 
   Where.Condition joinOf(DatabaseDefinition external);
 
-  Map.Entry<EntityDataCollection.Key, DatabaseDefinition> toEntry();
+  Map.Entry<String, DatabaseDefinition> toEntry();
 
   default DatabaseField get_databaseField(Member member) {
     return get_columns().get(member);
@@ -103,8 +103,8 @@ public interface DatabaseDefinition {
     }
 
     @Override
-    public Map.Entry<EntityDataCollection.Key, DatabaseDefinition> toEntry() {
-      return new AbstractMap.SimpleImmutableEntry<>(new EntityDataCollection.Key(get_class()), this);
+    public Map.Entry<String, DatabaseDefinition> toEntry() {
+      return new AbstractMap.SimpleImmutableEntry<>(new EntityDataCollection.Key(get_class()).get(), this);
     }
   }
 
@@ -173,8 +173,8 @@ public interface DatabaseDefinition {
     }
 
     @Override
-    public Map.Entry<EntityDataCollection.Key, DatabaseDefinition> toEntry() {
-      return new AbstractMap.SimpleImmutableEntry<>(get_collectionKey(), this);
+    public Map.Entry<String, DatabaseDefinition> toEntry() {
+      return new AbstractMap.SimpleImmutableEntry<>(get_collectionKey().get(), this);
     }
 
     @Override

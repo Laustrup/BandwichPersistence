@@ -35,7 +35,7 @@ public class BandwichEntityDataCollection implements EntityDataCollection {
 
   }
 
-  public static final Map<Key, DatabaseDefinition> DEFINITIONS = defineDefinitions(
+  public static final Map<String, DatabaseDefinition> DEFINITIONS = defineDefinitions(
       ClassDatabaseDefinition.of(ContactInfo.class),
       ClassDatabaseDefinition.of(ContactInfo.Phone.class),
       ClassDatabaseDefinition.of(ContactInfo.Address.class),
@@ -52,14 +52,14 @@ public class BandwichEntityDataCollection implements EntityDataCollection {
       ClassDatabaseDefinition.of(Band.Membership.class)
   );
 
-  private static Map<Key, DatabaseDefinition> defineDefinitions(ClassDatabaseDefinition... classDatabaseDefinitions) {
+  private static Map<String, DatabaseDefinition> defineDefinitions(ClassDatabaseDefinition... classDatabaseDefinitions) {
     return collectMap(Arrays.stream(classDatabaseDefinitions)
         .map(databaseDefinition -> databaseDefinition.toDatabaseDefinition().toEntry())
     );
   }
 
   @Override
-  public Map<Key, DatabaseDefinition> getAll() {
+  public Map<String, DatabaseDefinition> getAll() {
     return DEFINITIONS;
   }
 

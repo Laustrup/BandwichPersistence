@@ -4,29 +4,29 @@ import laustrup.bandwichpersistence.core.models.Login;
 
 public class LoginBuilder extends BuilderService<Login> {
 
-    private static LoginBuilder _instance;
+  private static LoginBuilder _instance;
 
-    public static LoginBuilder get_instance() {
-        if (_instance == null)
-            _instance = new LoginBuilder();
+  public static LoginBuilder get_instance() {
+    if (_instance == null)
+      _instance = new LoginBuilder();
 
-        return _instance;
-    }
+    return _instance;
+  }
 
-    private LoginBuilder() {
+  private LoginBuilder() {
 
-    }
+  }
 
-    @Override
-    protected void completion(Login reference, Login object) {
+  @Override
+  protected void completion(Login reference, Login object) {
 
-    }
+  }
 
-    @Override
-    protected Login construct() {
-        return new Login(
-                get_field(Login.Fields.username),
-                get_field(Login.Fields.password)
-        );
-    }
+  @Override
+  protected Login construct() {
+    return new Login(
+        get_field(Login.Fields.username),
+        get_field(Login.Fields.password)
+    );
+  }
 }

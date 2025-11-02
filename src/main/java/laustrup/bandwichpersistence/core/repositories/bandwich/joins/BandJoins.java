@@ -8,13 +8,13 @@ import static laustrup.bandwichpersistence.core.repositories.bandwich.BandwichCo
 
 public class BandJoins {
 
-    public static final Join
-            LEFT_BAND_MEMBERSHIP_TO_ARTIST = left(BAND_MEMBERSHIP, ARTIST),
-            LEFT_BAND_TO_BAND_MEMBERSHIP = left(BAND, BAND_MEMBERSHIP);
+  public static final Join
+      LEFT_BAND_MEMBERSHIP_TO_ARTIST = left(BAND_MEMBERSHIP, ARTIST),
+      LEFT_BAND_TO_BAND_MEMBERSHIP = left(BAND, BAND_MEMBERSHIP);
 
-    public static final Seszt<Join>
-            LEFT_BAND_TO_BAND_MEMBERSHIP_FULL = Seszt.of(
-                    LEFT_BAND_MEMBERSHIP_TO_ARTIST,
-                    LEFT_BAND_TO_BAND_MEMBERSHIP
-            );
+  public static final Seszt<Join>
+      LEFT_BAND_TO_BAND_MEMBERSHIP_FULL = Seszt.of(
+      LEFT_BAND_MEMBERSHIP_TO_ARTIST,
+      LEFT_BAND_TO_BAND_MEMBERSHIP
+  );
 }

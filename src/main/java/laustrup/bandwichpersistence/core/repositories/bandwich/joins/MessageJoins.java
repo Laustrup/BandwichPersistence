@@ -8,6 +8,6 @@ import static laustrup.bandwichpersistence.core.repositories.bandwich.BandwichCo
 
 public class MessageJoins {
 
-    public static final Join
-            LEFT_TO_CHAT_ROOM = left(MESSAGE, CHAT_ROOM);
+  public static final Join
+      LEFT_TO_CHAT_ROOM = left(MESSAGE, CHAT_ROOM);
 }

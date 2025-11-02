@@ -20,235 +20,235 @@ import static java.sql.ResultSet.TYPE_SCROLL_INSENSITIVE;
 @Slf4j
 public class DatabaseManager {
 
-    public static DatabaseResponse read(Query query) {
-        return handle(query, Action.READ);
+  public static DatabaseResponse read(Query query) {
+    return handle(query, Action.READ);
+  }
+
+  public static DatabaseResponse read(Query query, DatabaseParameter parameter) {
+    return read(query, Stream.of(parameter));
+  }
+
+  public static DatabaseResponse read(Query query, Stream<DatabaseParameter> databaseParameters) {
+    return handle(query, Action.READ, databaseParameters);
+  }
+
+  public static DatabaseResponse create(Query query) {
+    return handle(query, Action.CREATE);
+  }
+
+  public static DatabaseResponse create(Query query, Stream<DatabaseParameter> parameters) {
+    return handle(query, Action.CREATE, parameters);
+  }
+
+  private static DatabaseResponse handle(Query query, Action action) {
+    try {
+      return execute(query, action);
+    } catch (SQLException e) {
+      return null;
+    }
+  }
+
+  private static DatabaseResponse handle(
+      Query query,
+      Action action,
+      Stream<DatabaseParameter> parameters
+  ) {
+    try {
+      return execute(query, action, parameters);
+    } catch (SQLException e) {
+      return null;
+    }
+  }
+
+  public static DatabaseResponse execute(Query query, Action action) throws SQLException {
+    return execute(query, action, Objects.requireNonNull(DatabaseLibrary.get_connectionString()));
+  }
+
+  public static DatabaseResponse execute(Query query, Action action, String url) throws SQLException {
+    return execute(query, action, new ArrayList<>().stream().map(datum -> (DatabaseParameter) datum), url);
+  }
+
+  public static DatabaseResponse execute(Query query, Action action, Stream<DatabaseParameter> parameters) throws SQLException {
+    return execute(query, action, parameters, Objects.requireNonNull(DatabaseLibrary.get_connectionString()));
+  }
+
+  public static DatabaseResponse execute(Query query, Action action, DatabaseParameter parameter) {
+    return execute(query, action, parameter, Objects.requireNonNull(DatabaseLibrary.get_connectionString()));
+  }
+
+  public static DatabaseResponse execute(
+      Query query,
+      Action action,
+      DatabaseParameter parameter,
+      String url
+  ) {
+    return execute(query, action, Stream.of(parameter), url);
+  }
+
+  public static DatabaseResponse execute(
+      Query query,
+      Action action,
+      Stream<DatabaseParameter> parameters,
+      String url
+  ) {
+    Exception exception = null;
+    PreparedStatement preparedStatement = null;
+
+    try {
+      preparedStatement = prepareStatement(
+          query,
+          action,
+          parameters,
+          url
+      );
+
+      switch (action) {
+        case READ -> preparedStatement.executeQuery();
+        case CREATE, UPDATE, DELETE, CUD -> preparedStatement.executeUpdate();
+        default -> preparedStatement.execute();
+      }
+    } catch (Exception e) {
+      exception = e;
     }
 
-    public static DatabaseResponse read(Query query, DatabaseParameter parameter) {
-        return read(query, Stream.of(parameter));
-    }
+    return new DatabaseResponse(
+        preparedStatement,
+        query,
+        exception
+    );
+  }
 
-    public static DatabaseResponse read(Query query, Stream<DatabaseParameter> databaseParameters) {
-        return handle(query, Action.READ, databaseParameters);
-    }
+  private static String prepareTransaction(String sql) {
+    boolean insertSemicolon = !sql
+        .replace(" ", "")
+        .replace("\n", "")
+        .endsWith(";");
 
-    public static DatabaseResponse create(Query query) {
-        return handle(query, Action.CREATE);
-    }
+    return DatabaseLibrary.isH2InMemory() ? sql : /*language=mysql*/
+        "\nstart transaction;\n\n" +
+            sql +
+            (insertSemicolon ? ";" : "") +
+            "\ncommit;";
+  }
 
-    public static DatabaseResponse create(Query query, Stream<DatabaseParameter> parameters) {
-        return handle(query, Action.CREATE, parameters);
-    }
+  private static PreparedStatement prepareStatement(
+      Query query,
+      Action action,
+      Stream<DatabaseParameter> parameters,
+      String url
+  ) {
+    PreparedStatement preparedStatement;
 
-    private static DatabaseResponse handle(Query query, Action action) {
-        try {
-            return execute(query, action);
-        } catch (SQLException e) {
-            return null;
-        }
-    }
+    try {
+      int keyIndex = 0,
+          parameterIndex = 1;
 
-    private static DatabaseResponse handle(
-            Query query,
-            Action action,
-            Stream<DatabaseParameter> parameters
-    ) {
-        try {
-            return execute(query, action, parameters);
-        } catch (SQLException e) {
-            return null;
-        }
-    }
+      Map<String, DatabaseParameter> parametersByKey = parameters
+          .collect(Collectors.toMap(DatabaseParameter::get_key, parameter -> parameter));
+      String script = prepareScript(query.get_script(), action);
 
-    public static DatabaseResponse execute(Query query, Action action) throws SQLException {
-        return execute(query, action, Objects.requireNonNull(DatabaseLibrary.get_connectionString()));
-    }
+      for (char character : script.toCharArray()) {
+        if (character == Query.get_identifier()) {
+          String key = script.substring(
+              keyIndex,
+              script.indexOf(Query.get_endExpression(), keyIndex)
+          ) + Query.get_endExpression();
+          DatabaseParameter parameter = parametersByKey.get(key);
 
-    public static DatabaseResponse execute(Query query, Action action, String url) throws SQLException {
-        return execute(query, action, new ArrayList<>().stream().map(datum -> (DatabaseParameter) datum), url);
-    }
+          if (parameter == null) {
+            String message = "Unknown parameter: " + key;
+            log.error(message);
+            throw new IllegalArgumentException(message);
+          }
 
-    public static DatabaseResponse execute(Query query, Action action, Stream<DatabaseParameter> parameters) throws SQLException {
-        return execute(query, action, parameters, Objects.requireNonNull(DatabaseLibrary.get_connectionString()));
-    }
-
-    public static DatabaseResponse execute(Query query, Action action, DatabaseParameter parameter) {
-        return execute(query, action, parameter, Objects.requireNonNull(DatabaseLibrary.get_connectionString()));
-    }
-
-    public static DatabaseResponse execute(
-            Query query,
-            Action action,
-            DatabaseParameter parameter,
-            String url
-    ) {
-        return execute(query, action, Stream.of(parameter), url);
-    }
-
-    public static DatabaseResponse execute(
-            Query query,
-            Action action,
-            Stream<DatabaseParameter> parameters,
-            String url
-    ){
-        Exception exception = null;
-        PreparedStatement preparedStatement = null;
-
-        try {
-            preparedStatement = prepareStatement(
-                    query,
-                    action,
-                    parameters,
-                    url
-            );
-
-            switch (action) {
-                case READ -> preparedStatement.executeQuery();
-                case CREATE, UPDATE, DELETE, CUD -> preparedStatement.executeUpdate();
-                default -> preparedStatement.execute();
-            }
-        } catch (Exception e) {
-            exception = e;
-        }
-
-        return new DatabaseResponse(
-                preparedStatement,
-                query,
-                exception
-        );
-    }
-
-    private static String prepareTransaction(String sql) {
-        boolean insertSemicolon = !sql
-                .replace(" ", "")
-                .replace("\n", "")
-                .endsWith(";");
-
-        return DatabaseLibrary.isH2InMemory() ? sql : /*language=mysql*/
-                "\nstart transaction;\n\n" +
-                        sql +
-                        (insertSemicolon ? ";" : "") +
-                        "\ncommit;";
-    }
-
-    private static PreparedStatement prepareStatement(
-            Query query,
-            Action action,
-            Stream<DatabaseParameter> parameters,
-            String url
-    ) {
-        PreparedStatement preparedStatement;
-
-        try {
-            int keyIndex = 0,
-                parameterIndex = 1;
-
-            Map<String, DatabaseParameter> parametersByKey = parameters
-                    .collect(Collectors.toMap(DatabaseParameter::get_key, parameter -> parameter));
-            String script = prepareScript(query.get_script(), action);
-
-            for (char character : script.toCharArray()) {
-                if (character == Query.get_identifier()) {
-                    String key = script.substring(
-                            keyIndex,
-                            script.indexOf(Query.get_endExpression(), keyIndex)
-                    ) + Query.get_endExpression();
-                    DatabaseParameter parameter = parametersByKey.get(key);
-
-                    if (parameter == null) {
-                        String message = "Unknown parameter: " + key;
-                        log.error(message);
-                        throw new IllegalArgumentException(message);
-                    }
-
-                    parameter.get_indexes().add(parameterIndex);
-                    parameterIndex++;
-                }
-
-                keyIndex++;
-            }
-
-            Map<Integer, DatabaseParameter> databaseParametersByIndex = new HashMap<>();
-            for (DatabaseParameter parameter : parametersByKey.values()) {
-                script = script.replace(parameter.get_key(), "?");
-                for (Integer databaseParameterIndex : parameter.get_indexes())
-                    databaseParametersByIndex.put(databaseParameterIndex, parameter);
-            }
-
-            long inputCount = script.chars().filter(character -> character == '?').count();
-            if (databaseParametersByIndex.size() != inputCount) {
-                throw new IllegalArgumentException(String.format("""
-                        Issue when preparing query:
-                        %n%s
-                        
-                        Amount of inputs are %s and parameters to input are %s.
-                        """,
-                        script,
-                        inputCount,
-                        databaseParametersByIndex.size()
-                ));
-            }
-
-            preparedStatement = Objects
-                    .requireNonNull(DatabaseGate.getConnection(url))
-                    .prepareStatement(script, TYPE_SCROLL_INSENSITIVE, CONCUR_READ_ONLY);
-
-            for (Integer key : databaseParametersByIndex.keySet()) {
-                DatabaseParameter parameter = databaseParametersByIndex.get(key);
-
-                if (parameter.get_type() != null)
-                    preparedStatement.setObject(key, parameter.get_value(), parameter.get_type());
-                else
-                    preparedStatement.setObject(key, parameter.get_value());
-            }
-        } catch (Exception exception) {
-            throw new RuntimeException(exception);
+          parameter.get_indexes().add(parameterIndex);
+          parameterIndex++;
         }
 
-        return preparedStatement;
+        keyIndex++;
+      }
+
+      Map<Integer, DatabaseParameter> databaseParametersByIndex = new HashMap<>();
+      for (DatabaseParameter parameter : parametersByKey.values()) {
+        script = script.replace(parameter.get_key(), "?");
+        for (Integer databaseParameterIndex : parameter.get_indexes())
+          databaseParametersByIndex.put(databaseParameterIndex, parameter);
+      }
+
+      long inputCount = script.chars().filter(character -> character == '?').count();
+      if (databaseParametersByIndex.size() != inputCount) {
+        throw new IllegalArgumentException(String.format("""
+                Issue when preparing query:
+                %n%s
+                
+                Amount of inputs are %s and parameters to input are %s.
+                """,
+            script,
+            inputCount,
+            databaseParametersByIndex.size()
+        ));
+      }
+
+      preparedStatement = Objects
+          .requireNonNull(DatabaseGate.getConnection(url))
+          .prepareStatement(script, TYPE_SCROLL_INSENSITIVE, CONCUR_READ_ONLY);
+
+      for (Integer key : databaseParametersByIndex.keySet()) {
+        DatabaseParameter parameter = databaseParametersByIndex.get(key);
+
+        if (parameter.get_type() != null)
+          preparedStatement.setObject(key, parameter.get_value(), parameter.get_type());
+        else
+          preparedStatement.setObject(key, parameter.get_value());
+      }
+    } catch (Exception exception) {
+      throw new RuntimeException(exception);
     }
 
-    private static String prepareScript(String script, Action action) {
-        return action != Action.READ
-                ? prepareTransaction(script)
-                : script;
-    }
+    return preparedStatement;
+  }
 
-    public enum Action {
-        /**
-         * Used when only row(s) are inserted.
-         * Executes the executeUpdate().
-         */
-        CREATE,
-        /**
-         * Used when only reading and no mutation is meant to happen.
-         * Executes the executeQuery().
-         */
-        READ,
-        /**
-         * Used when only row(s) are updated.
-         * Executes the executeUpdate().
-         */
-        UPDATE,
-        /**
-         * Used when only row(s) are removed.
-         * Executes the executeUpdate().
-         */
-        DELETE,
-        /**
-         * Used when row(s) are either inserted, updated or deleted.
-         * Executes the executeUpdate().
-         */
-        CUD,
-        /**
-         * Used when migrating a sql script to the database within the schema.
-         * Executes the execute().
-         */
-        MIGRATION,
-        /**
-         * Used when operating in the root level of directives.
-         * Executes the execute().
-         */
-        ROOT_PATH
-    }
+  private static String prepareScript(String script, Action action) {
+    return action != Action.READ
+        ? prepareTransaction(script)
+        : script;
+  }
+
+  public enum Action {
+    /**
+     * Used when only row(s) are inserted.
+     * Executes the executeUpdate().
+     */
+    CREATE,
+    /**
+     * Used when only reading and no mutation is meant to happen.
+     * Executes the executeQuery().
+     */
+    READ,
+    /**
+     * Used when only row(s) are updated.
+     * Executes the executeUpdate().
+     */
+    UPDATE,
+    /**
+     * Used when only row(s) are removed.
+     * Executes the executeUpdate().
+     */
+    DELETE,
+    /**
+     * Used when row(s) are either inserted, updated or deleted.
+     * Executes the executeUpdate().
+     */
+    CUD,
+    /**
+     * Used when migrating a sql script to the database within the schema.
+     * Executes the execute().
+     */
+    MIGRATION,
+    /**
+     * Used when operating in the root level of directives.
+     * Executes the execute().
+     */
+    ROOT_PATH
+  }
 }

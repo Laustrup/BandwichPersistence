@@ -9,11 +9,11 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Junction {
 
-    String title();
+  String title();
 
-    Table.IdReference idReference() default @Table.IdReference;
+  Table.IdReference idReference() default @Table.IdReference;
 
-    Table.Column[] entityColumns();
+  Table.Column[] entityColumns();
 
-    Table.Column[] additionalColumns() default {};
+  Table.Column[] additionalColumns() default {};
 }

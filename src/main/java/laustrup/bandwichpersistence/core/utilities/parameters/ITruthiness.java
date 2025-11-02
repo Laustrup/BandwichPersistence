@@ -6,6 +6,7 @@ package laustrup.bandwichpersistence.core.utilities.parameters;
  */
 public interface ITruthiness {
 
-    boolean randomize();
-    boolean randomize(int change);
+  boolean randomize();
+
+  boolean randomize(int change);
 }

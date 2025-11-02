@@ -10,26 +10,26 @@ import java.util.logging.Logger;
 
 public class DatabaseLibraryRepository {
 
-    private static Logger _logger = Logger.getLogger(DatabaseLibraryRepository.class.getSimpleName());
+  private static Logger _logger = Logger.getLogger(DatabaseLibraryRepository.class.getSimpleName());
 
-    public static void createSchemaIfNotExists(String schema) {
-        try {
-            DatabaseManager.execute(
-                    DatabaseLibraryQueries.createSchemaIfNotExists(schema),
-                    DatabaseManager.Action.ROOT_PATH,
-                    DatabaseLibrary.get_rootConnectionString(true)
-            );
-        } catch (SQLException e) {
-            _logger.log(
-                    Level.CONFIG,
-                    String.format("""
-                            Error when trying to create schema "%s" when setting up database.
-                            """,
-                            schema
-                    ),
-                    e
-            );
-            throw new RuntimeException(e);
-        }
+  public static void createSchemaIfNotExists(String schema) {
+    try {
+      DatabaseManager.execute(
+          DatabaseLibraryQueries.createSchemaIfNotExists(schema),
+          DatabaseManager.Action.ROOT_PATH,
+          DatabaseLibrary.get_rootConnectionString(true)
+      );
+    } catch (SQLException e) {
+      _logger.log(
+          Level.CONFIG,
+          String.format("""
+                  Error when trying to create schema "%s" when setting up database.
+                  """,
+              schema
+          ),
+          e
+      );
+      throw new RuntimeException(e);
     }
+  }
 }

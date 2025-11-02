@@ -7,30 +7,30 @@ import java.util.UUID;
 
 public class CountryBuilder extends BuilderService<ContactInfo.Country> {
 
-    private static CountryBuilder _instance;
+  private static CountryBuilder _instance;
 
-    public static CountryBuilder get_instance() {
-        if (_instance == null)
-            _instance = new CountryBuilder();
+  public static CountryBuilder get_instance() {
+    if (_instance == null)
+      _instance = new CountryBuilder();
 
-        return _instance;
-    }
+    return _instance;
+  }
 
-    private CountryBuilder() {
+  private CountryBuilder() {
 
-    }
+  }
 
-    @Override
-    protected void completion(ContactInfo.Country reference, ContactInfo.Country object) {
+  @Override
+  protected void completion(ContactInfo.Country reference, ContactInfo.Country object) {
 
-    }
+  }
 
-    @Override
-    protected ContactInfo.Country construct() {
-        return new ContactInfo.Country(
-                new ContactInfo.Country.Id((UUID) get_field(Model.Fields._identity)),
-                get_field(ContactInfo.Country.Fields._title),
-                get_field(ContactInfo.Country.Fields._code)
-        );
-    }
+  @Override
+  protected ContactInfo.Country construct() {
+    return new ContactInfo.Country(
+        new ContactInfo.Country.Id((UUID) get_field(Model.Fields._identity)),
+        get_field(ContactInfo.Country.Fields._title),
+        get_field(ContactInfo.Country.Fields._code)
+    );
+  }
 }

@@ -7,6 +7,6 @@ import static laustrup.bandwichpersistence.core.repositories.bandwich.BandwichCo
 
 public class SubscriptionJoins {
 
-    public static final Join
-            LEFT_SUBSCRIPTION = left(SUBSCRIPTION, ARTIST, ORGANISATION_EMPLOYEE);
+  public static final Join
+      LEFT_SUBSCRIPTION = left(SUBSCRIPTION, ARTIST, ORGANISATION_EMPLOYEE);
 }

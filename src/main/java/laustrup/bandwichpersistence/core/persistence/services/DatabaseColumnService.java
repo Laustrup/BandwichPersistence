@@ -14,98 +14,100 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService.getTableColumn;
-import static laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService.getTableColumns;
+import static laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService.*;
 import static laustrup.bandwichpersistence.core.services.ClassFieldService.getDeclared;
 import static laustrup.bandwichpersistence.core.services.EternaryService.ifNotNull;
 import static laustrup.bandwichpersistence.core.services.EternaryService.stating;
 
 public abstract class DatabaseColumnService {
 
-    public static boolean fieldIsEqualToColumn(Field field, Table.Column column) {
-        return field.isAnnotationPresent(Table.Column.class) &&
-                getTableColumn(field.getDeclaringClass(), field.getName()).equals(column);
+  public static boolean fieldIsEqualToColumn(Field field, Table.Column column) {
+    return field.isAnnotationPresent(Table.Column.class) &&
+        getTableColumn(field.getDeclaringClass(), field.getName()).equals(column);
+  }
+
+  public static String fieldToColumnName(String... fields) {
+    return fieldToColumnName(String.join("_", fields));
+  }
+
+  public static String fieldToColumnName(String field) {
+    if (field == null)
+      return null;
+
+    if (field.charAt(0) == '_')
+      field = field.substring(1);
+
+    for (int i = 0; i < field.length(); i++) {
+      char character = field.charAt(i);
+
+      if (Character.isUpperCase(character)) {
+        field = field.replace(String.valueOf(character), (i != 0 ? "_" : "") + Character.toLowerCase(character));
+        if (i != 0)
+          i++;
+      }
     }
 
-    public static String fieldToColumnName(String... fields) {
-        return fieldToColumnName(String.join("_", fields));
+    return field;
+  }
+
+  public static AbstractMap.SimpleImmutableEntry<Field, DatabaseField> memberToColumnEntry(Field field) {
+    return new AbstractMap.SimpleImmutableEntry<>(field, DatabaseField.of(field));
+  }
+
+  public static Map<? extends Member, DatabaseField> get_columns(Class<?> clazz) {
+    if (clazz == null)
+      return null;
+    if (clazz.getDeclaredFields().length == 0)
+      return new HashMap<>();
+
+    Function<Field, String> fieldsMapKey = field -> stating(field.isAnnotationPresent(Table.Column.class))
+        .then(ifNotNull(field.getAnnotation(Table.Column.class))
+            .get(Table.Column::value)
+            .orElse(null)
+        ).orElse(field.getName());
+    Map<String, Field> fields = Arrays.stream(clazz.getDeclaredFields())
+        .collect(Collectors.toMap(fieldsMapKey, Function.identity()));
+
+    Map<Field, DatabaseField> explicits = getTableColumns(clazz).stream()
+        .filter(column -> column.value() != null && !column.value().isEmpty())
+        .collect(Collectors.toMap(
+            column -> fields.get(column.value()),
+            column -> DatabaseField.of(TableColumnData.of(clazz, column).member())
+        ));
+
+    return Arrays.stream(clazz.getDeclaredFields())
+        .filter(field -> stating(field.isAnnotationPresent(Table.Column.class))
+            .then(!ifNotNull(field.getAnnotation(Table.ExcludedColumn.class))
+                .then(true)
+                .orElse(false))
+            .orElse(true)
+        ).map(field -> stating(explicits.containsKey(field))
+            .then(new AbstractMap.SimpleImmutableEntry<>(field, explicits.get(field)))
+            .orElse(memberToColumnEntry(field))
+        ).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+  }
+
+  public static String getIdColumnOf(Class<?> entity) {
+    if (isIdless(entity))
+      return null;
+
+    return Stream.of("id", "_id", "identity", "_identity")
+        .filter(field -> isId(entity, field))
+        .findFirst()
+        .orElseThrow(() -> new RuntimeException(String.format(
+            "Could not find database field id in database field configuration! Class was %s",
+            entity.getSimpleName()
+        )));
+  }
+
+  private static boolean isId(Class<?> entity, String column) {
+    if (column == null)
+      return false;
+
+    try {
+      return getDeclared(entity, column).getName().equals(column);
+    } catch (Exception e) {
+      return false;
     }
-
-    public static String fieldToColumnName(String field) {
-        if (field == null)
-            return null;
-
-        if (field.charAt(0) == '_')
-            field = field.substring(1);
-
-        for (int i = 0; i < field.length(); i++) {
-            char character = field.charAt(i);
-
-            if (Character.isUpperCase(character)) {
-                field = field.replace(String.valueOf(character), (i != 0 ? "_" : "") + Character.toLowerCase(character));
-                if (i != 0)
-                    i++;
-            }
-        }
-
-        return field;
-    }
-
-    public static AbstractMap.SimpleImmutableEntry<Field, DatabaseField> memberToColumnEntry(Field field) {
-        return new AbstractMap.SimpleImmutableEntry<>(field, DatabaseField.of(field));
-    }
-
-    public static Map<? extends Member, DatabaseField> get_columns(Class<?> clazz) {
-        if (clazz == null)
-            return null;
-        if (clazz.getDeclaredFields().length == 0)
-            return new HashMap<>();
-
-        Function<Field, String> fieldsMapKey = field -> stating(field.isAnnotationPresent(Table.Column.class))
-                .then(ifNotNull(field.getAnnotation(Table.Column.class))
-                        .get(Table.Column::value)
-                        .orElse(null)
-                ).orElse(field.getName());
-        Map<String, Field> fields = Arrays.stream(clazz.getDeclaredFields())
-                .collect(Collectors.toMap(fieldsMapKey, Function.identity()));
-
-        Map<Field, DatabaseField> explicits = getTableColumns(clazz).stream()
-                .filter(column -> column.value() != null && !column.value().isEmpty())
-                .collect(Collectors.toMap(
-                        column -> fields.get(column.value()),
-                        column -> DatabaseField.of(TableColumnData.of(clazz, column).member())
-                ));
-
-        return Arrays.stream(clazz.getDeclaredFields())
-                .filter(field -> stating(field.isAnnotationPresent(Table.Column.class))
-                        .then(!ifNotNull(field.getAnnotation(Table.ExcludedColumn.class))
-                                .then(true)
-                                .orElse(false))
-                        .orElse(true)
-                ).map(field -> stating(explicits.containsKey(field))
-                        .then(new AbstractMap.SimpleImmutableEntry<>(field, explicits.get(field)))
-                        .orElse(memberToColumnEntry(field))
-                ).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-    }
-
-    public static String getIdColumnOf(Class<?> entity) {
-        return Stream.of("id", "_id", "identity", "_identity")
-                .filter(field -> isId(entity, field))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException(String.format(
-                        "Could not find database field id in database field configuration! Class was %s",
-                        entity.getSimpleName()
-                )));
-    }
-
-    private static boolean isId(Class<?> entity, String column) {
-        if (column == null)
-            return false;
-
-        try {
-            return getDeclared(entity, column).getName().equals(column);
-        } catch (Exception e) {
-            return false;
-        }
-    }
+  }
 }

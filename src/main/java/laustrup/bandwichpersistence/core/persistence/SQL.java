@@ -1,6 +1,6 @@
 package laustrup.bandwichpersistence.core.persistence;
 
 public enum SQL {
-    MySQL,
-    H2
+  MySQL,
+  H2
 }

@@ -9,9 +9,9 @@ import static laustrup.bandwichpersistence.core.repositories.bandwich.BandwichCo
 
 public class ArtistJoins {
 
-    public static final Join
-            LEFT_ARTIST_TO_CONTACT_INFO = left(ARTIST, CHAT_ROOM);
+  public static final Join
+      LEFT_ARTIST_TO_CONTACT_INFO = left(ARTIST, CHAT_ROOM);
 
-    public static final Seszt<Join>
-            LEFT_ARTIST_TO_CONTACT_INFO_FULL = Seszt.of(LEFT_ARTIST_TO_CONTACT_INFO);
+  public static final Seszt<Join>
+      LEFT_ARTIST_TO_CONTACT_INFO_FULL = Seszt.of(LEFT_ARTIST_TO_CONTACT_INFO);
 }

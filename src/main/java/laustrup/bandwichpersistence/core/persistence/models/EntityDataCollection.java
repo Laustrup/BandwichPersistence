@@ -15,7 +15,7 @@ public interface EntityDataCollection {
   }
 
   default DatabaseDefinition get(Key key) {
-    DatabaseDefinition data = getAll().get(key);
+    DatabaseDefinition data = getAll().get(key.get());
 
     if (data == null)
       throw new NullPointerException("Entity key " + key + " has no data");
@@ -23,14 +23,14 @@ public interface EntityDataCollection {
     return data;
   }
 
-  Map<Key, DatabaseDefinition> getAll();
+  Map<String, DatabaseDefinition> getAll();
 
   default DatabaseDefinition.Entity entityOf(Class<?> entity) {
-    return (DatabaseDefinition.Entity) getAll().get(new Key(entity));
+    return (DatabaseDefinition.Entity) getAll().get(new Key(entity).get());
   }
 
   default DatabaseDefinition.Conjunction conjunctionOf(Class<?> target, Class<?> common) {
-    return (DatabaseDefinition.Conjunction) getAll().get(new Key(target, common));
+    return (DatabaseDefinition.Conjunction) getAll().get(new Key(target, common).get());
   }
 
   class Key {
@@ -42,7 +42,7 @@ public interface EntityDataCollection {
 
     public Key(Class<?> clazz) {
       _class = clazz;
-      _name = clazz.getSimpleName();
+      _name = clazz.getName();
     }
 
     public Key(Class<?> target, Class<?> common) {
@@ -60,16 +60,18 @@ public interface EntityDataCollection {
     }
 
     public String get() {
-      return stating(get_class().isPresent())
-          .then(_class.getSimpleName())
+      Optional<Class<?>>  clazz = get_class();
+
+      return stating(clazz.isPresent())
+          .then(() -> clazz.map(Class::getName).orElse(null))
           .orElse(_name);
     }
 
     public static String conjunctionKey(Class<?> target, Class<?> common) {
       return String.join(
           "_",
-          target.getSimpleName(),
-          common.getSimpleName()
+          target.getName(),
+          common.getName()
       );
     }
 

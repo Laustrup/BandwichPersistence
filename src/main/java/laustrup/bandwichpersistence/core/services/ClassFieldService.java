@@ -79,7 +79,8 @@ public class ClassFieldService {
     try {
       field.setAccessible(true);
       value = (RETURN) field.get(object);
-    } catch (Exception ignored) {}
+    } catch (Exception ignored) {
+    }
 
     field.setAccessible(isAccessible);
 

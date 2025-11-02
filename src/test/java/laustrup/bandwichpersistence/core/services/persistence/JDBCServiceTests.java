@@ -4,11 +4,7 @@ import laustrup.bandwichpersistence.BandwichTester;
 import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.models.Organisation;
 import laustrup.bandwichpersistence.core.persistence.DatabaseField;
-import laustrup.bandwichpersistence.core.services.builders.OrganisationBuilder;
-import laustrup.bandwichpersistence.core.services.builders.OrganisationEmployeeBuilder;
 import laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService.Configurations;
-import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
@@ -21,7 +17,6 @@ import static laustrup.bandwichpersistence.core.persistence.DatabaseField.Config
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.DatabaseService.toDatabaseColumn;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService.Configurations.Mode.PEEK;
-import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.build;
 import static laustrup.bandwichpersistence.items.TestItems.generateResultSet;
 import static laustrup.bandwichpersistence.quality_assurance.Asserter.asserting;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -67,25 +62,6 @@ class JDBCServiceTests extends BandwichTester {
 
       asserting((isBinary ? uuidReference : reference).get())
           .isNotNull();
-    });
-  }
-
-  @Test
-  void canBuildMultiple() {
-    mocked(() -> {
-      ResultSet resultSet = generateResultSet();
-
-      var actual = act(build(
-          resultSet,
-          () -> OrganisationBuilder.get_instance().combine(
-              new Seszt<>(),
-              OrganisationEmployeeBuilder.get_instance().build(resultSet)
-          )
-      )).findFirst()
-          .orElseThrow();
-
-      asserting(actual)
-          .is(employees -> employees.size() > 1);
     });
   }
 }

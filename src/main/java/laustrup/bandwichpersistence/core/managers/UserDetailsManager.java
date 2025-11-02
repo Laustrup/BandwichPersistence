@@ -26,65 +26,67 @@ import static org.springframework.http.HttpStatus.OK;
 
 public class UserDetailsManager {
 
-    private static final Logger _logger = Logger.getLogger(UserDetailsManager.class.getName());
+  private static final Logger _logger = Logger.getLogger(UserDetailsManager.class.getName());
 
-    private static final UserBuilder _userBuilder = UserBuilder.get_instance();
+  private static final UserBuilder _userBuilder = UserBuilder.get_instance();
 
-    public static UserDetails getUserDetails(String email) {
-        return databaseInteraction(() ->
-                UserBuilder.buildLogins(UserDetailsRepository.getUserDetailsByEmail(email))
-                        .findFirst()
-                        .orElse(null)
-        );
-    }
+  public static UserDetails getUserDetails(String email) {
+    return databaseInteraction(() ->
+        UserBuilder.buildLogins(UserDetailsRepository.getUserDetailsByEmail(email))
+            .findFirst()
+            .orElse(null)
+    );
+  }
 
-    public static Response<User<? extends User.Id>> getUser(Login login) {
-        return databaseInteraction(() -> {
-            User<? extends User.Id> user = null;
-            HttpStatus status = OK;
+  public static Response<User<? extends User.Id>> getUser(Login login) {
+    return databaseInteraction(() -> {
+      User<? extends User.Id> user = null;
+      HttpStatus status = OK;
 
-            try {
-                user = _userBuilder.build(passwordFits(
-                        UserDetailsRepository.getUserByEmail(login),
-                        login.getPassword()
-                ));
-            } catch (IllegalArgumentException exception) {
-                status = HttpStatus.UNAUTHORIZED;
-                _logger.warning(exception.getMessage());
-            } catch (Exception exception) {
-                status = HttpStatus.INTERNAL_SERVER_ERROR;
-                _logger.warning(exception.getMessage());
-            }
+      try {
+        user = _userBuilder.build(passwordFits(
+            UserDetailsRepository.getUserByEmail(login),
+            login.getPassword()
+        ));
+      } catch (IllegalArgumentException exception) {
+        status = HttpStatus.UNAUTHORIZED;
+        _logger.warning(exception.getMessage());
+      } catch (Exception exception) {
+        status = HttpStatus.INTERNAL_SERVER_ERROR;
+        _logger.warning(exception.getMessage());
+      }
 
-            return new Response<>(user, status);
-        });
-    }
+      return new Response<>(user, status);
+    });
+  }
 
-    private static ResultSet passwordFits(ResultSet resultSet, String password) {
-        Subscription.UserType userType = Subscription.UserType.valueOf(getUserType(resultSet));
+  private static ResultSet passwordFits(ResultSet resultSet, String password) {
+    Subscription.UserType userType = Subscription.UserType.valueOf(getUserType(resultSet));
 
-        if (matches(password, get(
-                new Configurations(DatabaseField.of(switch (userType) {
-                    case ARTIST -> getDeclared(Artist.class, User.Fields._password);
-                    case ORGANISATION_EMPLOYEE -> getDeclared(Organisation.Employee.class, User.Fields._password);
-                    case PARTICIPANT -> getDeclared(Participant.class, User.Fields._password);
-                }), resultSet, PEEK),
-                String.class
-        )))
-            return resultSet;
-        else
-            throw new IllegalArgumentException("password does not match");
-    }
+    if (matches(password, get(
+            new Configurations(DatabaseField.of(switch (userType) {
+              case ARTIST -> getDeclared(Artist.class, User.Fields._password);
+              case ORGANISATION_EMPLOYEE -> getDeclared(Organisation.Employee.class, User.Fields._password);
+              case PARTICIPANT -> getDeclared(Participant.class, User.Fields._password);
+            }), resultSet, PEEK
+            ),
+            String.class
+        )
+    ))
+      return resultSet;
+    else
+      throw new IllegalArgumentException("password does not match");
+  }
 
-    public static String getUserType(ResultSet resultSet) {
-        String type = get(
-                new Configurations(
-                        DatabaseField.of(getDeclared(Subscription.class, Subscription.DTO.Fields.userType)),
-                        resultSet,
-                        PEEK
-                ),
-                String.class
-        );
-        return type != null ? type.toLowerCase() : null;
-    }
+  public static String getUserType(ResultSet resultSet) {
+    String type = get(
+        new Configurations(
+            DatabaseField.of(getDeclared(Subscription.class, Subscription.DTO.Fields.userType)),
+            resultSet,
+            PEEK
+        ),
+        String.class
+    );
+    return type != null ? type.toLowerCase() : null;
+  }
 }

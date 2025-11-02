@@ -8,11 +8,11 @@ import static laustrup.bandwichpersistence.core.services.ClassFieldService.getFi
 
 public record TableColumnData(Table.Column column, Member member) {
 
-    public static TableColumnData of(Table.Column column, Member member) {
-        return new TableColumnData(column, member);
-    }
+  public static TableColumnData of(Table.Column column, Member member) {
+    return new TableColumnData(column, member);
+  }
 
-    public static TableColumnData of(Class<?> clazz, Table.Column column) {
-        return new TableColumnData(column, getField(clazz, column).orElseThrow());
-    }
+  public static TableColumnData of(Class<?> clazz, Table.Column column) {
+    return new TableColumnData(column, getField(clazz, column).orElseThrow());
+  }
 }

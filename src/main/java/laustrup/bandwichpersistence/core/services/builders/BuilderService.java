@@ -125,7 +125,7 @@ public abstract class BuilderService<MODEL> {
       Predicate<COMBINED> modelEquals = model -> model.equals(entity);
       boolean toStringEquals = collective.toString().equals(entity.toString());
 
-      if (toStringEquals || (collective instanceof Model<?,?> && modelEquals.test(collective))) {
+      if (toStringEquals || (collective instanceof Model<?, ?> && modelEquals.test(collective))) {
         collection.get_data()[counter.get()] = entity;
         return;
       }
