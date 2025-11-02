@@ -11,6 +11,7 @@ import laustrup.bandwichpersistence.core.models.users.ContactInfo;
 import laustrup.bandwichpersistence.core.persistence.models.EntityDataCollection;
 import laustrup.bandwichpersistence.core.persistence.worm.models.DatabaseDefinition;
 import laustrup.bandwichpersistence.core.services.EternaryService.Operator.Property;
+import laustrup.bandwichpersistence.core.utilities.collections.Liszt;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 
 import java.util.Arrays;
@@ -47,8 +48,6 @@ public class BandwichEntityDataCollection implements EntityDataCollection {
       ClassDatabaseDefinition.of(Artist.class, Artist.Authority.class, Authority.class),
       ClassDatabaseDefinition.of(Subscription.class),
       ClassDatabaseDefinition.of(ChatRoom.class),
-      ClassDatabaseDefinition.of(Organisation.Employee.class, ChatRoom.class),
-      ClassDatabaseDefinition.of(Artist.class, ChatRoom.class),
       ClassDatabaseDefinition.of(Message.class),
       ClassDatabaseDefinition.of(Band.Membership.class)
   );
@@ -66,18 +65,22 @@ public class BandwichEntityDataCollection implements EntityDataCollection {
 
   private record ClassDatabaseDefinition(Seszt<Class<?>> classes) {
 
-    public static ClassDatabaseDefinition of(Class<?>... classes) {
-      return new ClassDatabaseDefinition(new Seszt<>(classes));
+    public static ClassDatabaseDefinition of(Class<?> clazz) {
+      return new ClassDatabaseDefinition(new Seszt<>(clazz));
+    }
+
+    public static ClassDatabaseDefinition of(Class<?> target, Class<?> relation, Class<?> common) {
+      return new ClassDatabaseDefinition(Seszt.of(target, relation, common));
     }
 
     public DatabaseDefinition toDatabaseDefinition() {
       try {
-        return stating(classes.size() == 1)
-            .then(() -> (DatabaseDefinition) new DatabaseDefinition.Entity(classes.Get(1)))
-            .or(Property.of(
-                () -> DatabaseDefinition.Conjunction.of(classes.Get(1), classes.Get(2), classes.Get(3)),
-                classes.size() >= 3
-            )).orElseThrow(new IllegalArgumentException("Database definition is only allowed to have from 1 -> 2 classes!"));
+        return stating(Liszt.of(
+            Property.inCase(classes.size() == 1)
+                .then(() -> new DatabaseDefinition.Entity(classes.Get(1))),
+            Property.inCase(classes.size() == 3)
+                .then(() -> DatabaseDefinition.Conjunction.of(classes.Get(1), classes.Get(2), classes.Get(3)))
+        )).orElseThrow(new IllegalArgumentException("At the moment Database Definition only supports 1 or 3 classes for entities."));
       } catch (Exception e) {
         throw new RuntimeException(e);
       }

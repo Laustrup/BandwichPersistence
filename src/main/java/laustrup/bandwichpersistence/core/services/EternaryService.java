@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.experimental.FieldNameConstants;
 
+import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -44,6 +45,10 @@ public class EternaryService {
 
   public static Eternary stating(boolean success) {
     return new Eternary(success);
+  }
+
+  public static <ELEMENT> Binder<ELEMENT> stating(Coollection<Operator.Property<ELEMENT>> properties) {
+    return new Binder<>(properties);
   }
 
   static <ELEMENT> boolean nextCondition(boolean isSuccess, Operator.Property<ELEMENT> properties) {
@@ -112,12 +117,18 @@ public class EternaryService {
       super(properties);
     }
 
-    public Binder(Liszt<Operator.Property<ELEMENT>> properties) {
+    public Binder(Coollection<Operator.Property<ELEMENT>> properties) {
       super(properties);
     }
 
+    public Binder<ELEMENT> or(Collection<Property<ELEMENT>> properties) {
+      get_properties().addAll(properties);
+      return this;
+    }
+
     public Binder<ELEMENT> or(Property<ELEMENT> property) {
-      return new Binder<>(_properties.Add(property));
+      _properties.add(property);
+      return new Binder<>(_properties);
     }
   }
 
@@ -125,14 +136,14 @@ public class EternaryService {
   @Getter
   public static class Operator<ELEMENT> {
 
-    protected Liszt<Property<ELEMENT>> _properties;
+    protected Coollection<Property<ELEMENT>> _properties;
 
     @SafeVarargs
     public Operator(Property<ELEMENT>... properties) {
       this(Liszt.of(properties));
     }
 
-    public Operator(Liszt<Property<ELEMENT>> properties) {
+    public Operator(Coollection<Property<ELEMENT>> properties) {
       _properties = properties;
     }
 
@@ -206,18 +217,27 @@ public class EternaryService {
         return Optional.ofNullable(_condition);
       }
 
-      public static <STATIC_ELEMENT> Property<STATIC_ELEMENT> of(
-          Supplier<STATIC_ELEMENT> option,
-          boolean condition
-      ) {
-        return new Property<>(option, ignored -> condition);
+      public static Case inCase(boolean condition) {
+        return inCase(() -> condition);
       }
 
-      public static <STATIC_ELEMENT> Property<STATIC_ELEMENT> of(
-          STATIC_ELEMENT option,
-          Predicate<STATIC_ELEMENT> condition
-      ) {
-        return new Property<>(() -> option, condition);
+      public static Case inCase(Supplier<Boolean> condition) {
+        return new Case(condition);
+      }
+
+      public record Case(Supplier<Boolean> condition) {
+
+        public Case(boolean condition) {
+          this(() -> condition);
+        }
+
+        public <OPTION> Property<OPTION> then(OPTION option) {
+          return then(() -> option);
+        }
+
+        public <OPTION> Property<OPTION> then(Supplier<OPTION> option) {
+          return new Property<>(option, condition.get());
+        }
       }
     }
   }

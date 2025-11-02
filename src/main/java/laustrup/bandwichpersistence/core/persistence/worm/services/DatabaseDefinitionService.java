@@ -7,6 +7,7 @@ import laustrup.bandwichpersistence.core.persistence.worm.annotations.Table;
 import laustrup.bandwichpersistence.core.persistence.worm.models.TableColumnData;
 import laustrup.bandwichpersistence.core.services.ClassFieldService;
 import laustrup.bandwichpersistence.core.services.EternaryService.Operator.Property;
+import laustrup.bandwichpersistence.core.utilities.collections.Liszt;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,12 +27,14 @@ import static laustrup.bandwichpersistence.core.services.EternaryService.stating
 public abstract class DatabaseDefinitionService {
 
   public static Optional<Annotation> get_databaseDefinition(Class<?> clazz) {
-    return stating(clazz.isAnnotationPresent(Table.class))
-        .then(() -> (Annotation) get_table(clazz))
-        .or(Property.of(
-            () -> get_junction(clazz),
-            clazz.isAnnotationPresent(Junction.class)
-        )).orEmpty();
+    return stating(Liszt.of(
+        Property.inCase(clazz.isAnnotationPresent(Table.class))
+            .then(() -> get_table(clazz)),
+        Property.inCase(clazz.isAnnotationPresent(Junction.class))
+            .then(() -> get_junction(clazz)),
+        Property.inCase(clazz.isAnnotationPresent(Table.Enum.class))
+            .then(() -> get_tableEnum(clazz))
+    )).orEmpty();
   }
 
   public static Table get_table(Class<?> clazz) {
@@ -39,6 +42,13 @@ public abstract class DatabaseDefinitionService {
       throw new NullPointerException("Can't get table since its class is null!");
 
     return ifAnnotationIsPresent(clazz, Table.class, clazz.getAnnotation(Table.class));
+  }
+
+  private static Annotation get_tableEnum(Class<?> clazz) {
+    if (clazz == null)
+      throw new NullPointerException("Can't get table enum since its class is null!");
+
+    return ifAnnotationIsPresent(clazz, Table.Enum.class, clazz.getAnnotation(Table.Enum.class));
   }
 
   public static TableColumnData getTableColumnData(Class<?> clazz, Table.Column column) {
@@ -83,21 +93,34 @@ public abstract class DatabaseDefinitionService {
   }
 
   private static String handleTitle(Class<?> clazz) {
+    if (clazz == null)
+      return null;
+
     Annotation annotation = get_databaseDefinition(clazz)
         .orElseThrow(() -> new IllegalStateException("Couldn't define database definition for " + clazz.getSimpleName()));
 
-    return stating(annotation.annotationType().equals(Table.class))
-        .then(() -> ((Table) annotation).value())
-        .orElse(() -> ((Junction) annotation).title());
+    return stating(Liszt.of(
+        Property.inCase(clazz.isAnnotationPresent(Table.class))
+            .then(() -> ((Table) annotation).value()),
+        Property.inCase(clazz.isAnnotationPresent(Junction.class))
+            .then(() -> ((Junction) annotation).title()),
+        Property.inCase(clazz.isAnnotationPresent(Table.Enum.class))
+            .then(() -> ((Table.Enum) annotation).title())
+    )).orElseNull();
   }
 
   private static Table.IdReference handleIdReference(Class<?> clazz) {
     Annotation annotation = get_databaseDefinition(clazz)
         .orElseThrow(() -> new IllegalStateException("Couldn't define database definition for " + clazz.getSimpleName()));
 
-    return stating(annotation.annotationType().equals(Table.class))
-        .then(() -> ((Table) annotation).idReference())
-        .orElse(() -> ((Junction) annotation).idReference());
+    return stating(Liszt.of(
+        Property.inCase(clazz.isAnnotationPresent(Table.class))
+            .then(() -> ((Table) annotation).idReference()),
+        Property.inCase(clazz.isAnnotationPresent(Junction.class))
+            .then(() -> ((Junction) annotation).idReference()),
+        Property.inCase(clazz.isAnnotationPresent(Table.Enum.class))
+            .then(() -> ((Table.Enum) annotation).idReference())
+    )).orElseNull();
   }
 
   public static String getIdReference(Class<?> entity) {

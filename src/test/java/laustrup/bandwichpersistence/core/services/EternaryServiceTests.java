@@ -99,14 +99,14 @@ class EternaryServiceTests extends BandwichTester {
     Binder<String> binder = act(eternary.then(_then));
     String actual = binder.orElse(_orElse);
 
-    asserting(new Binder<>(Property.of(_then, then -> then.equals(expected)))).compare(binder);
+    asserting(new Binder<>(Property.inCase(() -> _then.equals(expected)).then(_then))).compare(binder);
     asserting(expected).is(actual);
   }
 
   private void or(Eternary eternary, String expected) {
     Binder<String> binder = act(eternary
         .then(_then)
-        .or(Property.of(_or, expected::equals))
+        .or(Property.inCase(() -> expected.equals(_or)).then(_or))
     );
     String actual = binder.orElse(_orElse);
 
@@ -117,7 +117,7 @@ class EternaryServiceTests extends BandwichTester {
   private void orElse(Eternary eternary, String expected) {
     String actual = act(eternary
         .then(_then)
-        .or(Property.of(_or, String::isEmpty))
+        .or(Property.inCase(_or::isEmpty).then(_or))
         .orElse(_orElse)
     );
 

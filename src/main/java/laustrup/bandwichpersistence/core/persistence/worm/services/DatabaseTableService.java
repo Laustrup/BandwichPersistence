@@ -42,7 +42,7 @@ public abstract class DatabaseTableService {
 
     return stating(title.endsWith("y"))
         .then(title.substring(0, title.length() - 1) + "ies")
-        .or(Property.of(title + "es", ignored -> title.endsWith("ss")))
+        .or(Property.inCase(title.endsWith("ss")).then(title + "es"))
         .orElse(title + "s");
   }
 
@@ -53,7 +53,7 @@ public abstract class DatabaseTableService {
     String ending = title.substring(title.length() - 3);
     return stating(title.length() > 4 && ending.equals("ies"))
         .then(title.substring(0, title.length() - 3) + "y")
-        .or(Property.of(title.substring(0, title.length() - 2), ignored -> ending.endsWith("ses")))
+        .or(Property.inCase(ending.endsWith("ses")).then(title.substring(0, title.length() - 2)))
         .orElse(() -> stating(ending.endsWith("s"))
             .then(title.substring(0, title.length() - 1))
             .orElse(title)
