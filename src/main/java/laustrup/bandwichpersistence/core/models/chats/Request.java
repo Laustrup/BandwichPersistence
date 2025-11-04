@@ -3,9 +3,8 @@ package laustrup.bandwichpersistence.core.models.chats;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import laustrup.bandwichpersistence.core.models.Event;
-import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.models.users.User;
-import laustrup.bandwichpersistence.core.services.ModelService;
+import laustrup.bandwichpersistence.core.persistence.worm.annotations.Table;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
@@ -13,29 +12,34 @@ import lombok.experimental.FieldNameConstants;
 import java.time.Instant;
 import java.util.UUID;
 
+import static laustrup.bandwichpersistence.core.services.ModelService.toStringify;
+
 /**
  * Determines if a User have approved to be a part of the Event.
  */
-@Getter @FieldNameConstants
+@Getter @FieldNameConstants @Table.Target
 public class Request {
 
   /**
    * The User that needs to approve the Event.
    */
-  private User.Id _receiverId;
+  @Table.Column(isPrimary = true)
+  private final User.Id _receiverId;
 
-  private User.Id _senderId;
+  @Table.Column(isPrimary = true)
+  private final User.Id _senderId;
 
   /**
    * The Event that has been requested for.
    */
-  private Event _event;
+  @Table.Column(isPrimary = true)
+  private final Event _event;
 
   /**
    * The value that indicates if the request for the Event has been approved.
    * From the first date that isn't null, this has been approved.
    */
-  @Setter
+  @Setter @Table.Column("is_approved")
   private Instant _approved;
 
   /**
@@ -62,7 +66,7 @@ public class Request {
     _approved = null;
   }
 
-  private Instant _timestamp;
+  private final Instant _timestamp;
 
   /**
    * Will translate a transport object of this object into a construct of this object.
@@ -97,23 +101,7 @@ public class Request {
 
     @Override
     public String toString() {
-        return ModelService.defineToString(
-            getClass().getSimpleName(),
-            get_receiverId(),
-            get_eventId(),
-            new String[]{
-                "receiverId",
-                "eventId",
-                DTO.Fields.approved,
-                Model.ModelDTO.Fields.timestamp
-            },
-            new String[]{
-                get_receiverId().toString(),
-                get_eventId().toString(),
-                _approved != null ? _approved.toString() : null,
-                String.valueOf(_timestamp)
-            }
-        );
+        return toStringify(this);
     }
 
     public Event.Id get_eventId() {
@@ -125,17 +113,17 @@ public class Request {
     public static class DTO {
 
         /** The User that needs to approve the Event. */
-        private UUID receiverId;
+        private final UUID receiverId;
 
-        private UUID senderId;
+        private final UUID senderId;
 
         /** The Event that has been requested for. */
-        private Event.DTO event;
+        private final Event.DTO event;
 
         /** The value that indicates if the request for the Event has been approved. */
-        private Instant approved;
+        private final Instant approved;
 
-        private Instant timestamp;
+        private final Instant timestamp;
 
         @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
         public DTO(

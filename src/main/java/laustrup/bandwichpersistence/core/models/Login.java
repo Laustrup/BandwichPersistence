@@ -15,9 +15,9 @@ import java.util.List;
 @FieldNameConstants
 public class Login implements UserDetails {
 
-  private String username;
+  private final String username;
 
-  private String password;
+  private final String password;
 
   private User<? extends User.Id> user;
 

@@ -91,7 +91,7 @@ public abstract class DatabaseColumnService {
     if (isIdless(entity))
       return null;
 
-    return Stream.of("id", "_id", "identity", "_identity")
+    return Stream.of("id", "id", "identity", "_identity")
         .filter(field -> isId(entity, field))
         .findFirst()
         .orElseThrow(() -> new RuntimeException(String.format(

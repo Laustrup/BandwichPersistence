@@ -1,6 +1,8 @@
 package laustrup.bandwichpersistence.core.models.users;
 
-import laustrup.bandwichpersistence.core.models.*;
+import laustrup.bandwichpersistence.core.models.Follow;
+import laustrup.bandwichpersistence.core.models.Rating;
+import laustrup.bandwichpersistence.core.models.Subscription;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,6 +13,8 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static laustrup.bandwichpersistence.core.services.ModelService.toStringify;
 
 /**
  * Defines a User, that will attend an Event as an audience.
@@ -23,7 +27,7 @@ public class Participant extends User<Participant.Id> {
    * These are the Users that the Participant can follow,
    * indicating that new content will be shared with the Participant.
    */
-  private Seszt<Follow> _follows;
+  private final Seszt<Follow> _follows;
 
   /**
    * Ratings made from other users on this user based on a value.
@@ -46,7 +50,6 @@ public class Participant extends User<Participant.Id> {
         new Seszt<>(participant.getRatings().stream().map(Rating::new)),
         new Subscription(participant.getSubscription()),
         new Seszt<>(participant.getFollows().stream().map(Follow::new)),
-        participant.getHistory(),
         participant.getTimestamp()
     );
   }
@@ -62,7 +65,6 @@ public class Participant extends User<Participant.Id> {
             Seszt<Rating> ratings,
             Subscription subscription,
             Seszt<Follow> follows,
-            History history,
             Instant timestamp
     ) {
         super(
@@ -74,7 +76,6 @@ public class Participant extends User<Participant.Id> {
                 contactInfo,
                 participations,
                 subscription,
-                history,
                 timestamp
         );
         _ratings = ratings;
@@ -113,20 +114,7 @@ public class Participant extends User<Participant.Id> {
 
     @Override
     public String toString() {
-        return defineToString(
-            getClass().getSimpleName(),
-            new String[] {
-                Model.Fields._identity,
-                User.Fields._description,
-                Model.Fields._timestamp
-            },
-            new String[] {
-                String.valueOf(get_identity()),
-                get_username(),
-                get_description(),
-                String.valueOf(get_timestamp())
-            }
-        );
+        return toStringify(this);
     }
 
     /**

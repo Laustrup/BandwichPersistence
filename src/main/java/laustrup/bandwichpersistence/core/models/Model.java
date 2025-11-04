@@ -5,7 +5,6 @@ import laustrup.bandwichpersistence.core.models.identification.Identity;
 import laustrup.bandwichpersistence.core.models.identification.Signature;
 import laustrup.bandwichpersistence.core.persistence.worm.annotations.Table;
 import laustrup.bandwichpersistence.core.services.ModelService;
-import laustrup.bandwichpersistence.core.utilities.Coollection;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -23,20 +22,11 @@ import static laustrup.bandwichpersistence.core.services.ObjectService.ifExists;
  */
 @Getter
 @FieldNameConstants
-@ToString(of = {"_identity", "_title", "_timestamp"})
+@ToString(of = {"_identity", "_timestamp"})
 public abstract class Model<IDENTITY extends Identity<SIGNATURE>, SIGNATURE extends Signature<?>> {
 
   @Table.Column(value = "id")
   protected IDENTITY _identity;
-
-  /**
-   * The name for an entity or model.
-   * Can be of different purposes,
-   * such as username or simply for naming a unit.
-   */
-  @Setter
-  @Table.ExcludedColumn
-  protected String _title;
 
   /**
    * Specifies the time this entity was created.
@@ -81,65 +71,20 @@ public abstract class Model<IDENTITY extends Identity<SIGNATURE>, SIGNATURE exte
   }
 
   /**
-   * Will generate a timestamp of the moment now in datetime.
-   *
-   * @param title A title describing this entity internally.
-   */
-  public Model(String title) {
-    _title = title;
-    _timestamp = Instant.now();
-  }
-
-  /**
-   * @param title     A title describing this entity internally.
    * @param timestamp Specifies the time this entity was created.
    */
-  public Model(String title, Instant timestamp) {
-    _title = title;
+  public Model(Instant timestamp) {
     _timestamp = timestamp;
   }
 
-  public Model(IDENTITY id, String title, Instant timestamp) {
+  public Model(IDENTITY id, Instant timestamp) {
     _identity = id;
-    _title = title;
     _timestamp = timestamp;
   }
 
-  public Model(IDENTITY id, String title) {
+  public Model(IDENTITY id) {
     _identity = id;
-    _title = title;
     _timestamp = Instant.now();
-  }
-
-  protected String defineToString(String title, Coollection<ToStringArgument> arguments) {
-    return defineToString(title, ToStringArgument.convert(arguments));
-  }
-
-  /**
-   * Will generate a toString from the attributes and values.
-   * Makes it able to have the same structure for all objects.
-   * If there is more value inputs than keys, the toString will not be unique, even though it must.
-   *
-   * @param title  The class name of the class Model, always use getClass().getSimpleName().
-   * @param values First array is a String array of keys and the other are its values.
-   * @return The generated toString.
-   */
-  protected String defineToString(String title, String[][] values) {
-    return defineToString(title, values[0], values[1]);
-  }
-
-  /**
-   * Will generate a toString from the attributes and values.
-   * Makes it able to have the same structure for all objects.
-   * If there is more value inputs than keys, the toString will not be unique, even though it must.
-   *
-   * @param title  The class name of the class Model, always use getClass().getSimpleName().
-   * @param keys   The attributes of the class Model, visualized as keys.
-   * @param values The values of the attributes/keys, as Strings.
-   * @return The generated toString.
-   */
-  protected String defineToString(String title, String[] keys, String[] values) {
-    return ModelService.defineToString(title, get_identity(), keys, values);
   }
 
   @Override
@@ -166,14 +111,6 @@ public abstract class Model<IDENTITY extends Identity<SIGNATURE>, SIGNATURE exte
      */
     protected SIGNATURE_TYPE id;
 
-    /**
-     * The name for an entity or model.
-     * Can be of different purposes,
-     * such as username or simply for naming a unit.
-     */
-    @Setter
-    protected String title;
-
 
     /**
      * Specifies the time this entity was created.
@@ -190,29 +127,24 @@ public abstract class Model<IDENTITY extends Identity<SIGNATURE>, SIGNATURE exte
 
     public ModelDTO(
         SIGNATURE_TYPE id,
-        String title,
         Situation situation,
         Instant timestamp
     ) {
       this.id = id;
-      this.title = title;
       this.situation = situation;
       this.timestamp = timestamp;
     }
 
     public ModelDTO(
         SIGNATURE_TYPE id,
-        String title,
         Instant timestamp
     ) {
       this.id = id;
-      this.title = title;
       this.timestamp = timestamp;
     }
 
     public ModelDTO(Model<IDENTITY, SIGNATURE> model) {
       id = ifExists(model.get_identity(), Identity::get_value);
-      title = model.get_title();
       timestamp = model.get_timestamp();
       situation = model.get_situation();
     }

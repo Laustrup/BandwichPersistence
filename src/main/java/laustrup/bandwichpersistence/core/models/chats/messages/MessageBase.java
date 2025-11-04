@@ -4,6 +4,7 @@ import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.models.identification.Identity;
 import laustrup.bandwichpersistence.core.models.identification.Signature;
 import laustrup.bandwichpersistence.core.models.users.User;
+import laustrup.bandwichpersistence.core.persistence.worm.annotations.Table;
 import laustrup.bandwichpersistence.core.services.UserService;
 import lombok.Getter;
 import lombok.Setter;
@@ -35,14 +36,16 @@ public abstract class MessageBase<IDENTITY extends Identity<Signature.UUID>> ext
   /**
    * If null it has not been sent, otherwise it has at the time it has.
    */
-  @Setter
+  @Setter @Table.Column("is_sent")
   protected Instant _sent;
 
   /**
    * Can be null in case that it have never been edited, otherwise it will be the time that it was edited.
    */
+  @Table.Column("is_edited")
   protected boolean _edited;
 
+  @Table.Column("is_read")
   protected Instant _read;
 
   /**
@@ -70,13 +73,13 @@ public abstract class MessageBase<IDENTITY extends Identity<Signature.UUID>> ext
       Instant read,
       Instant timestamp
   ) {
-    super(id, "Message-"+id, timestamp);
+    super(id, timestamp);
     _author = author;
-        _content = content;
-        _sent = sent;
-        _edited = isEdited;
-        _read = read;
-    }
+    _content = content;
+    _sent = sent;
+    _edited = isEdited;
+    _read = read;
+  }
 
     /**
      * Will tell if the Message is sent, by whether the time is sent was null.
@@ -137,7 +140,6 @@ public abstract class MessageBase<IDENTITY extends Identity<Signature.UUID>> ext
 
         public DTO(
                 UUID id,
-                String title,
                 Instant timestamp,
                 UserDTO<? extends User.Id> author,
                 String content,
@@ -145,7 +147,7 @@ public abstract class MessageBase<IDENTITY extends Identity<Signature.UUID>> ext
                 boolean isEdited,
                 Instant read
         ) {
-            super(id, title, timestamp);
+            super(id, timestamp);
             this.author = author;
             this.content = content;
             this.sent = sent;

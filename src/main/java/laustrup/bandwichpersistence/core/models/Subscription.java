@@ -6,10 +6,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import laustrup.bandwichpersistence.core.models.identification.CommonIdentity;
 import laustrup.bandwichpersistence.core.models.identification.Signature;
 import laustrup.bandwichpersistence.core.persistence.worm.annotations.Table;
-import laustrup.bandwichpersistence.core.services.ModelService;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
+
+import static laustrup.bandwichpersistence.core.services.ModelService.toStringify;
 
 /**
  * Defines the kind of subscription a user is having.
@@ -17,20 +18,19 @@ import lombok.experimental.FieldNameConstants;
  */
 @Getter
 @FieldNameConstants
-@Table(value = "subscriptions")
+@Table
 public class Subscription {
 
-  private Id _id;
+  private final Id _id;
 
   /**
    * An enum that determines what kind of status, the situation of the Subscription is in.
    */
-  @Setter
-  private Status _status;
+  private final Status _status;
 
-  private Kind _kind;
+  private final Kind _kind;
 
-  private UserType _userType;
+  private final UserType _userType;
 
   /**
    * Will translate a transport object of this object into a construct of this object.
@@ -97,18 +97,7 @@ public class Subscription {
 
   @Override
   public String toString() {
-    return ModelService.defineToString(
-        getClass().getSimpleName(),
-        get_id(),
-        new String[]{
-            Model.Fields._identity,
-            Fields._status
-        },
-        new String[]{
-            String.valueOf(get_id()),
-            get_status() != null ? get_status().name() : null,
-        }
-    );
+    return toStringify(this);
   }
 
   /**

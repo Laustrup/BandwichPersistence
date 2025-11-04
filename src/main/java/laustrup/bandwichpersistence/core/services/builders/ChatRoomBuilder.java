@@ -30,7 +30,7 @@ public class ChatRoomBuilder extends BuilderService<ChatRoom> {
   protected ChatRoom construct() {
     return new ChatRoom(
         new ChatRoom.Id((UUID) get_field(Model.Fields._identity)),
-        get_field(Model.Fields._title),
+        get_field(ChatRoom.Fields._title),
         get_field(ChatRoom.Fields._messages),
         get_field(ChatRoom.Fields._chatters),
         get_field(Model.Fields._timestamp)

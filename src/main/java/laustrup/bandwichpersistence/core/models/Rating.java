@@ -2,6 +2,7 @@ package laustrup.bandwichpersistence.core.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import laustrup.bandwichpersistence.core.models.users.User;
+import laustrup.bandwichpersistence.core.persistence.worm.annotations.Table;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
@@ -10,6 +11,8 @@ import java.time.Instant;
 import java.util.InputMismatchException;
 import java.util.UUID;
 
+import static laustrup.bandwichpersistence.core.services.ModelService.toStringify;
+
 /**
  * Can be added to a model to indicate the rating that the model is appreciated.
  * The first id is the appointed and the second is the judge.
@@ -17,9 +20,11 @@ import java.util.UUID;
  */
 @Getter
 @FieldNameConstants
+@Table.Target
 public class Rating {
 
-  private User.Id _appointedId, _reviewerId;
+  @Table.Column(isPrimary = true)
+  private final User.Id _appointedId, _reviewerId;
 
   /**
    * The value of the rating that is appointed.
@@ -30,10 +35,9 @@ public class Rating {
   /**
    * Is not meant to be necessary, but can be added by the judge.
    */
-  @Setter
-  private String _comment;
+  private final String _comment;
 
-  private Instant _timestamp;
+  private final Instant _timestamp;
 
   /**
    * Will translate a transport object of this object into a construct of this object.
@@ -104,15 +108,7 @@ public class Rating {
 
   @Override
   public String toString() {
-    return String.format("""
-            %s(%s=%s,%s=%s)
-            """,
-        getClass().getSimpleName(),
-        Fields._appointedId,
-        get_appointedId(),
-        Fields._reviewerId,
-        get_reviewerId()
-    );
+    return toStringify(this);
   }
 
   /**

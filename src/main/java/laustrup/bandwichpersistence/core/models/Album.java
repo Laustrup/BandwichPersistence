@@ -13,19 +13,23 @@ import lombok.experimental.FieldNameConstants;
 import java.time.Instant;
 import java.util.Set;
 
+import static laustrup.bandwichpersistence.core.services.ModelService.toStringify;
+
 /**
  * Contains objects that are describing data of either photos or music.
  * The items contain the link to the file source.
  */
 @Getter
 @FieldNameConstants
-@Table(value = "albums")
+@Table
 public class Album extends Model<Album.Id, Signature.UUID> {
+
+  private final String _title;
 
   /**
    * Items containing endpoints that are being used for getting the image/music file.
    */
-  private Seszt<Media> _media;
+  private final Seszt<Media> _media;
 
   /**
    * Will translate a transport object of this object into a construct of this object.
@@ -55,7 +59,8 @@ public class Album extends Model<Album.Id, Signature.UUID> {
       Seszt<Media> media,
       Instant timestamp
   ) {
-    super(id, title, timestamp);
+    super(id, timestamp);
+    _title = title;
     _media = media;
   }
 
@@ -76,11 +81,8 @@ public class Album extends Model<Album.Id, Signature.UUID> {
    * @param title The title of the Album.
    * @param media The items contained on this Album.
    */
-  public Album(
-      String title,
-      Seszt<Media> media
-  ) {
-    super(title);
+  public Album(String title, Seszt<Media> media) {
+    _title = title;
     _media = media;
   }
 
@@ -165,19 +167,7 @@ public class Album extends Model<Album.Id, Signature.UUID> {
 
   @Override
   public String toString() {
-    return defineToString(
-        getClass().getSimpleName(),
-        new String[]{
-            Model.Fields._identity,
-            Model.Fields._title,
-            Model.Fields._timestamp
-        },
-        new String[]{
-            String.valueOf(_identity),
-            _title,
-            String.valueOf(_timestamp)
-        }
-    );
+    return toStringify(this);
   }
 
   /**
@@ -186,19 +176,19 @@ public class Album extends Model<Album.Id, Signature.UUID> {
    */
   @Getter
   @FieldNameConstants
-  @Table(value = "album_media")
+  @Table("media")
   public static class Media extends Model<Media.Id, Signature.UUID> {
 
     /**
      * The endpoint for a URL, that is used to get the file of the item.
      */
-    private String _endpoint;
+    private final String _endpoint;
 
     /**
      * This is an Enum.
      * The Album might either be a MUSIC or IMAGE Album.
      */
-    private Kind _kind;
+    private final Kind _kind;
 
     /**
      * Will translate a transport object of this object into a construct of this object.
@@ -208,7 +198,6 @@ public class Album extends Model<Album.Id, Signature.UUID> {
     public Media(DTO item) {
       this(
           new Id(item.getId()),
-          item.getTitle(),
           item.getEndpoint(),
           item.getKind(),
           item.getTimestamp()
@@ -217,12 +206,11 @@ public class Album extends Model<Album.Id, Signature.UUID> {
 
     public Media(
         Id id,
-        String title,
         String endpoint,
         Kind kind,
         Instant timestamp
     ) {
-      super(id, title, timestamp);
+      super(id, timestamp);
       _endpoint = endpoint;
       _kind = kind;
     }
@@ -245,19 +233,7 @@ public class Album extends Model<Album.Id, Signature.UUID> {
 
     @Override
     public String toString() {
-      return defineToString(
-          getClass().getSimpleName(),
-          new String[]{
-              Fields._endpoint,
-              Fields._kind,
-              Model.Fields._timestamp
-          },
-          new String[]{
-              _endpoint,
-              _kind != null ? _kind.toString() : null,
-              _timestamp != null ? _timestamp.toString() : null
-          }
-      );
+      return toStringify(this);
     }
 
     /**
@@ -272,23 +248,22 @@ public class Album extends Model<Album.Id, Signature.UUID> {
       /**
        * The endpoint for a URL, that is used to get the file of the item.
        */
-      private String endpoint;
+      private final String endpoint;
 
       /**
        * This is an Enum.
        * The Album might either be a MUSIC or IMAGE Album.
        */
-      private Kind kind;
+      private final Kind kind;
 
       @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
       public DTO(
           @JsonProperty java.util.UUID id,
-          @JsonProperty String title,
           @JsonProperty Instant timestamp,
           @JsonProperty String endpoint,
           @JsonProperty Kind kind
       ) {
-        super(id, title, timestamp);
+        super(id, timestamp);
         this.endpoint = endpoint;
         this.kind = kind;
       }
@@ -323,10 +298,12 @@ public class Album extends Model<Album.Id, Signature.UUID> {
   @Getter
   public static class DTO extends ModelDTO<Album.Id, Signature.UUID, java.util.UUID> {
 
+    private final String title;
+
     /**
      * These endpoints are being used for getting the image/music file.
      */
-    private Set<Media.DTO> media;
+    private final Set<Media.DTO> media;
 
     @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
     public DTO(
@@ -335,7 +312,8 @@ public class Album extends Model<Album.Id, Signature.UUID> {
         @JsonProperty Instant timestamp,
         @JsonProperty Set<Media.DTO> media
     ) {
-      super(id, title, timestamp);
+      super(id, timestamp);
+      this.title = title;
       this.media = media;
     }
 
@@ -346,6 +324,7 @@ public class Album extends Model<Album.Id, Signature.UUID> {
      */
     public DTO(Album album) {
       super(album);
+      title = album.get_title();
       media = album.get_media().asSet(Media.DTO::new);
     }
   }

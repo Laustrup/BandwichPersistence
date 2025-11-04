@@ -29,7 +29,7 @@ public class AlbumBuilder extends BuilderService<Album> {
   protected Album construct() {
     return new Album(
         new Album.Id((UUID) get_field(Model.Fields._identity)),
-        get_field(Model.Fields._title),
+        get_field(Album.Fields._title),
         get_field(Album.Fields._media),
         get_field(Model.Fields._timestamp)
     );

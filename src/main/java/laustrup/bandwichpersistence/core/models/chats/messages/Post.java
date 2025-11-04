@@ -8,6 +8,7 @@ import laustrup.bandwichpersistence.core.models.identification.CommonIdentity;
 import laustrup.bandwichpersistence.core.models.identification.Identity;
 import laustrup.bandwichpersistence.core.models.identification.Signature;
 import laustrup.bandwichpersistence.core.models.users.User;
+import laustrup.bandwichpersistence.core.persistence.worm.annotations.Table;
 import laustrup.bandwichpersistence.core.services.ModelService;
 import lombok.Getter;
 import lombok.experimental.FieldNameConstants;
@@ -16,11 +17,12 @@ import java.time.Instant;
 import java.util.UUID;
 
 import static laustrup.bandwichpersistence.core.services.ModelService.from;
+import static laustrup.bandwichpersistence.core.services.ModelService.toStringify;
 
 /**
  * A kind of post that can be posted at any Model Object.
  */
-@Getter @FieldNameConstants
+@Getter @FieldNameConstants @Table
 public class Post extends MessageBase<Post.Id> {
 
   public Model<? extends Identity<?>, ?> _receiver;
@@ -66,23 +68,7 @@ public class Post extends MessageBase<Post.Id> {
 
   @Override
   public String toString() {
-    return defineToString(
-      getClass().getSimpleName(),
-      new String[]{
-        Model.Fields._identity,
-        MessageBase.Fields._content,
-        MessageBase.Fields._sent,
-        MessageBase.Fields._edited,
-          Model.Fields._timestamp
-            },
-            new String[]{
-                String.valueOf(_identity),
-                _content,
-                String.valueOf(_sent),
-                String.valueOf(_edited),
-                String.valueOf(_timestamp)
-            }
-        );
+    return toStringify(this);
     }
 
     /**
@@ -98,7 +84,6 @@ public class Post extends MessageBase<Post.Id> {
         @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
         public DTO(
                 @JsonProperty UUID id,
-                @JsonProperty String title,
                 @JsonProperty Instant timestamp,
                 @JsonProperty User.UserDTO<? extends User.Id> author,
                 @JsonProperty String content,
@@ -107,7 +92,7 @@ public class Post extends MessageBase<Post.Id> {
                 @JsonProperty Instant read,
                 @JsonProperty ModelDTO<Identity<Signature<?>>, Signature<?>, ?> receiver
         ) {
-            super(id, title, timestamp, author, content, sent, isEdited, read);
+            super(id, timestamp, author, content, sent, isEdited, read);
             this.receiver = receiver;
         }
 

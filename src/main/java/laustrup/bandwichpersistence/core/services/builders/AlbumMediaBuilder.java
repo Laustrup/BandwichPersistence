@@ -29,7 +29,6 @@ public class AlbumMediaBuilder extends BuilderService<Album.Media> {
   protected Album.Media construct() {
     return new Album.Media(
         new Album.Media.Id((UUID) get_field(Model.Fields._identity)),
-        get_field(Model.Fields._title),
         get_field(Album.Media.Fields._endpoint),
         get_field(Album.Media.Fields._kind),
         get_field(Model.Fields._timestamp)

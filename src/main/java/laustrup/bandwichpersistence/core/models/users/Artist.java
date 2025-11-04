@@ -19,28 +19,30 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Getter @FieldNameConstants @Table(value = "artists")
+import static laustrup.bandwichpersistence.core.services.ModelService.toStringify;
+
+@Getter @FieldNameConstants @Table
 public class Artist extends BusinessUser<Artist.Id> {
 
   /**
    * The Bands that the Artist is a member of.
    */
-  private Seszt<Membership> _bandMemberships;
+  private final Seszt<Membership> _bandMemberships;
 
   /**
    * The Requests requested for this Artist.
    */
-  private Seszt<Request> _requests;
+  private final Seszt<Request> _requests;
 
-  private Seszt<Album> _albums;
+  private final Seszt<Album> _albums;
 
-  private Seszt<Follow> _follows;
+  private final Seszt<Follow> _follows;
 
-  private Seszt<Event.Gig> _gigs;
+  private final Seszt<Event.Gig> _gigs;
 
-  private Seszt<Rating> _ratings;
+  private final Seszt<Rating> _ratings;
 
-  private Seszt<Authority> _authorities;
+  private final Seszt<Authority> _authorities;
 
   /**
    * A description of the gear, that the Artist possesses and what they require for an Event.
@@ -71,7 +73,6 @@ public class Artist extends BusinessUser<Artist.Id> {
               new Seszt<>(artist.getFollows().stream().map(Follow::new)),
                 new Seszt<>(artist.getRequests().stream().map(Request::new)),
                 new Seszt<>(artist.getRatings().stream().map(Rating::new)),
-                artist.getHistory(),
                 artist.getTimestamp()
         );
     }
@@ -94,7 +95,6 @@ public class Artist extends BusinessUser<Artist.Id> {
             Seszt<Follow> follows,
             Seszt<Request> requests,
             Seszt<Rating> ratings,
-            History history,
             Instant timestamp
     ) {
         super(
@@ -107,7 +107,6 @@ public class Artist extends BusinessUser<Artist.Id> {
                 subscription,
                 chatRooms,
                 participations,
-                history,
                 timestamp
         );
         _albums = albums;
@@ -156,20 +155,7 @@ public class Artist extends BusinessUser<Artist.Id> {
 
     @Override
     public String toString() {
-        return defineToString(
-            getClass().getSimpleName(),
-            new String[] {
-                Model.Fields._identity,
-                User.Fields._username,
-                User.Fields._description,
-                Model.Fields._timestamp
-            },
-            new String[] {
-                String.valueOf(get_identity()),
-                get_username(),
-                get_description(),
-                String.valueOf(get_timestamp())
-            });
+        return toStringify(this);
     }
 
     @Junction(
@@ -237,7 +223,6 @@ public class Artist extends BusinessUser<Artist.Id> {
                 @JsonProperty Subscription.DTO subscription,
                 @JsonProperty Set<ChatRoom.DTO> chatRooms,
                 @JsonProperty Set<Authority> authorities,
-                @JsonProperty History history,
                 @JsonProperty Instant timestamp,
                 @JsonProperty Set<Membership.DTO> bandMemberships,
                 @JsonProperty Set<Request.DTO> requests,
@@ -257,7 +242,6 @@ public class Artist extends BusinessUser<Artist.Id> {
                     participations,
                     subscription,
                     chatRooms,
-                    history,
                     timestamp
             );
             this.bandMemberships = bandMemberships;
@@ -287,12 +271,12 @@ public class Artist extends BusinessUser<Artist.Id> {
         }
     }
 
-    @Getter @Table(value = "band_memberships")
+    @Getter @Table(value = "band_memberships") @Table.Target
     public static class Membership {
 
-        private Band _band;
+        private final Band _band;
 
-        private Artist.Membership.Association _association;
+        private final Artist.Membership.Association _association;
 
         public Membership(Artist.Membership.DTO membership) {
             _band = new Band(membership.getMember());
@@ -312,9 +296,9 @@ public class Artist extends BusinessUser<Artist.Id> {
         @Getter @FieldNameConstants
         public static class DTO {
 
-            private Band.DTO member;
+            private final Band.DTO member;
 
-            private Artist.Membership.Association association;
+            private final Artist.Membership.Association association;
 
             public DTO(Artist.Membership membership) {
                 member = new Band.DTO(membership.get_band());

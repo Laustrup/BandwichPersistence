@@ -33,7 +33,6 @@ public class ArtistBuilder extends BuilderService<Artist> {
     combine(reference.get_follows(), object.get_follows());
     combine(reference.get_requests(), object.get_requests());
     combine(reference.get_ratings(), object.get_ratings());
-    combine(reference.get_history().get_stories(), object.get_history().get_stories());
   }
 
   @Override
@@ -56,7 +55,6 @@ public class ArtistBuilder extends BuilderService<Artist> {
         get_field(Artist.Fields._follows),
         get_field(Artist.Fields._requests),
         get_field(Artist.Fields._ratings),
-        get_field(User.Fields._history),
         get_field(Model.Fields._timestamp)
     );
   }

@@ -23,23 +23,25 @@ import java.util.Set;
 import static laustrup.bandwichpersistence.core.utilities.collections.Seszt.copy;
 
 @Getter
-@Table(value = "organisations")
+@Table
 @FieldNameConstants
 public class Organisation extends Model<Organisation.Id, Signature.UUID> {
 
-  private Seszt<Request> _requests;
+  private final String _title;
 
-  private ContactInfo _contactInfo;
+  private final Seszt<Request> _requests;
 
-  private Seszt<Event> _events;
+  private final ContactInfo _contactInfo;
 
-  private Seszt<Venue> _venues;
+  private final Seszt<Event> _events;
 
-  private Seszt<ChatRoom.Template> _chatRoomTemplates;
+  private final Seszt<Venue> _venues;
 
-  private Seszt<Album> _albums;
+  private final Seszt<ChatRoom.Template> _chatRoomTemplates;
 
-  private Seszt<Employee> _employees;
+  private final Seszt<Album> _albums;
+
+  private final Seszt<Employee> _employees;
 
   public Organisation(DTO organisation) {
     this(
@@ -68,7 +70,8 @@ public class Organisation extends Model<Organisation.Id, Signature.UUID> {
       Seszt<Employee> employees,
       Instant timestamp
   ) {
-    super(id, title, timestamp);
+    super(id, timestamp);
+    _title = title;
     _requests = requests;
     _contactInfo = contactInfo;
     _events = events;
@@ -99,19 +102,21 @@ public class Organisation extends Model<Organisation.Id, Signature.UUID> {
   @JsonIgnoreProperties(ignoreUnknown = true)
   public static class DTO extends ModelDTO<Organisation.Id, Signature.UUID, java.util.UUID> {
 
-    private Set<Request.DTO> requests;
+    private final String title;
 
-    private ContactInfo.DTO contactInfo;
+    private final Set<Request.DTO> requests;
 
-    private Set<Event.DTO> events;
+    private final ContactInfo.DTO contactInfo;
 
-    private Set<Venue.DTO> venues;
+    private final Set<Event.DTO> events;
 
-    private Set<ChatRoom.Template.DTO> chatRoomTemplates;
+    private final Set<Venue.DTO> venues;
 
-    private Set<Album.DTO> albums;
+    private final Set<ChatRoom.Template.DTO> chatRoomTemplates;
 
-    private Set<Employee.DTO> employees;
+    private final Set<Album.DTO> albums;
+
+    private final Set<Employee.DTO> employees;
 
     @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
     public DTO(
@@ -126,7 +131,8 @@ public class Organisation extends Model<Organisation.Id, Signature.UUID> {
         @JsonProperty Set<Album.DTO> albums,
         @JsonProperty Set<Employee.DTO> employees
     ) {
-      super(id, title, timestamp);
+      super(id, timestamp);
+      this.title = title;
       this.requests = requests;
       this.contactInfo = contactInfo;
       this.events = events;
@@ -138,6 +144,7 @@ public class Organisation extends Model<Organisation.Id, Signature.UUID> {
 
     public DTO(Organisation organisation) {
       super(organisation);
+      title = organisation.get_title();
       requests = organisation.get_requests().asSet(Request.DTO::new);
       contactInfo = new ContactInfo.DTO(organisation.get_contactInfo());
       events = organisation.get_events().asSet(Event.DTO::new);
@@ -149,7 +156,7 @@ public class Organisation extends Model<Organisation.Id, Signature.UUID> {
   }
 
   @Getter
-  @Table(value = "organisation_employees")
+  @Table("organisation_employees")
   @FieldNameConstants
   public static class Employee extends BusinessUser<Employee.Id> {
 
@@ -170,7 +177,6 @@ public class Organisation extends Model<Organisation.Id, Signature.UUID> {
           new Seszt<>(employee.getAuthorities().stream()),
           new Seszt<>(employee.getChatRooms().stream().map(ChatRoom::new)),
           new Seszt<>(employee.getParticipations().stream().map(Participation::new)),
-          employee.getHistory(),
           employee.getTimestamp()
       );
     }
@@ -187,7 +193,6 @@ public class Organisation extends Model<Organisation.Id, Signature.UUID> {
         Seszt<Authority> authorities,
         Seszt<ChatRoom> chatRooms,
         Seszt<Participation> participations,
-        History history,
         Instant timestamp
     ) {
       super(
@@ -200,7 +205,6 @@ public class Organisation extends Model<Organisation.Id, Signature.UUID> {
           subscription,
           chatRooms,
           participations,
-          history,
           timestamp
       );
       _roles = roles;
@@ -251,7 +255,7 @@ public class Organisation extends Model<Organisation.Id, Signature.UUID> {
     @FieldNameConstants
     public static class DTO extends BusinessUserDTO<Employee.Id> {
 
-      private Set<Role> roles;
+      private final Set<Role> roles;
 
       private Set<Authority> authorities;
 
@@ -267,7 +271,6 @@ public class Organisation extends Model<Organisation.Id, Signature.UUID> {
           @JsonProperty Subscription.DTO subscription,
           @JsonProperty Set<ChatRoom.DTO> chatRooms,
           @JsonProperty Set<Authority> authorities,
-          @JsonProperty History history,
           @JsonProperty Instant timestamp,
           @JsonProperty Set<Role> roles
       ) {
@@ -281,7 +284,6 @@ public class Organisation extends Model<Organisation.Id, Signature.UUID> {
             participations,
             subscription,
             chatRooms,
-            history,
             timestamp
         );
         this.roles = roles;

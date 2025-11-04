@@ -34,7 +34,7 @@ public class OrganisationBuilder extends BuilderService<Organisation> {
   protected Organisation construct() {
     return new Organisation(
         new Organisation.Id((UUID) get_field(Model.Fields._identity)),
-        get_field(Model.Fields._title),
+        get_field(Organisation.Fields._title),
         get_field(Organisation.Fields._events),
         get_field(Organisation.Fields._venues),
         get_field(Organisation.Fields._requests),

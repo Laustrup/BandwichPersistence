@@ -29,8 +29,8 @@ public class CountryBuilder extends BuilderService<ContactInfo.Country> {
   protected ContactInfo.Country construct() {
     return new ContactInfo.Country(
         new ContactInfo.Country.Id((UUID) get_field(Model.Fields._identity)),
-        get_field(ContactInfo.Country.Fields._title),
-        get_field(ContactInfo.Country.Fields._code)
+        get_field(ContactInfo.Country.Fields.title),
+        get_field(ContactInfo.Country.Fields.code)
     );
   }
 }

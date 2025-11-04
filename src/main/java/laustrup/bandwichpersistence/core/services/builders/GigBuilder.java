@@ -29,6 +29,7 @@ public class GigBuilder extends BuilderService<Event.Gig> {
   protected Event.Gig construct() {
     return new Event.Gig(
         new Event.Gig.Id((UUID) get_field(Model.Fields._identity)),
+        get_field(Event.Gig.Fields._title),
         get_field(Event.Gig.Fields._event),
         get_field(Event.Gig.Fields._act),
         get_field(Event.Gig.Fields._start),

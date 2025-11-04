@@ -1,5 +1,6 @@
 package laustrup.bandwichpersistence.core.models;
 
+import laustrup.bandwichpersistence.core.persistence.worm.annotations.Table;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
 import lombok.experimental.FieldNameConstants;
@@ -27,10 +28,10 @@ public abstract class TicketBase {
    */
   protected String _valuta;
 
+  @Table.Column("is_sitting")
+  private final boolean _sitting;
 
-  private boolean _sitting;
-
-  private Seszt<String> _areas;
+  private final Seszt<String> _areas;
 
   protected Instant _timestamp;
 
@@ -82,9 +83,9 @@ public abstract class TicketBase {
      */
     protected String valuta;
 
-    private boolean isSitting;
+    private final boolean isSitting;
 
-    private Set<String> areas;
+    private final Set<String> areas;
 
     protected Instant timestamp;
 

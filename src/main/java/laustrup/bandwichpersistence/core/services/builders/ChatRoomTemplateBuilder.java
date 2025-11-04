@@ -29,7 +29,7 @@ public class ChatRoomTemplateBuilder extends BuilderService<ChatRoom.Template> {
   protected ChatRoom.Template construct() {
     return new ChatRoom.Template(
         new ChatRoom.Template.Id((UUID) get_field(Model.Fields._identity)),
-        get_field(Model.Fields._title),
+        get_field(ChatRoom.Template.Fields._title),
         get_field(ChatRoom.Template.Fields._chatters),
         get_field(Model.Fields._timestamp)
     );

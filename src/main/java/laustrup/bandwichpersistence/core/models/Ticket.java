@@ -6,6 +6,7 @@ import laustrup.bandwichpersistence.core.models.identification.CommonIdentity;
 import laustrup.bandwichpersistence.core.models.identification.Identity;
 import laustrup.bandwichpersistence.core.models.identification.Signature;
 import laustrup.bandwichpersistence.core.models.users.User;
+import laustrup.bandwichpersistence.core.persistence.worm.annotations.Table;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,7 +17,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Set;
 
-import static laustrup.bandwichpersistence.core.services.ModelService.defineToString;
+import static laustrup.bandwichpersistence.core.services.ModelService.toStringify;
 import static laustrup.bandwichpersistence.core.utilities.collections.Seszt.copy;
 
 /**
@@ -24,25 +25,27 @@ import static laustrup.bandwichpersistence.core.utilities.collections.Seszt.copy
  */
 @Getter
 @FieldNameConstants
+@Table
 public class Ticket extends TicketBase {
 
-  private User.Id _userId;
+  private final User.Id _userId;
 
-  private Event.Id _eventId;
+  private final Event.Id _eventId;
 
-  private String _seat;
+  private final String _seat;
 
   /**
    * Indicates the time that the participant has arrived to the event.
    * If it is null, the participant has not had his ticket scanned yet.
    */
   @Setter
+  @Table.Column("is_arrived")
   private LocalDateTime _arrived;
 
   /**
    * The option that this ticket was created from.
    */
-  private Identity<Signature.UUID> _optionId;
+  private final Identity<Signature.UUID> _optionId;
 
   /**
    * Converts a Data Transport Object into this object.
@@ -92,48 +95,29 @@ public class Ticket extends TicketBase {
 
   @Override
   public String toString() {
-    return defineToString(
-        getClass().getSimpleName(),
-        get_userId(),
-        get_eventId(),
-        new String[]{
-            "userId",
-            "eventId",
-            TicketBase.Fields._price,
-            Ticket.Fields._arrived,
-            Model.Fields._timestamp
-        },
-        new String[]{
-            String.valueOf(_userId),
-            String.valueOf(_eventId),
-            String.valueOf(get_price()),
-            String.valueOf(get_arrived()),
-            String.valueOf(_timestamp)
-        }
-    );
+    return toStringify(this);
   }
 
   @Getter
-  @Setter
   @FieldNameConstants
   public static class DTO extends TicketBase.DTO {
 
-    private java.util.UUID userId;
+    private final java.util.UUID userId;
 
-    private java.util.UUID eventId;
+    private final java.util.UUID eventId;
 
-    private String seat;
+    private final String seat;
 
     /**
      * Indicates the time that the participant has arrived to the event.
      * If it is null, the participant has not had his ticket scanned yet.
      */
-    private LocalDateTime arrived;
+    private final LocalDateTime arrived;
 
     /**
      * The option that this ticket was created from.
      */
-    private java.util.UUID optionId;
+    private final java.util.UUID optionId;
 
     @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
     public DTO(
@@ -176,18 +160,19 @@ public class Ticket extends TicketBase {
    */
   @Getter
   @FieldNameConstants
+  @Table("ticket_options")
   public static class Option extends TicketBase {
 
-    private Id _id;
+    private final Id _id;
 
-    private Event.Id _eventId;
+    private final Event.Id _eventId;
 
-    private String _title;
+    private final String _title;
 
     /**
      * This venue is the owner of this option and can reuse them for events.
      */
-    private Venue.Id _venueId;
+    private final Venue.Id _venueId;
 
     /**
      * Will translate a transport object of this object into a construct of this object.
@@ -265,22 +250,7 @@ public class Ticket extends TicketBase {
 
     @Override
     public String toString() {
-      return defineToString(
-          getClass().getSimpleName(),
-          get_id(),
-          new String[]{
-              Model.Fields._identity,
-              Model.Fields._title,
-              TicketBase.Fields._price,
-              Model.Fields._timestamp
-          },
-          new String[]{
-              String.valueOf(_id),
-              get_title(),
-              String.valueOf(get_price()),
-              String.valueOf(_timestamp)
-          }
-      );
+      return toStringify(this);
     }
 
     /**
@@ -304,7 +274,6 @@ public class Ticket extends TicketBase {
        * The venue that is the owner of this option and can reuse them for events.
        */
       private java.util.UUID venueId;
-
 
       private String title;
 
@@ -347,18 +316,19 @@ public class Ticket extends TicketBase {
     }
 
     @Getter
+    @Table("ticket_option_templates")
     public static class Template extends TicketBase {
 
       /**
        * The events that this is configured for.
        */
-      private Seszt<Event.Id> _eventIds;
+      private final Seszt<Event.Id> _eventIds;
 
-      private String _title;
+      private final String _title;
 
       public Template(DTO template) {
         this(
-            copy(template.getEventIds(), id -> new Event.Id(id)),
+            copy(template.getEventIds(), Event.Id::new),
             template.getTitle(),
             template.getPrice(),
             template.getValuta(),
@@ -385,9 +355,9 @@ public class Ticket extends TicketBase {
       @Getter
       public static class DTO extends TicketBase.DTO {
 
-        private Set<java.util.UUID> eventIds;
+        private final Set<java.util.UUID> eventIds;
 
-        private String title;
+        private final String title;
 
         public DTO(Template template) {
           super(template);

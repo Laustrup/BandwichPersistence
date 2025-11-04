@@ -1,6 +1,5 @@
 package laustrup.bandwichpersistence.core.models.chats.messages;
 
-import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.models.identification.CommonIdentity;
 import laustrup.bandwichpersistence.core.models.identification.Signature;
 import laustrup.bandwichpersistence.core.models.users.User;
@@ -9,10 +8,12 @@ import lombok.Getter;
 
 import java.time.Instant;
 
+import static laustrup.bandwichpersistence.core.services.ModelService.toStringify;
+
 /**
  * A Message that are sent in a ChatRoom.
  */
-@Getter @Table(value = "messages")
+@Getter @Table
 public class Message extends MessageBase<Message.Id> {
 
   /**
@@ -37,22 +38,7 @@ public class Message extends MessageBase<Message.Id> {
 
   @Override
   public String toString() {
-    return defineToString(
-      getClass().getSimpleName(),
-      new String[] {
-        Model.Fields._identity,
-        MessageBase.Fields._author,
-        MessageBase.Fields._content,
-        MessageBase.Fields._sent,
-        Model.Fields._timestamp
-      }, new String[] {
-        String.valueOf(_identity),
-        _author != null ? _author.toString() : null,
-        _content,
-        String.valueOf(_sent),
-        String.valueOf(_timestamp)
-      }
-    );
+    return toStringify(this);
   }
 
   public static class Id extends CommonIdentity<Signature.UUID> {

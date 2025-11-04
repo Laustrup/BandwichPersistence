@@ -8,14 +8,15 @@ import laustrup.bandwichpersistence.core.models.identification.CommonIdentity;
 import laustrup.bandwichpersistence.core.models.identification.Signature;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
 import laustrup.bandwichpersistence.core.models.users.User;
+import laustrup.bandwichpersistence.core.persistence.worm.annotations.Table;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 
 import java.time.Instant;
 import java.util.Set;
 
+import static laustrup.bandwichpersistence.core.services.ModelService.toStringify;
 import static laustrup.bandwichpersistence.core.utilities.collections.Seszt.copy;
 
 /**
@@ -25,38 +26,38 @@ import static laustrup.bandwichpersistence.core.utilities.collections.Seszt.copy
  */
 @Getter
 @FieldNameConstants
+@Table
 public class Venue extends Model<Venue.Id, Signature.UUID> {
+
+  private final String _title;
 
   /**
    * The location that the Venue is located at, which could be an address or simple a place.
    */
-  @Setter
-  private ContactInfo.Address _location;
+  private final ContactInfo.Address _location;
 
-  private String _description;
+  private final String _description;
 
-  private Seszt<Organisation> _organisations;
+  private final Seszt<Organisation> _organisations;
 
-  private Seszt<Album> _albums;
+  private final Seszt<Album> _albums;
 
-  private Seszt<Post> _posts;
+  private final Seszt<Post> _posts;
 
-  private Seszt<Rating> _ratings;
+  private final Seszt<Rating> _ratings;
 
   /**
    * The description of the gear that the Venue posses.
    * Kind of the opposite of a runner.
    */
-  @Setter
-  private String _stageSetup;
+  private final String _stageSetup;
 
-  private Seszt<String> _areas;
+  private final Seszt<String> _areas;
 
   /**
    * The size of the stage and room, that Events can be held at.
    */
-  @Setter
-  private int _size;
+  private final int _size;
 
   /**
    * Will translate a transport object of this object into a construct of this object.
@@ -94,7 +95,8 @@ public class Venue extends Model<Venue.Id, Signature.UUID> {
       int size,
       Instant timestamp
   ) {
-    super(id, title, timestamp);
+    super(id, timestamp);
+    _title = title;
     _description = description;
     _organisations = organisations;
     _albums = albums;
@@ -124,21 +126,7 @@ public class Venue extends Model<Venue.Id, Signature.UUID> {
 
   @Override
   public String toString() {
-    return defineToString(
-        getClass().getSimpleName(),
-        new String[]{
-            Model.Fields._identity,
-            Fields._location,
-            Fields._stageSetup,
-            Model.Fields._timestamp
-        },
-        new String[]{
-            String.valueOf(get_identity()),
-            get_location().toString(),
-            get_stageSetup(),
-            String.valueOf(get_timestamp())
-        }
-    );
+    return toStringify(this);
   }
 
   /**
@@ -147,37 +135,38 @@ public class Venue extends Model<Venue.Id, Signature.UUID> {
    * Doesn't have any logic.
    */
   @Getter
-  @Setter
   @FieldNameConstants
   @JsonIgnoreProperties(ignoreUnknown = true)
   public static class DTO extends ModelDTO<Venue.Id, Signature.UUID, java.util.UUID> {
 
+    private final String title;
+
     /**
      * The location that the Venue is located at, which could be an address or simple a place.
      */
-    private ContactInfo.Address.DTO location;
+    private final ContactInfo.Address.DTO location;
 
-    private String description;
+    private final String description;
 
-    private Set<Organisation.DTO> organisations;
+    private final Set<Organisation.DTO> organisations;
 
-    private Set<Album.DTO> albums;
+    private final Set<Album.DTO> albums;
 
-    private Set<Post.DTO> posts;
+    private final Set<Post.DTO> posts;
 
-    private Set<Rating.DTO> ratings;
+    private final Set<Rating.DTO> ratings;
 
-    private Set<String> areas;
+    private final Set<String> areas;
 
     /**
      * The description of the gear that the Venue posses.
      */
-    private String stageSetup;
+    private final String stageSetup;
 
     /**
      * The size of the stage and room, that Events can be held at.
      */
-    private int size;
+    private final int size;
 
     @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
     public DTO(
@@ -194,7 +183,8 @@ public class Venue extends Model<Venue.Id, Signature.UUID> {
         @JsonProperty String stageSetup,
         @JsonProperty int size
     ) {
-      super(id, title, timestamp);
+      super(id, timestamp);
+      this.title = title;
       this.location = location;
       this.description = description;
       this.organisations = organisations;
@@ -213,6 +203,7 @@ public class Venue extends Model<Venue.Id, Signature.UUID> {
      */
     public DTO(Venue venue) {
       super(venue);
+      title = venue.get_title();
       location = new ContactInfo.Address.DTO(venue.get_location());
       description = venue.get_description();
       organisations = venue.get_organisations().asSet(Organisation.DTO::new);
@@ -229,7 +220,7 @@ public class Venue extends Model<Venue.Id, Signature.UUID> {
   @FieldNameConstants
   public static class Rating extends laustrup.bandwichpersistence.core.models.Rating {
 
-    private Organisation _organisation;
+    private final Organisation _organisation;
 
     public Rating(DTO rating) {
       this(
@@ -258,7 +249,7 @@ public class Venue extends Model<Venue.Id, Signature.UUID> {
     @FieldNameConstants
     public static class DTO extends laustrup.bandwichpersistence.core.models.Rating.DTO {
 
-      private Organisation.DTO organisation;
+      private final Organisation.DTO organisation;
 
       public DTO(Rating rating) {
         super(rating);

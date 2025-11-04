@@ -9,6 +9,7 @@ import laustrup.bandwichpersistence.core.models.identification.CommonIdentity;
 import laustrup.bandwichpersistence.core.models.identification.Signature;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
 import laustrup.bandwichpersistence.core.models.users.Participant;
+import laustrup.bandwichpersistence.core.persistence.worm.annotations.Table;
 import laustrup.bandwichpersistence.core.utilities.collections.Liszt;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import laustrup.bandwichpersistence.core.utilities.parameters.Truthiness;
@@ -24,6 +25,8 @@ import java.util.InputMismatchException;
 import java.util.Objects;
 import java.util.Set;
 
+import static laustrup.bandwichpersistence.core.services.EternaryService.ifEmpty;
+import static laustrup.bandwichpersistence.core.services.ModelService.toStringify;
 import static laustrup.bandwichpersistence.core.utilities.collections.Seszt.copy;
 import static laustrup.bandwichpersistence.core.utilities.services.UtilityService.toSet;
 
@@ -33,7 +36,10 @@ import static laustrup.bandwichpersistence.core.utilities.services.UtilityServic
 @Getter
 @FieldNameConstants
 @Slf4j
+@Table
 public class Event extends Model<Event.Id, Signature.UUID> {
+
+  private final String _title;
 
   /**
    * Is when the participants can enter the event,
@@ -58,6 +64,7 @@ public class Event extends Model<Event.Id, Signature.UUID> {
    * The amount of time it will take the gigs in total in milliseconds.
    * Is being calculated automatically.
    */
+  @Table.ExcludedColumn
   private long _duration;
 
   /**
@@ -69,28 +76,29 @@ public class Event extends Model<Event.Id, Signature.UUID> {
   /**
    * This Event is paid or voluntary.
    */
-  @Setter
-  private Truthiness _charity;
+  @Table.Column("is_charity")
+  private final Truthiness _charity;
 
   /**
    * If this is a public Event, other Users can view and interact with it.
    * It is public if it is not null, otherwise it has the time that it became public.
    */
-  private Instant _public;
+  @Table.Column("is_public")
+  private final Instant _public;
 
   /**
    * Will be true, if this Event is cancelled.
    * Can only be cancelled by the Venue.
    * It is cancelled if it is not null, otherwise it has the time that it became cancelled.
    */
+  @Table.Column("is_cancelled")
   private Instant _cancelled;
 
   /**
    * This is marked if there is no more tickets to sell.
    * It is sold out if it is not null, otherwise it has the time that it became sold out.
    */
-  @Setter
-  private Instant _soldOut;
+  private final Instant _soldOut;
 
   /**
    * This is the address or place, whether the Event will be held.
@@ -98,58 +106,56 @@ public class Event extends Model<Event.Id, Signature.UUID> {
    */
   private ContactInfo.Address _location;
 
-  private ZoneId _zoneId;
+  private final ZoneId _zoneId;
 
   /**
    * The options that are available for tickets to be bought or reserved.
    */
-  private Seszt<Ticket.Option> _ticketOptions;
+  private final Seszt<Ticket.Option> _ticketOptions;
 
   /**
    * The tickets that have been bought or reserved.
    */
-  private Seszt<Ticket> _tickets;
+  private final Seszt<Ticket> _tickets;
 
   /**
    * Different information of contacting.
    */
-  private ContactInfo _contactInfo;
+  private final ContactInfo _contactInfo;
 
   /**
    * The gigs with times and acts of the Event.
    */
-  private Seszt<Gig> _gigs;
+  private final Seszt<Gig> _gigs;
 
-  private Seszt<Organisation> _organisations;
+  private final Seszt<Organisation> _organisations;
 
   /**
    * This venue is the ones responsible for the Event,
    * perhaps even the place it is held, but not necessarily.
    */
-  private Venue _venue;
+  private final Venue _venue;
 
   /**
    * These requests are needed to make sure, everyone wants to be a part of the Event.
    */
-  private Seszt<Request> _requests;
+  private final Seszt<Request> _requests;
 
   /**
    * The people that will participate in the Event,
    * not including venues or acts.
    */
-  private Seszt<Participation> _participations;
+  private final Seszt<Participation> _participations;
 
   /**
    * Post from different people, that will mention contents.
    */
-  private Seszt<Post> _posts;
+  private final Seszt<Post> _posts;
 
   /**
    * An Album of images, that can be used to promote this Event.
    */
-  private Seszt<Album> _albums;
-
-  private History _history;
+  private final Seszt<Album> _albums;
 
   /**
    * Will translate a transport object of this object into a construct of this object.
@@ -178,7 +184,6 @@ public class Event extends Model<Event.Id, Signature.UUID> {
         copy(event.getParticipations(), Participation::new),
         copy(event.getPosts(), Post::new),
         copy(event.getAlbums(), Album::new),
-        event.getHistory(),
         event.getTimestamp()
     );
   }
@@ -204,11 +209,12 @@ public class Event extends Model<Event.Id, Signature.UUID> {
       Seszt<Participation> participations,
       Seszt<Post> posts,
       Seszt<Album> albums,
-      History history,
       Instant timestamp
   ) throws InputMismatchException {
-    super(id, title == null || title.isEmpty() ? "Untitled event" : title, timestamp);
-
+    super(id, timestamp);
+    _title = ifEmpty(title)
+        .then("Untitled event")
+        .orElse(title);
     _description = description;
     _gigs = gigs;
     if (!_gigs.isEmpty())
@@ -246,7 +252,6 @@ public class Event extends Model<Event.Id, Signature.UUID> {
     _participations = participations;
     _posts = posts;
     _albums = albums;
-    _history = history;
   }
 
   /**
@@ -578,21 +583,7 @@ public class Event extends Model<Event.Id, Signature.UUID> {
 
   @Override
   public String toString() {
-    return defineToString(
-        getClass().getSimpleName(),
-        new String[]{
-            Model.Fields._identity,
-            Model.Fields._title,
-            Fields._description,
-            Model.Fields._timestamp
-        },
-        new String[]{
-            String.valueOf(_identity),
-            _title,
-            _description,
-            String.valueOf(_timestamp)
-        }
-    );
+    return toStringify(this);
   }
 
   /**
@@ -605,110 +596,110 @@ public class Event extends Model<Event.Id, Signature.UUID> {
   @JsonIgnoreProperties(ignoreUnknown = true)
   public static class DTO extends ModelDTO<Event.Id, Signature.UUID, java.util.UUID> {
 
-    private ZoneId zoneId;
+    private final String title;
+
+    private final ZoneId zoneId;
 
     /**
      * Is when the participants can enter the event,
      * not necessarily the same time as when the gigs start.
      * It must be before or same time as the gigs start.
      */
-    private Instant openDoors;
+    private final Instant openDoors;
 
     /**
      * This DateTime is determining when the first gig will start.
      * Is being calculated automatically.
      */
-    private Instant start;
+    private final Instant start;
 
     /**
      * This DateTime is determining when the last gig will end.
      * Is being calculated automatically.
      */
-    private Instant end;
+    private final Instant end;
 
     /**
      * The description of the Event, that can be edited by Performers or Venue
      *
      */
-    private String description;
+    private final String description;
 
     /**
      * This Event is paid or voluntary.
      */
-    private Truthiness.Argument isCharity;
+    private final Truthiness.Argument isCharity;
 
     /**
      * If this is a public Event, other Users can view and interact with it.
      */
-    private Instant isPublic;
+    private final Instant isPublic;
 
     /**
      * Will be true, if this Event is cancelled.
      * Can only be cancelled by the Venue.
      */
-    private Instant isCancelled;
+    private final Instant isCancelled;
 
     /**
      * This is marked if there is no more tickets to sell.
      */
-    private Instant isSoldOut;
+    private final Instant isSoldOut;
 
     /**
      * This is the address or place, whether the Event will be held.
      * Will be used to be searched at in Google Maps.
      */
-    private ContactInfo.Address.DTO location;
+    private final ContactInfo.Address.DTO location;
 
     /**
      * The options that are available for tickets to be bought or reserved.
      */
-    private Set<Ticket.Option.DTO> ticketOptions;
+    private final Set<Ticket.Option.DTO> ticketOptions;
 
     /**
      * The tickets that have been bought or reserved.
      */
-    private Set<Ticket.DTO> tickets;
+    private final Set<Ticket.DTO> tickets;
 
     /**
      * Different information of contacting.
      */
-    private ContactInfo.DTO contactInfo;
+    private final ContactInfo.DTO contactInfo;
 
     /**
      * The gigs with times and acts of the Event.
      */
-    private Set<Gig.DTO> gigs;
+    private final Set<Gig.DTO> gigs;
 
-    private Set<Organisation.DTO> organisations;
+    private final Set<Organisation.DTO> organisations;
 
     /**
      * This venue is the ones responsible for the Event,
      * perhaps even the place it is held, but not necessarily.
      */
-    private Venue.DTO venue;
+    private final Venue.DTO venue;
 
     /**
      * These requests are needed to make sure, everyone wants to be a part of the Event.
      */
-    private Set<Request.DTO> requests;
+    private final Set<Request.DTO> requests;
 
     /**
      * The people that will participate in the Event,
      * not including venues or acts.
      */
-    private Set<Participation.DTO> participations;
+    private final Set<Participation.DTO> participations;
 
     /**
      * Post from different people, that will mention contents.
      */
-    private Set<Post.DTO> posts;
+    private final Set<Post.DTO> posts;
 
     /**
      * An Album of images, that can be used to promote this Event.
      */
-    private Set<Album.DTO> albums;
-
-    private History history;
+    private final Set<Album.DTO> albums;
 
     @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
     public DTO(
@@ -734,10 +725,10 @@ public class Event extends Model<Event.Id, Signature.UUID> {
         @JsonProperty Set<Post.DTO> posts,
         @JsonProperty Set<Album.DTO> albums,
         @JsonProperty ZoneId zoneId,
-        @JsonProperty History history,
         @JsonProperty Instant timestamp
     ) {
-      super(id, title, timestamp);
+      super(id, timestamp);
+      this.title = title;
       this.openDoors = openDoors;
       this.start = start;
       this.end = end;
@@ -758,7 +749,6 @@ public class Event extends Model<Event.Id, Signature.UUID> {
       this.posts = posts;
       this.albums = albums;
       this.zoneId = zoneId;
-      this.history = history;
     }
 
     /**
@@ -790,7 +780,6 @@ public class Event extends Model<Event.Id, Signature.UUID> {
           toSet(event.get_posts(), Post.DTO::new),
           toSet(event.get_albums(), Album.DTO::new),
           event.get_zoneId(),
-          event.get_history(),
           event.get_timestamp()
       );
     }
@@ -800,29 +789,31 @@ public class Event extends Model<Event.Id, Signature.UUID> {
    * Determines a specific gig of one band for a specific time.
    */
   @Getter
-  @Setter
   @FieldNameConstants
+  @Table
   public static class Gig extends Model<Gig.Id, Signature.UUID> {
+
+    private final String _title;
 
     /**
      * The Event of this Gig.
      */
-    private Event _event;
+    private final Event _event;
 
     /**
      * This act is of a Gig and can both be assigned as artists or bands.
      */
-    private Seszt<Band> _act;
+    private final Seszt<Band> _act;
 
     /**
      * The start of the Gig, where the act will begin.
      */
-    private Instant _start;
+    private final Instant _start;
 
     /**
      * The end of the Gig, where the act will end.
      */
-    private Instant _end;
+    private final Instant _end;
 
     /**
      * Will translate a transport object of this object into a construct of this object.
@@ -832,6 +823,7 @@ public class Event extends Model<Event.Id, Signature.UUID> {
     public Gig(DTO gig) {
       this(
           new Id(gig.getId()),
+          gig.getTitle(),
           new Event(gig.getEvent()),
           copy(gig.getAct(), Band::new),
           gig.getStart(),
@@ -840,25 +832,17 @@ public class Event extends Model<Event.Id, Signature.UUID> {
       );
     }
 
-    /**
-     * A constructor with all the values of this Object.
-     *
-     * @param id        The primary id that identifies this unique Object.
-     * @param event     The Event of this Gig.
-     * @param act       This act is of a Gig and can both be assigned as artists or bands.
-     * @param start     The start of the Gig, where the act will begin.
-     * @param end       The end of the Gig, where the act will end.
-     * @param timestamp The time this Object was created.
-     */
     public Gig(
         Gig.Id id,
+        String title,
         Event event,
         Seszt<Band> act,
         Instant start,
         Instant end,
         Instant timestamp
     ) {
-      super(id, "Gig:" + id, timestamp);
+      super(id, timestamp);
+      _title = title;
       _event = event;
       _act = act;
       _start = start;
@@ -874,8 +858,8 @@ public class Event extends Model<Event.Id, Signature.UUID> {
      * @param start The start of the Gig, where the act will begin.
      * @param end   The end of the Gig, where the act will end.
      */
-    public Gig(Event event, Seszt<Band> act, Instant start, Instant end) {
-      this(null, event, act, start, end, Instant.now());
+    public Gig(String title, Event event, Seszt<Band> act, Instant start, Instant end) {
+      this(null, title, event, act, start, end, Instant.now());
     }
 
     /**
@@ -932,19 +916,7 @@ public class Event extends Model<Event.Id, Signature.UUID> {
 
     @Override
     public String toString() {
-      return defineToString(
-          getClass().getSimpleName(),
-          new String[]{
-              Model.Fields._identity,
-              Fields._start,
-              Fields._end
-          },
-          new String[]{
-              String.valueOf(get_identity()),
-              String.valueOf(get_start()),
-              String.valueOf(get_end())
-          }
-      );
+      return toStringify(this);
     }
 
     /**
@@ -957,25 +929,27 @@ public class Event extends Model<Event.Id, Signature.UUID> {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class DTO extends ModelDTO<Gig.Id, Signature.UUID, java.util.UUID> {
 
+      private final String title;
+
       /**
        * The Event of this Gig.
        */
-      private Event.DTO event;
+      private final Event.DTO event;
 
       /**
        * This act is of a Gig and can both be assigned as artists or bands.
        */
-      private Set<Band.DTO> act;
+      private final Set<Band.DTO> act;
 
       /**
        * The start of the Gig, where the act will begin.
        */
-      private Instant start;
+      private final Instant start;
 
       /**
        * The end of the Gig, where the act will end.
        */
-      private Instant end;
+      private final Instant end;
 
       @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
       public DTO(
@@ -988,7 +962,8 @@ public class Event extends Model<Event.Id, Signature.UUID> {
           @JsonProperty Instant start,
           @JsonProperty Instant end
       ) {
-        super(id, title, situation, timestamp);
+        super(id, situation, timestamp);
+        this.title = title;
         this.event = event;
         this.act = act;
         this.start = start;
@@ -1002,6 +977,7 @@ public class Event extends Model<Event.Id, Signature.UUID> {
        */
       public DTO(Gig gig) {
         super(gig);
+        title = gig.get_title();
         event = new Event.DTO(gig.get_event());
         act = copy(gig.get_act(), Band.DTO::new);
         start = gig.get_start();
@@ -1020,7 +996,7 @@ public class Event extends Model<Event.Id, Signature.UUID> {
     /**
      * The Participant of the participation.
      */
-    private Participant _participant;
+    private final Participant _participant;
 
     /**
      * Will translate a transport object of this object into a construct of this object.
@@ -1060,15 +1036,7 @@ public class Event extends Model<Event.Id, Signature.UUID> {
 
     @Override
     public String toString() {
-      return String.format("""
-              %s(%s=%s,%s=%s)
-              """,
-          getClass().getSimpleName(),
-          Participant.class.getSimpleName(),
-          _participant.get_identity(),
-          Type.class.getSimpleName(),
-          _type
-      );
+      return toStringify(this);
     }
 
     /**
@@ -1077,13 +1045,12 @@ public class Event extends Model<Event.Id, Signature.UUID> {
      * Doesn't have any logic.
      */
     @Getter
-    @Setter
     public static class DTO extends ParticipationBase.DTO {
 
       /**
        * The Participant of the participation.
        */
-      private Participant.DTO participant;
+      private final Participant.DTO participant;
 
       @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
       public DTO(

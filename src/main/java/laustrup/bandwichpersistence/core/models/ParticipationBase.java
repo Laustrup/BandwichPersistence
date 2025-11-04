@@ -17,17 +17,11 @@ public abstract class ParticipationBase {
   protected Instant _timestamp;
 
   public ParticipationBase(DTO participation) {
-    this(
-        participation.getType(),
-        participation.getTimestamp()
-    );
+    this(participation.getType(), participation.getTimestamp());
   }
 
   public ParticipationBase(Type type) {
-    this(
-        type,
-        Instant.now()
-    );
+    this(type, Instant.now());
   }
 
   public ParticipationBase(Type type, Instant timestamp) {
@@ -70,10 +64,7 @@ public abstract class ParticipationBase {
     }
 
     public DTO(ParticipationBase participation) {
-      this(
-          participation.get_type(),
-          participation.get_timestamp()
-      );
+      this(participation.get_type(), participation.get_timestamp());
     }
   }
 }

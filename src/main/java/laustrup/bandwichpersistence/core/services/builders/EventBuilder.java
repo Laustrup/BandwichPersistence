@@ -36,7 +36,7 @@ public class EventBuilder extends BuilderService<Event> {
   protected Event construct() {
     return new Event(
         new Event.Id((UUID) get_field(Model.Fields._identity)),
-        get_field(Model.Fields._title),
+        get_field(Event.Fields._title),
         get_field(Event.Fields._description),
         get_field(Event.Fields._openDoors),
         get_field(Event.Fields._charity),
@@ -55,7 +55,6 @@ public class EventBuilder extends BuilderService<Event> {
         new Seszt<>(),
         get_field(Event.Fields._posts),
         get_field(Event.Fields._albums),
-        get_field(Event.Fields._history),
         get_field(Model.Fields._timestamp)
     );
   }

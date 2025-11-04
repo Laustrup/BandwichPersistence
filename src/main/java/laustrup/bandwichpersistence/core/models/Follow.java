@@ -10,11 +10,11 @@ import java.util.UUID;
 @Getter
 public class Follow {
 
-  private boolean _notify;
+  private final boolean _notify;
 
-  private User.Id _followerId;
+  private final User.Id _followerId;
 
-  private User.Id _followedId;
+  private final User.Id _followedId;
 
   public Follow(Follow.DTO follow) {
     this(follow.isNotify(), new User.Id(follow.getFollowerId()), new User.Id(follow.getFollowedId()));
@@ -31,11 +31,11 @@ public class Follow {
   @JsonIgnoreProperties(ignoreUnknown = true)
   public static class DTO {
 
-    private boolean notify;
+    private final boolean notify;
 
-    private UUID followerId;
+    private final UUID followerId;
 
-    private UUID followedId;
+    private final UUID followedId;
 
     public DTO(Follow follow) {
       notify = follow.is_notify();

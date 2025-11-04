@@ -11,11 +11,11 @@ import java.time.Instant;
 @Getter
 public class Tag extends Model<Tag.Id, Signature.UUID> {
 
-  private User<User.Id> _tagger;
+  private final User<User.Id> _tagger;
 
-  private User<User.Id> _target;
+  private final User<User.Id> _target;
 
-  private Model<Identity<?>, ?> _model;
+  private final Model<Identity<?>, ?> _model;
 
   public Tag(
       Id id,
@@ -24,7 +24,7 @@ public class Tag extends Model<Tag.Id, Signature.UUID> {
       Model<Identity<?>, ?> model,
       Instant timestamp
   ) {
-    super(id, tagger.get_title() + "-" + target.get_title(), timestamp);
+    super(id, timestamp);
     _tagger = tagger;
     _target = target;
     _model = model;

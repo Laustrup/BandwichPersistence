@@ -11,7 +11,6 @@ import laustrup.bandwichpersistence.core.persistence.worm.annotations.Table;
 import laustrup.bandwichpersistence.core.services.UserService;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 
 import java.time.Instant;
@@ -19,29 +18,31 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static laustrup.bandwichpersistence.core.services.ModelService.toStringify;
+
 /**
  * Extends performer and contains Artists as members
  */
 @Getter
 @FieldNameConstants
-@Table(value = "bands")
+@Table
 public class Band extends Model<Band.Id, Signature.UUID> {
 
-  private String _description;
+  private final String _description;
 
-  private Subscription _subscription;
+  private final Subscription _subscription;
 
-  private Seszt<Album> _albums;
+  private final Seszt<Album> _albums;
 
-  private Seszt<Event> _events;
+  private final Seszt<Event> _events;
 
-  private Seszt<User<? extends User.Id>> _fans;
+  private final Seszt<User<? extends User.Id>> _fans;
 
-  private Seszt<Post> _posts;
+  private final Seszt<Post> _posts;
 
-  private String _name;
+  private final String _name;
 
-  private String _runner;
+  private final String _runner;
 
   /**
    * Will translate a transport object of this object into a construct of this object.
@@ -75,8 +76,7 @@ public class Band extends Model<Band.Id, Signature.UUID> {
       Seszt<User<? extends User.Id>> fans,
       Instant timestamp
   ) {
-    super(id, name + "|" + id, timestamp);
-
+    super(id, timestamp);
     _name = name;
     _description = description;
     _albums = albums;
@@ -115,21 +115,7 @@ public class Band extends Model<Band.Id, Signature.UUID> {
 
   @Override
   public String toString() {
-    return defineToString(
-        getClass().getSimpleName(),
-        new String[]{
-            Model.Fields._identity,
-            User.Fields._username,
-            User.Fields._description,
-            Model.Fields._timestamp
-        },
-        new String[]{
-            String.valueOf(get_identity()),
-            get_name(),
-            get_description(),
-            Model.Fields._timestamp
-        }
-    );
+    return toStringify(this);
   }
 
   /**
@@ -138,27 +124,25 @@ public class Band extends Model<Band.Id, Signature.UUID> {
    * Doesn't have any logic.
    */
   @Getter
-  @Setter
   @FieldNameConstants
   @JsonIgnoreProperties(ignoreUnknown = true)
   public static class DTO extends ModelDTO<Band.Id, Signature.UUID, java.util.UUID> {
 
+    private final String description;
 
-    private String description;
+    private final Subscription.DTO subscription;
 
-    private Subscription.DTO subscription;
+    private final Set<Album.DTO> albums;
 
-    private Set<Album.DTO> albums;
+    private final Set<Event.DTO> events;
 
-    private Set<Event.DTO> events;
+    private final Set<User.UserDTO<? extends User.Id>> fans;
 
-    private Set<User.UserDTO<? extends User.Id>> fans;
+    private final Set<Post.DTO> posts;
 
-    private Set<Post.DTO> posts;
+    private final String name;
 
-    private String name;
-
-    private String runner;
+    private final String runner;
 
     /**
      * Converts into this DTO Object.
@@ -191,9 +175,9 @@ public class Band extends Model<Band.Id, Signature.UUID> {
   @Table(value = "band_memberships")
   public static class Membership {
 
-    private Artist _member;
+    private final Artist _member;
 
-    private Association _association;
+    private final Association _association;
 
     public Membership(DTO membership) {
       _member = new Artist(membership.getMember());
@@ -215,9 +199,9 @@ public class Band extends Model<Band.Id, Signature.UUID> {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class DTO {
 
-      private Artist.DTO member;
+      private final Artist.DTO member;
 
-      private Association association;
+      private final Association association;
 
       public DTO(Membership membership) {
         member = new Artist.DTO(membership.get_member());

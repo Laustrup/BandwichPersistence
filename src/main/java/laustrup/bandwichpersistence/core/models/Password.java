@@ -6,11 +6,11 @@ import lombok.Getter;
 @Getter
 public class Password {
 
-  private String _content;
+  private final String _content;
 
-  private String _stash;
+  private final String _stash;
 
-  private String _combined;
+  private final String _combined;
 
   public Password(String content, String stash) {
     _content = content;

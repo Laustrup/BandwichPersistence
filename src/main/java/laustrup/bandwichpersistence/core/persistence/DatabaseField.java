@@ -27,7 +27,7 @@ public record DatabaseField(Table table, Column column) {
     this(configuration.get_table(), configuration.get_column());
   }
 
-  private static final String[] _idIndicators = new String[]{"id", "_id"};
+  private static final String[] _idIndicators = new String[]{"id", "id"};
 
   public static Map<DatabaseField, String> toSelections(Map<? extends Member, DatabaseField> data) {
     return data.keySet().stream()

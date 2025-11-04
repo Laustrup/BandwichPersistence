@@ -44,7 +44,6 @@ public class OrganisationEmployeeBuilder extends BuilderService<Employee> {
         get_field(Employee.Fields._authorities),
         get_field(BusinessUser.Fields._chatRooms),
         get_field(User.Fields._participations),
-        get_field(User.Fields._history),
         get_field(Model.Fields._timestamp)
     );
   }

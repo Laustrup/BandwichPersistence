@@ -33,7 +33,7 @@ public class VenueBuilder extends BuilderService<Venue> {
   protected Venue construct() {
     return new Venue(
         new Venue.Id((UUID) get_field(Model.Fields._identity)),
-        get_field(Model.Fields._title),
+        get_field(Venue.Fields._title),
         get_field(Venue.Fields._description),
         get_field(Venue.Fields._organisations),
         get_field(Venue.Fields._albums),

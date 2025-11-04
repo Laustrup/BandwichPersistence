@@ -78,7 +78,7 @@ public class TestItems {
     return get(new Configurations(
             DatabaseField.of(databaseFieldConfiguration(
                 clazz,
-                (clazz.isAssignableFrom(Model.class)) ? Model.Fields._identity : "_id"
+                (clazz.isAssignableFrom(Model.class)) ? Model.Fields._identity : "id"
             )),
             read(
                 new Query(selecting(new Properties(clazz, that)).select())

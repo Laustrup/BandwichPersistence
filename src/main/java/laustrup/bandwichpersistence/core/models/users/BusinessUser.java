@@ -1,6 +1,5 @@
 package laustrup.bandwichpersistence.core.models.users;
 
-import laustrup.bandwichpersistence.core.models.History;
 import laustrup.bandwichpersistence.core.models.Subscription;
 import laustrup.bandwichpersistence.core.models.chats.ChatRoom;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
@@ -16,7 +15,7 @@ import java.util.stream.Collectors;
 @Getter @FieldNameConstants
 public abstract class BusinessUser<IDENTITY extends User.Id> extends User<IDENTITY> {
 
-  private Seszt<ChatRoom> _chatRooms;
+  private final Seszt<ChatRoom> _chatRooms;
 
   public BusinessUser(BusinessUserDTO<IDENTITY> user, IDENTITY identity) {
     super(user, identity);
@@ -33,7 +32,6 @@ public abstract class BusinessUser<IDENTITY extends User.Id> extends User<IDENTI
       Subscription subscription,
       Seszt<ChatRoom> chatRooms,
       Seszt<Participation> participations,
-      History history,
       Instant timestamp
   ) {
     super(
@@ -45,7 +43,6 @@ public abstract class BusinessUser<IDENTITY extends User.Id> extends User<IDENTI
         contactInfo,
         participations,
         subscription,
-        history,
         timestamp
     );
     _chatRooms = chatRooms;
@@ -66,7 +63,6 @@ public abstract class BusinessUser<IDENTITY extends User.Id> extends User<IDENTI
                 Set<Participation.DTO> participations,
                 Subscription.DTO subscription,
                 Set<ChatRoom.DTO> chatRooms,
-                History history,
                 Instant timestamp
         ) {
             super(
@@ -78,7 +74,6 @@ public abstract class BusinessUser<IDENTITY extends User.Id> extends User<IDENTI
                     contactInfo,
                     participations,
                     subscription,
-                    history,
                     timestamp
             );
             this.chatRooms = chatRooms;

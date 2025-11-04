@@ -3,9 +3,8 @@ package laustrup.bandwichpersistence.core.persistence.worm.annotations;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 
-@Target(ElementType.TYPE)
+@java.lang.annotation.Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Table {
 
@@ -15,7 +14,7 @@ public @interface Table {
 
   boolean idLess() default false;
 
-  @Target(ElementType.FIELD)
+  @java.lang.annotation.Target(ElementType.FIELD)
   @Retention(RetentionPolicy.RUNTIME)
   @interface Column {
 
@@ -30,13 +29,13 @@ public @interface Table {
     String value() default "";
   }
 
-  @Target(ElementType.FIELD)
+  @java.lang.annotation.Target(ElementType.FIELD)
   @Retention(RetentionPolicy.RUNTIME)
   @interface ExcludedColumn {
 
   }
 
-  @Target(ElementType.TYPE)
+  @java.lang.annotation.Target(ElementType.TYPE)
   @Retention(RetentionPolicy.RUNTIME)
   @interface Enum {
 
@@ -45,5 +44,11 @@ public @interface Table {
     IdReference idReference() default @IdReference;
 
     Column[] columns();
+  }
+
+  @java.lang.annotation.Target(ElementType.TYPE)
+  @Retention(RetentionPolicy.RUNTIME)
+  @interface Target {
+
   }
 }
