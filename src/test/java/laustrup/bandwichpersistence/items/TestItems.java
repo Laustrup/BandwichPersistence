@@ -2,7 +2,6 @@ package laustrup.bandwichpersistence.items;
 
 import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.models.Situation;
-import laustrup.bandwichpersistence.core.models.ToStringArgument;
 import laustrup.bandwichpersistence.core.models.identification.CommonIdentity;
 import laustrup.bandwichpersistence.core.models.identification.Identity;
 import laustrup.bandwichpersistence.core.models.identification.Signature;
@@ -14,7 +13,6 @@ import laustrup.bandwichpersistence.core.persistence.services.SelectService.Sele
 import laustrup.bandwichpersistence.core.persistence.worm.annotations.Table;
 import laustrup.bandwichpersistence.core.services.ModelService;
 import laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService.Configurations;
-import laustrup.bandwichpersistence.core.utilities.Coollection;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import laustrup.bandwichpersistence.core.utilities.parameters.Truthiness;
 import lombok.AllArgsConstructor;
@@ -78,7 +76,7 @@ public class TestItems {
     return get(new Configurations(
             DatabaseField.of(databaseFieldConfiguration(
                 clazz,
-                (clazz.isAssignableFrom(Model.class)) ? Model.Fields._identity : "id"
+                (clazz.isAssignableFrom(Model.class)) ? Model.Fields._identity : "_id"
             )),
             read(
                 new Query(selecting(new Properties(clazz, that)).select())
@@ -187,11 +185,6 @@ public class TestItems {
         }
 
         @Override
-        public String get_title() {
-          return instance.get_title();
-        }
-
-        @Override
         public Instant get_timestamp() {
           return Instant.now();
         }
@@ -202,28 +195,8 @@ public class TestItems {
         }
 
         @Override
-        public void set_title(String _title) {
-          super.set_title(_title);
-        }
-
-        @Override
         public Situation set_situation(Situation situation) {
           return super.set_situation(situation);
-        }
-
-        @Override
-        protected String defineToString(String title, Coollection<ToStringArgument> arguments) {
-          return super.defineToString(title, arguments);
-        }
-
-        @Override
-        protected String defineToString(String title, String[][] values) {
-          return super.defineToString(title, values);
-        }
-
-        @Override
-        protected String defineToString(String title, String[] keys, String[] values) {
-          return super.defineToString(title, keys, values);
         }
 
         @Override

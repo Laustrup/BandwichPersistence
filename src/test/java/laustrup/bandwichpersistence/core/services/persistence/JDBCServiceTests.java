@@ -51,7 +51,7 @@ class JDBCServiceTests extends BandwichTester {
               new Configurations(
                   DatabaseField.of(databaseFieldConfiguration(
                       Organisation.class,
-                      isBinary ? Model.Fields._identity : Model.Fields._title
+                      isBinary ? Model.Fields._identity : "_title"
                   )),
                   resultSet,
                   PEEK

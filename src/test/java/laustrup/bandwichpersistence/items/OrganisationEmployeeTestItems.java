@@ -49,7 +49,6 @@ public class OrganisationEmployeeTestItems {
                 new Seszt<>(),
                 new Seszt<>(),
                 new Seszt<>(),
-                null,
                 Instant.now()
         );
     }

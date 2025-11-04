@@ -88,7 +88,7 @@ public class ContactInfoTestItems {
                 new Country.Id(generateUUID(
                         clazz,
                         complying().which(Condition.equals(
-                                DatabaseField.of(databaseFieldConfiguration(clazz, Country.Fields._title)),
+                                DatabaseField.of(databaseFieldConfiguration(clazz, Country.Fields.title)),
                                 title
                         ))
                 )),

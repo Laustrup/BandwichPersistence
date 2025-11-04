@@ -18,7 +18,7 @@ class DatabaseDefinitionServiceTests extends BandwichTester {
     test(() -> {
       String expected = arrange(switch (clazz.getSimpleName()) {
         case "Organisation" -> "organisations";
-        case "Media" -> "album_media";
+        case "Media" -> "media";
         default -> throw new IllegalStateException("Unexpected value: " + clazz.getSimpleName());
       });
 
