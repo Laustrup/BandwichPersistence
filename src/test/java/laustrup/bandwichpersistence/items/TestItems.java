@@ -11,6 +11,8 @@ import laustrup.bandwichpersistence.core.persistence.services.SelectService.Sele
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Properties;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Clause.Clausement;
 import laustrup.bandwichpersistence.core.persistence.worm.annotations.Table;
+import laustrup.bandwichpersistence.core.persistence.worm.models.DatabaseDefinition;
+import laustrup.bandwichpersistence.core.repositories.bandwich.BandwichEntityDataCollection;
 import laustrup.bandwichpersistence.core.services.ModelService;
 import laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService.Configurations;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
@@ -23,6 +25,7 @@ import lombok.experimental.FieldNameConstants;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.time.Instant;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
@@ -33,6 +36,7 @@ import static laustrup.bandwichpersistence.core.persistence.DatabaseField.Config
 import static laustrup.bandwichpersistence.core.persistence.DatabaseField.Configuration.databaseFieldConfigurationOfId;
 import static laustrup.bandwichpersistence.core.persistence.DatabaseManager.read;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.selecting;
+import static laustrup.bandwichpersistence.core.repositories.bandwich.BandwichEntityDataCollection.defineDefinitions;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService.get;
 
 public class TestItems {
@@ -236,5 +240,26 @@ public class TestItems {
   }
 
   public record Instances(Instance expected, Instance actual) {
+  }
+
+  public static class EntityDataCollection implements laustrup.bandwichpersistence.core.persistence.models.EntityDataCollection {
+
+    public static EntityDataCollection _instance;
+
+    public static EntityDataCollection get_instance() {
+      if (_instance == null)
+        _instance = new EntityDataCollection();
+
+      return _instance;
+    }
+
+    private EntityDataCollection() {
+
+    }
+
+    @Override
+    public Map<String, DatabaseDefinition> getAll() {
+      return defineDefinitions(BandwichEntityDataCollection.ClassDatabaseDefinition.of(Instance.class));
+    }
   }
 }

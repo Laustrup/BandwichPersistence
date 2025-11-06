@@ -2,7 +2,7 @@ package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.Ticket;
 
-public class TicketBuilder extends BuilderService<Ticket> {
+public class TicketBuilder extends BandwichBuilderService<Ticket> {
 
   private static TicketBuilder _instance;
 

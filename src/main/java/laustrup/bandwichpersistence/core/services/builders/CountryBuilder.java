@@ -2,7 +2,7 @@ package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
 
-public class CountryBuilder extends BuilderService<ContactInfo.Country> {
+public class CountryBuilder extends BandwichBuilderService<ContactInfo.Country> {
 
   private static CountryBuilder _instance;
 

@@ -2,7 +2,7 @@ package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.chats.messages.Message;
 
-public class MessageBuilder extends BuilderService<Message> {
+public class MessageBuilder extends BandwichBuilderService<Message> {
 
   private static MessageBuilder _instance;
 

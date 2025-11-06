@@ -2,7 +2,7 @@ package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.Subscription;
 
-public class SubscriptionBuilder extends BuilderService<Subscription> {
+public class SubscriptionBuilder extends BandwichBuilderService<Subscription> {
 
   private static SubscriptionBuilder _instance;
 

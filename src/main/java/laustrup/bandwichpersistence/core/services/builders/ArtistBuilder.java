@@ -2,7 +2,7 @@ package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.users.Artist;
 
-public class ArtistBuilder extends BuilderService<Artist> {
+public class ArtistBuilder extends BandwichBuilderService<Artist> {
 
   private static ArtistBuilder _instance;
 

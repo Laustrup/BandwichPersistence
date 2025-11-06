@@ -2,7 +2,7 @@ package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.Album;
 
-public class AlbumMediaBuilder extends BuilderService<Album.Media> {
+public class AlbumMediaBuilder extends BandwichBuilderService<Album.Media> {
 
   private static AlbumMediaBuilder _instance;
 

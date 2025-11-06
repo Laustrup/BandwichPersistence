@@ -2,7 +2,7 @@ package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.chats.ChatRoom;
 
-public class ChatRoomBuilder extends BuilderService<ChatRoom> {
+public class ChatRoomBuilder extends BandwichBuilderService<ChatRoom> {
 
   private static ChatRoomBuilder _instance;
 

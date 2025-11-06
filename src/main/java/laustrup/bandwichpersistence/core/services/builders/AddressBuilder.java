@@ -2,7 +2,7 @@ package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
 
-public class AddressBuilder extends BuilderService<ContactInfo.Address> {
+public class AddressBuilder extends BandwichBuilderService<ContactInfo.Address> {
 
   private static AddressBuilder _instance;
 

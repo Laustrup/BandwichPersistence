@@ -2,7 +2,7 @@ package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.Band;
 
-public class BandBuilder extends BuilderService<Band> {
+public class BandBuilder extends BandwichBuilderService<Band> {
 
   private static BandBuilder _instance;
 

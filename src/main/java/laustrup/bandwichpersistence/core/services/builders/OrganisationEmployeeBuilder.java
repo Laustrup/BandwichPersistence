@@ -2,7 +2,7 @@ package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.Organisation.Employee;
 
-public class OrganisationEmployeeBuilder extends BuilderService<Employee> {
+public class OrganisationEmployeeBuilder extends BandwichBuilderService<Employee> {
 
   private static OrganisationEmployeeBuilder _instance;
 

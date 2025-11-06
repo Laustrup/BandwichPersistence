@@ -2,7 +2,7 @@ package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.chats.Request;
 
-public class RequestBuilder extends BuilderService<Request> {
+public class RequestBuilder extends BandwichBuilderService<Request> {
 
   private static RequestBuilder _instance;
 

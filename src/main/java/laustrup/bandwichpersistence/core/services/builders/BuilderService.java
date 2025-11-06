@@ -1,9 +1,9 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.Model;
+import laustrup.bandwichpersistence.core.persistence.models.EntityDataCollection;
 import laustrup.bandwichpersistence.core.persistence.worm.models.DatabaseDefinition;
 import laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService;
-import laustrup.bandwichpersistence.core.repositories.bandwich.BandwichEntityDataCollection;
 import laustrup.bandwichpersistence.core.services.persistence.JDBCService;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 
@@ -36,9 +36,9 @@ public abstract class BuilderService<MODEL> {
 
   protected Map<? extends Member, AtomicReference<?>> _fields;
 
-  protected BuilderService() {
+  protected BuilderService(EntityDataCollection collection) {
     _logger = Logger.getLogger(getGeneric().getName());
-    _entity = get_entityData();
+    _entity = get_entityData(collection);
     _fields = _entity.get_columns().keySet().stream()
         .map(field ->
             new AbstractMap.SimpleImmutableEntry<>(field, new AtomicReference<>())
@@ -59,9 +59,8 @@ public abstract class BuilderService<MODEL> {
     throw new RuntimeException(exception);
   }
 
-  private DatabaseDefinition.Entity get_entityData() {
-    return (DatabaseDefinition.Entity) BandwichEntityDataCollection.get_instance()
-        .get(getGeneric());
+  private DatabaseDefinition.Entity get_entityData(EntityDataCollection collection) {
+    return (DatabaseDefinition.Entity) collection.get(getGeneric());
   }
 
   public MODEL build(ResultSet resultSet) {

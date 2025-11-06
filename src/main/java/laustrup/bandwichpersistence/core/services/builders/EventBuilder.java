@@ -2,7 +2,7 @@ package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.Event;
 
-public class EventBuilder extends BuilderService<Event> {
+public class EventBuilder extends BandwichBuilderService<Event> {
 
   private static EventBuilder _instance;
 

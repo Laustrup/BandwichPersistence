@@ -52,7 +52,7 @@ public class BandwichEntityDataCollection implements EntityDataCollection {
       ClassDatabaseDefinition.of(Band.Membership.class)
   );
 
-  private static Map<String, DatabaseDefinition> defineDefinitions(ClassDatabaseDefinition... classDatabaseDefinitions) {
+  public static Map<String, DatabaseDefinition> defineDefinitions(ClassDatabaseDefinition... classDatabaseDefinitions) {
     return collectMap(Arrays.stream(classDatabaseDefinitions)
         .map(databaseDefinition -> databaseDefinition.toDatabaseDefinition().toEntry())
     );
@@ -63,7 +63,7 @@ public class BandwichEntityDataCollection implements EntityDataCollection {
     return DEFINITIONS;
   }
 
-  private record ClassDatabaseDefinition(Seszt<Class<?>> classes) {
+  public record ClassDatabaseDefinition(Seszt<Class<?>> classes) {
 
     public static ClassDatabaseDefinition of(Class<?> clazz) {
       return new ClassDatabaseDefinition(new Seszt<>(clazz));

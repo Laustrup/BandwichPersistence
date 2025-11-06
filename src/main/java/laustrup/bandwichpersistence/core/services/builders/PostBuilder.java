@@ -2,7 +2,7 @@ package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.chats.messages.Post;
 
-public class PostBuilder extends BuilderService<Post> {
+public class PostBuilder extends BandwichBuilderService<Post> {
 
   private static PostBuilder _instance;
 

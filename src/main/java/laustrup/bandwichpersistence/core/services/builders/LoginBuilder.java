@@ -2,7 +2,7 @@ package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.Login;
 
-public class LoginBuilder extends BuilderService<Login> {
+public class LoginBuilder extends BandwichBuilderService<Login> {
 
   private static LoginBuilder _instance;
 

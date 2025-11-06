@@ -2,7 +2,7 @@ package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.Event;
 
-public class GigBuilder extends BuilderService<Event.Gig> {
+public class GigBuilder extends BandwichBuilderService<Event.Gig> {
 
   private static GigBuilder _instance;
 

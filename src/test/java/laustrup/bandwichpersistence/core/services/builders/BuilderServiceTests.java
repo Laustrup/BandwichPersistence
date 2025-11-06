@@ -2,6 +2,7 @@ package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.BandwichTester;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
+import laustrup.bandwichpersistence.items.TestItems;
 import laustrup.bandwichpersistence.items.TestItems.Instance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -11,7 +12,9 @@ import static laustrup.bandwichpersistence.quality_assurance.Asserter.asserting;
 
 class BuilderServiceTests extends BandwichTester {
 
-  private final BuilderService<Instance> _builderService = new BuilderService<>() {
+  private final BuilderService<Instance> _builderService = new BuilderService<>(
+      TestItems.EntityDataCollection.get_instance()
+  ) {
     @Override
     protected void completion(Instance reference, Instance object) {
 

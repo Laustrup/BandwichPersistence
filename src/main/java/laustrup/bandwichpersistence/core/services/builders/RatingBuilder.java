@@ -2,7 +2,7 @@ package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.Rating;
 
-public class RatingBuilder extends BuilderService<Rating> {
+public class RatingBuilder extends BandwichBuilderService<Rating> {
 
   private static RatingBuilder _instance;
 
