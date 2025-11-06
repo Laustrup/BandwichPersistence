@@ -77,6 +77,7 @@ public class Artist extends BusinessUser<Artist.Id> {
         );
     }
 
+    @Table.Constructor
     public Artist(
             Artist.Id id,
             String username,

@@ -4,6 +4,7 @@ import laustrup.bandwichpersistence.core.models.identification.CommonIdentity;
 import laustrup.bandwichpersistence.core.models.identification.Identity;
 import laustrup.bandwichpersistence.core.models.identification.Signature;
 import laustrup.bandwichpersistence.core.models.users.User;
+import laustrup.bandwichpersistence.core.persistence.worm.annotations.Table;
 import lombok.Getter;
 
 import java.time.Instant;
@@ -17,6 +18,7 @@ public class Tag extends Model<Tag.Id, Signature.UUID> {
 
   private final Model<Identity<?>, ?> _model;
 
+  @Table.Constructor
   public Tag(
       Id id,
       User<User.Id> tagger,

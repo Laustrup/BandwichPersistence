@@ -10,27 +10,19 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
 
+import java.util.UUID;
+
 import static laustrup.bandwichpersistence.core.services.ModelService.toStringify;
 
 /**
  * Defines the kind of subscription a user is having.
  * Only Artists and Bands can have a paying subscription.
+ *
+ * @param status An enum that determines what kind of status, the situation of the Subscription is in.
  */
-@Getter
 @FieldNameConstants
 @Table
-public class Subscription {
-
-  private final Id _id;
-
-  /**
-   * An enum that determines what kind of status, the situation of the Subscription is in.
-   */
-  private final Status _status;
-
-  private final Kind _kind;
-
-  private final UserType _userType;
+public record Subscription(Id id, Status status, Kind kind, UserType userType) {
 
   /**
    * Will translate a transport object of this object into a construct of this object.
@@ -52,16 +44,8 @@ public class Subscription {
    * @param id     The id the defines this specific Subscription, is the same as the User of this Subscription.
    * @param status An enum that determines what kind of status, the situation of the Subscription is in.
    */
-  public Subscription(
-      Id id,
-      Status status,
-      Kind kind,
-      UserType userType
-  ) {
-    _id = id;
-    _status = status;
-    _kind = kind;
-    _userType = userType;
+  @Table.Constructor
+  public Subscription {
   }
 
   /**
@@ -85,7 +69,7 @@ public class Subscription {
       super(signature);
     }
 
-    public Id(java.util.UUID signature) {
+    public Id(UUID signature) {
       super(new Signature.UUID(signature));
     }
 
@@ -134,20 +118,20 @@ public class Subscription {
   @JsonIgnoreProperties(ignoreUnknown = true)
   public static class DTO {
 
-    private java.util.UUID id;
+    private UUID id;
 
     /**
      * An enum that determines what kind of status, the situation of the Subscription is in.
      */
-    private Subscription.Status status;
+    private Status status;
 
-    private Subscription.Kind kind;
+    private Kind kind;
 
     private UserType userType;
 
     @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
     public DTO(
-        @JsonProperty java.util.UUID id,
+        @JsonProperty UUID id,
         @JsonProperty Status status,
         @JsonProperty Kind kind,
         @JsonProperty UserType userType
@@ -160,10 +144,10 @@ public class Subscription {
 
     public DTO(Subscription subscription) {
       this(
-          subscription.get_id().get_value(),
-          Subscription.Status.valueOf(subscription.get_status().toString()),
-          subscription.get_kind(),
-          subscription.get_userType()
+          subscription.id().get_value(),
+          Status.valueOf(subscription.status().toString()),
+          subscription.kind(),
+          subscription.userType()
       );
     }
   }

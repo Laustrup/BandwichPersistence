@@ -188,6 +188,7 @@ public class Event extends Model<Event.Id, Signature.UUID> {
     );
   }
 
+  @Table.Constructor
   public Event(
       Event.Id id,
       String title,
@@ -832,6 +833,7 @@ public class Event extends Model<Event.Id, Signature.UUID> {
       );
     }
 
+    @Table.Constructor
     public Gig(
         Gig.Id id,
         String title,
@@ -1017,6 +1019,7 @@ public class Event extends Model<Event.Id, Signature.UUID> {
      * @param participant The Participant of the participation.
      * @param type        The type of which participant is participating in the participation.
      */
+    @Table.Constructor
     public Participation(Participant participant, Type type, Instant timestamp) {
       super(type, timestamp);
       _participant = participant;

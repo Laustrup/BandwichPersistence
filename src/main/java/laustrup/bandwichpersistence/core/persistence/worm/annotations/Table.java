@@ -51,4 +51,10 @@ public @interface Table {
   @interface Target {
 
   }
+
+  @java.lang.annotation.Target(ElementType.CONSTRUCTOR)
+  @Retention(RetentionPolicy.RUNTIME)
+  @interface Constructor {
+
+  }
 }

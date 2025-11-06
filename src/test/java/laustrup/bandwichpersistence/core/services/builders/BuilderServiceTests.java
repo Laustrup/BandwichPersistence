@@ -11,43 +11,33 @@ import static laustrup.bandwichpersistence.quality_assurance.Asserter.asserting;
 
 class BuilderServiceTests extends BandwichTester {
 
-    private final BuilderService<Instance> _builderService = new BuilderService<>() {
-        @Override
-        protected void completion(Instance reference, Instance object) {
+  private final BuilderService<Instance> _builderService = new BuilderService<>() {
+    @Override
+    protected void completion(Instance reference, Instance object) {
 
-        }
-
-        @Override
-        protected Instance construct() {
-            return new Instance(
-                    get_field(Instance.Fields._id),
-                    get_field(Instance.Fields._title),
-                    get_field(Instance.Fields._active),
-                    get_field(Instance.Fields._amount)
-            );
-        }
-    };
-
-    @ParameterizedTest
-    @CsvSource(value = {"true", "false"})
-    void canCombine(boolean shouldUpdate) {
-        mocked(() -> {
-            Instance entity = Instance.initialise();
-            Seszt<Instance> collection = new Seszt<>(
-                    Instance.initialise(),
-                    Instance.initialise(shouldUpdate ? entity : null)
-            );
-            InstanceCollection arrangement = arrange(new InstanceCollection(collection, entity));
-
-            act(() -> _builderService.combine(arrangement.collection(), arrangement.entity()));
-
-            asserting(arrangement.collection())
-                    .anyMatches(instance -> ((Instance) instance).get_id().equals(entity.get_id()))
-                    .inCase(
-                            shouldUpdate,
-                            instances -> instances.stream()
-                                    .noneMatch(instance -> instance.isSameAs(entity))
-                    );
-        });
     }
+  };
+
+  @ParameterizedTest
+  @CsvSource(value = {"true", "false"})
+  void canCombine(boolean shouldUpdate) {
+    mocked(() -> {
+      Instance entity = Instance.initialise();
+      Seszt<Instance> collection = new Seszt<>(
+          Instance.initialise(),
+          Instance.initialise(shouldUpdate ? entity : null)
+      );
+      InstanceCollection arrangement = arrange(new InstanceCollection(collection, entity));
+
+      act(() -> _builderService.combine(arrangement.collection(), arrangement.entity()));
+
+      asserting(arrangement.collection())
+          .anyMatches(instance -> ((Instance) instance).get_id().equals(entity.get_id()))
+          .inCase(
+              shouldUpdate,
+              instances -> instances.stream()
+                  .noneMatch(instance -> instance.isSameAs(entity))
+          );
+    });
+  }
 }

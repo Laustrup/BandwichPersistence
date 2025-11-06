@@ -1,5 +1,6 @@
 package laustrup.bandwichpersistence.core.persistence.worm.services;
 
+import laustrup.bandwichpersistence.core.persistence.exceptions.DatabaseDefinitionException;
 import laustrup.bandwichpersistence.core.persistence.models.members.CommonField;
 import laustrup.bandwichpersistence.core.persistence.models.members.InheritanceField;
 import laustrup.bandwichpersistence.core.persistence.worm.annotations.Junction;
@@ -12,6 +13,7 @@ import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.util.Arrays;
@@ -33,22 +35,48 @@ public abstract class DatabaseDefinitionService {
         Property.inCase(clazz.isAnnotationPresent(Junction.class))
             .then(() -> get_junction(clazz)),
         Property.inCase(clazz.isAnnotationPresent(Table.Enum.class))
-            .then(() -> get_tableEnum(clazz))
+            .then(() -> get_tableEnum(clazz)),
+        Property.inCase(clazz.isAnnotationPresent(Table.Constructor.class))
+            .then(() -> get_constructor(clazz))
     )).orEmpty();
   }
 
   public static Table get_table(Class<?> clazz) {
-    if (clazz == null)
-      throw new NullPointerException("Can't get table since its class is null!");
-
-    return ifAnnotationIsPresent(clazz, Table.class, clazz.getAnnotation(Table.class));
+    return handleGet(clazz, Table.class);
   }
 
-  private static Annotation get_tableEnum(Class<?> clazz) {
-    if (clazz == null)
-      throw new NullPointerException("Can't get table enum since its class is null!");
+  private static Table.Enum get_tableEnum(Class<?> clazz) {
+    return handleGet(clazz, Table.Enum.class);
+  }
 
-    return ifAnnotationIsPresent(clazz, Table.Enum.class, clazz.getAnnotation(Table.Enum.class));
+  public static Table.Constructor get_constructor(Class<?> clazz) {
+    return handleGet(clazz, Table.Constructor.class);
+  }
+
+  private static <ANNOTATION extends Annotation> ANNOTATION handleGet(Class<?> clazz, Class<ANNOTATION> annotation) {
+    return stating(clazz != null)
+        .then(() -> ifAnnotationIsPresent(clazz, annotation, clazz.getAnnotation(annotation)))
+        .orElseThrow(new NullPointerException(String.format("Can't get %s since its class is null!", annotation.getSimpleName())));
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <CLASS> Constructor<CLASS> get_tableConstructor(Class<?> clazz) {
+    if (clazz == null)
+      throw new NullPointerException("Can't get constructor since its class is null!");
+
+    Liszt<Constructor<?>> constructors = Liszt.of(Arrays.stream(clazz.getConstructors())
+        .filter(constructor -> constructor.isAnnotationPresent(Table.Constructor.class))
+    );
+
+    if (constructors.size() > 1)
+      throw new IllegalStateException("Only one constructor allowed for a builder!");
+
+    return (Constructor<CLASS>) stating(constructors.size() == 1)
+        .then(() -> constructors.stream().findAny().orElseThrow())
+        .orElseThrow(new IllegalStateException(stating(constructors.isEmpty())
+            .then("Couldn't find any constructor for Database Definition, please add one for " + clazz.getSimpleName())
+            .orElse("Only one constructor allowed for a builder! The class was " + clazz.getSimpleName())
+        ));
   }
 
   public static TableColumnData getTableColumnData(Class<?> clazz, Table.Column column) {
@@ -97,7 +125,10 @@ public abstract class DatabaseDefinitionService {
       return null;
 
     Annotation annotation = get_databaseDefinition(clazz)
-        .orElseThrow(() -> new IllegalStateException("Couldn't define database definition for " + clazz.getSimpleName()));
+        .orElseThrow(() -> new DatabaseDefinitionException(String.format(
+            "Couldn't define database definition for %s.\nDoes it have the correct annotation?",
+            clazz.getSimpleName()
+        )));
 
     return stating(Liszt.of(
         Property.inCase(clazz.isAnnotationPresent(Table.class))

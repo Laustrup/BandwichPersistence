@@ -66,7 +66,7 @@ public class UserBuilder {
   }
 
   protected void completion(User<? extends User.Id> collective, User<? extends User.Id> part) {
-    switch (collective.get_subscription().get_userType()) {
+    switch (collective.get_subscription().userType()) {
       case ARTIST -> _artistBuilder.completion((Artist) collective, (Artist) part);
       case ORGANISATION_EMPLOYEE -> _organisationEmployeeBuilder.completion(
           (Employee) collective,

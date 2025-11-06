@@ -64,6 +64,7 @@ public class Band extends Model<Band.Id, Signature.UUID> {
     );
   }
 
+  @Table.Constructor
   public Band(
       Id id,
       String name,

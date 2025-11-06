@@ -21,15 +21,4 @@ public class RatingBuilder extends BuilderService<Rating> {
   protected void completion(Rating reference, Rating object) {
 
   }
-
-  @Override
-  protected Rating construct() {
-    return new Rating(
-        get_field(Rating.Fields._value),
-        get_field(Rating.Fields._appointedId),
-        get_field(Rating.Fields._reviewerId),
-        get_field(Rating.Fields._comment),
-        get_field(Rating.Fields._timestamp)
-    );
-  }
 }

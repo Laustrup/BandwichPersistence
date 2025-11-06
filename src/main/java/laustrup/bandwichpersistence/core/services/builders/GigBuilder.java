@@ -1,9 +1,6 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.Event;
-import laustrup.bandwichpersistence.core.models.Model;
-
-import java.util.UUID;
 
 public class GigBuilder extends BuilderService<Event.Gig> {
 
@@ -25,16 +22,4 @@ public class GigBuilder extends BuilderService<Event.Gig> {
     combine(collective.get_act(), part.get_act());
   }
 
-  @Override
-  protected Event.Gig construct() {
-    return new Event.Gig(
-        new Event.Gig.Id((UUID) get_field(Model.Fields._identity)),
-        get_field(Event.Gig.Fields._title),
-        get_field(Event.Gig.Fields._event),
-        get_field(Event.Gig.Fields._act),
-        get_field(Event.Gig.Fields._start),
-        get_field(Event.Gig.Fields._end),
-        get_field(Model.Fields._timestamp)
-    );
-  }
 }

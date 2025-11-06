@@ -21,12 +21,4 @@ public class LoginBuilder extends BuilderService<Login> {
   protected void completion(Login reference, Login object) {
 
   }
-
-  @Override
-  protected Login construct() {
-    return new Login(
-        get_field(Login.Fields.username),
-        get_field(Login.Fields.password)
-    );
-  }
 }

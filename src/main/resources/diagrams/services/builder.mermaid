@@ -1,0 +1,16 @@
+flowchart TD
+    build("MODEL build(ResultSet)") -->|Find columns| memberfication{"What is member?"}
+    memberfication -->|collection| combine("combine")
+    memberfication -->|part of entity| getBuilder("get_BuilderService")
+    getBuilder --> complete("complete")
+    memberfication -->|else| setField("set(Field, Entry)")
+    combine --> anyMembersLeft{"Any members left?"}
+    setField --> anyMembersLeft
+    complete --> anyMembersLeft
+    anyMembersLeft -->|Yes| memberfication
+    anyMembersLeft -->|No| findConstructor("Find constructor")
+    findConstructor --> parameterCheck{"Correct amount of parameters?"}
+    parameterCheck -->|No| unequallyParameterCount(("Throw illegal state"))
+    parameterCheck -->|Yes| constructModel{"Build fields from constructor"}
+    constructModel -->|Failure| throwConstructorException(("Thrown exception"))
+    constructModel -->|Success| return(("return"))

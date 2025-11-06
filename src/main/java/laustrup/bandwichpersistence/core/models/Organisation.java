@@ -58,6 +58,7 @@ public class Organisation extends Model<Organisation.Id, Signature.UUID> {
     );
   }
 
+  @Table.Constructor
   public Organisation(
       Id id,
       String title,
@@ -181,6 +182,7 @@ public class Organisation extends Model<Organisation.Id, Signature.UUID> {
       );
     }
 
+    @Table.Constructor
     public Employee(
         Id id,
         String username,

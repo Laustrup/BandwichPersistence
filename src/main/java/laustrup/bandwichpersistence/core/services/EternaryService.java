@@ -161,7 +161,7 @@ public class EternaryService {
           .map(Supplier::get);
     }
 
-    public ELEMENT orElseThrow(Exception exception) throws Exception {
+    public <EXCEPTION extends Exception> ELEMENT orElseThrow(EXCEPTION exception) throws EXCEPTION {
       Optional<ELEMENT> item = findSuccessfulPropertyOption()
           .map(Supplier::get);
 
@@ -170,7 +170,7 @@ public class EternaryService {
           : item.orElseThrow();
     }
 
-    public ELEMENT orElseThrow() throws Exception {
+    public <EXCEPTION extends Exception> ELEMENT orElseThrow() throws EXCEPTION {
       return orElseThrow(null);
     }
 

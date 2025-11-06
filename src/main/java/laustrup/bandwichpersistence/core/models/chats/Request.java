@@ -82,6 +82,7 @@ public class Request {
     );
   }
 
+  @Table.Constructor
   public Request(
       User.Id receiver,
       User.Id sender,

@@ -81,6 +81,7 @@ public class Venue extends Model<Venue.Id, Signature.UUID> {
     );
   }
 
+  @Table.Constructor
   public Venue(
       Id id,
       String title,
@@ -233,6 +234,7 @@ public class Venue extends Model<Venue.Id, Signature.UUID> {
       );
     }
 
+    @Table.Constructor
     public Rating(
         int value,
         User.Id appointedId,

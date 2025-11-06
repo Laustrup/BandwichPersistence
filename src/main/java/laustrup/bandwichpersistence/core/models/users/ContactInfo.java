@@ -56,6 +56,7 @@ public class ContactInfo {
    *
    * @param contactInfo The transport object to be transformed.
    */
+  @Table.Constructor
   public ContactInfo(DTO contactInfo) {
     this(
         new Id(contactInfo.getId()),
@@ -154,6 +155,7 @@ public class ContactInfo {
       );
     }
 
+    @Table.Constructor
     public Address(Id id, String street, String floor, String municipality, String zip, String city) {
       _id = id;
       _street = street;
@@ -232,87 +234,85 @@ public class ContactInfo {
         }
   }
 
-  /**
-   * An object with information about a curtain Country.
-   *
-   * @param title The name of the Country.
-   * @param code  The value of the first few digits of a phone number.
-   */
-    @Table
-    @FieldNameConstants
-    public record Country(@Table.Column(isPrimary = true) Id id, String title, String code) {
+  @Table
+  @FieldNameConstants
+  public record Country(@Table.Column(isPrimary = true) Id id, String title, String code) {
 
-      /**
-       * Will translate a transport object of this object into a construct of this object.
-       *
-       * @param country The transport object to be transformed.
-       */
-      public Country(DTO country) {
-        this(new Id(country.getId()), country.getTitle(), country.getCode());
+    /**
+     * Will translate a transport object of this object into a construct of this object.
+     *
+     * @param country The transport object to be transformed.
+     */
+    public Country(DTO country) {
+      this(new Id(country.getId()), country.getTitle(), country.getCode());
+    }
+
+    @Table.Constructor
+    public Country {
+    }
+
+    public static class Id extends CommonIdentity<Signature.UUID> {
+
+      public Id(Signature.UUID signature) {
+        super(signature);
       }
 
-      public static class Id extends CommonIdentity<Signature.UUID> {
-
-        public Id(Signature.UUID signature) {
-          super(signature);
-        }
-
-        public Id(UUID signature) {
-          super(new Signature.UUID(signature));
-        }
-
-        @Override
-        public Class<Country> getOwnerClassType() {
-          return Country.class;
-        }
+      public Id(UUID signature) {
+        super(new Signature.UUID(signature));
       }
 
-      /**
-       * The Data Transfer Object.
-       * Is meant to be used as having common fields and be the body of Requests and Responses.
-       * Doesn't have any logic.
-       */
-      @Getter
-      @FieldNameConstants
-      public static class DTO {
-
-        private final UUID id;
-
-        /**
-         * The name of the Country.
-         */
-        private final String title;
-
-        /**
-         * The value of the first few digits of a phone number.
-         */
-        private final String code;
-
-        @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
-        public DTO(
-            @JsonProperty UUID id,
-            @JsonProperty String title,
-            @JsonProperty String code
-        ) {
-          this.id = id;
-          this.title = title;
-          this.code = code;
-        }
-
-        /**
-         * Converts into this DTO Object.
-         *
-         * @param country The Object to be converted.
-         */
-        public DTO(Country country) {
-          this(
-              country.id().get_value(),
-              country.title(),
-              country.code()
-          );
-        }
+      @Override
+      public Class<Country> getOwnerClassType() {
+        return Country.class;
       }
     }
+
+    /**
+     * The Data Transfer Object.
+     * Is meant to be used as having common fields and be the body of Requests and Responses.
+     * Doesn't have any logic.
+     */
+    @Getter
+    @FieldNameConstants
+    public static class DTO {
+
+      private final UUID id;
+
+      /**
+       * The name of the Country.
+       */
+      private final String title;
+
+      /**
+       * The value of the first few digits of a phone number.
+       */
+      private final String code;
+
+      @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
+      public DTO(
+          @JsonProperty UUID id,
+          @JsonProperty String title,
+          @JsonProperty String code
+      ) {
+        this.id = id;
+        this.title = title;
+        this.code = code;
+      }
+
+      /**
+       * Converts into this DTO Object.
+       *
+       * @param country The Object to be converted.
+       */
+      public DTO(Country country) {
+        this(
+            country.id().get_value(),
+            country.title(),
+            country.code()
+        );
+      }
+    }
+  }
 
   /**
    * Details about phone contacting information.
@@ -329,14 +329,12 @@ public class ContactInfo {
     /**
      * A country object, that represents the nationality of this PhoneNumber.
      */
-    @Setter
-    private int _countryDigits;
+    private final int _countryDigits;
 
     /**
      * The contact numbers for the Phone.
      */
-    @Setter
-    private long _numbers;
+    private final long _numbers;
 
     /**
      * True if the number is for a mobile.
@@ -359,6 +357,7 @@ public class ContactInfo {
       );
     }
 
+    @Table.Constructor
     public Phone(int countryDigits, long numbers, boolean mobile, boolean business) {
       _countryDigits = countryDigits;
       _numbers = numbers;

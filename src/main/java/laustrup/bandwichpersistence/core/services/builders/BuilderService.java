@@ -2,26 +2,30 @@ package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.persistence.worm.models.DatabaseDefinition;
+import laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService;
 import laustrup.bandwichpersistence.core.repositories.bandwich.BandwichEntityDataCollection;
 import laustrup.bandwichpersistence.core.services.persistence.JDBCService;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Member;
 import java.lang.reflect.ParameterizedType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.AbstractMap;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static laustrup.bandwichpersistence.core.services.ClassFieldService.*;
+import static laustrup.bandwichpersistence.core.services.EternaryService.stating;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.set;
 
 public abstract class BuilderService<MODEL> {
@@ -46,14 +50,6 @@ public abstract class BuilderService<MODEL> {
     return (Class<MODEL>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
   }
 
-  protected static String classToTableName(Class<?>... classes) {
-    return classToTableName(Arrays.stream(classes).map(Class::getSimpleName).toArray(String[]::new));
-  }
-
-  protected static String classToTableName(String... titles) {
-    return String.join("", titles);
-  }
-
   void printError(Member id, Exception exception) {
     _logger.warning(String.format(
         "Could not build object with id %s:\n%s",
@@ -69,27 +65,54 @@ public abstract class BuilderService<MODEL> {
   }
 
   public MODEL build(ResultSet resultSet) {
-    interaction(
-        resultSet,
-        () -> _entity.get_columns().entrySet().forEach(column -> {
-          if (memberIsCollection(column.getKey()))
-            combine(
-                get_field(column.getKey().getName()),
-                get_BuilderService(column.getKey().getDeclaringClass()).build(resultSet)
-            );
-          else if (memberIsPartOfEntity(column.getKey()))
-            get_BuilderService(column.getKey().getDeclaringClass()).complete(
-                get_field(column.getKey().getName()),
-                resultSet
-            );
-          else
-            set(_fields, column);
-        }),
-        _entity.get_primaries().get_data()
-    );
-
-    return construct();
+    interaction(resultSet, handleColumns(resultSet), _entity.get_primaries().get_data());
+    return buildFromConstructor();
   }
+
+  private MODEL buildFromConstructor() {
+    Constructor<MODEL> constructor = DatabaseDefinitionService.get_tableConstructor(_entity.get_class());
+
+    return stating(constructor.getParameterCount() == _fields.size())
+        .then(construct(constructor))
+        .orElseThrow(new IllegalStateException(String.format(
+            "Parameter count for %s was %s, but builder found %s",
+            _entity.get_class().getSimpleName(),
+            constructor.getParameterCount(),
+            _fields.size()
+        )));
+  }
+
+  private Supplier<MODEL> construct(Constructor<MODEL> constructor) {
+    return () -> {
+      try {
+        return constructor.newInstance(_fields.values());
+      } catch (InstantiationException e) {
+        throw new RuntimeException(String.format("Couldn't initiate %s in builder!", _entity.get_class()), e);
+      } catch (IllegalAccessException e) {
+        throw new RuntimeException(String.format("Couldn't access constructor for %s in builder!", _entity.get_class()), e);
+      } catch (InvocationTargetException e) {
+        throw new RuntimeException("On builder for " + _entity.get_class(), e);
+      }
+    };
+  }
+
+  private Runnable handleColumns(ResultSet resultSet) {
+    return () -> _entity.get_columns().entrySet().forEach(column -> {
+      if (memberIsCollection(column.getKey()))
+        combine(
+            get_field(column.getKey().getName()),
+            get_BuilderService(column.getKey().getDeclaringClass()).build(resultSet)
+        );
+      else if (memberIsPartOfEntity(column.getKey()))
+        get_BuilderService(column.getKey().getDeclaringClass()).complete(
+            get_field(column.getKey().getName()),
+            resultSet
+        );
+      else
+        set(_fields, column);
+    });
+  }
+
 
   private BuilderService<?> get_BuilderService(Class<?> clazz) {
     return BandwichBuilderServiceCollection.getInstance()
@@ -110,8 +133,6 @@ public abstract class BuilderService<MODEL> {
   }
 
   protected abstract void completion(MODEL reference, MODEL object);
-
-  protected abstract MODEL construct();
 
   protected <COMBINED> void combine(Seszt<COMBINED> collection, Seszt<COMBINED> entities) {
     entities.forEach(entity -> combine(collection, entity));
@@ -165,7 +186,7 @@ public abstract class BuilderService<MODEL> {
   }
 
   @SuppressWarnings("unchecked")
-  protected <FIELD> FIELD get_field(String name) {
+  private <FIELD> FIELD get_field(String name) {
     return (FIELD) _fields.get(getDeclared(getGeneric(), name));
   }
 }

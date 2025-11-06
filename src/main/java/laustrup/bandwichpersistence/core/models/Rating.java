@@ -63,6 +63,7 @@ public class Rating {
    * @param comment     A comment that is attached to the Rating.
    * @param timestamp   Specifies the time the Rating was created.
    */
+  @Table.Constructor
   public Rating(
       int value,
       User.Id appointedId,

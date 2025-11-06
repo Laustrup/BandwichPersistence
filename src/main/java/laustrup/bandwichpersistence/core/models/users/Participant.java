@@ -3,6 +3,7 @@ package laustrup.bandwichpersistence.core.models.users;
 import laustrup.bandwichpersistence.core.models.Follow;
 import laustrup.bandwichpersistence.core.models.Rating;
 import laustrup.bandwichpersistence.core.models.Subscription;
+import laustrup.bandwichpersistence.core.persistence.worm.annotations.Table;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
 import lombok.Setter;
@@ -54,29 +55,30 @@ public class Participant extends User<Participant.Id> {
     );
   }
 
+  @Table.Constructor
   public Participant(
       Id id,
       String username,
       String firstName,
       String lastName,
-          String description,
-            ContactInfo contactInfo,
-            Seszt<Participation> participations,
-            Seszt<Rating> ratings,
-            Subscription subscription,
-            Seszt<Follow> follows,
-            Instant timestamp
+      String description,
+      ContactInfo contactInfo,
+      Seszt<Participation> participations,
+      Seszt<Rating> ratings,
+      Subscription subscription,
+      Seszt<Follow> follows,
+      Instant timestamp
     ) {
         super(
-                id,
-                username,
-                firstName,
-                lastName,
-                description,
-                contactInfo,
-                participations,
-                subscription,
-                timestamp
+            id,
+            username,
+            firstName,
+            lastName,
+            description,
+            contactInfo,
+            participations,
+            subscription,
+            timestamp
         );
         _ratings = ratings;
         _follows = follows;

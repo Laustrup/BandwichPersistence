@@ -85,15 +85,15 @@ public class ContactInfoTestItems {
         Class<?> clazz = Country.class;
 
         return new Country(
-                new Country.Id(generateUUID(
-                        clazz,
-                        complying().which(Condition.equals(
-                                DatabaseField.of(databaseFieldConfiguration(clazz, Country.Fields.title)),
-                                title
-                        ))
-                )),
-                title,
-                code
+            new Country.Id(generateUUID(
+                clazz,
+                complying().which(Condition.equals(
+                    DatabaseField.of(databaseFieldConfiguration(clazz, Country.Fields.title)),
+                    title
+                ))
+            )),
+            title,
+            code
         );
     }
 }

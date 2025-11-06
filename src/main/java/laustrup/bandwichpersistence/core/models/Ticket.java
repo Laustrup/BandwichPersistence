@@ -67,6 +67,7 @@ public class Ticket extends TicketBase {
     );
   }
 
+  @Table.Constructor
   public Ticket(
       User.Id userId,
       Event.Id eventId,

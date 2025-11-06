@@ -21,14 +21,4 @@ public class PhoneBuilder extends BuilderService<ContactInfo.Phone> {
   protected void completion(ContactInfo.Phone reference, ContactInfo.Phone object) {
 
   }
-
-  @Override
-  protected ContactInfo.Phone construct() {
-    return new ContactInfo.Phone(
-        get_field(ContactInfo.Phone.Fields._countryDigits),
-        get_field(ContactInfo.Phone.Fields._numbers),
-        get_field(ContactInfo.Phone.Fields._mobile),
-        get_field(ContactInfo.Phone.Fields._business)
-    );
-  }
 }

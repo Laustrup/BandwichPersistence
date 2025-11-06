@@ -53,6 +53,7 @@ public class Album extends Model<Album.Id, Signature.UUID> {
    * @param media     The items contained on this Album.
    * @param timestamp The date this Album was created.
    */
+  @Table.Constructor
   public Album(
       Id id,
       String title,
@@ -204,6 +205,7 @@ public class Album extends Model<Album.Id, Signature.UUID> {
       );
     }
 
+    @Table.Constructor
     public Media(
         Id id,
         String endpoint,

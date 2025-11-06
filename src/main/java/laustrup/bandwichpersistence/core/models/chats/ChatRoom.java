@@ -30,6 +30,7 @@ import static laustrup.bandwichpersistence.core.services.ObjectService.ifExists;
  */
 @Getter
 @FieldNameConstants
+@Table
 public class ChatRoom extends Model<ChatRoom.Id, Signature.UUID> {
 
   private String _title;
@@ -44,6 +45,7 @@ public class ChatRoom extends Model<ChatRoom.Id, Signature.UUID> {
    */
   private final Seszt<User<? extends User.Id>> _chatters;
 
+  @Table.Constructor
   public ChatRoom(ChatRoom.DTO chatRoom) {
     this(
         new Id(chatRoom.getId()),
@@ -63,6 +65,7 @@ public class ChatRoom extends Model<ChatRoom.Id, Signature.UUID> {
    * @param chatters  The chatters that are members of this ChatRoom.
    * @param timestamp The time this ChatRoom was created.
    */
+  @Table.Constructor
   public ChatRoom(
       Id id,
       String title,

@@ -36,6 +36,7 @@ public class Post extends MessageBase<Post.Id> {
     _receiver = from(post);
   }
 
+  @Table.Constructor
   public Post(
       Id id,
       User<? extends User.Id> author,

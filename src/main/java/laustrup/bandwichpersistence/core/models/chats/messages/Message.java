@@ -24,6 +24,7 @@ public class Message extends MessageBase<Message.Id> {
     super(mail, new Id(new Signature.UUID(mail.getId())));
   }
 
+  @Table.Constructor
   public Message(
       Id id,
       User<? extends User.Id> author,
