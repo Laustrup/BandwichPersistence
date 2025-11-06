@@ -173,7 +173,7 @@ public class TestItems {
         compare.accept(_active, instance.is_active());
         compare.accept(_amount, instance.get_amount());
 
-        truthiness.set_argument(BigDecimal.valueOf(count.get() / equals.get()));
+        truthiness.set_argument(BigDecimal.valueOf(equals.get() / count.get()));
       }
 
       return truthiness;
