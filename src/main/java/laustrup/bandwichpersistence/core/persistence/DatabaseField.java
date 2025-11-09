@@ -60,7 +60,7 @@ public record DatabaseField(Table table, Column column) {
   }
 
   private String handleSelection(String delimiter) {
-    return String.format("%s%s%s", table.title(), delimiter, column.title());
+    return String.format("%s%s%s", table.getKey(), delimiter, column.title());
   }
 
   public boolean is_key() {

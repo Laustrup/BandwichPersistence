@@ -21,6 +21,7 @@ import java.util.function.Supplier;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
+import static laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService.toAlias;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.DatabaseService.columnOf;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService.Configurations.Mode.NEUTRAL;
 
@@ -379,7 +380,7 @@ public class JDBCService {
         String tableColumn = configurations.field().get_tableColumn().toLowerCase();
 
         for (int i = 1; i <= metaData.getColumnCount(); i++) {
-          String metaDataTableColumn = metaData.getTableName(i) + "." + metaData.getColumnName(i);
+          String metaDataTableColumn = toAlias(metaData.getTableName(i)) + "." + metaData.getColumnName(i);
           if (metaDataTableColumn.equals(tableColumn))
             return i;
         }

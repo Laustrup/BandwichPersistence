@@ -43,7 +43,7 @@ class JDBCServiceTests extends BandwichTester {
   @CsvSource(value = {"true", "false"})
   void canSetReference(boolean isBinary) {
     mocked(() -> {
-      ResultSet resultSet = getResultSetGenerator().generate("select * from organisations");
+      ResultSet resultSet = getResultSetGenerator().generate("select * from organisations _organisations");
       AtomicReference<String> reference = isBinary ? null : arrange(new AtomicReference<>());
       AtomicReference<UUID> uuidReference = isBinary ? arrange(AtomicReference::new) : null;
 
