@@ -1,0 +1,14 @@
+flowchart TD
+    onStartup -->|get scripts| scripts(scripts from migration directory)
+    scripts --> validateScripts{Is name valid?}
+    validateScripts -->|yes| validateScripts
+    validateScripts -->|no| scriptRenamed(Script is renamed)
+    scriptRenamed -->|log event| validateScripts
+    validateScripts -->|no scripts left| failedScripts{Failed scripts}
+    failedScripts -->|any scripts that has failed| illegalState((Illegal state))
+    failedScripts -->|no failed scripts| unknownScripts{unknown scripts}
+    unknownScripts -->|no more unknown scripts| ending((end))
+    unknownScripts -->|execute| sqlExecuted(sql executed)
+    sqlExecuted -->|convert to scriptory| scriptorySaved{scriptory saved}
+    scriptorySaved -->|sql execution failed| exit6((system exit 6))
+    scriptorySaved -->|log| unknownScripts

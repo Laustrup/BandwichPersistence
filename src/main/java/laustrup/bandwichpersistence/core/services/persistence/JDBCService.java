@@ -187,19 +187,20 @@ public class JDBCService {
     @SuppressWarnings("unchecked")
     public static <T> AtomicReference<T> set(Configurations configurations, AtomicReference<T> reference) {
       return handleConfigurations(configurations, () -> {
-            try {
-              DatabaseField databaseField = configurations.field();
+        DatabaseField databaseField = configurations.field();
 
-              return (AtomicReference<T>) reference.getAndSet((T) (
-                  databaseField.is_key() && getType(Configurations.of(configurations, NEUTRAL)) == DataType.BINARY
-                      ? getUUID(Configurations.of(configurations, NEUTRAL))
-                      : configurations.resultSet.getObject(databaseField.get_tableColumn())
-              ));
-            } catch (SQLException e) {
-              throw new RuntimeException(e);
-            }
-          }
-      );
+        return (AtomicReference<T>) reference.getAndSet((T) (databaseField.is_key() && getType(Configurations.of(configurations, NEUTRAL)) == DataType.BINARY
+            ? getUUID(Configurations.of(configurations, NEUTRAL))
+            : getObject(configurations, databaseField)));
+      });
+    }
+
+    private static Object getObject(Configurations configurations, DatabaseField databaseField) {
+      try {
+        return configurations.resultSet.getObject(databaseField.get_tableColumn());
+      } catch (SQLException e) {
+        throw new RuntimeException(e);
+      }
     }
 
     @SuppressWarnings("unchecked")
@@ -276,8 +277,9 @@ public class JDBCService {
     public static UUID getUUID(Configurations configurations) {
       return handleConfigurations(configurations, () -> {
             try {
-              Optional<byte[]> bytes = Optional.ofNullable(configurations.resultSet.getBytes(columnOf(configurations.field().get_tableColumn())));
-              return bytes.isPresent() ? UUID.nameUUIDFromBytes(bytes.orElseThrow()) : null;
+              return Optional.ofNullable(configurations.resultSet.getBytes(columnOf(configurations.field().get_tableColumn())))
+                  .map(UUID::nameUUIDFromBytes)
+                  .orElse(null);
             } catch (SQLException exception) {
               throw new RuntimeException(exception);
             }
@@ -374,14 +376,17 @@ public class JDBCService {
     private static int columnIndex(Configurations configurations) throws NameNotFoundException {
       try {
         ResultSetMetaData metaData = configurations.resultSet.getMetaData();
+        String tableColumn = configurations.field().get_tableColumn().toLowerCase();
 
-        for (int i = 1; i <= metaData.getColumnCount(); i++)
-          if ((metaData.getTableName(i) + "." + metaData.getColumnName(i)).equals(configurations.field().get_columnAlias().toLowerCase()))
+        for (int i = 1; i <= metaData.getColumnCount(); i++) {
+          String metaDataTableColumn = metaData.getTableName(i) + "." + metaData.getColumnName(i);
+          if (metaDataTableColumn.equals(tableColumn))
             return i;
+        }
 
         throw new NameNotFoundException(String.format(
             "Could not find column %s when finding its index.",
-            configurations.field()
+            configurations.field().get_tableColumn()
         ));
       } catch (SQLException e) {
         throw new RuntimeException(e);

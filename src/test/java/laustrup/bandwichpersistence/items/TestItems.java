@@ -1,6 +1,7 @@
 package laustrup.bandwichpersistence.items;
 
 import laustrup.bandwichpersistence.core.models.Model;
+import laustrup.bandwichpersistence.core.models.Organisation;
 import laustrup.bandwichpersistence.core.models.Situation;
 import laustrup.bandwichpersistence.core.models.identification.CommonIdentity;
 import laustrup.bandwichpersistence.core.models.identification.Identity;
@@ -12,6 +13,7 @@ import laustrup.bandwichpersistence.core.persistence.services.SelectService.Sele
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Clause.Clausement;
 import laustrup.bandwichpersistence.core.persistence.worm.annotations.Table;
 import laustrup.bandwichpersistence.core.persistence.worm.models.DatabaseDefinition;
+import laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService;
 import laustrup.bandwichpersistence.core.repositories.bandwich.BandwichEntityDataCollection;
 import laustrup.bandwichpersistence.core.services.ModelService;
 import laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService.Configurations;
@@ -69,7 +71,7 @@ public class TestItems {
   }
 
   private static Query selectOrganizationQuery(String title) {
-    return selectQuery("organisations", title);
+    return selectQuery(DatabaseDefinitionService.get_table(Organisation.class).value(), title);
   }
 
   public static ResultSet generateResultSet() {

@@ -147,6 +147,16 @@ public class EternaryService {
       _properties = properties;
     }
 
+    public <OTHER> Object orObject(OTHER other) {
+      return orObject(() -> other);
+    }
+
+    public <OTHER> Object orObject(Supplier<OTHER> action) {
+      Optional<Supplier<ELEMENT>> element = findSuccessfulPropertyOption();
+
+      return element.isPresent() ? element.get() : action.get();
+    }
+
     public ELEMENT orElse(ELEMENT alternative) {
       return orElse(() -> alternative);
     }

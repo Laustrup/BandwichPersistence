@@ -17,11 +17,12 @@ import static laustrup.bandwichpersistence.core.persistence.DatabaseField.Config
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.DatabaseService.toDatabaseColumn;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService.Configurations.Mode.PEEK;
-import static laustrup.bandwichpersistence.items.TestItems.generateResultSet;
+import static laustrup.bandwichpersistence.items.ResultSetTestGenerator.getResultSetGenerator;
 import static laustrup.bandwichpersistence.quality_assurance.Asserter.asserting;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class JDBCServiceTests extends BandwichTester {
+
 
   @ParameterizedTest
   @CsvSource(value = {
@@ -42,7 +43,7 @@ class JDBCServiceTests extends BandwichTester {
   @CsvSource(value = {"true", "false"})
   void canSetReference(boolean isBinary) {
     mocked(() -> {
-      ResultSet resultSet = generateResultSet();
+      ResultSet resultSet = getResultSetGenerator().generate("select * from organisations");
       AtomicReference<String> reference = isBinary ? null : arrange(new AtomicReference<>());
       AtomicReference<UUID> uuidReference = isBinary ? arrange(AtomicReference::new) : null;
 
