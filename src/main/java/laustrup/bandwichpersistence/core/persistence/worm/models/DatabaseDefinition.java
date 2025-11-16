@@ -14,7 +14,10 @@ import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
 
 import java.lang.reflect.Member;
-import java.util.*;
+import java.util.AbstractMap;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Objects;
 
 import static laustrup.bandwichpersistence.core.persistence.models.EntityDataCollection.Key.conjunctionKey;
 import static laustrup.bandwichpersistence.core.persistence.services.DatabaseColumnService.getIdColumnOf;
@@ -83,7 +86,7 @@ public interface DatabaseDefinition {
 
     public Seszt<Member> get_primaries() {
       return new Seszt<>(_columns.keySet().stream()
-          .filter(member -> Optional.ofNullable(getTableColumn(member))
+          .filter(member -> getTableColumn(member)
               .map(Table.Column::isPrimary)
               .orElse(false)
           )

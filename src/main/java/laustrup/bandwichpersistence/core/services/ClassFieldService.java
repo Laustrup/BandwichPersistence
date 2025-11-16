@@ -19,6 +19,9 @@ import static laustrup.bandwichpersistence.core.persistence.services.DatabaseCol
 public class ClassFieldService {
 
   public static Member getDeclared(Class<?> clazz, String fieldName) {
+    if (clazz == null || fieldName == null || fieldName.isEmpty())
+      return null;
+
     try {
       return clazz.getDeclaredField(fieldName);
     } catch (NoSuchFieldException exception) {
@@ -26,10 +29,10 @@ public class ClassFieldService {
 
       if (member == null)
         throw new RuntimeException(String.format(
-            "Could not find field %s with class of %s!",
-            fieldName,
-            clazz.getSimpleName()
-        ), exception
+                "Could not find field %s with class of %s!",
+                fieldName,
+                clazz.getSimpleName()
+            ), exception
         );
       else
         return member;

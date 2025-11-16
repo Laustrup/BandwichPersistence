@@ -2,6 +2,7 @@ package laustrup.bandwichpersistence.core.persistence;
 
 import laustrup.bandwichpersistence.core.persistence.worm.models.TableColumnData;
 import laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService;
+import laustrup.bandwichpersistence.core.utilities.collections.Liszt;
 
 import java.lang.reflect.Member;
 import java.util.Arrays;
@@ -9,7 +10,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static laustrup.bandwichpersistence.core.persistence.services.DatabaseColumnService.getIdColumnOf;
+import static laustrup.bandwichpersistence.core.persistence.services.DatabaseColumnService.getIdColumnsOf;
 import static laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService.*;
 import static laustrup.bandwichpersistence.core.services.EternaryService.ifNotEmpty;
 import static laustrup.bandwichpersistence.core.services.EternaryService.ifNotNull;
@@ -106,11 +107,13 @@ public record DatabaseField(Table table, Column column) {
       return new Configuration(entity, columnName);
     }
 
-    public static Configuration databaseFieldConfigurationOfId(Class<?> entity) {
+    public static Liszt<Configuration> databaseFieldConfigurationsOfId(Class<?> entity) {
       if (entity == null)
         throw new IllegalArgumentException("Entity of database field configuration is null");
 
-      return new Configuration(entity, getIdColumnOf(entity));
+      return Liszt.of(getIdColumnsOf(entity)
+          .map(column -> databaseFieldConfiguration(entity, column))
+      );
     }
 
     public Table get_table() {

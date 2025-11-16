@@ -25,7 +25,7 @@ import static laustrup.bandwichpersistence.core.services.ObjectService.ifExists;
 @ToString(of = {"_identity", "_timestamp"})
 public abstract class Model<IDENTITY extends Identity<SIGNATURE>, SIGNATURE extends Signature<?>> {
 
-  @Table.Column(value = "id")
+  @Table.Column(value = "id", isPrimary = true)
   protected IDENTITY _identity;
 
   /**

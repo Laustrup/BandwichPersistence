@@ -19,7 +19,6 @@ import laustrup.bandwichpersistence.core.services.ModelService;
 import laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService.Configurations;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import laustrup.bandwichpersistence.core.utilities.parameters.Truthiness;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldNameConstants;
@@ -35,7 +34,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 
 import static laustrup.bandwichpersistence.core.persistence.DatabaseField.Configuration.databaseFieldConfiguration;
-import static laustrup.bandwichpersistence.core.persistence.DatabaseField.Configuration.databaseFieldConfigurationOfId;
+import static laustrup.bandwichpersistence.core.persistence.DatabaseField.Configuration.databaseFieldConfigurationsOfId;
 import static laustrup.bandwichpersistence.core.persistence.DatabaseManager.read;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.selecting;
 import static laustrup.bandwichpersistence.core.repositories.bandwich.BandwichEntityDataCollection.defineDefinitions;
@@ -96,7 +95,7 @@ public class TestItems {
   public static UUID generateUUID(Class<?> table, Selecting selecting) {
     return get(
         new Configurations(
-            DatabaseField.of(databaseFieldConfigurationOfId(table)),
+            DatabaseField.of(databaseFieldConfigurationsOfId(table).findFirst().orElseThrow()),
             read(new Query(selecting.select())).get_resultSet(),
             () -> {
               throw new RuntimeException(String.format(
@@ -113,7 +112,6 @@ public class TestItems {
 
   @Getter
   @Setter
-  @AllArgsConstructor
   @FieldNameConstants
   @Table("test_instances")
   public static class Instance {
@@ -127,6 +125,14 @@ public class TestItems {
 
     private int _amount;
 
+    @Table.Constructor
+    public Instance(Id id, String title, boolean active, int amount) {
+      _id = id;
+      _title = title;
+      _active = active;
+      _amount = amount;
+    }
+
     public Instance(Id id) {
       this(id, UUID.randomUUID().toString(), true, randomAmount());
     }
@@ -135,6 +141,7 @@ public class TestItems {
       this(title, 0);
     }
 
+    @Table.Constructor
     public Instance(String title, int amount) {
       this(Id.randomize(), title, true, amount);
     }

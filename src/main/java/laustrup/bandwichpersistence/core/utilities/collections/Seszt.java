@@ -238,13 +238,13 @@ public class Seszt<E> extends Coollection<E> implements ISeszt<E>, Set<E>, ICool
   }
 
   @Override
-  public E getFirst() {
-    return size() > 0 ? get_data()[0] : null;
+  public Optional<E> findFirst() {
+    return Optional.ofNullable(size() > 0 ? get_data()[0] : null);
   }
 
   @Override
-  public E getLast() {
-    return size() > 0 ? get_data()[size() - 1] : null;
+  public Optional<E> findLast() {
+    return Optional.ofNullable(size() > 0 ? get_data()[size() - 1] : null);
   }
 
   @Override

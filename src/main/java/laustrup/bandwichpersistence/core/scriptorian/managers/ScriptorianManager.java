@@ -64,7 +64,7 @@ public class ScriptorianManager {
                   
                   It can either be done by deleting the row with successstamp of null, which will make it run again on next startup or by setting it to now(), which will ignore the script on startup.
                   """,
-              scriptoriesWithoutSuccess.getFirst().get_errorMessage()
+              scriptoriesWithoutSuccess.findFirst().orElseThrow().get_errorMessage()
           ));
 
         String currentFileName = "";

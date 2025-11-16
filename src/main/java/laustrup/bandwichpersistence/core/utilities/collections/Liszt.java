@@ -497,12 +497,12 @@ public class Liszt<E> extends Coollection<E> implements ILiszt<E>, List<E>, ICoo
   }
 
   @Override
-  public E getLast() {
-    return _data.length > 0 ? get_data()[size() - 1] : null;
+  public Optional<E> findLast() {
+    return Optional.ofNullable(!isEmpty() ? get_data()[size() - 1] : null);
   }
 
   @Override
-  public E getFirst() {
-    return get_data()[0];
+  public Optional<E> findFirst() {
+    return Optional.ofNullable(isEmpty() ? null : get_data()[0]);
   }
 }

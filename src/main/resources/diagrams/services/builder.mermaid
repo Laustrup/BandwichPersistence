@@ -9,8 +9,15 @@ flowchart TD
     complete --> anyMembersLeft
     anyMembersLeft -->|Yes| memberfication
     anyMembersLeft -->|No| findConstructor("Find constructor")
-    findConstructor --> parameterCheck{"Correct amount of parameters?"}
-    parameterCheck -->|No| unequallyParameterCount(("Throw illegal state"))
-    parameterCheck -->|Yes| constructModel{"Build fields from constructor"}
-    constructModel -->|Failure| throwConstructorException(("Thrown exception"))
+    findConstructor --> constructorState{"Constructor state"}
+    constructorState -->|No constructor found| throwBuilderException(("Throw builder exception"))
+    constructorState -->|Not correct amount of parameters| throwBuilderException
+    constructorState -->|More than one annotated constructor| throwBuilderException
+    constructorState -->|Is constructor not public?| throwBuilderException
+    constructorState -->|Accepted| getConstructorParameters("Get parameters for constructor")
+    getConstructorParameters -->|Sort fields for parameters and get values| fieldsPrepared("Fields are prepared")
+    fieldsPrepared --> constructModel{"Build fields from constructor"}
     constructModel -->|Success| return(("return"))
+    constructModel -->|Couldn't initiate constructor| constructorBuildFailure(("Throw exception"))
+    constructModel -->|Couldn't access constructor| constructorBuildFailure
+    constructModel -->|Couldn't invocate target| constructorBuildFailure

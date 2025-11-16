@@ -85,21 +85,36 @@ public abstract class DatabaseDefinitionService {
 
   public static TableColumnData getTableColumnData(Class<?> clazz, String columnName) {
     return new TableColumnData(
-        getTableColumn(clazz, columnName),
+        getTableColumn(clazz, columnName)
+            .orElseThrow(() -> Table.Column.Exception.notFound(clazz, "getting the column data")),
         getDeclared(clazz, columnName)
     );
   }
 
-  public static Table.Column getTableColumn(Class<?> entity, String columnName) {
+  public static Optional<Table.Column> getTableColumn(Class<?> entity, String columnName) {
     return getTableColumn(getDeclared(entity, columnName));
   }
 
-  public static Table.Column getTableColumn(Member member) {
+  public static Optional<Table.Column> getTableColumn(Member member) {
     if (member == null) {
       log.warn("Member is null when getting the entity column, which it shouldn't!");
-      return null;
+      return Optional.empty();
     }
-    return ifAnnotationIsPresent(member, getField(member).getAnnotation(Table.Column.class));
+
+    Field field = getField(member);
+
+    return stating(!field.isAnnotationPresent(Table.ExcludedColumn.class))
+        .then(() -> ifAnnotationIsPresent(member, getField(member).getAnnotation(Table.Column.class)))
+        .orEmpty();
+  }
+
+  public static boolean idReferenceReferencesTable(Table.IdReference idReference, Class<?> entity) {
+    Table table = get_table(entity);
+
+    if (table == null || idReference == null)
+      return false;
+
+    return idReference.value().contains(pluralToSingular(table.value()));
   }
 
   public static Field getField(Member member) {
@@ -141,10 +156,17 @@ public abstract class DatabaseDefinitionService {
   }
 
   public static boolean isIdless(Class<?> clazz) {
-    return ifAnnotationIsPresent(clazz, Table.class, clazz.getAnnotation(Table.class).idLess());
+    return Arrays.stream(clazz.getDeclaredFields()).noneMatch(DatabaseDefinitionService::fieldIsPrimary);
   }
 
-  private static Table.IdReference handleIdReference(Class<?> clazz) {
+  public static boolean fieldIsPrimary(Field field) {
+    Table.Column column = getTableColumn(field)
+        .orElse(null);
+
+    return column != null && column.isPrimary();
+  }
+
+  public static Table.IdReference handleIdReference(Class<?> clazz) {
     Annotation annotation = get_databaseDefinition(clazz)
         .orElseThrow(() -> new IllegalStateException("Couldn't define database definition for " + clazz.getSimpleName()));
 

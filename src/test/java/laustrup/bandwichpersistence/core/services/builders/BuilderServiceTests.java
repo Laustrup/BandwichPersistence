@@ -1,25 +1,43 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.BandwichTester;
+import laustrup.bandwichpersistence.core.persistence.worm.annotations.Table;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import laustrup.bandwichpersistence.items.TestItems;
 import laustrup.bandwichpersistence.items.TestItems.Instance;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Member;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
+
+import static laustrup.bandwichpersistence.core.services.ClassFieldService.getDeclared;
 import static laustrup.bandwichpersistence.items.TestItems.InstanceCollection;
 import static laustrup.bandwichpersistence.quality_assurance.Asserter.asserting;
 
 class BuilderServiceTests extends BandwichTester {
 
-  private final BuilderService<Instance> _builderService = new BuilderService<>(
-      TestItems.EntityDataCollection.get_instance()
-  ) {
+  private static class TestInstanceBuilder extends BuilderService<Instance> {
+
+    public TestInstanceBuilder() {
+      this(null);
+    }
+
+    public TestInstanceBuilder(Map<? extends Member, AtomicReference<?>> fields) {
+      super(TestItems.EntityDataCollection.get_instance());
+      if (fields != null)
+        _fields = fields;
+    }
+
     @Override
     protected void completion(Instance reference, Instance object) {
 
     }
-  };
+  }
 
   @ParameterizedTest
   @CsvSource(value = {"true", "false"})
@@ -31,8 +49,9 @@ class BuilderServiceTests extends BandwichTester {
           Instance.initialise(shouldUpdate ? entity : null)
       );
       InstanceCollection arrangement = arrange(new InstanceCollection(collection, entity));
+      TestInstanceBuilder builder = new TestInstanceBuilder();
 
-      act(() -> _builderService.combine(arrangement.collection(), arrangement.entity()));
+      act(() -> builder.combine(arrangement.collection(), arrangement.entity()));
 
       asserting(arrangement.collection())
           //TODO Make work for should update as well
@@ -42,6 +61,30 @@ class BuilderServiceTests extends BandwichTester {
               instances -> instances.stream()
                   .noneMatch(instance -> instance.isSameAs(entity))
           );
+    });
+  }
+
+  @Test
+  void canConstruct() {
+    test(() -> {
+      Instance expected = Instance.initialise();
+      TestInstanceBuilder builder = new TestInstanceBuilder(Map.of(
+          getDeclared(Instance.class, Instance.Fields._id), new AtomicReference<>(expected.get_id()),
+          getDeclared(Instance.class, Instance.Fields._title), new AtomicReference<>(expected.get_title()),
+          getDeclared(Instance.class, Instance.Fields._active), new AtomicReference<>(expected.is_active()),
+          getDeclared(Instance.class, Instance.Fields._amount), new AtomicReference<>(expected.get_amount())
+      ));
+      @SuppressWarnings("unchecked")
+      Constructor<Instance> constructor = (Constructor<Instance>) arrange(Arrays.stream(Instance.class.getConstructors())
+          .filter(instanceConstructor -> instanceConstructor.isAnnotationPresent(Table.Constructor.class))
+          .findFirst()
+          .orElseThrow()
+      );
+
+      Instance actual = act(builder.construct(constructor));
+
+      asserting(actual)
+          .is(expected);
     });
   }
 }

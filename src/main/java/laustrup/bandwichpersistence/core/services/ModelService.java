@@ -75,7 +75,10 @@ public class ModelService {
         column != null && column.isPrimary() == filterPrimary;
 
     Function<Boolean, String> build = (isPrimary) -> Arrays.stream(fields)
-        .filter(field -> filtering.apply(getTableColumn(field), isPrimary))
+        .filter(field -> filtering.apply(getTableColumn(field)
+            .orElseThrow(() -> new IllegalStateException(String.format("Field %s could not be found when doing to string content", field))),
+            isPrimary
+        ))
         .map(field -> String.format("%s: %s", field.getName(), getValue(object, field).orElse("null")))
         .collect(Collectors.joining(",\n\t\t"));
 

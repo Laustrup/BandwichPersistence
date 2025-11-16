@@ -1,5 +1,7 @@
 package laustrup.bandwichpersistence.core.utilities;
 
+import java.util.Optional;
+
 /**
  * Contains features that are used in all collection classes.
  */
@@ -27,12 +29,12 @@ public interface ICoollection<E> {
    *
    * @return The found data element.
    */
-  E getFirst();
+  Optional<E> findFirst();
 
   /**
    * Finds the last data in the datum array.
    *
    * @return The found data element.
    */
-  E getLast();
+  Optional<E> findLast();
 }

@@ -16,84 +16,84 @@ import static laustrup.bandwichpersistence.items.TestItems.generateUUID;
 
 public class ContactInfoTestItems {
 
-    public static ContactInfo generateContactInfo(
-            String email,
-            Seszt<Phone> phones,
-            Address address,
-            Country country
-    ) {
-        Class<?> clazz = ContactInfo.class;
+  public static ContactInfo generateContactInfo(
+      String email,
+      Seszt<Phone> phones,
+      Address address,
+      Country country
+  ) {
+    Class<?> clazz = ContactInfo.class;
 
-        return new ContactInfo(
-                new ContactInfo.Id(generateUUID(
-                        clazz,
-                        selecting(new Properties(
-                                clazz,
-                                complying().which(Condition.equals(
-                                        DatabaseField.of(databaseFieldConfiguration(ContactInfo.class, ContactInfo.Fields._email)),
-                                        email
-                                ))
-                        ))
-                )),
-                email,
-                phones,
-                address,
-                country
-        );
-    }
-
-    public static Phone generatePhone(
-            int countryDigits,
-            int numbers,
-            boolean isMobile,
-            boolean isBusiness
-    ) {
-        return new Phone(
-                countryDigits,
-                numbers,
-                isMobile,
-                isBusiness
-        );
-    }
-
-    public static Address generateAddress(
-            String street,
-            String floor,
-            String municipality,
-            String zip,
-            String city
-    ) {
-        Class<?> clazz = Address.class;
-
-        return new Address(
-                new Address.Id(generateUUID(
-                        clazz,
-                        complying().which(Condition.equals(
-                                DatabaseField.of(databaseFieldConfiguration(clazz, Address.Fields._street)),
-                                street
-                        ))
-                )),
-                street,
-                floor,
-                municipality,
-                zip,
-                city
-        );
-    }
-
-    public static Country generateCountry(String title, String code) {
-        Class<?> clazz = Country.class;
-
-        return new Country(
-            new Country.Id(generateUUID(
+    return new ContactInfo(
+        new ContactInfo.Id(generateUUID(
+            clazz,
+            selecting(new Properties(
                 clazz,
                 complying().which(Condition.equals(
-                    DatabaseField.of(databaseFieldConfiguration(clazz, Country.Fields.title)),
-                    title
+                    DatabaseField.of(databaseFieldConfiguration(ContactInfo.class, ContactInfo.Fields._email)),
+                    email
                 ))
-            )),
-            title,
-            code
-        );
-    }
+            ))
+        )),
+        email,
+        phones,
+        address,
+        country
+    );
+  }
+
+  public static Phone generatePhone(
+      int countryDigits,
+      int numbers,
+      boolean isMobile,
+      boolean isBusiness
+  ) {
+    return new Phone(
+        countryDigits,
+        numbers,
+        isMobile,
+        isBusiness
+    );
+  }
+
+  public static Address generateAddress(
+      String street,
+      String floor,
+      String municipality,
+      String zip,
+      String city
+  ) {
+    Class<?> clazz = Address.class;
+
+    return new Address(
+        new Address.Id(generateUUID(
+            clazz,
+            complying().which(Condition.equals(
+                DatabaseField.of(databaseFieldConfiguration(clazz, Address.Fields._street)),
+                street
+            ))
+        )),
+        street,
+        floor,
+        municipality,
+        zip,
+        city
+    );
+  }
+
+  public static Country generateCountry(String title, String code) {
+    Class<?> clazz = Country.class;
+
+    return new Country(
+        new Country.Id(generateUUID(
+            clazz,
+            complying().which(Condition.equals(
+                DatabaseField.of(databaseFieldConfiguration(clazz, Country.Fields._title)),
+                title
+            ))
+        )),
+        title,
+        code
+    );
+  }
 }

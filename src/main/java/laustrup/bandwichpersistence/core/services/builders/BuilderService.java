@@ -1,26 +1,26 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.Model;
+import laustrup.bandwichpersistence.core.persistence.DatabaseField;
 import laustrup.bandwichpersistence.core.persistence.models.EntityDataCollection;
 import laustrup.bandwichpersistence.core.persistence.worm.models.DatabaseDefinition;
 import laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService;
+import laustrup.bandwichpersistence.core.services.EternaryService.Operator;
 import laustrup.bandwichpersistence.core.services.persistence.JDBCService;
+import laustrup.bandwichpersistence.core.utilities.collections.Liszt;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Member;
-import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.AbstractMap;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
+import java.util.function.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -69,11 +69,19 @@ public abstract class BuilderService<MODEL> {
   }
 
   private MODEL buildFromConstructor() {
-    Constructor<MODEL> constructor = DatabaseDefinitionService.get_tableConstructor(_entity.get_class());
+    Constructor<MODEL> constructor;
+    try {
+      constructor = DatabaseDefinitionService.get_tableConstructor(_entity.get_class());
+    } catch (Exception exception) {
+      throw new BuilderException(exception);
+    }
+
+    if (constructor == null)
+      throw new BuilderException("No constructor found for class %s!", _entity.get_class());
 
     return stating(constructor.getParameterCount() == _fields.size())
         .then(construct(constructor))
-        .orElseThrow(new IllegalStateException(String.format(
+        .orElseThrow(new BuilderException(String.format(
             "Parameter count for %s was %s, but builder found %s",
             _entity.get_class().getSimpleName(),
             constructor.getParameterCount(),
@@ -81,37 +89,87 @@ public abstract class BuilderService<MODEL> {
         )));
   }
 
-  private Supplier<MODEL> construct(Constructor<MODEL> constructor) {
+  public Supplier<MODEL> construct(Constructor<MODEL> constructor) {
+    Function<String, String> exceptionMessage = template ->
+        String.format(template, _entity.get_class().getSimpleName());
+
+    if (constructor.accessFlags().stream().noneMatch(flag -> flag == AccessFlag.PUBLIC))
+      throw new BuilderException(exceptionMessage.apply("Constructor for %s is not public!"));
+
     return () -> {
       try {
-        return constructor.newInstance(_fields.values());
-      } catch (InstantiationException e) {
-        throw new RuntimeException(String.format("Couldn't initiate %s in builder!", _entity.get_class()), e);
-      } catch (IllegalAccessException e) {
-        throw new RuntimeException(String.format("Couldn't access constructor for %s in builder!", _entity.get_class()), e);
-      } catch (InvocationTargetException e) {
-        throw new RuntimeException("On builder for " + _entity.get_class(), e);
+        return constructor.newInstance(getConstructorParameters(constructor));
+      } catch (InstantiationException exception) {
+        throw new RuntimeException(exceptionMessage.apply("Couldn't initiate %s in builder!"), exception);
+      } catch (IllegalAccessException exception) {
+        throw new RuntimeException(exceptionMessage.apply("Couldn't access constructor for %s in builder!"), exception);
+      } catch (InvocationTargetException exception) {
+        throw new RuntimeException(exceptionMessage.apply("On builder for %s"), exception);
       }
     };
   }
 
-  private Runnable handleColumns(ResultSet resultSet) {
-    return () -> _entity.get_columns().entrySet().forEach(column -> {
-      if (memberIsCollection(column.getKey()))
-        combine(
-            get_field(column.getKey().getName()),
-            get_BuilderService(column.getKey().getDeclaringClass()).build(resultSet)
-        );
-      else if (memberIsPartOfEntity(column.getKey()))
-        get_BuilderService(column.getKey().getDeclaringClass()).complete(
-            get_field(column.getKey().getName()),
-            resultSet
-        );
-      else
-        set(_fields, column);
-    });
+  private Object[] getConstructorParameters(Constructor<MODEL> constructor) {
+    return _fields.keySet().stream()
+        .sorted(constructorParamComparator(constructor, Member::getName))
+        .map(field -> _fields.get(field).get())
+        .toArray();
   }
 
+  private static <ELEMENT, CLASS> Comparator<ELEMENT> constructorParamComparator(
+      Constructor<CLASS> constructor,
+      Function<ELEMENT, String> parameterNameIdentifier
+  ) {
+    Liszt<String> parameterNames = Liszt.of(Arrays.stream(constructor.getParameters()).map(Parameter::getName));
+    Function<ELEMENT, Integer> elementIndexOfParameter = (element) ->
+        parameterNames.indexOf(parameterNameIdentifier.apply(element));
+    BiFunction<ELEMENT, ELEMENT, Integer> comparation = (current, next) -> {
+      int
+          currentIndex = elementIndexOfParameter.apply(current),
+          nextIndex = elementIndexOfParameter.apply(next);
+
+      return stating(Liszt.of(
+          Operator.Property.inCase(currentIndex > nextIndex)
+              .then(1),
+          Operator.Property.inCase(currentIndex < nextIndex)
+              .then(-1)
+      )).orElse(0);
+    };
+
+    return comparation::apply;
+  }
+
+  private Runnable handleColumns(ResultSet resultSet) {
+    Consumer<Map.Entry<? extends Member, DatabaseField>> handling = column -> {
+      if (memberIsCollection(column.getKey()))
+        addToCollection(column, resultSet);
+      else if (memberIsPartOfEntity(column.getKey()))
+        buildEntityMember(column, resultSet);
+      else
+        set(_fields, column);
+    };
+
+    return () -> _entity.get_columns().entrySet()
+        .forEach(handling);
+  }
+
+  private void addToCollection(Map.Entry<? extends Member, DatabaseField> column, ResultSet resultSet) {
+    combine(
+        get_field(column.getKey().getName()),
+        get_builderService(column).build(resultSet)
+    );
+  }
+
+  private void buildEntityMember(Map.Entry<? extends Member, DatabaseField> column, ResultSet resultSet) {
+    get_builderService(column).complete(
+        get_field(column.getKey().getName()),
+        resultSet
+    );
+  }
+
+  private BuilderService<?> get_builderService(Map.Entry<? extends Member, DatabaseField> column) {
+    return get_BuilderService(column.getKey().getDeclaringClass());
+  }
 
   private BuilderService<?> get_BuilderService(Class<?> clazz) {
     return BandwichBuilderServiceCollection.getInstance()
@@ -187,5 +245,20 @@ public abstract class BuilderService<MODEL> {
   @SuppressWarnings("unchecked")
   private <FIELD> FIELD get_field(String name) {
     return (FIELD) _fields.get(getDeclared(getGeneric(), name));
+  }
+
+  private static class BuilderException extends RuntimeException {
+
+    public BuilderException(String message) {
+      super(message);
+    }
+
+    public BuilderException(Exception exception) {
+      super(exception);
+    }
+
+    public BuilderException(String template, Class<?> entity) {
+      super(String.format(template, _entity.get_class().getSimpleName()));
+    }
   }
 }

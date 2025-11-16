@@ -100,6 +100,12 @@ public abstract class DatabaseColumnService {
         )));
   }
 
+  public static Stream<Table.Column> getIdColumnsOf(Class<?> entity) {
+    return Arrays.stream(entity.getDeclaredFields())
+        .map(field -> getTableColumn(field).orElse(null))
+        .filter(table -> table != null && table.isPrimary());
+  }
+
   private static boolean isId(Class<?> entity, String column) {
     if (column == null)
       return false;

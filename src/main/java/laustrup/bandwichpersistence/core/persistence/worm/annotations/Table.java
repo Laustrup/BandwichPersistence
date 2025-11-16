@@ -12,8 +12,6 @@ public @interface Table {
 
   IdReference idReference() default @IdReference;
 
-  boolean idLess() default false;
-
   @java.lang.annotation.Target(ElementType.FIELD)
   @Retention(RetentionPolicy.RUNTIME)
   @interface Column {
@@ -21,6 +19,16 @@ public @interface Table {
     String value() default "";
 
     boolean isPrimary() default false;
+
+    class Exception extends java.lang.IllegalStateException {
+      public Exception(String message) {
+        super(message);
+      }
+
+      public static Exception notFound(Class<?> entity, String when) {
+        return new Exception(String.format("Couldn't find column for %s, when %s", entity.getSimpleName(), when));
+      }
+    }
   }
 
   @Retention(RetentionPolicy.RUNTIME)
