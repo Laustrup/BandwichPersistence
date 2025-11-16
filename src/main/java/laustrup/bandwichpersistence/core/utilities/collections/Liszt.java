@@ -410,7 +410,7 @@ public class Liszt<E> extends Coollection<E> implements ILiszt<E>, List<E>, ICoo
   @Override
   public int indexOf(Object object) {
     for (int i = 0; i < _data.length; i++)
-      if (_data[i] == object)
+      if (_data[i] == object || _data[i].equals(object))
         return i;
 
     return -1;

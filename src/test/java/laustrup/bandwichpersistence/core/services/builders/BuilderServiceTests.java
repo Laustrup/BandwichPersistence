@@ -83,8 +83,8 @@ class BuilderServiceTests extends BandwichTester {
 
       Instance actual = act(builder.construct(constructor));
 
-      asserting(actual)
-          .is(expected);
+      asserting(actual.toString())
+          .is(expected.toString());
     });
   }
 }

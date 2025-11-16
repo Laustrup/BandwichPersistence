@@ -141,7 +141,6 @@ public class TestItems {
       this(title, 0);
     }
 
-    @Table.Constructor
     public Instance(String title, int amount) {
       this(Id.randomize(), title, true, amount);
     }
@@ -186,6 +185,11 @@ public class TestItems {
       }
 
       return truthiness;
+    }
+
+    @Override
+    public String toString() {
+      return ModelService.toStringify(this);
     }
 
     public static <IDENTITY extends Identity<Signature.UUID>> Model<IDENTITY, Signature.UUID> toModel(Instance instance) {

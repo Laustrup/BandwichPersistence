@@ -111,7 +111,7 @@ public abstract class BuilderService<MODEL> {
 
   private Object[] getConstructorParameters(Constructor<MODEL> constructor) {
     return _fields.keySet().stream()
-        .sorted(constructorParamComparator(constructor, Member::getName))
+        .sorted(constructorParamComparator(constructor, member -> member.getName().substring(1)))
         .map(field -> _fields.get(field).get())
         .toArray();
   }
