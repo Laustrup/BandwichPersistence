@@ -2,6 +2,7 @@ package laustrup.bandwichpersistence.core.models.users;
 
 import laustrup.bandwichpersistence.core.models.Subscription;
 import laustrup.bandwichpersistence.core.models.chats.ChatRoom;
+import laustrup.bandwichpersistence.core.persistence.worm.annotations.Table;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
 import lombok.experimental.FieldNameConstants;
@@ -12,7 +13,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-@Getter @FieldNameConstants
+@Getter @FieldNameConstants @Table.Skeleton
 public abstract class BusinessUser<IDENTITY extends User.Id> extends User<IDENTITY> {
 
   private final Seszt<ChatRoom> _chatRooms;

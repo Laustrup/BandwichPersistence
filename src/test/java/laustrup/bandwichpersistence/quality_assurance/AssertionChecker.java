@@ -1,25 +1,35 @@
 package laustrup.bandwichpersistence.quality_assurance;
 
+import java.util.Collection;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-public interface AssertionChecker<E> {
+public interface AssertionChecker<EXPECTED> {
 
-    AssertionChecker<E> is(E actual);
+  AssertionChecker<EXPECTED> is(EXPECTED actual);
 
-    AssertionChecker<E> isNot(E actual);
+  AssertionChecker<EXPECTED> isNot(EXPECTED actual);
 
-    AssertionChecker<E> is(Predicate<E> assertion);
+  AssertionChecker<EXPECTED> is(Predicate<EXPECTED> assertion);
 
-    AssertionChecker<E> isTrue();
+  AssertionChecker<EXPECTED> isTrue();
 
-    AssertionChecker<E> is(Supplier<E> supplier);
+  AssertionChecker<EXPECTED> is(Supplier<EXPECTED> supplier);
 
-    AssertionChecker<E> contains(E actual);
+  AssertionChecker<EXPECTED> contains(EXPECTED actual);
 
-    <W> AssertionChecker<E> anyMatches(Predicate<W> assertion);
+  <W> AssertionChecker<EXPECTED> anyMatches(Predicate<W> assertion);
 
-    AssertionChecker<E> inCase(boolean condition, Predicate<E> assertion);
+  AssertionChecker<EXPECTED> inCase(boolean condition, Predicate<EXPECTED> assertion);
 
-    AssertionChecker<E> isNotNull();
+  AssertionChecker<EXPECTED> isNotNull();
+
+  interface CollectiveAssertionChecker<EXPECTED extends Collection<EXPECTED_ELEMENT>, EXPECTED_ELEMENT> extends AssertionChecker<EXPECTED> {
+
+    CollectiveAssertionChecker<EXPECTED, EXPECTED_ELEMENT> isNotEmpty();
+
+    CollectiveAssertionChecker<EXPECTED, EXPECTED_ELEMENT> isEmpty();
+
+    Asserter.Checker.CollectiveChecker<EXPECTED, EXPECTED_ELEMENT> allMatches(Predicate<EXPECTED_ELEMENT> predication);
+  }
 }

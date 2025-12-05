@@ -17,11 +17,16 @@ public class Asserter {
     return Checker.of(expected);
   }
 
+  public static <EXPECTED extends Collection<EXPECTED_ELEMENT>, EXPECTED_ELEMENT>
+      Checker.CollectiveChecker<EXPECTED, EXPECTED_ELEMENT> asserting(EXPECTED expected) {
+    return Checker.CollectiveChecker.of(expected);
+  }
+
   public static class Checker<EXPECTED> implements AssertionChecker<EXPECTED> {
 
-    private final EXPECTED _expected;
+    protected final EXPECTED _expected;
 
-    private final boolean _negate;
+    protected final boolean _negate;
 
     private boolean
         _equalToChecked,
@@ -100,7 +105,7 @@ public class Asserter {
       return check(() -> assertingNotNull(_expected));
     }
 
-    private AssertionChecker<EXPECTED> check(Runnable action) {
+    protected AssertionChecker<EXPECTED> check(Runnable action) {
       return check(this, action);
     }
 
@@ -192,6 +197,83 @@ public class Asserter {
         fail("Expected and actual was not suppose to both be null!");
 
       return !(_expected == null && actual == null) ? action.get() : null;
+    }
+
+    public static class CollectiveChecker<EXPECTED extends Collection<EXPECTED_ELEMENT>, EXPECTED_ELEMENT> extends Checker<EXPECTED>
+        implements CollectiveAssertionChecker<EXPECTED, EXPECTED_ELEMENT> {
+
+      public CollectiveChecker(EXPECTED expected) {
+        super(expected);
+      }
+
+      public static <EXPECTED extends Collection<EXPECTED_ELEMENT>, EXPECTED_ELEMENT>
+          CollectiveChecker<EXPECTED, EXPECTED_ELEMENT> of(EXPECTED expected) {
+        return new CollectiveChecker<>(expected);
+      }
+
+      //region super class' methods
+      @Override
+      public CollectiveChecker<EXPECTED, EXPECTED_ELEMENT> is(EXPECTED actual) {
+        return (CollectiveChecker<EXPECTED, EXPECTED_ELEMENT>) super.is(actual);
+      }
+
+      @Override
+      public CollectiveChecker<EXPECTED, EXPECTED_ELEMENT> isNot(EXPECTED actual) {
+        return (CollectiveChecker<EXPECTED, EXPECTED_ELEMENT>) super.isNot(actual);
+      }
+
+      @Override
+      public CollectiveChecker<EXPECTED, EXPECTED_ELEMENT> is(Predicate<EXPECTED> assertion) {
+        return (CollectiveChecker<EXPECTED, EXPECTED_ELEMENT>) super.is(assertion);
+      }
+
+      @Override
+      public CollectiveChecker<EXPECTED, EXPECTED_ELEMENT> isTrue() {
+        return (CollectiveChecker<EXPECTED, EXPECTED_ELEMENT>) super.isTrue();
+      }
+
+      @Override
+      public CollectiveChecker<EXPECTED, EXPECTED_ELEMENT> is(Supplier<EXPECTED> supplier) {
+        return (CollectiveChecker<EXPECTED, EXPECTED_ELEMENT>) super.is(supplier);
+      }
+
+      @Override
+      public CollectiveChecker<EXPECTED, EXPECTED_ELEMENT> contains(EXPECTED actual) {
+        return (CollectiveChecker<EXPECTED, EXPECTED_ELEMENT>) super.contains(actual);
+      }
+
+      @Override
+      public <W> CollectiveChecker<EXPECTED, EXPECTED_ELEMENT> anyMatches(Predicate<W> assertion) {
+        return (CollectiveChecker<EXPECTED, EXPECTED_ELEMENT>) super.anyMatches(assertion);
+      }
+
+      @Override
+      public CollectiveChecker<EXPECTED, EXPECTED_ELEMENT> inCase(boolean condition, Predicate<EXPECTED> assertion) {
+        return (CollectiveChecker<EXPECTED, EXPECTED_ELEMENT>) super.inCase(condition, assertion);
+      }
+
+      @Override
+      public CollectiveChecker<EXPECTED, EXPECTED_ELEMENT> isNotNull() {
+        return (CollectiveChecker<EXPECTED, EXPECTED_ELEMENT>) super.isNotNull();
+      }
+      //endregion
+
+      @Override
+      public CollectiveChecker<EXPECTED, EXPECTED_ELEMENT> isNotEmpty() {
+        return (CollectiveChecker<EXPECTED, EXPECTED_ELEMENT>) check(() -> assertFalse(_expected.isEmpty()));
+      }
+
+      @Override
+      public CollectiveChecker<EXPECTED, EXPECTED_ELEMENT> isEmpty() {
+        return (CollectiveChecker<EXPECTED, EXPECTED_ELEMENT>) check(() -> assertTrue(_expected.isEmpty()));
+      }
+
+      @Override
+      public CollectiveChecker<EXPECTED, EXPECTED_ELEMENT> allMatches(Predicate<EXPECTED_ELEMENT> predication) {
+        return (CollectiveChecker<EXPECTED, EXPECTED_ELEMENT>) check(() -> assertTrue(_expected.stream()
+            .allMatch(predication)
+        ));
+      }
     }
   }
 }

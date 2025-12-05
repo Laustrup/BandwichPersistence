@@ -2,7 +2,8 @@ package laustrup.bandwichpersistence.core.persistence.services;
 
 import laustrup.bandwichpersistence.core.persistence.DatabaseField;
 import laustrup.bandwichpersistence.core.persistence.worm.annotations.Table;
-import laustrup.bandwichpersistence.core.persistence.worm.models.TableColumnData;
+import laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService;
+import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
@@ -60,22 +61,15 @@ public abstract class DatabaseColumnService {
     if (clazz.getDeclaredFields().length == 0)
       return new HashMap<>();
 
-    Function<Field, String> fieldsMapKey = field -> stating(field.isAnnotationPresent(Table.Column.class))
-        .then(ifNotNull(field.getAnnotation(Table.Column.class))
-            .get(Table.Column::value)
-            .orElse(null)
-        ).orElse(field.getName());
-    Map<String, Field> fields = Arrays.stream(clazz.getDeclaredFields())
-        .collect(Collectors.toMap(fieldsMapKey, Function.identity()));
+    Map<String, Field> fields = getFields(clazz);
 
-    Map<Field, DatabaseField> explicits = getTableColumns(clazz).stream()
-        .filter(column -> column.value() != null && !column.value().isEmpty())
+    Map<Field, DatabaseField> explicits = getTableColumns(fields.values().toArray(new Field[0])).stream()
         .collect(Collectors.toMap(
-            column -> fields.get(column.value()),
-            column -> DatabaseField.of(TableColumnData.of(clazz, column).member())
+            data -> fields.get(getColumnTitle(data.member())),
+            data -> DatabaseField.of(data.member())
         ));
 
-    return Arrays.stream(clazz.getDeclaredFields())
+    return Arrays.stream(fields.values().toArray(new Field[0]))
         .filter(field -> stating(field.isAnnotationPresent(Table.Column.class))
             .then(!ifNotNull(field.getAnnotation(Table.ExcludedColumn.class))
                 .then(true)
@@ -85,6 +79,19 @@ public abstract class DatabaseColumnService {
             .then(new AbstractMap.SimpleImmutableEntry<>(field, explicits.get(field)))
             .orElse(memberToColumnEntry(field))
         ).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+  }
+
+  private static Map<String, Field> getFields(Class<?> clazz) {
+    Seszt<Field> fields = Seszt.of(clazz.getDeclaredFields());
+    Class<?> superClass = clazz.getSuperclass();
+
+    while (superClass != null && !superClass.equals(Object.class) && !superClass.equals(Enum.class)) {
+      fields.add(superClass.getDeclaredFields());
+      superClass = superClass.getSuperclass();
+    }
+
+    return fields.stream()
+        .collect(Collectors.toMap(DatabaseDefinitionService::getColumnTitle, Function.identity()));
   }
 
   public static String getIdColumnOf(Class<?> entity) {
@@ -103,7 +110,7 @@ public abstract class DatabaseColumnService {
   public static Stream<Table.Column> getIdColumnsOf(Class<?> entity) {
     return Arrays.stream(entity.getDeclaredFields())
         .map(field -> getTableColumn(field).orElse(null))
-        .filter(table -> table != null && table.isPrimary());
+        .filter(column -> column != null && column.isPrimary());
   }
 
   private static boolean isId(Class<?> entity, String column) {

@@ -37,7 +37,9 @@ public abstract class DatabaseDefinitionService {
         Property.inCase(clazz.isAnnotationPresent(Table.Enum.class))
             .then(() -> get_tableEnum(clazz)),
         Property.inCase(clazz.isAnnotationPresent(Table.Constructor.class))
-            .then(() -> get_constructor(clazz))
+            .then(() -> get_constructor(clazz)),
+        Property.inCase(clazz.isAnnotationPresent(Table.Skeleton.class))
+            .then(() -> clazz.getAnnotation(Table.Skeleton.class))
     )).orEmpty();
   }
 
@@ -191,10 +193,10 @@ public abstract class DatabaseDefinitionService {
     );
   }
 
-  public static Seszt<Table.Column> getTableColumns(Class<?> clazz) {
-    return new Seszt<>(Arrays.stream(clazz.getDeclaredFields())
+  public static Seszt<TableColumnData> getTableColumns(Field[] fields) {
+    return new Seszt<>(Arrays.stream(fields)
         .filter(field -> field.isAnnotationPresent(Table.Column.class))
-        .map(field -> field.getAnnotation(Table.Column.class))
+        .map(TableColumnData::of)
     );
   }
 

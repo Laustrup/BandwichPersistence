@@ -23,6 +23,7 @@ import static laustrup.bandwichpersistence.core.services.ObjectService.ifExists;
 @Getter
 @FieldNameConstants
 @ToString(of = {"_identity", "_timestamp"})
+@Table.Skeleton
 public abstract class Model<IDENTITY extends Identity<SIGNATURE>, SIGNATURE extends Signature<?>> {
 
   @Table.Column(value = "id", isPrimary = true)

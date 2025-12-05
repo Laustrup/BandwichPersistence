@@ -247,6 +247,45 @@ public class TestItems {
         return Instance.class;
       }
     }
+
+    @Getter
+    @Table
+    public static class Child extends Instance {
+
+      private final float _floating;
+
+      public Child(Id id, String title, boolean active, int amount, float floating) {
+        super(id, title, active, amount);
+        _floating = floating;
+      }
+
+      public Child(Id id, float floating) {
+        super(id);
+        _floating = floating;
+      }
+
+      public Child(String title, float floating) {
+        super(title);
+        _floating = floating;
+      }
+
+      public Child(String title, int amount, float floating) {
+        super(title, amount);
+        _floating = floating;
+      }
+
+      @Override
+      public String toString() {
+        return ModelService.toStringify(this);
+      }
+
+      public static class Id extends Instance.Id {
+
+        public Id(Signature.UUID identifier) {
+          super(identifier);
+        }
+      }
+    }
   }
 
   public record InstanceCollection(Seszt<Instance> collection, Instance entity) {

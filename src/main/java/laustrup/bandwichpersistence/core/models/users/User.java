@@ -29,6 +29,7 @@ import java.util.Set;
  */
 @Getter
 @FieldNameConstants
+@Table.Skeleton
 public abstract class User<IDENTITY extends User.Id> extends Model<IDENTITY, Signature.UUID> {
 
   /**
