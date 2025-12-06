@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static laustrup.bandwichpersistence.core.persistence.DatabaseField.Configuration.Exception.noSuchColumn;
 import static laustrup.bandwichpersistence.core.persistence.services.DatabaseColumnService.getIdColumnsOf;
 import static laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService.*;
 import static laustrup.bandwichpersistence.core.services.EternaryService.ifNotEmpty;
@@ -93,14 +94,20 @@ public record DatabaseField(Table table, Column column) {
     }
 
     private Configuration(Class<?> entity, String columnName) {
-      this(entity, getTableColumnData(entity, columnName));
+      this(entity, getTableColumnData(entity, columnName)
+          .orElseThrow(() -> noSuchColumn(entity, columnName))
+      );
     }
 
     public static Configuration databaseFieldConfiguration(
         Class<?> entity,
         laustrup.bandwichpersistence.core.persistence.worm.annotations.Table.Column columnEntity
     ) {
-      return new Configuration(entity, getTableColumnData(entity, columnEntity));
+      return new Configuration(entity, getTableColumnData(entity, columnEntity)
+          .orElseThrow(() -> Exception.noSuchColumn(entity, getColumnTitle(entity, columnEntity)
+              .orElse(String.format("Column to '%s' class doesn't exist!", entity.getSimpleName()))
+          ))
+      );
     }
 
     public static Configuration databaseFieldConfiguration(Class<?> entity, String columnName) {
@@ -122,6 +129,20 @@ public record DatabaseField(Table table, Column column) {
 
     public Column get_column() {
       return Column.of(_column);
+    }
+
+    public static class Exception extends RuntimeException {
+
+      public Exception(String message) {
+        super(message);
+      }
+
+      public static Exception noSuchColumn(Class<?> clazz, String columnName) {
+        return new Exception(String.format("No such column: '%s' for class '%s'",
+            columnName,
+            clazz == null ? "null" : clazz.getSimpleName()
+        ));
+      }
     }
   }
 

@@ -18,10 +18,12 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import static laustrup.bandwichpersistence.core.persistence.services.DatabaseColumnService.fieldToColumnName;
 import static laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseTableService.*;
 import static laustrup.bandwichpersistence.core.services.ClassFieldService.getDeclared;
+import static laustrup.bandwichpersistence.core.services.ClassFieldService.getFields;
 import static laustrup.bandwichpersistence.core.services.EternaryService.ifNotEmpty;
 import static laustrup.bandwichpersistence.core.services.EternaryService.stating;
 
@@ -81,16 +83,17 @@ public abstract class DatabaseDefinitionService {
         ));
   }
 
-  public static TableColumnData getTableColumnData(Class<?> clazz, Table.Column column) {
-    return getTableColumnData(clazz, ClassFieldService.getField(clazz, column).orElseThrow().getName());
+  public static Optional<TableColumnData> getTableColumnData(Class<?> clazz, Table.Column column) {
+    return ClassFieldService.getField(clazz, column)
+        .flatMap(field -> getTableColumnData(clazz, field.getName()));
   }
 
-  public static TableColumnData getTableColumnData(Class<?> clazz, String columnName) {
-    return new TableColumnData(
-        getTableColumn(clazz, columnName)
-            .orElseThrow(() -> Table.Column.Exception.notFound(clazz, "getting the column data")),
-        getDeclared(clazz, columnName)
-    );
+  public static Optional<TableColumnData> getTableColumnData(Class<?> clazz, String columnName) {
+    return getTableColumn(clazz, columnName)
+        .map(tableColumn -> new TableColumnData(
+            tableColumn,
+            getDeclared(clazz, columnName)
+        ));
   }
 
   public static Optional<Table.Column> getTableColumn(Class<?> entity, String columnName) {
@@ -209,6 +212,17 @@ public abstract class DatabaseDefinitionService {
     String value = field.getAnnotation(Table.Column.class).value();
 
     return value.isEmpty() ? defineColumnTitle(member.getName()) : value;
+  }
+
+  public static Optional<String> getColumnTitle(Class<?> clazz, Table.Column column) {
+    Predicate<Field> filtering = field ->
+        field.isAnnotationPresent(Table.Column.class) &&
+        field.getAnnotation(Table.Column.class).equals(column);
+
+    return getFields(clazz).values().stream()
+        .filter(filtering)
+        .map(DatabaseDefinitionService::getColumnTitle)
+        .findFirst();
   }
 
   public static String getTableTitle(Class<?> clazz, String tableName) {

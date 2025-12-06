@@ -2,6 +2,7 @@ package laustrup.bandwichpersistence.core.services;
 
 import laustrup.bandwichpersistence.core.persistence.models.members.InheritanceField;
 import laustrup.bandwichpersistence.core.persistence.worm.annotations.Table;
+import laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService;
 import laustrup.bandwichpersistence.core.utilities.Coollection;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 
@@ -9,10 +10,12 @@ import java.lang.reflect.AccessFlag;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static laustrup.bandwichpersistence.core.persistence.services.DatabaseColumnService.fieldIsEqualToColumn;
 
@@ -67,8 +70,21 @@ public class ClassFieldService {
     return member.getDeclaringClass().getDeclaredFields().length > 0;
   }
 
+  public static Map<String, Field> getFields(Class<?> clazz) {
+    Seszt<Field> fields = Seszt.of(clazz.getDeclaredFields());
+    Class<?> superClass = clazz.getSuperclass();
+
+    while (superClass != null && !superClass.equals(Object.class) && !superClass.equals(Enum.class)) {
+      fields.add(superClass.getDeclaredFields());
+      superClass = superClass.getSuperclass();
+    }
+
+    return fields.stream()
+        .collect(Collectors.toMap(DatabaseDefinitionService::getColumnTitle, Function.identity()));
+  }
+
   public static Optional<Field> getField(Class<?> clazz, Table.Column column) {
-    return Arrays.stream(clazz.getDeclaredFields())
+    return getFields(clazz).values().stream()
         .filter(field -> fieldIsEqualToColumn(field, column))
         .findFirst();
   }

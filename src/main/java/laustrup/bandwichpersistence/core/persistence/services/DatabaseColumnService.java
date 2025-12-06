@@ -2,8 +2,6 @@ package laustrup.bandwichpersistence.core.persistence.services;
 
 import laustrup.bandwichpersistence.core.persistence.DatabaseField;
 import laustrup.bandwichpersistence.core.persistence.worm.annotations.Table;
-import laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService;
-import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
@@ -11,12 +9,12 @@ import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService.*;
 import static laustrup.bandwichpersistence.core.services.ClassFieldService.getDeclared;
+import static laustrup.bandwichpersistence.core.services.ClassFieldService.getFields;
 import static laustrup.bandwichpersistence.core.services.EternaryService.ifNotNull;
 import static laustrup.bandwichpersistence.core.services.EternaryService.stating;
 
@@ -24,7 +22,9 @@ public abstract class DatabaseColumnService {
 
   public static boolean fieldIsEqualToColumn(Field field, Table.Column column) {
     return field.isAnnotationPresent(Table.Column.class) &&
-        getTableColumn(field.getDeclaringClass(), field.getName()).equals(column);
+        getTableColumn(field.getDeclaringClass(), field.getName())
+            .map(tableColumn -> tableColumn.equals(column))
+            .orElse(false);
   }
 
   public static String fieldToColumnName(String... fields) {
@@ -81,19 +81,6 @@ public abstract class DatabaseColumnService {
         ).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
   }
 
-  private static Map<String, Field> getFields(Class<?> clazz) {
-    Seszt<Field> fields = Seszt.of(clazz.getDeclaredFields());
-    Class<?> superClass = clazz.getSuperclass();
-
-    while (superClass != null && !superClass.equals(Object.class) && !superClass.equals(Enum.class)) {
-      fields.add(superClass.getDeclaredFields());
-      superClass = superClass.getSuperclass();
-    }
-
-    return fields.stream()
-        .collect(Collectors.toMap(DatabaseDefinitionService::getColumnTitle, Function.identity()));
-  }
-
   public static String getIdColumnOf(Class<?> entity) {
     if (isIdless(entity))
       return null;
@@ -108,7 +95,7 @@ public abstract class DatabaseColumnService {
   }
 
   public static Stream<Table.Column> getIdColumnsOf(Class<?> entity) {
-    return Arrays.stream(entity.getDeclaredFields())
+    return getFields(entity).values().stream()
         .map(field -> getTableColumn(field).orElse(null))
         .filter(column -> column != null && column.isPrimary());
   }
