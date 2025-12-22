@@ -1,6 +1,5 @@
 package laustrup.bandwichpersistence.core.persistence.worm.models;
 
-import laustrup.bandwichpersistence.core.models.Model;
 import laustrup.bandwichpersistence.core.persistence.DatabaseField;
 import laustrup.bandwichpersistence.core.persistence.models.EntityDataCollection;
 import laustrup.bandwichpersistence.core.persistence.models.members.SimpleField;
@@ -8,7 +7,6 @@ import laustrup.bandwichpersistence.core.persistence.services.DatabaseColumnServ
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where;
 import laustrup.bandwichpersistence.core.persistence.worm.annotations.Junction;
 import laustrup.bandwichpersistence.core.persistence.worm.annotations.Table;
-import laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService;
 import laustrup.bandwichpersistence.core.utilities.collections.Liszt;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
@@ -18,11 +16,12 @@ import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.BiFunction;
+import java.util.function.Supplier;
 
+import static laustrup.bandwichpersistence.core.persistence.exceptions.DatabaseDefinitionException.noIdReference;
 import static laustrup.bandwichpersistence.core.persistence.models.EntityDataCollection.Key.conjunctionKey;
-import static laustrup.bandwichpersistence.core.persistence.services.DatabaseColumnService.getIdColumnOf;
 import static laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService.*;
-import static laustrup.bandwichpersistence.core.services.ClassFieldService.getDeclared;
 import static laustrup.bandwichpersistence.core.services.collections.MapService.collectMap;
 
 public interface DatabaseDefinition {
@@ -45,11 +44,15 @@ public interface DatabaseDefinition {
 
   String get_idReference();
 
-  default DatabaseField get_databaseFieldWithReference(Member member) {
-    String idReference = DatabaseDefinitionService.getIdReference(member.getDeclaringClass());
-    DatabaseField databaseField = get_databaseField(member);
+  default DatabaseField get_databaseFieldWithReference() {
+    Class<?> clazz = get_class();
+    String idReference = getIdReference(clazz)
+        .orElseThrow(() -> noIdReference(clazz));
 
-    return new DatabaseField(databaseField.table(), new DatabaseField.Column(idReference, toAlias(idReference)));
+    return new DatabaseField(
+        new DatabaseField.Table(clazz),
+        new DatabaseField.Column(idReference, toAlias(idReference))
+    );
   }
 
   @Getter
@@ -79,7 +82,8 @@ public interface DatabaseDefinition {
       this(
           clazz,
           get_databaseDefinitionTitle(clazz),
-          DatabaseDefinitionService.getIdReference(clazz),
+          getIdReference(clazz)
+              .orElseThrow(() -> noIdReference(clazz)),
           DatabaseColumnService.get_columns(clazz)
       );
     }
@@ -99,9 +103,15 @@ public interface DatabaseDefinition {
 
     @Override
     public Where.Condition joinOf(DatabaseDefinition external) {
+      BiFunction<Class<?>, Boolean, Supplier<IllegalArgumentException>> exception = (c, isInternal) -> () ->
+          new IllegalArgumentException(String.format("No id found for '%s' when creating join of %s class",
+              c.getSimpleName(),
+              isInternal ? "internal" : "external"
+          ));
+
       return Where.Condition.equals(
-          get_databaseFieldWithReference(getDeclared(get_class(), getIdColumnOf(get_class()))),
-          external.get_databaseFieldWithReference(getDeclared(external.get_class(), getIdColumnOf(external.get_class())))
+          get_databaseFieldWithReference(),
+          external.get_databaseFieldWithReference()
       );
     }
 
@@ -170,8 +180,8 @@ public interface DatabaseDefinition {
     @Override
     public Where.Condition joinOf(DatabaseDefinition external) {
       return Where.Condition.equals(
-          get_databaseFieldWithReference(getDeclared(get_class(), Model.ModelDTO.Fields.id)),
-          external.get_databaseFieldWithReference(getDeclared(external.get_class(), Model.ModelDTO.Fields.id))
+          get_databaseFieldWithReference(),
+          external.get_databaseFieldWithReference()
       );
     }
 

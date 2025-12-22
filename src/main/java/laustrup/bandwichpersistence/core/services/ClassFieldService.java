@@ -1,6 +1,5 @@
 package laustrup.bandwichpersistence.core.services;
 
-import laustrup.bandwichpersistence.core.persistence.models.members.InheritanceField;
 import laustrup.bandwichpersistence.core.persistence.worm.annotations.Table;
 import laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService;
 import laustrup.bandwichpersistence.core.utilities.Coollection;
@@ -25,40 +24,15 @@ public class ClassFieldService {
     if (clazz == null || fieldName == null || fieldName.isEmpty())
       return null;
 
-    try {
-      return clazz.getDeclaredField(fieldName);
-    } catch (NoSuchFieldException exception) {
-      Member member = getDeclaredFromSuperClass(clazz, fieldName);
+    Map<String, Field> fields = getFields(clazz);
 
-      if (member == null)
-        throw new RuntimeException(String.format(
-                "Could not find field %s with class of %s!",
-                fieldName,
-                clazz.getSimpleName()
-            ), exception
-        );
-      else
-        return member;
-    }
-  }
-
-  private static InheritanceField getDeclaredFromSuperClass(Class<?> clazz, String fieldName) {
-    if (clazz == Object.class)
-      return null;
-
-    Class<?> superClass = clazz.getSuperclass();
-    InheritanceField member = null;
-
-    while (superClass != null && (member != null || !superClass.equals(Object.class))) {
-      try {
-        member = new InheritanceField(clazz, superClass.getDeclaredField(fieldName));
-      } catch (NoSuchFieldException ignored) {
-      }
-
-      superClass = superClass.getSuperclass();
-    }
-
-    return member;
+    return fields.values().stream()
+        .filter(field -> field.getName().equals(fieldName))
+        .findFirst()
+        .orElseThrow(() -> new IllegalArgumentException(String.format("Couldn't find any '%s' field in class '%s'",
+            fieldName,
+            clazz.getSimpleName()
+        )));
   }
 
   public static boolean memberIsCollection(Member member) {

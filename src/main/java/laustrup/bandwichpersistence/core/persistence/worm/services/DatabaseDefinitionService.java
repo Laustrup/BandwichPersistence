@@ -161,7 +161,7 @@ public abstract class DatabaseDefinitionService {
   }
 
   public static boolean isIdless(Class<?> clazz) {
-    return Arrays.stream(clazz.getDeclaredFields()).noneMatch(DatabaseDefinitionService::fieldIsPrimary);
+    return getFields(clazz).values().stream().noneMatch(DatabaseDefinitionService::fieldIsPrimary);
   }
 
   public static boolean fieldIsPrimary(Field field) {
@@ -185,15 +185,18 @@ public abstract class DatabaseDefinitionService {
     )).orElseNull();
   }
 
-  public static String getIdReference(Class<?> entity) {
+  public static Optional<String> getIdReference(Class<?> entity) {
     if (entity == null)
-      return null;
+      return Optional.empty();
 
-    String idReference = handleIdReference(entity).value();
+    Table.IdReference idReference = handleIdReference(entity);
 
-    return defineColumnTitle(ifNotEmpty(idReference)
+    if (idReference == null)
+      return Optional.empty();
+
+    return Optional.of(defineColumnTitle(ifNotEmpty(idReference.value())
         .otherwise(String.join("_", pluralToSingular(get_databaseDefinitionTitle(entity)), "id"))
-    );
+    ));
   }
 
   public static Seszt<TableColumnData> getTableColumns(Field[] fields) {

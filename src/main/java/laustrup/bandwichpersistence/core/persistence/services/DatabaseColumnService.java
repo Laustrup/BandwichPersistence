@@ -5,15 +5,11 @@ import laustrup.bandwichpersistence.core.persistence.worm.annotations.Table;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
-import java.util.AbstractMap;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService.*;
-import static laustrup.bandwichpersistence.core.services.ClassFieldService.getDeclared;
 import static laustrup.bandwichpersistence.core.services.ClassFieldService.getFields;
 import static laustrup.bandwichpersistence.core.services.EternaryService.ifNotNull;
 import static laustrup.bandwichpersistence.core.services.EternaryService.stating;
@@ -81,33 +77,24 @@ public abstract class DatabaseColumnService {
         ).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
   }
 
-  public static String getIdColumnOf(Class<?> entity) {
+  public static Optional<String> getIdColumnOf(Class<?> entity) {
     if (isIdless(entity))
-      return null;
+      return Optional.empty();
 
-    return Stream.of("id", "id", "identity", "_identity")
-        .filter(field -> isId(entity, field))
+    Map<String, Field> fields = getFields(entity);
+
+    return Optional.of(Stream.of("_id", "_identity", "identity")
+        .filter(field -> fields.values().stream().anyMatch(value -> field.equals(value.getName())))
         .findFirst()
         .orElseThrow(() -> new RuntimeException(String.format(
             "Could not find database field id in database field configuration! Class was %s",
             entity.getSimpleName()
-        )));
+        ))));
   }
 
   public static Stream<Table.Column> getIdColumnsOf(Class<?> entity) {
     return getFields(entity).values().stream()
         .map(field -> getTableColumn(field).orElse(null))
         .filter(column -> column != null && column.isPrimary());
-  }
-
-  private static boolean isId(Class<?> entity, String column) {
-    if (column == null)
-      return false;
-
-    try {
-      return getDeclared(entity, column).getName().equals(column);
-    } catch (Exception e) {
-      return false;
-    }
   }
 }

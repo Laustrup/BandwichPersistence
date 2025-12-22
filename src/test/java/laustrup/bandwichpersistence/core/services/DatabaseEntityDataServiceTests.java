@@ -7,6 +7,7 @@ import laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefin
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import static laustrup.bandwichpersistence.core.persistence.exceptions.DatabaseDefinitionException.noIdReference;
 import static laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService.getIdReference;
 import static laustrup.bandwichpersistence.quality_assurance.Asserter.asserting;
 
@@ -38,7 +39,9 @@ class DatabaseDefinitionServiceTests extends BandwichTester {
         default -> throw new IllegalStateException("Unexpected value: " + clazz.getSimpleName());
       });
 
-      String actual = act(getIdReference(clazz));
+      String actual = act(getIdReference(clazz)
+          .orElseThrow(() -> noIdReference(clazz))
+      );
 
       asserting(expected)
           .is(actual);

@@ -1,0 +1,18 @@
+flowchart TD
+    properties("Properties") -->|Generate Selection| propertiesNull{"Are properties null?"}
+    propertiesNull -->|No| defineSelectStatement("Define statement")
+    defineSelectStatement --> fromProperties{"From properties"}
+    fromProperties -->|Is distinct?| selectionDefined(("select %distinct %* from %table %alias"))
+    fromProperties -->|What should be selected?| selectionDefined
+    fromProperties -->|What table?| selectionDefined
+    selectionDefined -->|Anything else?| fromProperties
+    propertiesNull -->|Yes| throwException((Throw Exception))
+
+    join("Join") --> isJoinParametersAllowed{"Are area, table or products null"}
+    isJoinParametersAllowed -->|Yes| throwException
+    isJoinParametersAllowed -->|No| defineJoin{"Define join"}
+    defineJoin -->|What area?| joinApply(("Apply %area join %table %alias on %clause"))
+    defineJoin -->|What table?| joinApply
+    defineJoin -->|What products| whereClauseOfProduct("Define where clause of products")
+    whereClauseOfProduct --> joinApply
+    joinApply -->|Anything else?| defineJoin

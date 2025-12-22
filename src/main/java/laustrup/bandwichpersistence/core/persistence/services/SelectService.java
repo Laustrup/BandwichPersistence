@@ -152,7 +152,8 @@ public abstract class SelectService {
           return new Selections(new HashMap<>(Arrays.stream(classes)
               .flatMap(clazz ->
                   toSelections(new DatabaseDefinition.Entity(clazz).get_columns()).entrySet().stream()
-              ).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))));
+              ).distinct()
+              .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))));
         }
 
         @Override

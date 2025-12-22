@@ -46,7 +46,7 @@ public record DatabaseField(Table table, Column column) {
   }
 
   public static DatabaseField referenceOf(Class<?> entity, Class<?> target) {
-    return new DatabaseField(new Table(entity), new Column(getIdReference(target)));
+    return new DatabaseField(new Table(entity), new Column(getIdReference(target).orElseThrow()));
   }
 
   public static DatabaseField of(Configuration configuration) {
