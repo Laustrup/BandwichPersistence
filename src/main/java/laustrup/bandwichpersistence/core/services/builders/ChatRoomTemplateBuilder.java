@@ -1,7 +1,10 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.chats.ChatRoom;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ChatRoomTemplateBuilder extends BandwichBuilderService<ChatRoom.Template> {
 
   private static ChatRoomTemplateBuilder _instance;
@@ -11,10 +14,6 @@ public class ChatRoomTemplateBuilder extends BandwichBuilderService<ChatRoom.Tem
       _instance = new ChatRoomTemplateBuilder();
 
     return _instance;
-  }
-
-  private ChatRoomTemplateBuilder() {
-
   }
 
   @Override

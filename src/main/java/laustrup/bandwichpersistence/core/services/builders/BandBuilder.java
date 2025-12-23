@@ -1,7 +1,10 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.Band;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class BandBuilder extends BandwichBuilderService<Band> {
 
   private static BandBuilder _instance;
@@ -11,10 +14,6 @@ public class BandBuilder extends BandwichBuilderService<Band> {
       _instance = new BandBuilder();
 
     return _instance;
-  }
-
-  private BandBuilder() {
-
   }
 
   @Override

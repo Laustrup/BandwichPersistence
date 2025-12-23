@@ -1,7 +1,10 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.Venue;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class VenueRatingBuilder extends BandwichBuilderService<Venue.Rating> {
 
   private static VenueRatingBuilder _instance;
@@ -11,10 +14,6 @@ public class VenueRatingBuilder extends BandwichBuilderService<Venue.Rating> {
       _instance = new VenueRatingBuilder();
 
     return _instance;
-  }
-
-  private VenueRatingBuilder() {
-
   }
 
   @Override

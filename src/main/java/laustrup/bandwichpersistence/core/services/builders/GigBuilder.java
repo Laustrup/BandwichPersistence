@@ -1,7 +1,9 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.Event;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
 public class GigBuilder extends BandwichBuilderService<Event.Gig> {
 
   private static GigBuilder _instance;
@@ -11,10 +13,6 @@ public class GigBuilder extends BandwichBuilderService<Event.Gig> {
       _instance = new GigBuilder();
 
     return _instance;
-  }
-
-  private GigBuilder() {
-
   }
 
   @Override

@@ -1,7 +1,10 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.Event;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class EventBuilder extends BandwichBuilderService<Event> {
 
   private static EventBuilder _instance;
@@ -11,10 +14,6 @@ public class EventBuilder extends BandwichBuilderService<Event> {
       _instance = new EventBuilder();
 
     return _instance;
-  }
-
-  private EventBuilder() {
-
   }
 
   @Override

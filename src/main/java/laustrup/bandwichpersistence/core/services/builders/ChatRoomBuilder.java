@@ -1,7 +1,9 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.chats.ChatRoom;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
 public class ChatRoomBuilder extends BandwichBuilderService<ChatRoom> {
 
   private static ChatRoomBuilder _instance;
@@ -11,10 +13,6 @@ public class ChatRoomBuilder extends BandwichBuilderService<ChatRoom> {
       _instance = new ChatRoomBuilder();
 
     return _instance;
-  }
-
-  private ChatRoomBuilder() {
-
   }
 
   @Override

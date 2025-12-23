@@ -1,7 +1,10 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.Organisation;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class OrganisationBuilder extends BandwichBuilderService<Organisation> {
 
   private static OrganisationBuilder _instance;
@@ -11,10 +14,6 @@ public class OrganisationBuilder extends BandwichBuilderService<Organisation> {
       _instance = new OrganisationBuilder();
 
     return _instance;
-  }
-
-  private OrganisationBuilder() {
-
   }
 
   @Override

@@ -20,7 +20,7 @@ import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
 import static laustrup.bandwichpersistence.core.persistence.exceptions.DatabaseDefinitionException.noIdReference;
-import static laustrup.bandwichpersistence.core.persistence.models.EntityDataCollection.Key.conjunctionKey;
+import static laustrup.bandwichpersistence.core.persistence.models.EntityDataCollection.Key.conjunctionKeyOf;
 import static laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService.*;
 import static laustrup.bandwichpersistence.core.services.collections.MapService.collectMap;
 
@@ -117,7 +117,11 @@ public interface DatabaseDefinition {
 
     @Override
     public Map.Entry<String, DatabaseDefinition> toEntry() {
-      return new AbstractMap.SimpleImmutableEntry<>(new EntityDataCollection.Key(get_class()).get(), this);
+      return new AbstractMap.SimpleImmutableEntry<>(entryKeyOf(get_class()), this);
+    }
+
+    public static String entryKeyOf(Class<?> clazz) {
+      return new EntityDataCollection.Key(clazz).get();
     }
   }
 
@@ -149,7 +153,7 @@ public interface DatabaseDefinition {
 
     @Override
     public String get_title() {
-      return conjunctionKey(target.get_class(), common.get_class());
+      return conjunctionKeyOf(target.get_class(), common.get_class());
     }
 
     @Override
@@ -196,7 +200,13 @@ public interface DatabaseDefinition {
     }
 
     public EntityDataCollection.Key get_collectionKey() {
-      return new EntityDataCollection.Key(target.get_class(), common.get_class());
+      return new EntityDataCollection.Key(
+          target.get_class(),
+          common.get_class(),
+          Arrays.stream(relations)
+              .map(Entity::get_class)
+              .toArray(Class[]::new)
+      );
     }
   }
 }

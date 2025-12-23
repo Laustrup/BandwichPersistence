@@ -4,11 +4,12 @@ import laustrup.bandwichpersistence.core.persistence.DatabaseField;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Clause.Clausement;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition;
 import laustrup.bandwichpersistence.core.persistence.worm.models.DatabaseDefinition;
-import laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService;
+import laustrup.bandwichpersistence.core.services.EternaryService.Eternary;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -17,6 +18,7 @@ import static java.lang.String.join;
 import static laustrup.bandwichpersistence.core.persistence.DatabaseField.toSelections;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition.Equation.EQUALS;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition.Equation.IS_NULL;
+import static laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService.get_databaseDefinitionTitle;
 import static laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService.toAlias;
 import static laustrup.bandwichpersistence.core.services.EternaryService.stating;
 
@@ -28,6 +30,31 @@ public abstract class SelectService {
 
   public static Selecting selecting(Selecting.Properties properties) {
     return new Selecting(properties);
+  }
+
+  public static class SelectException extends RuntimeException {
+
+    private SelectException(String message) {
+      super(message);
+    }
+
+    public static SelectException noExternalDatabaseDefinition(DatabaseDefinition[] internals) {
+      return new SelectException(String.format("There wasn't any external database definition with internals of %s",
+          Arrays.stream(internals)
+              .map(DatabaseDefinition::get_title)
+              .collect(Collectors.joining())
+      ));
+    }
+
+    public static SelectException noInternalDatabaseDefinition(DatabaseDefinition external) {
+      return new SelectException(String.format("There wasn't any internal database definition of external %s",
+          external.get_title()
+      ));
+    }
+
+    public static SelectException noExternalOrInternalDatabaseDefinition() {
+      return new SelectException("There could neither be found an internal nor external database definition!");
+    }
   }
 
   public static class Selecting {
@@ -53,8 +80,8 @@ public abstract class SelectService {
 
     private String defineSelectStatement() {
       return /*language=MySQL*/ format(
-          "select %s%s from %s %s",
-          _properties.is_distinct() ? "distinct " : "",
+          "select%s%sfrom %s %s",
+          _properties.is_distinct() ? " distinct" : "",
           _properties.get_selections().apply(),
           _properties.get_table(),
           toAlias(_properties.get_table())
@@ -106,8 +133,12 @@ public abstract class SelectService {
         this(selections, table, null, distinct);
       }
 
+      public Properties(Selections selections, Class<?> table) {
+        this(selections, get_databaseDefinitionTitle(table), null, false);
+      }
+
       public Properties(Class<?> table, Clausement where) {
-        this(Selections.asterisk(), DatabaseDefinitionService.get_databaseDefinitionTitle(table), where, false);
+        this(Selections.asterisk(), get_databaseDefinitionTitle(table), where, false);
       }
 
       public Properties(String table, boolean distinct, Clausement where) {
@@ -132,8 +163,17 @@ public abstract class SelectService {
 
         private final Map<DatabaseField, String> _groupings;
 
-        private String generateRow(Map.Entry<DatabaseField, String> entry) {
-          return String.format("%s as %s", entry.getKey(), entry.getValue());
+        private String generateSelectionRow(Map.Entry<DatabaseField, String> entry) {
+          Eternary eternary = stating(!entry.getKey().get_tableColumn().equals(entry.getValue()));
+          Function<String, String> action = then -> eternary
+              .then(then)
+              .orElse("");
+
+          return String.format("%s%s%s",
+              entry.getKey().get_tableColumn(),
+              action.apply(" as "),
+              action.apply(entry.getValue())
+          );
         }
 
         public Selections(Map<DatabaseField, String> groupings) {
@@ -158,15 +198,13 @@ public abstract class SelectService {
 
         @Override
         public String apply() {
-          String asterix = "*";
-
           return stating(_groupings.isEmpty())
-              .then(asterix)
-              .orElse(() -> _groupings.entrySet().stream()
-                  .map(this::generateRow)
-                  .reduce((a, b) -> String.format("%s\n%s", a, b))
-                  .orElse(asterix)
-              );
+              .then(" * ")
+              .orElse(() -> String.format("\n\t%s\n",
+                  _groupings.entrySet().stream()
+                      .map(this::generateSelectionRow)
+                      .collect(Collectors.joining(",\n\t"))
+              ));
         }
       }
     }
@@ -212,9 +250,25 @@ public abstract class SelectService {
         return left(table, conditions.toArray(Condition[]::new));
       }
 
-      public static Join left(DatabaseDefinition external, DatabaseDefinition... internals) {
-        Seszt<DatabaseDefinition> data = new Seszt<>(external);
+      public static Join left(
+          DatabaseDefinition external,
+          DatabaseDefinition internal,
+          DatabaseDefinition... internals
+      ) {
+        if (external == null && internal == null)
+          throw SelectException.noExternalOrInternalDatabaseDefinition();
+
+        if (external == null)
+          throw SelectException.noExternalDatabaseDefinition(stating(internals.length > 0)
+              .then(internals)
+              .orElse(() -> new DatabaseDefinition[]{internal})
+          );
+
+        Seszt<DatabaseDefinition> data = new Seszt<>(external, internal);
         data.addAll(Arrays.asList(internals));
+
+        if (data.size() < 2 || data.stream().anyMatch(Objects::isNull))
+          throw SelectException.noInternalDatabaseDefinition(external);
 
         return left(
             external.get_title(),
@@ -232,7 +286,7 @@ public abstract class SelectService {
       }
 
       public static Join inner(Class<?> table, DatabaseField internal, DatabaseField external) {
-        return new Join(Area.INNER, DatabaseDefinitionService.get_databaseDefinitionTitle(table), Condition.equals(internal, external));
+        return new Join(Area.INNER, get_databaseDefinitionTitle(table), Condition.equals(internal, external));
       }
 
       @Override

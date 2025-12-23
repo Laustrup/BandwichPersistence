@@ -24,6 +24,8 @@ public interface AssertionChecker<EXPECTED> {
 
   AssertionChecker<EXPECTED> isNotNull();
 
+  AssertionChecker<EXPECTED> isIdenticalTo(EXPECTED actual);
+
   interface CollectiveAssertionChecker<EXPECTED extends Collection<EXPECTED_ELEMENT>, EXPECTED_ELEMENT> extends AssertionChecker<EXPECTED> {
 
     CollectiveAssertionChecker<EXPECTED, EXPECTED_ELEMENT> isNotEmpty();

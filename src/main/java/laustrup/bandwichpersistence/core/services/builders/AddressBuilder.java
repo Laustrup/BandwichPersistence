@@ -1,7 +1,10 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class AddressBuilder extends BandwichBuilderService<ContactInfo.Address> {
 
   private static AddressBuilder _instance;
@@ -11,9 +14,6 @@ public class AddressBuilder extends BandwichBuilderService<ContactInfo.Address> 
       _instance = new AddressBuilder();
 
     return _instance;
-  }
-
-  private AddressBuilder() {
   }
 
   @Override

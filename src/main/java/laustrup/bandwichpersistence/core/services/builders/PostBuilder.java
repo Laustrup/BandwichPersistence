@@ -1,7 +1,10 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.chats.messages.Post;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class PostBuilder extends BandwichBuilderService<Post> {
 
   private static PostBuilder _instance;
@@ -11,10 +14,6 @@ public class PostBuilder extends BandwichBuilderService<Post> {
       _instance = new PostBuilder();
 
     return _instance;
-  }
-
-  private PostBuilder() {
-
   }
 
   @Override

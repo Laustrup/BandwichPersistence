@@ -1,7 +1,10 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CountryBuilder extends BandwichBuilderService<ContactInfo.Country> {
 
   private static CountryBuilder _instance;
@@ -11,10 +14,6 @@ public class CountryBuilder extends BandwichBuilderService<ContactInfo.Country> 
       _instance = new CountryBuilder();
 
     return _instance;
-  }
-
-  private CountryBuilder() {
-
   }
 
   @Override

@@ -1,7 +1,10 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.users.Artist;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ArtistBuilder extends BandwichBuilderService<Artist> {
 
   private static ArtistBuilder _instance;
@@ -11,10 +14,6 @@ public class ArtistBuilder extends BandwichBuilderService<Artist> {
       _instance = new ArtistBuilder();
 
     return _instance;
-  }
-
-  private ArtistBuilder() {
-
   }
 
   @Override

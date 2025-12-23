@@ -5,10 +5,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import static laustrup.bandwichpersistence.core.services.ClassFieldService.getValue;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class Asserter {
@@ -103,6 +105,29 @@ public class Asserter {
     @Override
     public AssertionChecker<EXPECTED> isNotNull() {
       return check(() -> assertingNotNull(_expected));
+    }
+
+    @Override
+    public AssertionChecker<EXPECTED> isIdenticalTo(EXPECTED actual) {
+      return check(() -> {
+        BiFunction<Exception, Field, RuntimeException> exceptionHandler = (exception, field) ->
+            new RuntimeException(String.format("No field of %s in AssertionChecker of identical to",
+                field.getName()),
+                exception
+            );
+        Arrays.stream(_expected.getClass().getDeclaredFields()).forEach(expected -> {
+          try {
+            Field actualField = actual.getClass().getDeclaredField(expected.getName());
+
+            assertEquals(getValue(_expected, expected), getValue(actual, actualField));
+          } catch (NoSuchFieldException exception) {
+            throw new RuntimeException(String.format("No field of %s in AssertionChecker of identical to",
+                expected.getName()),
+                exception
+            );
+          }
+        });
+      });
     }
 
     protected AssertionChecker<EXPECTED> check(Runnable action) {

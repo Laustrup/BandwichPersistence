@@ -1,7 +1,10 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.Ticket;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class TicketOptionBuilder extends BandwichBuilderService<Ticket.Option> {
 
   private static TicketOptionBuilder _instance;
@@ -11,10 +14,6 @@ public class TicketOptionBuilder extends BandwichBuilderService<Ticket.Option> {
       _instance = new TicketOptionBuilder();
 
     return _instance;
-  }
-
-  protected TicketOptionBuilder() {
-
   }
 
   @Override

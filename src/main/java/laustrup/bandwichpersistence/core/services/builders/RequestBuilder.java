@@ -1,7 +1,10 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.chats.Request;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class RequestBuilder extends BandwichBuilderService<Request> {
 
   private static RequestBuilder _instance;
@@ -11,10 +14,6 @@ public class RequestBuilder extends BandwichBuilderService<Request> {
       _instance = new RequestBuilder();
 
     return _instance;
-  }
-
-  private RequestBuilder() {
-
   }
 
   @Override

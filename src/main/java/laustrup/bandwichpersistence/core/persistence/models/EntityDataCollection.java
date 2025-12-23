@@ -1,11 +1,19 @@
 package laustrup.bandwichpersistence.core.persistence.models;
 
+import laustrup.bandwichpersistence.core.persistence.exceptions.DatabaseDefinitionException;
 import laustrup.bandwichpersistence.core.persistence.worm.models.DatabaseDefinition;
+import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
+import org.springframework.lang.Nullable;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import static laustrup.bandwichpersistence.core.persistence.models.EntityDataCollection.Key.conjunctionKeyOf;
+import static laustrup.bandwichpersistence.core.persistence.worm.models.DatabaseDefinition.Entity.entryKeyOf;
+import static laustrup.bandwichpersistence.core.services.EternaryService.ifNull;
 import static laustrup.bandwichpersistence.core.services.EternaryService.stating;
 
 public interface EntityDataCollection {
@@ -25,15 +33,36 @@ public interface EntityDataCollection {
 
   Map<String, DatabaseDefinition> getAll();
 
-  default DatabaseDefinition.Entity entityOf(Class<?> entity) {
-    return (DatabaseDefinition.Entity) getAll().get(new Key(entity).get());
+  default DatabaseDefinition entityOf(Class<?> entity) {
+    return entityOf(entity, null);
   }
 
-  default DatabaseDefinition.Conjunction conjunctionOf(Class<?> target, Class<?> common) {
-    return (DatabaseDefinition.Conjunction) getAll().get(new Key(target, common).get());
+  default DatabaseDefinition entityOf(
+      Class<?> target,
+      @Nullable Class<?> common,
+      Class<?>... relations
+  ) {
+    return Optional.ofNullable(getAll().get(ifNull(common)
+        .then(() -> entryKeyOf(target))
+        .orElse(() -> conjunctionKeyOf(target, common, relations))
+    )).orElseThrow(() -> new DatabaseDefinitionException(String.format("""
+            Couldn't find any entity of
+            
+                target = "%s"
+                common = "%s"
+                relations = "%s"
+            """,
+        target,
+        common,
+        Arrays.stream(relations)
+            .map(Class::getName)
+            .collect(Collectors.joining(Key.KEY_DELIMITER))
+    )));
   }
 
   class Key {
+
+    public static final String KEY_DELIMITER = "_";
 
     private final Class<?> _class;
 
@@ -45,9 +74,9 @@ public interface EntityDataCollection {
       _name = clazz.getName();
     }
 
-    public Key(Class<?> target, Class<?> common) {
+    public Key(Class<?> target, Class<?> common, Class<?>... relations) {
       _class = null;
-      _name = conjunctionKey(target, common);
+      _name = conjunctionKeyOf(target, common, relations);
     }
 
     public Key(String name) {
@@ -67,12 +96,11 @@ public interface EntityDataCollection {
           .orElse(_name);
     }
 
-    public static String conjunctionKey(Class<?> target, Class<?> common) {
-      return String.join(
-          "_",
-          target.getName(),
-          common.getName()
-      );
+    public static String conjunctionKeyOf(Class<?> target, Class<?> common, Class<?>... relations) {
+      return Seszt.of(target, common)
+          .Add(relations).stream()
+          .map(DatabaseDefinition.Entity::entryKeyOf)
+          .collect(Collectors.joining(Key.KEY_DELIMITER));
     }
 
     @Override

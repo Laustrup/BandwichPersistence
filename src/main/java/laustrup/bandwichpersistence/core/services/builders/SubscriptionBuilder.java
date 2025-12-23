@@ -1,7 +1,10 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.Subscription;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class SubscriptionBuilder extends BandwichBuilderService<Subscription> {
 
   private static SubscriptionBuilder _instance;
@@ -11,10 +14,6 @@ public class SubscriptionBuilder extends BandwichBuilderService<Subscription> {
       _instance = new SubscriptionBuilder();
 
     return _instance;
-  }
-
-  private SubscriptionBuilder() {
-
   }
 
   @Override

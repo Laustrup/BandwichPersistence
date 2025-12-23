@@ -8,6 +8,8 @@ import laustrup.bandwichpersistence.core.models.users.ContactInfo;
 import laustrup.bandwichpersistence.core.models.users.User;
 import laustrup.bandwichpersistence.core.persistence.DatabaseField;
 import laustrup.bandwichpersistence.core.services.persistence.JDBCService;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -19,6 +21,7 @@ import static laustrup.bandwichpersistence.core.managers.UserDetailsManager.getU
 import static laustrup.bandwichpersistence.core.services.ClassFieldService.getDeclared;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.getString;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UserBuilder {
 
   private static final ArtistBuilder _artistBuilder = ArtistBuilder.get_instance();
@@ -32,10 +35,6 @@ public class UserBuilder {
       _instance = new UserBuilder();
 
     return _instance;
-  }
-
-  private UserBuilder() {
-
   }
 
   public static Stream<Login> buildLogins(ResultSet resultSet) {

@@ -1,7 +1,10 @@
 package laustrup.bandwichpersistence.core.services.builders;
 
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ContactInfoBuilder extends BandwichBuilderService<ContactInfo> {
 
   private static ContactInfoBuilder _instance;
@@ -11,10 +14,6 @@ public class ContactInfoBuilder extends BandwichBuilderService<ContactInfo> {
       _instance = new ContactInfoBuilder();
 
     return _instance;
-  }
-
-  private ContactInfoBuilder() {
-
   }
 
   @Override
