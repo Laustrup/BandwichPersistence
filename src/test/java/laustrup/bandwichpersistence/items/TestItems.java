@@ -6,17 +6,12 @@ import laustrup.bandwichpersistence.core.models.Situation;
 import laustrup.bandwichpersistence.core.models.identification.CommonIdentity;
 import laustrup.bandwichpersistence.core.models.identification.Identity;
 import laustrup.bandwichpersistence.core.models.identification.Signature;
-import laustrup.bandwichpersistence.core.persistence.DatabaseField;
 import laustrup.bandwichpersistence.core.persistence.models.Query;
-import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting;
-import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Properties;
-import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Clause.Clausement;
 import laustrup.bandwichpersistence.core.persistence.worm.annotations.Table;
 import laustrup.bandwichpersistence.core.persistence.worm.models.DatabaseDefinition;
 import laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService;
 import laustrup.bandwichpersistence.core.repositories.bandwich.BandwichEntityDataCollection;
 import laustrup.bandwichpersistence.core.services.ModelService;
-import laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService.Configurations;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import laustrup.bandwichpersistence.core.utilities.parameters.Truthiness;
 import lombok.Getter;
@@ -33,12 +28,8 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 
-import static laustrup.bandwichpersistence.core.persistence.DatabaseField.Configuration.databaseFieldConfiguration;
-import static laustrup.bandwichpersistence.core.persistence.DatabaseField.Configuration.databaseFieldConfigurationsOfId;
 import static laustrup.bandwichpersistence.core.persistence.DatabaseManager.read;
-import static laustrup.bandwichpersistence.core.persistence.services.SelectService.selecting;
 import static laustrup.bandwichpersistence.core.repositories.bandwich.BandwichEntityDataCollection.defineDefinitions;
-import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService.get;
 
 public class TestItems {
 
@@ -77,51 +68,18 @@ public class TestItems {
     return read(selectOrganizationQuery(OrganisationTestItems.OrganisationTitle.ARENA.get_naming())).get_resultSet();
   }
 
-  public static UUID generateUUID(Class<?> clazz, Clausement that) {
-    return get(new Configurations(
-            DatabaseField.of(databaseFieldConfiguration(
-                clazz,
-                (clazz.isAssignableFrom(Model.class)) ? Model.Fields._identity : "_id"
-            )),
-            read(
-                new Query(selecting(new Properties(clazz, that)).select())
-            ).get_resultSet(),
-            Configurations.Mode.START
-        ),
-        UUID.class
-    );
-  }
-
-  public static UUID generateUUID(Class<?> table, Selecting selecting) {
-    return get(
-        new Configurations(
-            DatabaseField.of(databaseFieldConfigurationsOfId(table).findFirst().orElseThrow()),
-            read(new Query(selecting.select())).get_resultSet(),
-            () -> {
-              throw new RuntimeException(String.format(
-                  "Couldn't generate UUID for table '%s' with selecting '%s'",
-                  table,
-                  Optional.of(selecting).map(Selecting::select).orElse("<null>")
-              ));
-            },
-            Configurations.Mode.START
-        ),
-        UUID.class
-    );
-  }
-
   @Getter
   @Setter
   @FieldNameConstants
   @Table("test_instances")
   public static class Instance {
 
-    @Table.Column(isPrimary = true)
-    private Id _id;
-
     private String _title;
 
     private boolean _active;
+
+    @Table.Column(isPrimary = true)
+    private Id _id;
 
     private int _amount;
 

@@ -33,6 +33,7 @@ import static laustrup.bandwichpersistence.core.managers.ManagerService.database
 import static laustrup.bandwichpersistence.core.persistence.queries.ScriptorianQueries.Parameter;
 import static laustrup.bandwichpersistence.core.scriptorian.repositories.ScriptorianRepository.*;
 import static laustrup.bandwichpersistence.core.services.ClassFieldService.getDeclared;
+import static laustrup.bandwichpersistence.core.services.FileService.getContent;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
 
 public class ScriptorianManager {
@@ -51,19 +52,21 @@ public class ScriptorianManager {
     try {
       _logger.log(Level.INFO, "Scriptorian started");
 
-      Seszt<File> scripts = prepareScripts(PathLibrary.get_migrationDirectoryFullPath());
+      Seszt<File> scripts = prepareScripts(get_migrationDirectoryFullPath());
 
       databaseInteraction(() -> {
+        createDefaultSchemaIfNotExists();
+
         Seszt<Scriptorian.Scriptory> scriptoriesWithoutSuccess = scriptoriesWithoutSuccess();
         if (!scriptoriesWithoutSuccess.isEmpty())
           throw new IllegalStateException(String.format("""
-                  %nThere is a conflict with scriptories, please resolve it.
-                  
-                  conflict to resolve is:
-                  %s
-                  
-                  It can either be done by deleting the row with successstamp of null, which will make it run again on next startup or by setting it to now(), which will ignore the script on startup.
-                  """,
+              %nThere is a conflict with scriptories, please resolve it.
+              
+              conflict to resolve is:
+              %s
+              
+              It can either be done by deleting the row with successstamp of null, which will make it run again on next startup or by setting it to now(), which will ignore the script on startup.
+              """,
               scriptoriesWithoutSuccess.findFirst().orElseThrow().get_errorMessage()
           ));
 
@@ -79,7 +82,7 @@ public class ScriptorianManager {
             String errorMessage = null;
 
             try {
-              executeScript(FileService.getContent(file));
+              executeScript(getContent(file));
             } catch (RuntimeException exception) {
               String logMessage = String.format("Couldn't execute migration sql file \"%s\"", currentFileName);
               _logger.log(
@@ -126,7 +129,7 @@ public class ScriptorianManager {
               .sorted(ScriptorianManager::sortScripts))
       ) {
         try {
-          executeScript(FileService.getContent(sql));
+          executeScript(getContent(sql));
           _logger.log(
               Level.INFO,
               String.format("Successfully executed injection sql file \"%s\".", sql.getName())
@@ -282,7 +285,7 @@ public class ScriptorianManager {
         split[1],
         file.getName(),
         null,
-        FileService.getContent(file),
+        getContent(file),
         createStamp.apply(versionstampAttributes),
         null,
         createStamp.apply(createdstampAttributes),
@@ -300,7 +303,7 @@ public class ScriptorianManager {
         new DatabaseParameter(Parameter.TITLE.get_key(), file.getName().split(String.valueOf(_splitter))[1]),
         new DatabaseParameter(Parameter.FILE_NAME.get_key(), file.getName()),
         new DatabaseParameter(Parameter.ERROR_MESSAGE.get_key(), errorMessage),
-        new DatabaseParameter(Parameter.CONTENT.get_key(), FileService.getContent(file)),
+        new DatabaseParameter(Parameter.CONTENT.get_key(), getContent(file)),
         new DatabaseParameter(Parameter.VERSIONSTAMP.get_key(), scriptory.get_versionstamp()),
         new DatabaseParameter(Parameter.SUCCESSSTAMP.get_key(), errorMessage == null ? Instant.now() : null),
         new DatabaseParameter(Parameter.CREATEDSTAMP.get_key(), scriptory.get_createdstamp())

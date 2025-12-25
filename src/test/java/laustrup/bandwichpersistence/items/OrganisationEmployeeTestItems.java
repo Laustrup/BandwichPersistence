@@ -2,25 +2,18 @@ package laustrup.bandwichpersistence.items;
 
 import jdk.jshell.spi.ExecutionControl.NotImplementedException;
 import laustrup.bandwichpersistence.core.models.Organisation.Employee;
-import laustrup.bandwichpersistence.core.models.users.ContactInfo;
-import laustrup.bandwichpersistence.core.persistence.DatabaseField;
-import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Join;
-import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Properties;
-import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
+import laustrup.bandwichpersistence.items.OrganisationTestItems.OrganisationTitle;
 
 import java.time.Instant;
+import java.util.UUID;
 
 import static laustrup.bandwichpersistence.core.models.Organisation.Employee.Role.LEADER;
 import static laustrup.bandwichpersistence.core.models.Subscription.Kind.PAYING;
 import static laustrup.bandwichpersistence.core.models.Subscription.Status.ACCEPTED;
 import static laustrup.bandwichpersistence.core.models.Subscription.UserType.ORGANISATION_EMPLOYEE;
-import static laustrup.bandwichpersistence.core.persistence.DatabaseField.Configuration.databaseFieldConfiguration;
-import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.complying;
-import static laustrup.bandwichpersistence.core.persistence.services.SelectService.selecting;
-import static laustrup.bandwichpersistence.items.OrganisationTestItems.generateIværkstedContactInfo;
+import static laustrup.bandwichpersistence.items.ContactInfoTestItems.generateContactInfo;
 import static laustrup.bandwichpersistence.items.SubscriptionTestItems.generateSubscription;
-import static laustrup.bandwichpersistence.items.TestItems.generateUUID;
 
 public class OrganisationEmployeeTestItems {
 
@@ -35,8 +28,7 @@ public class OrganisationEmployeeTestItems {
   }
 
   private static Employee generateJensJensen() {
-    String email = "jens@ivaerkstedet.dk";
-    Employee.Id id = generateEmployeeId(email);
+    Employee.Id id = new Employee.Id(UUID.fromString("11111111-1111-1111-a111-111111111113"));
 
     return new Employee(
         id,
@@ -44,7 +36,7 @@ public class OrganisationEmployeeTestItems {
         "Jens",
         "Jensen",
         "Jeg hedder Jens",
-        generateIværkstedContactInfo("contact@ivaerkstedet.dk"),
+        generateContactInfo(OrganisationTitle.IVÆRKSTED),
         generateSubscription(id, ACCEPTED, PAYING, ORGANISATION_EMPLOYEE),
         new Seszt<>(LEADER),
         new Seszt<>(),
@@ -52,27 +44,6 @@ public class OrganisationEmployeeTestItems {
         new Seszt<>(),
         Instant.now()
     );
-  }
-
-  private static Employee.Id generateEmployeeId(String email) {
-    return new Employee.Id(generateUUID(
-        Employee.class,
-        selecting(new Properties(
-            Employee.class,
-            complying()
-                .which(Condition.equals(
-                    DatabaseField.of(databaseFieldConfiguration(
-                        ContactInfo.class,
-                        ContactInfo.Fields._email
-                    )),
-                    email
-                ))
-        )).addJoin(Join.inner(
-            ContactInfo.class,
-            DatabaseField.of(databaseFieldConfiguration(ContactInfo.class, ContactInfo.Fields._id)),
-            DatabaseField.referenceOf(Employee.class, ContactInfo.class)
-        ))
-    ));
   }
 
   public enum OrganisationEmployeeTitle {

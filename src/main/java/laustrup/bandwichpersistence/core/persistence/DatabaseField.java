@@ -3,18 +3,16 @@ package laustrup.bandwichpersistence.core.persistence;
 import laustrup.bandwichpersistence.core.persistence.worm.models.TableColumnData;
 import laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService;
 import laustrup.bandwichpersistence.core.utilities.collections.Liszt;
+import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 
 import java.lang.reflect.Member;
 import java.util.Arrays;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static laustrup.bandwichpersistence.core.persistence.DatabaseField.Configuration.Exception.noSuchColumn;
 import static laustrup.bandwichpersistence.core.persistence.services.DatabaseColumnService.getIdColumnsOf;
 import static laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService.*;
-import static laustrup.bandwichpersistence.core.services.EternaryService.ifNotEmpty;
-import static laustrup.bandwichpersistence.core.services.EternaryService.ifNotNull;
+import static laustrup.bandwichpersistence.core.services.EternaryService.*;
 
 public record DatabaseField(Table table, Column column) {
 
@@ -31,10 +29,10 @@ public record DatabaseField(Table table, Column column) {
 
   private static final String[] _idIndicators = new String[]{"id", "id"};
 
-  public static Map<DatabaseField, String> toSelections(Map<? extends Member, DatabaseField> data) {
-    return data.keySet().stream()
+  public static Seszt<DatabaseField> toSelections(Map<? extends Member, DatabaseField> data) {
+    return new Seszt<>(data.keySet().stream()
         .map(DatabaseField::of)
-        .collect(Collectors.toMap(Function.identity(), DatabaseField::get_tableColumn));
+    );
   }
 
   public static DatabaseField of(Member member) {
@@ -54,15 +52,25 @@ public record DatabaseField(Table table, Column column) {
   }
 
   public String get_tableColumn() {
-    return handleSelection(".");
+    return handleSelection(".", true);
+  }
+
+  public String get_entityColumn() {
+    return handleSelection(".", false);
   }
 
   public String get_columnAlias() {
-    return handleSelection("_");
+    return handleSelection("_", true);
   }
 
-  private String handleSelection(String delimiter) {
-    return String.format("%s%s%s", table.getKey(), delimiter, column.title());
+  private String handleSelection(String delimiter, boolean ofKey) {
+    return String.format("%s%s%s",
+        table.getKey(),
+        delimiter,
+        stating(ofKey)
+            .then(column.getKey())
+            .orElse(column.title())
+    );
   }
 
   public boolean is_key() {
@@ -149,7 +157,7 @@ public record DatabaseField(Table table, Column column) {
   public record Column(String title, String alias) implements Unit {
 
     public Column(Member member) {
-      this(getColumnTitle(member));
+      this(member.getName(), getColumnTitle(member));
     }
 
     private Column(String title) {

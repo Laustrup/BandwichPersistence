@@ -21,7 +21,7 @@ class EntityDataCollectionTests extends BandwichTester {
 
       asserting(expected)
           .isNotNull()
-          .isIdenticalTo(actual);
+          .compare(actual);
     });
   }
 }

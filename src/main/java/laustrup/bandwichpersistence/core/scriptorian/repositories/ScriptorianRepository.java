@@ -30,10 +30,7 @@ public class ScriptorianRepository {
 
   public static void executeScript(String content) {
     try {
-      execute(
-          new Query(content),
-          Action.MIGRATION
-      );
+      execute(new Query(content), Action.MIGRATION);
     } catch (SQLException e) {
       System.err.println(e.getMessage());
       throw new RuntimeException(e);

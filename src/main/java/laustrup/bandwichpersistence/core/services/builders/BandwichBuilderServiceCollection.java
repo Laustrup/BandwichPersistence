@@ -20,7 +20,6 @@ public class BandwichBuilderServiceCollection implements BuilderServiceCollectio
       MapSection.of(ContactInfo.class, ContactInfoBuilder.get_instance()),
       MapSection.of(ContactInfo.Address.class, AddressBuilder.get_instance()),
       MapSection.of(ContactInfo.Phone.class, PhoneBuilder.get_instance()),
-      MapSection.of(ContactInfo.Country.class, CountryBuilder.get_instance()),
       MapSection.of(Album.class, AlbumBuilder.get_instance()),
       MapSection.of(Album.Media.class, AlbumMediaBuilder.get_instance()),
       MapSection.of(Artist.class, ArtistBuilder.get_instance()),

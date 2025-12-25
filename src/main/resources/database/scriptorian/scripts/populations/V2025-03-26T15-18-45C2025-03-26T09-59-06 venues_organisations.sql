@@ -8,52 +8,46 @@ set
     @password = '$2y$05$Ad01b.9//2.NKwsL/6y/HeWk3TgdMDve4ThnFPKt.5FMfP2GHbRke£d01',
 
     -- Iværksted
-    @address_id_vaerkstedsvej = unhex(md5(uuid())),
-    @contact_info_id_ivaerksted = unhex(md5(uuid())),
+    @address_id_vaerkstedsvej = 0x1111111111111111a111111111111111,
+    @contact_info_id_ivaerksted = 0x1111111111111111a111111111111112,
     
-    @subscription_id_ivaerksted_jens = unhex(md5(uuid())),
+    @ivaerksted_jens_id = 0x1111111111111111a111111111111113,
         @contact_info_jens_ivaerksted = 'jens@ivaerkstedet.dk',
-    @subscription_id_ivaerksted_birthe = unhex(md5(uuid())),
+    @ivaerksted_birthe_id = 0x1111111111111111a111111111111114,
         @contact_info_birthe_ivaerksted = 'birthe@ivaerkstedet.dk',
 
     -- Arena
-    @address_id_arenavej = unhex(md5(uuid())),
-    @contact_info_id_arena = unhex(md5(uuid())),
-    
-    @subscription_id_arena_john = unhex(md5(uuid())),
+    @address_id_arenavej = 0x1111111111111111a111111111111115,
+    @contact_info_id_arena = 0x1111111111111111a111111111111116,
+
+    @arena_john_id = 0x1111111111111111a111111111111117,
         @contact_info_john_arena = 'john@arena.com',
-    @subscription_id_arena_james = unhex(md5(uuid())),
+    @arena_james_id = 0x1111111111111111a111111111111118,
         @contact_info_james_arena = 'james@arena.com',
-    @subscription_id_arena_joanna = unhex(md5(uuid())),
+    @arena_joanna_id = 0x1111111111111111a111111111111119,
         @contact_info_joanna_arena = 'joanna@arena.com',
-    @subscription_id_arena_susanne = unhex(md5(uuid())),
+    @arena_susanne_id = 0x1111111111111111a111111111111121,
         @contact_info_susanne_arena = 'susanne@arena.com',
-    @subscription_id_arena_hans = unhex(md5(uuid())),
+    @arena_hans_id = 0x1111111111111111a111111111111131,
         @contact_info_hans_arena = 'hans@arena.com',
     
     -- Plural Place
-    @address_id_jensenvej = unhex(md5(uuid())),
+    @address_id_jensenvej = 0x1111111111111111a111111111111141,
         -- Twogether
-        @contact_info_id_twogether = unhex(md5(uuid())),
+        @contact_info_id_twogether = 0x1111111111111111a111111111111151,
 
-        @subscription_id_twogether_jimmy = unhex(md5(uuid())),
+        @twogether_jimmy_id = 0x1111111111111111a111111111111161,
             @contact_info_jimmy_twogether = 'jimmy@twogether.com',
-        @subscription_id_twogether_hanne = unhex(md5(uuid())),
+        @twogether_hanne_id = 0x1111111111111111a111111111111171,
             @contact_info_hanne_twogether = 'hanne@twogether.com',
-        @subscription_id_twogether_xi = unhex(md5(uuid())),
+        @twogether_xi_id = 0x1111111111111111a111111111111181,
             @contact_info_xi_twogether = 'xi@twogether.com',
         
         -- Jamsters
-        @contact_info_id_jamsters = unhex(md5(uuid())),
+        @contact_info_id_jamsters = 0x1111111111111111a111111111111191,
 
-        @subscription_id_jamsters_tue = unhex(md5(uuid())),
-            @contact_info_tue_jamsters = 'tue@jamsters.dk',
-
-    -- Denmark
-    @country_id_denmark = unhex(md5(uuid())),
-
-    -- Sweden
-    @country_id_sweden = unhex(md5(uuid()))
+        @jamsters_tue_id = 0x1111111111111111a111111111111211,
+            @contact_info_tue_jamsters = 'tue@jamsters.dk'
 ;
 
 insert into addresses(id, street, floor, municipality, zip, city) values (
@@ -79,91 +73,81 @@ insert into addresses(id, street, floor, municipality, zip, city) values (
     'Odense C'
 );
 
-insert into countries(id, title, code) VALUES (
-    @country_id_denmark,
-    'Denmark',
-    'DK'
-), (
-    @country_id_sweden,
-    'Sweden',
-    'SE'
-);
-
-insert into contact_info(id, address_id, country_id, email) values (
+insert into contact_info(id, address_id, email, locale) values (
     @contact_info_id_ivaerksted,
     @address_id_vaerkstedsvej,
-    @country_id_denmark,
-    'contact@ivaerkstedet.dk'
+    'contact@ivaerkstedet.dk',
+    'da_DK'
 ), (
     unhex(md5(uuid())),
     @address_id_vaerkstedsvej,
-    @country_id_denmark,
-    @contact_info_jens_ivaerksted
+    @contact_info_jens_ivaerksted,
+    'da_DK'
 ), (
     unhex(md5(uuid())),
     @address_id_vaerkstedsvej,
-    @country_id_denmark,
-    @contact_info_birthe_ivaerksted
+    @contact_info_birthe_ivaerksted,
+    'da_DK'
 ), (
     @contact_info_id_arena,
     @address_id_arenavej,
-    @country_id_denmark,
-    'contact@arena.com'
+    'contact@arena.com',
+    'da_DK'
 ), (
     unhex(md5(uuid())),
     @address_id_arenavej,
-    @country_id_denmark,
-    @contact_info_hans_arena
+    @contact_info_hans_arena,
+    'da_DK'
 ), (
     unhex(md5(uuid())),
     @address_id_arenavej,
-    @country_id_denmark,
-    @contact_info_james_arena
+    @contact_info_james_arena,
+    'da_DK'
 ), (
     unhex(md5(uuid())),
     @address_id_arenavej,
-    @country_id_denmark,
-    @contact_info_joanna_arena
+    @contact_info_joanna_arena,
+    'da_DK'
 ), (
     unhex(md5(uuid())),
     @address_id_arenavej,
-    @country_id_denmark,
-    @contact_info_john_arena
+    @contact_info_john_arena,
+    'da_DK'
 ), (
     unhex(md5(uuid())),
     @address_id_arenavej,
-    @country_id_denmark,
-    @contact_info_susanne_arena
+    @contact_info_susanne_arena,
+    'da_DK'
 ), (
     @contact_info_id_twogether,
     @address_id_jensenvej,
-    @country_id_denmark,
-    'contact@twogether.com'
+    'contact@twogether.com',
+    'da_DK'
 ), (
     unhex(md5(uuid())),
     @address_id_jensenvej,
-    @country_id_denmark,
-    @contact_info_hanne_twogether
+    @contact_info_hanne_twogether,
+    'da_DK'
 ), (
     unhex(md5(uuid())),
     @address_id_jensenvej,
-    @country_id_denmark,
-    @contact_info_jimmy_twogether
+    @contact_info_jimmy_twogether,
+    'da_DK'
 ), (
     unhex(md5(uuid())),
     @address_id_jensenvej,
-    @country_id_denmark,
-    @contact_info_xi_twogether
+    @contact_info_xi_twogether,
+    'da_DK'
 ), (
     @contact_info_id_jamsters,
     @address_id_jensenvej,
-    @country_id_denmark,
-    'contact@jamsters.dk'
+    'contact@jamsters.dk',
+    'da_DK'
 ), (
     unhex(md5(uuid())),
     @address_id_jensenvej,
-    @country_id_denmark,
-    @contact_info_tue_jamsters
+    @contact_info_tue_jamsters,
+    'da_DK'
 );
 
 insert into phones(id, contact_info_id, country_digits, numbers, is_mobile, is_business) values (
@@ -197,57 +181,57 @@ insert into phones(id, contact_info_id, country_digits, numbers, is_mobile, is_b
 );
 
 insert into subscriptions(id, status, kind, user_type) VALUES (
-    @subscription_id_ivaerksted_jens,
+    @ivaerksted_jens_id,
     'ACCEPTED',
     'PAYING',
     'ORGANISATION_EMPLOYEE'
 ), (
-    @subscription_id_ivaerksted_birthe,
+    @ivaerksted_birthe_id,
     'PENDING',
     'FREE',
     'ORGANISATION_EMPLOYEE'
 ), (
-    @subscription_id_arena_john,
+    @arena_john_id,
     'ACCEPTED',
     'PAYING',
     'ORGANISATION_EMPLOYEE'
 ), (
-    @subscription_id_arena_james,
+    @arena_james_id,
     'ACCEPTED',
     'PAYING',
     'ORGANISATION_EMPLOYEE'
 ), (
-    @subscription_id_arena_joanna,
+    @arena_joanna_id,
     'ACCEPTED',
     'PAYING',
     'ORGANISATION_EMPLOYEE'
 ), (
-    @subscription_id_arena_susanne,
+    @arena_susanne_id,
     'ACCEPTED',
     'PAYING',
     'ORGANISATION_EMPLOYEE'
 ), (
-    @subscription_id_arena_hans,
+    @arena_hans_id,
     'ACCEPTED',
     'PAYING',
     'ORGANISATION_EMPLOYEE'
 ), (
-    @subscription_id_twogether_hanne,
+    @twogether_hanne_id,
     'ACCEPTED',
     'PAYING',
     'ORGANISATION_EMPLOYEE'
 ), (
-    @subscription_id_twogether_jimmy,
+    @twogether_jimmy_id,
     'ACCEPTED',
     'FREE',
     'ORGANISATION_EMPLOYEE'
 ), (
-    @subscription_id_twogether_xi,
+    @twogether_xi_id,
     'SUSPENDED',
     'PAYING',
     'ORGANISATION_EMPLOYEE'
 ), (
-    @subscription_id_jamsters_tue,
+    @jamsters_tue_id,
     'ACCEPTED',
     'PAYING',
     'ORGANISATION_EMPLOYEE'
@@ -296,7 +280,6 @@ insert into organisations(id, contact_info_id, title) values (
 
 insert into organisation_employees(
     id,
-    subscription_id,
     contact_info_id,
     password,
     username,
@@ -304,8 +287,7 @@ insert into organisation_employees(
     last_name,
     description
 ) values (
-    unhex(md5(uuid())),
-    @subscription_id_ivaerksted_jens,
+    @ivaerksted_jens_id,
     (select id from contact_info where email = @contact_info_jens_ivaerksted limit 1),
     @password,
     'jens',
@@ -313,8 +295,7 @@ insert into organisation_employees(
     'Jensen',
     'Jeg hedder Jens'
 ), (
-    unhex(md5(uuid())),
-    @subscription_id_ivaerksted_birthe,
+    @ivaerksted_birthe_id,
     (select id from contact_info where email = @contact_info_birthe_ivaerksted limit 1),
     @password,
     'birthe',
@@ -322,8 +303,7 @@ insert into organisation_employees(
     'Berthelsen',
     'Jeg hedder Birthe'
 ), (
-    unhex(md5(uuid())),
-    @subscription_id_arena_hans,
+    @arena_hans_id,
     (select id from contact_info where email = @contact_info_hans_arena limit 1),
     @password,
     'hans',
@@ -331,8 +311,7 @@ insert into organisation_employees(
     'Hansen',
     'Jeg hedder Hans'
 ), (
-    unhex(md5(uuid())),
-    @subscription_id_arena_susanne,
+    @arena_susanne_id,
     (select id from contact_info where email = @contact_info_susanne_arena limit 1),
     @password,
     'susanne',
@@ -340,8 +319,7 @@ insert into organisation_employees(
     'Simonsen',
     'Jeg hedder Susanne'
 ), (
-    unhex(md5(uuid())),
-    @subscription_id_arena_joanna,
+    @arena_joanna_id,
     (select id from contact_info where email = @contact_info_joanna_arena limit 1),
     @password,
     'joanna',
@@ -349,8 +327,7 @@ insert into organisation_employees(
     'Johansen',
     'Jeg hedder Joanna'
 ), (
-    unhex(md5(uuid())),
-    @subscription_id_arena_john,
+    @arena_john_id,
     (select id from contact_info where email = @contact_info_john_arena limit 1),
     @password,
     'john',
@@ -358,8 +335,7 @@ insert into organisation_employees(
     'Johnson',
     'Jeg hedder John'
 ), (
-    unhex(md5(uuid())),
-    @subscription_id_arena_james,
+    @arena_james_id,
     (select id from contact_info where email = @contact_info_james_arena limit 1),
     @password,
     'james',
@@ -367,8 +343,7 @@ insert into organisation_employees(
     'Jamerson',
     'Jeg hedder James'
 ), (
-    unhex(md5(uuid())),
-    @subscription_id_twogether_xi,
+    @twogether_xi_id,
     (select id from contact_info where email = @contact_info_xi_twogether limit 1),
     @password,
     'xi',
@@ -376,8 +351,7 @@ insert into organisation_employees(
     'Xang',
     'Jeg hedder Xi'
 ), (
-    unhex(md5(uuid())),
-    @subscription_id_twogether_jimmy,
+    @twogether_jimmy_id,
     (select id from contact_info where email = @contact_info_jimmy_twogether limit 1),
     @password,
     'jimmy',
@@ -385,8 +359,7 @@ insert into organisation_employees(
     'Jensen',
     'Jeg hedder Jimmy'
 ), (
-    unhex(md5(uuid())),
-    @subscription_id_twogether_hanne,
+    @twogether_hanne_id,
     (select id from contact_info where email = @contact_info_hanne_twogether limit 1),
     @password,
     'hanne',
@@ -394,8 +367,7 @@ insert into organisation_employees(
     'Hansen',
     'Jeg hedder Hanne'
 ), (
-    unhex(md5(uuid())),
-    @subscription_id_jamsters_tue,
+    @jamsters_tue_id,
     (select id from contact_info where email = @contact_info_tue_jamsters limit 1),
     @password,
     'tue',
@@ -406,46 +378,46 @@ insert into organisation_employees(
 
 insert into organisation_employments(organisation_id, organisation_employee_id, role) values (
     (select id from organisations where contact_info_id = @contact_info_id_ivaerksted),
-    (select id from organisation_employees where subscription_id = @subscription_id_ivaerksted_jens),
+    (select id from organisation_employees where id = @ivaerksted_jens_id),
     'LEADER'
 ), (
     (select id from organisations where contact_info_id = @contact_info_id_ivaerksted),
-    (select id from organisation_employees where subscription_id = @subscription_id_ivaerksted_birthe),
+    (select id from organisation_employees where id = @ivaerksted_birthe_id),
     'PR'
 ), (
     (select id from organisations where contact_info_id = @contact_info_id_arena),
-    (select id from organisation_employees where subscription_id = @subscription_id_arena_hans),
+    (select id from organisation_employees where id = @arena_hans_id),
     'LEADER'
 ), (
     (select id from organisations where contact_info_id = @contact_info_id_arena),
-    (select id from organisation_employees where subscription_id = @subscription_id_arena_susanne),
+    (select id from organisation_employees where id = @arena_susanne_id),
     'PR'
 ), (
     (select id from organisations where contact_info_id = @contact_info_id_arena),
-    (select id from organisation_employees where subscription_id = @subscription_id_arena_joanna),
+    (select id from organisation_employees where id = @arena_joanna_id),
     'BOOKER'
 ), (
     (select id from organisations where contact_info_id = @contact_info_id_arena),
-    (select id from organisation_employees where subscription_id = @subscription_id_arena_john),
+    (select id from organisation_employees where id = @arena_john_id),
     'BOOKER'
 ), (
     (select id from organisations where contact_info_id = @contact_info_id_arena),
-    (select id from organisation_employees where subscription_id = @subscription_id_arena_james),
+    (select id from organisation_employees where id = @arena_james_id),
     'BOOKER'
 ), (
     (select id from organisations where contact_info_id = @contact_info_id_twogether),
-    (select id from organisation_employees where subscription_id = @subscription_id_twogether_xi),
+    (select id from organisation_employees where id = @twogether_xi_id),
     'BOOKER'
 ), (
     (select id from organisations where contact_info_id = @contact_info_id_twogether),
-    (select id from organisation_employees where subscription_id = @subscription_id_twogether_jimmy),
+    (select id from organisation_employees where id = @twogether_jimmy_id),
     'PR'
 ), (
     (select id from organisations where contact_info_id = @contact_info_id_twogether),
-    (select id from organisation_employees where subscription_id = @subscription_id_twogether_hanne),
+    (select id from organisation_employees where id = @twogether_hanne_id),
     'LEADER'
 ), (
     (select id from organisations where contact_info_id = @contact_info_id_jamsters),
-    (select id from organisation_employees where subscription_id = @subscription_id_jamsters_tue),
+    (select id from organisation_employees where id = @jamsters_tue_id),
     'LEADER'
 );

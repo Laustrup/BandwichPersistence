@@ -4,12 +4,13 @@ import laustrup.bandwichpersistence.core.persistence.DatabaseField;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Clause.Clausement;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition;
 import laustrup.bandwichpersistence.core.persistence.worm.models.DatabaseDefinition;
-import laustrup.bandwichpersistence.core.services.EternaryService.Eternary;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
 
-import java.util.*;
-import java.util.function.Function;
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -65,9 +66,9 @@ public abstract class SelectService {
 
     private final Properties _properties;
 
-    private String _statement = "";
+    private final String _statement;
 
-    private Seszt<Join> _joins;
+    private final Seszt<Join> _joins;
 
     public Selecting(Properties properties) {
       if (properties == null)
@@ -125,6 +126,10 @@ public abstract class SelectService {
 
       private final String _table;
 
+      public Properties(Class<?> clazz) {
+        this(Selections.of(clazz), clazz);
+      }
+
       public Properties(String table) {
         this(Selections.asterisk(), table, false);
       }
@@ -161,39 +166,35 @@ public abstract class SelectService {
 
       public static class Selections implements Selector {
 
-        private final Map<DatabaseField, String> _groupings;
+        private final Seszt<DatabaseField> _groupings;
 
-        private String generateSelectionRow(Map.Entry<DatabaseField, String> entry) {
-          Eternary eternary = stating(!entry.getKey().get_tableColumn().equals(entry.getValue()));
-          Function<String, String> action = then -> eternary
-              .then(then)
-              .orElse("");
-
-          return String.format("%s%s%s",
-              entry.getKey().get_tableColumn(),
-              action.apply(" as "),
-              action.apply(entry.getValue())
+        private String generateSelectionRow(DatabaseField databaseField) {
+          return String.format("%s%s",
+              databaseField.get_tableColumn(),
+              stating(!databaseField.get_tableColumn().equals(databaseField.get_entityColumn()))
+                  .then(" as " + databaseField.get_entityColumn())
+                  .orElse("")
           );
         }
 
-        public Selections(Map<DatabaseField, String> groupings) {
+        public Selections(Seszt<DatabaseField> groupings) {
           _groupings = groupings;
         }
 
         public Selections(DatabaseDefinition.Entity configurationData) {
-          _groupings = new HashMap<>(toSelections(configurationData.get_columns()));
+          _groupings = toSelections(configurationData.get_columns());
         }
 
         public static Selections asterisk() {
-          return new Selections(new HashMap<>());
+          return new Selections(new Seszt<>());
         }
 
         public static Selections of(Class<?>... classes) {
-          return new Selections(new HashMap<>(Arrays.stream(classes)
+          return new Selections(new Seszt<>(Arrays.stream(classes)
               .flatMap(clazz ->
-                  toSelections(new DatabaseDefinition.Entity(clazz).get_columns()).entrySet().stream()
+                  toSelections(new DatabaseDefinition.Entity(clazz).get_columns()).stream()
               ).distinct()
-              .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))));
+          ));
         }
 
         @Override
@@ -201,7 +202,7 @@ public abstract class SelectService {
           return stating(_groupings.isEmpty())
               .then(" * ")
               .orElse(() -> String.format("\n\t%s\n",
-                  _groupings.entrySet().stream()
+                  _groupings.stream()
                       .map(this::generateSelectionRow)
                       .collect(Collectors.joining(",\n\t"))
               ));
@@ -298,8 +299,7 @@ public abstract class SelectService {
             _alias == null ? "" : " " + _alias,
             _products.stream()
                 .map(Product::apply)
-                .reduce((a, b) -> String.join(" && ", a, b))
-                .orElseThrow(() -> new IllegalStateException("Join needs at least one product!"))
+                .collect(Collectors.joining(" && "))
         );
       }
 
@@ -310,7 +310,7 @@ public abstract class SelectService {
         LEFT("left"),
         RIGHT("right");
 
-        private String _statement;
+        private final String _statement;
 
         Area(String statement) {
           _statement = statement;
@@ -326,8 +326,7 @@ public abstract class SelectService {
         public String apply() {
           String statement = conditions.stream()
               .map(Condition::apply)
-              .reduce((a, b) -> join(" || ", a, b))
-              .orElse("");
+              .collect(Collectors.joining(" || "));
 
           return statement.isEmpty() ? "" : (conditions().size() > 1
               ? String.format("(%s)", statement)
@@ -563,9 +562,9 @@ public abstract class SelectService {
 
           private final String _statement;
 
-          private boolean _plural;
+          private final boolean _plural;
 
-          private boolean _collection;
+          private final boolean _collection;
 
           Equation(String statement, boolean plural, boolean collection) {
             _statement = statement;

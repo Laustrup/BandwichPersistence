@@ -3,14 +3,12 @@ package laustrup.bandwichpersistence.core.repositories.common;
 import laustrup.bandwichpersistence.core.libraries.DatabaseLibrary;
 import laustrup.bandwichpersistence.core.persistence.DatabaseManager;
 import laustrup.bandwichpersistence.core.persistence.queries.DatabaseLibraryQueries;
+import lombok.extern.slf4j.Slf4j;
 
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+@Slf4j
 public class DatabaseLibraryRepository {
-
-  private static Logger _logger = Logger.getLogger(DatabaseLibraryRepository.class.getSimpleName());
 
   public static void createSchemaIfNotExists(String schema) {
     try {
@@ -20,13 +18,8 @@ public class DatabaseLibraryRepository {
           DatabaseLibrary.get_rootConnectionString(true)
       );
     } catch (SQLException e) {
-      _logger.log(
-          Level.CONFIG,
-          String.format("""
-                  Error when trying to create schema "%s" when setting up database.
-                  """,
-              schema
-          ),
+      log.info("Error when trying to create schema \"{}\" when setting up database.",
+          schema,
           e
       );
       throw new RuntimeException(e);

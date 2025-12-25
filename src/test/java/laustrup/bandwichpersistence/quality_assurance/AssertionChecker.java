@@ -24,7 +24,7 @@ public interface AssertionChecker<EXPECTED> {
 
   AssertionChecker<EXPECTED> isNotNull();
 
-  AssertionChecker<EXPECTED> isIdenticalTo(EXPECTED actual);
+  AssertionChecker<EXPECTED> compare(EXPECTED actual);
 
   interface CollectiveAssertionChecker<EXPECTED extends Collection<EXPECTED_ELEMENT>, EXPECTED_ELEMENT> extends AssertionChecker<EXPECTED> {
 
@@ -33,5 +33,22 @@ public interface AssertionChecker<EXPECTED> {
     CollectiveAssertionChecker<EXPECTED, EXPECTED_ELEMENT> isEmpty();
 
     Asserter.Checker.CollectiveChecker<EXPECTED, EXPECTED_ELEMENT> allMatches(Predicate<EXPECTED_ELEMENT> predication);
+  }
+
+  enum Clearance {
+    ALL_ARE_NULL,
+    ALL_ARE_EMPTY,
+    ACCEPTED;
+
+    static class Exception extends RuntimeException {
+
+      private Exception(String message) {
+        super(message);
+      }
+
+      public static Exception isNotAccepted(String detail) {
+        return new Exception("The asserter clearance was not accepted, since:\n\n" + detail);
+      }
+    }
   }
 }

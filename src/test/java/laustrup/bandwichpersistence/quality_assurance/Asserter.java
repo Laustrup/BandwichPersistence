@@ -5,12 +5,15 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import static java.util.function.Function.identity;
 import static laustrup.bandwichpersistence.core.services.ClassFieldService.getValue;
+import static laustrup.bandwichpersistence.core.services.EternaryService.ifNotNull;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class Asserter {
@@ -107,28 +110,6 @@ public class Asserter {
       return check(() -> assertingNotNull(_expected));
     }
 
-    @Override
-    public AssertionChecker<EXPECTED> isIdenticalTo(EXPECTED actual) {
-      return check(() -> {
-        BiFunction<Exception, Field, RuntimeException> exceptionHandler = (exception, field) ->
-            new RuntimeException(String.format("No field of %s in AssertionChecker of identical to",
-                field.getName()),
-                exception
-            );
-        Arrays.stream(_expected.getClass().getDeclaredFields()).forEach(expected -> {
-          try {
-            Field actualField = actual.getClass().getDeclaredField(expected.getName());
-
-            assertEquals(getValue(_expected, expected), getValue(actual, actualField));
-          } catch (NoSuchFieldException exception) {
-            throw new RuntimeException(String.format("No field of %s in AssertionChecker of identical to",
-                expected.getName()),
-                exception
-            );
-          }
-        });
-      });
-    }
 
     protected AssertionChecker<EXPECTED> check(Runnable action) {
       return check(this, action);
@@ -139,20 +120,47 @@ public class Asserter {
       return checker;
     }
 
-    public void compare(EXPECTED actual) {
-      if (actual == null)
-        fail(new NullPointerException("When comparing expected with actual, actual was null!"));
+    @Override
+    public AssertionChecker<EXPECTED> compare(EXPECTED actual) {
+      if (!Clearance.ACCEPTED.equals(clearanceCheck(actual)))
+        throw Clearance.Exception.isNotAccepted(ifNotNull(actual)
+            .then("Expected")
+            .orElse("Actual") + " is null"
+        );
 
-      Map<String, Field> actualFields = Arrays.stream(actual.getClass().getDeclaredFields())
-          .collect(Collectors.toMap(Field::getName, field -> field));
+      return check(() -> {
+        Map<String, Field> actualFields = Arrays.stream(actual.getClass().getDeclaredFields())
+            .collect(Collectors.toMap(Field::getName, identity()));
 
-      Arrays.stream(_expected.getClass().getDeclaredFields()).forEach(field -> {
-        try {
-          assertEquals(field.get(_expected), actualFields.get(field.getName()).get(actual));
-        } catch (IllegalAccessException e) {
-          fail(e.getMessage());
-        }
+        Function<String, IllegalStateException> exceptionHandler = fieldName ->
+            new IllegalStateException(String.format("No field of %s in %s",
+                fieldName,
+                _expected.getClass().getSimpleName()
+            ));
+
+        Consumer<Field> comparing = field -> {
+          Object actualValue = getValue(actual, actualFields.get(field.getName()))
+              .orElseThrow(() -> exceptionHandler.apply(field.getName()));
+
+          if (actualValue == null)
+            throw exceptionHandler.apply(field.getName());
+
+          assertEquals(getValue(_expected, field).orElseThrow(), actualValue);
+        };
+
+        Arrays.stream(_expected.getClass().getDeclaredFields()).forEach(comparing);
       });
+    }
+
+    protected Clearance clearanceCheck(EXPECTED actual) {
+      if (actual == null && _expected != null)
+        fail(new NullPointerException("When comparing expected with actual, actual was null!"));
+      else if (_expected == null && actual != null)
+        fail(new NullPointerException("When comparing expected with actual, expected was null!"));
+      else if (_expected == null && actual == null)
+        return Clearance.ALL_ARE_NULL;
+
+      return Clearance.ACCEPTED;
     }
 
     private void assertingEqualsTo(EXPECTED expected, EXPECTED actual) {

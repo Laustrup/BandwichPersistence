@@ -63,15 +63,14 @@ public class ClassFieldService {
         .findFirst();
   }
 
-  @SuppressWarnings("unchecked")
-  public static <RETURN> Optional<RETURN> getValue(Object object, Field field) {
-    RETURN value = null;
+  public static Optional<Object> getValue(Object object, Field field) {
+    Object value = null;
     Set<AccessFlag> accessFlags = field.accessFlags();
     boolean isAccessible = accessFlags.contains(AccessFlag.PUBLIC);
 
     try {
       field.setAccessible(true);
-      value = (RETURN) field.get(object);
+      value = field.get(object);
     } catch (Exception ignored) {
     }
 

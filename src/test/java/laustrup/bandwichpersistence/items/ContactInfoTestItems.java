@@ -2,98 +2,45 @@ package laustrup.bandwichpersistence.items;
 
 import laustrup.bandwichpersistence.core.models.users.ContactInfo;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo.Address;
-import laustrup.bandwichpersistence.core.models.users.ContactInfo.Country;
 import laustrup.bandwichpersistence.core.models.users.ContactInfo.Phone;
-import laustrup.bandwichpersistence.core.persistence.DatabaseField;
-import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Properties;
-import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
+import laustrup.bandwichpersistence.items.OrganisationTestItems.OrganisationTitle;
 
-import static laustrup.bandwichpersistence.core.persistence.DatabaseField.Configuration.databaseFieldConfiguration;
-import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.complying;
-import static laustrup.bandwichpersistence.core.persistence.services.SelectService.selecting;
-import static laustrup.bandwichpersistence.items.TestItems.generateUUID;
+import java.util.Locale;
+import java.util.UUID;
 
 public class ContactInfoTestItems {
 
-  public static ContactInfo generateContactInfo(
-      String email,
-      Seszt<Phone> phones,
-      Address address,
-      Country country
-  ) {
-    Class<?> clazz = ContactInfo.class;
+  public static ContactInfo generateContactInfo(OrganisationTitle organisationTitle) {
+    return switch (organisationTitle) {
+      case IVÆRKSTED -> iværkstedetContactInfo();
+      case ARENA, TWOGETHER, JAMSTER -> null;
+    };
+  }
 
+  private static ContactInfo iværkstedetContactInfo() {
     return new ContactInfo(
-        new ContactInfo.Id(generateUUID(
-            clazz,
-            selecting(new Properties(
-                clazz,
-                complying().which(Condition.equals(
-                    DatabaseField.of(databaseFieldConfiguration(ContactInfo.class, ContactInfo.Fields._email)),
-                    email
-                ))
-            ))
+        new ContactInfo.Id(UUID.fromString("11111111-1111-1111-a111-111111111112")),
+        "contact@ivaerkstedet.dk",
+        new Seszt<>(new Phone(
+            45,
+            12345678,
+            true,
+            true
         )),
-        email,
-        phones,
-        address,
-        country
+        iværkstedetAddress(),
+        Locale.of("da", "DK")
     );
   }
 
-  public static Phone generatePhone(
-      int countryDigits,
-      int numbers,
-      boolean isMobile,
-      boolean isBusiness
-  ) {
-    return new Phone(
-        countryDigits,
-        numbers,
-        isMobile,
-        isBusiness
-    );
-  }
-
-  public static Address generateAddress(
-      String street,
-      String floor,
-      String municipality,
-      String zip,
-      String city
-  ) {
-    Class<?> clazz = Address.class;
-
+  private static Address iværkstedetAddress() {
     return new Address(
-        new Address.Id(generateUUID(
-            clazz,
-            complying().which(Condition.equals(
-                DatabaseField.of(databaseFieldConfiguration(clazz, Address.Fields._street)),
-                street
-            ))
-        )),
-        street,
-        floor,
-        municipality,
-        zip,
-        city
-    );
-  }
-
-  public static Country generateCountry(String title, String code) {
-    Class<?> clazz = Country.class;
-
-    return new Country(
-        new Country.Id(generateUUID(
-            clazz,
-            complying().which(Condition.equals(
-                DatabaseField.of(databaseFieldConfiguration(clazz, Country.Fields._title)),
-                title
-            ))
-        )),
-        title,
-        code
+        new Address.Id(UUID.fromString("11111111-1111-1111-a111-111111111111")),
+        "Værkstedsvej 57",
+        null,
+        "Sjælland",
+        "4600",
+        "Køge"
     );
   }
 }

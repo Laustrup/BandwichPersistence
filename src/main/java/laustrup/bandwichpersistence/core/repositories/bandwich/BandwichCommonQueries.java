@@ -21,7 +21,6 @@ public abstract class BandwichCommonQueries extends CommonQueries {
         CONTACT_INFO = _dataCollection.entityOf(ContactInfo.class),
         PHONE = _dataCollection.entityOf(ContactInfo.Phone.class),
         ADDRESS = _dataCollection.entityOf(ContactInfo.Address.class),
-        COUNTRY = _dataCollection.entityOf(ContactInfo.Country.class),
         ARTIST = _dataCollection.entityOf(Artist.class),
         ARTIST_CHAT_ROOM = _dataCollection.entityOf(Artist.class, ChatRoom.class),
         BAND = _dataCollection.entityOf(Band.class),

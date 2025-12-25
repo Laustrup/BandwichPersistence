@@ -19,7 +19,7 @@ public class ScriptorianQueries {
           timestamp datetime not null default now(),
       
           constraint PK_scriptories
-              primary key (file_name)
+          primary key (file_name)
       );
       """);
 

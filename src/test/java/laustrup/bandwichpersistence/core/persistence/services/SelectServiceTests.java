@@ -4,7 +4,6 @@ import laustrup.bandwichpersistence.BandwichTester;
 import laustrup.bandwichpersistence.core.persistence.DatabaseField;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Join;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Properties;
-import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Properties.Selections;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition;
 import laustrup.bandwichpersistence.items.TestItems;
 import org.junit.jupiter.api.Test;
@@ -41,7 +40,10 @@ class SelectServiceTests extends BandwichTester {
   @Test
   void canSelectAllDatabaseFields() {
     String selections = Arrays.stream(TestItems.Instance.class.getDeclaredFields())
-        .map(field -> String.format("testInstances.%s", field.getName().replace("_", "")))
+        .map(field -> {
+          String column = field.getName().replace("_", "");
+          return String.format("testInstances.%s as testInstances._%s", column, column);
+        })
         .collect(Collectors.joining(",\n\t"));
 
     canSelect(
@@ -52,10 +54,7 @@ class SelectServiceTests extends BandwichTester {
             _alias
         ),
         null,
-        new Properties(
-            Selections.of(TestItems.Instance.class),
-            TestItems.Instance.class
-        )
+        new Properties(TestItems.Instance.class)
     );
   }
 

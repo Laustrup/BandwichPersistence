@@ -5,10 +5,10 @@ import laustrup.bandwichpersistence.BandwichTester;
 import laustrup.bandwichpersistence.core.models.Login;
 import laustrup.bandwichpersistence.core.models.Organisation.Employee;
 import laustrup.bandwichpersistence.items.OrganisationEmployeeTestItems;
-import laustrup.bandwichpersistence.quality_assurance.Asserter;
 import org.junit.jupiter.api.Test;
 
 import static laustrup.bandwichpersistence.items.OrganisationEmployeeTestItems.OrganisationEmployeeTitle.JENS_JENSEN;
+import static laustrup.bandwichpersistence.quality_assurance.Asserter.asserting;
 
 class UserDetailsManagerTests extends BandwichTester {
 
@@ -27,7 +27,7 @@ class UserDetailsManagerTests extends BandwichTester {
 
       Employee actual = act((Employee) UserDetailsManager.getUser(login).get_object());
 
-      Asserter.asserting(expected)
+      asserting(expected)
           .compare(actual);
     });
   }

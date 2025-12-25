@@ -38,7 +38,6 @@ public class BandwichEntityDataCollection implements EntityDataCollection {
       ClassDatabaseDefinition.of(ContactInfo.class),
       ClassDatabaseDefinition.of(ContactInfo.Phone.class),
       ClassDatabaseDefinition.of(ContactInfo.Address.class),
-      ClassDatabaseDefinition.of(ContactInfo.Country.class),
       ClassDatabaseDefinition.of(Artist.class),
       ClassDatabaseDefinition.of(Artist.class, ChatRoom.class),
       ClassDatabaseDefinition.of(Band.class),

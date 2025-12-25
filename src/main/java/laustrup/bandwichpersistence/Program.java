@@ -58,9 +58,8 @@ public class Program {
       String defaultSchema
   ) {
     Input input;
-    boolean startApplication = startup(arguments, args, defaultSchema);
 
-    if (startApplication)
+    if (startup(arguments, args, defaultSchema))
       do {
         input = null;
         ConfigurableApplicationContext context = SpringApplication.run(applicationClass, args);
