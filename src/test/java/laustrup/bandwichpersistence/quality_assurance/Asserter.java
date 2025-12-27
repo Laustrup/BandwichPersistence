@@ -1,5 +1,7 @@
 package laustrup.bandwichpersistence.quality_assurance;
 
+import laustrup.bandwichpersistence.core.utilities.collections.Liszt;
+
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Collection;
@@ -86,15 +88,6 @@ public class Asserter {
     @Override
     public AssertionChecker<EXPECTED> contains(EXPECTED actual) {
       return check(() -> assertingTrue(((List<?>) _expected).contains(actual)));
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public <PREXPECTED> AssertionChecker<EXPECTED> anyMatches(Predicate<PREXPECTED> assertion) {
-      return check(() -> assertingTrue(
-          ((Collection<PREXPECTED>) _expected).stream()
-              .anyMatch(assertion)
-      ));
     }
 
     @Override
@@ -276,11 +269,6 @@ public class Asserter {
       }
 
       @Override
-      public <W> CollectiveChecker<EXPECTED, EXPECTED_ELEMENT> anyMatches(Predicate<W> assertion) {
-        return (CollectiveChecker<EXPECTED, EXPECTED_ELEMENT>) super.anyMatches(assertion);
-      }
-
-      @Override
       public CollectiveChecker<EXPECTED, EXPECTED_ELEMENT> inCase(boolean condition, Predicate<EXPECTED> assertion) {
         return (CollectiveChecker<EXPECTED, EXPECTED_ELEMENT>) super.inCase(condition, assertion);
       }
@@ -302,10 +290,44 @@ public class Asserter {
       }
 
       @Override
+      public CollectiveChecker<EXPECTED, EXPECTED_ELEMENT> anyMatches(Predicate<EXPECTED_ELEMENT> predicate) {
+        return (CollectiveChecker<EXPECTED, EXPECTED_ELEMENT>) check(() -> {
+          if (_expected.stream().noneMatch(predicate))
+            fail("Not everything matched " + _expected);
+        });
+      }
+
+      @Override
       public CollectiveChecker<EXPECTED, EXPECTED_ELEMENT> allMatches(Predicate<EXPECTED_ELEMENT> predication) {
         return (CollectiveChecker<EXPECTED, EXPECTED_ELEMENT>) check(() -> assertTrue(_expected.stream()
             .allMatch(predication)
         ));
+      }
+
+      @Override
+      public CollectiveChecker<EXPECTED, EXPECTED_ELEMENT> isSameSize(Collection<EXPECTED_ELEMENT> actuals) {
+        return (CollectiveChecker<EXPECTED, EXPECTED_ELEMENT>) check(() -> {
+          if (_expected.size() != actuals.size())
+            fail(String.format("Size of expected %s is not the same as the actual %s!", _expected, actuals));
+        });
+      }
+
+      @Override
+      public CollectiveChecker<EXPECTED, EXPECTED_ELEMENT> isCorrectOrder(Collection<EXPECTED_ELEMENT> actuals) {
+        return (CollectiveChecker<EXPECTED, EXPECTED_ELEMENT>) check(() -> {
+          isSameSize(actuals);
+          Liszt<EXPECTED_ELEMENT>
+              expectedLiszt = Liszt.of(_expected.stream()),
+              actualsLiszt = Liszt.of(actuals.stream());
+
+          for (int i = 0; i < _expected.size(); i++)
+            if (expectedLiszt.get(i) != actualsLiszt.get(i))
+              fail(String.format("Not the correct element at index %s. It was %s, but was suppose to be %s",
+                  i,
+                  actualsLiszt.get(i),
+                  expectedLiszt.get(i)
+              ));
+        });
       }
     }
   }

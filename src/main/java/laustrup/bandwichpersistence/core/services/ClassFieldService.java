@@ -20,7 +20,7 @@ import static laustrup.bandwichpersistence.core.persistence.services.DatabaseCol
 
 public class ClassFieldService {
 
-  public static Member getDeclared(Class<?> clazz, String fieldName) {
+  public static Member getField(Class<?> clazz, String fieldName) {
     if (clazz == null || fieldName == null || fieldName.isEmpty())
       return null;
 

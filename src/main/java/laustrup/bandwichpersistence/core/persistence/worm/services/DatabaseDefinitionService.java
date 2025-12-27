@@ -22,7 +22,6 @@ import java.util.function.Predicate;
 
 import static laustrup.bandwichpersistence.core.persistence.services.DatabaseColumnService.fieldToColumnName;
 import static laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseTableService.*;
-import static laustrup.bandwichpersistence.core.services.ClassFieldService.getDeclared;
 import static laustrup.bandwichpersistence.core.services.ClassFieldService.getFields;
 import static laustrup.bandwichpersistence.core.services.EternaryService.ifNotEmpty;
 import static laustrup.bandwichpersistence.core.services.EternaryService.stating;
@@ -92,12 +91,12 @@ public abstract class DatabaseDefinitionService {
     return getTableColumn(clazz, columnName)
         .map(tableColumn -> new TableColumnData(
             tableColumn,
-            getDeclared(clazz, columnName)
+            ClassFieldService.getField(clazz, columnName)
         ));
   }
 
   public static Optional<Table.Column> getTableColumn(Class<?> entity, String columnName) {
-    return getTableColumn(getDeclared(entity, columnName));
+    return getTableColumn(ClassFieldService.getField(entity, columnName));
   }
 
   public static Optional<Table.Column> getTableColumn(Member member) {

@@ -244,7 +244,7 @@ public abstract class BuilderService<MODEL> {
 
   @SuppressWarnings("unchecked")
   private <FIELD> FIELD get_field(String name) {
-    return (FIELD) _fields.get(getDeclared(getGeneric(), name));
+    return (FIELD) _fields.get(getField(getGeneric(), name));
   }
 
   private static class BuilderException extends RuntimeException {

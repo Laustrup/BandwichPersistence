@@ -29,10 +29,11 @@ import java.util.logging.Logger;
 
 import static java.lang.Integer.parseInt;
 import static java.nio.file.Files.readAttributes;
+import static laustrup.bandwichpersistence.core.libraries.PathLibrary.get_migrationDirectoryFullPath;
 import static laustrup.bandwichpersistence.core.managers.ManagerService.databaseInteraction;
 import static laustrup.bandwichpersistence.core.persistence.queries.ScriptorianQueries.Parameter;
 import static laustrup.bandwichpersistence.core.scriptorian.repositories.ScriptorianRepository.*;
-import static laustrup.bandwichpersistence.core.services.ClassFieldService.getDeclared;
+import static laustrup.bandwichpersistence.core.services.ClassFieldService.getField;
 import static laustrup.bandwichpersistence.core.services.FileService.getContent;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.*;
 
@@ -314,14 +315,14 @@ public class ScriptorianManager {
     return new Seszt<>(build(
         resultSet,
         () -> new Scriptorian.Scriptory(
-            getString(DatabaseField.of(getDeclared(Scriptorian.Scriptory.class, Fields._title))),
-            getString(DatabaseField.of(getDeclared(Scriptorian.Scriptory.class, Fields._fileName))),
-            getString(DatabaseField.of(getDeclared(Scriptorian.Scriptory.class, Fields._errorMessage))),
-            getString(DatabaseField.of(getDeclared(Scriptorian.Scriptory.class, Fields._content))),
-            getInstant(DatabaseField.of(getDeclared(Scriptorian.Scriptory.class, Fields._versionstamp))),
-            getInstant(DatabaseField.of(getDeclared(Scriptorian.Scriptory.class, Fields._successstamp))),
-            getInstant(DatabaseField.of(getDeclared(Scriptorian.Scriptory.class, Fields._createdstamp))),
-            getInstant(DatabaseField.of(getDeclared(Scriptorian.Scriptory.class, Fields._timestamp)))
+            getString(DatabaseField.of(getField(Scriptorian.Scriptory.class, Fields._title))),
+            getString(DatabaseField.of(getField(Scriptorian.Scriptory.class, Fields._fileName))),
+            getString(DatabaseField.of(getField(Scriptorian.Scriptory.class, Fields._errorMessage))),
+            getString(DatabaseField.of(getField(Scriptorian.Scriptory.class, Fields._content))),
+            getInstant(DatabaseField.of(getField(Scriptorian.Scriptory.class, Fields._versionstamp))),
+            getInstant(DatabaseField.of(getField(Scriptorian.Scriptory.class, Fields._successstamp))),
+            getInstant(DatabaseField.of(getField(Scriptorian.Scriptory.class, Fields._createdstamp))),
+            getInstant(DatabaseField.of(getField(Scriptorian.Scriptory.class, Fields._timestamp)))
         )
     ));
   }

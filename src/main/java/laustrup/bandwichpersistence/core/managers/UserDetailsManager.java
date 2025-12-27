@@ -17,7 +17,8 @@ import java.sql.ResultSet;
 import java.util.logging.Logger;
 
 import static laustrup.bandwichpersistence.core.managers.ManagerService.databaseInteraction;
-import static laustrup.bandwichpersistence.core.services.ClassFieldService.getDeclared;
+import static laustrup.bandwichpersistence.core.repositories.common.UserDetailsRepository.getUserByEmail;
+import static laustrup.bandwichpersistence.core.services.ClassFieldService.getField;
 import static laustrup.bandwichpersistence.core.services.PasswordService.matches;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService.Configurations;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService.Configurations.Mode.PEEK;
@@ -45,7 +46,7 @@ public class UserDetailsManager {
 
       try {
         user = _userBuilder.build(passwordFits(
-            UserDetailsRepository.getUserByEmail(login),
+            getUserByEmail(login),
             login.getPassword()
         ));
       } catch (IllegalArgumentException exception) {
@@ -65,9 +66,9 @@ public class UserDetailsManager {
 
     if (matches(password, get(
             new Configurations(DatabaseField.of(switch (userType) {
-              case ARTIST -> getDeclared(Artist.class, User.Fields._password);
-              case ORGANISATION_EMPLOYEE -> getDeclared(Organisation.Employee.class, User.Fields._password);
-              case PARTICIPANT -> getDeclared(Participant.class, User.Fields._password);
+              case ARTIST -> getField(Artist.class, User.Fields._password);
+              case ORGANISATION_EMPLOYEE -> getField(Organisation.Employee.class, User.Fields._password);
+              case PARTICIPANT -> getField(Participant.class, User.Fields._password);
             }), resultSet, PEEK
             ),
             String.class
@@ -81,7 +82,7 @@ public class UserDetailsManager {
   public static String getUserType(ResultSet resultSet) {
     String type = get(
         new Configurations(
-            DatabaseField.of(getDeclared(Subscription.class, Subscription.DTO.Fields.userType)),
+            DatabaseField.of(getField(Subscription.class, Subscription.DTO.Fields.userType)),
             resultSet,
             PEEK
         ),

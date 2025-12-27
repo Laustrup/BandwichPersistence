@@ -15,7 +15,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static laustrup.bandwichpersistence.core.services.ClassFieldService.getDeclared;
+import static laustrup.bandwichpersistence.core.services.ClassFieldService.getField;
 import static laustrup.bandwichpersistence.items.TestItems.InstanceCollection;
 import static laustrup.bandwichpersistence.quality_assurance.Asserter.asserting;
 
@@ -69,10 +69,11 @@ class BuilderServiceTests extends BandwichTester {
     test(() -> {
       Instance expected = Instance.initialise();
       TestInstanceBuilder builder = new TestInstanceBuilder(Map.of(
-          getDeclared(Instance.class, Instance.Fields._id), new AtomicReference<>(expected.get_id()),
-          getDeclared(Instance.class, Instance.Fields._title), new AtomicReference<>(expected.get_title()),
-          getDeclared(Instance.class, Instance.Fields._active), new AtomicReference<>(expected.is_active()),
-          getDeclared(Instance.class, Instance.Fields._amount), new AtomicReference<>(expected.get_amount())
+          getField(Instance.class, Instance.Fields._id.name()), new AtomicReference<>(expected.get_id()),
+          getField(Instance.class, Instance.Fields._ownerId.name()), new AtomicReference<>(expected.get_ownerId()),
+          getField(Instance.class, Instance.Fields._title.name()), new AtomicReference<>(expected.get_title()),
+          getField(Instance.class, Instance.Fields._active.name()), new AtomicReference<>(expected.is_active()),
+          getField(Instance.class, Instance.Fields._amount.name()), new AtomicReference<>(expected.get_amount())
       ));
       @SuppressWarnings("unchecked")
       Constructor<Instance> constructor = (Constructor<Instance>) arrange(Arrays.stream(Instance.class.getConstructors())

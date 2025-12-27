@@ -51,7 +51,8 @@ public interface DatabaseDefinition {
 
     return new DatabaseField(
         new DatabaseField.Table(clazz),
-        new DatabaseField.Column(idReference, toAlias(idReference))
+        new DatabaseField.Column(idReference, toAlias(idReference)),
+        clazz
     );
   }
 
@@ -166,7 +167,8 @@ public interface DatabaseDefinition {
       return collectMap(Arrays.stream(get_metaDataColumns())
           .map(column -> new DatabaseField(
               new DatabaseField.Table(get_title(), toAlias(get_title())),
-              new DatabaseField.Column(TableColumnData.of(get_class(), column).member())
+              new DatabaseField.Column(TableColumnData.of(get_class(), column).member()),
+              get_class()
           )).map(field -> new AbstractMap.SimpleImmutableEntry<>(new SimpleField(get_class(), field), field))
       );
     }

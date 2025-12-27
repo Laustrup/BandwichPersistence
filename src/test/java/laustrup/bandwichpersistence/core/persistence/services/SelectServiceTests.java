@@ -5,17 +5,23 @@ import laustrup.bandwichpersistence.core.persistence.DatabaseField;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Join;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Properties;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition;
-import laustrup.bandwichpersistence.items.TestItems;
+import laustrup.bandwichpersistence.core.utilities.collections.Liszt;
+import laustrup.bandwichpersistence.items.TestItems.Instance;
 import org.junit.jupiter.api.Test;
-import org.springframework.lang.Nullable;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Arrays;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static laustrup.bandwichpersistence.core.persistence.DatabaseField.Configuration.databaseFieldConfiguration;
+import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Join.left;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.complying;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.selecting;
-import static laustrup.bandwichpersistence.core.services.EternaryService.ifNotNull;
+import static laustrup.bandwichpersistence.core.services.ClassFieldService.getField;
+import static laustrup.bandwichpersistence.core.services.StringService.upperCasesToLowerCaseWithUnderscore;
 import static laustrup.bandwichpersistence.quality_assurance.Asserter.asserting;
 
 class SelectServiceTests extends BandwichTester {
@@ -26,49 +32,80 @@ class SelectServiceTests extends BandwichTester {
 
   @Test
   void canSelectAll() {
-    canSelect(
-        /*language=MySQL*/ String.format(
-            "\nselect * from %s %s\n",
-            _table,
-            _alias
-        ),
-        _table,
-        null
-    );
+    test(() -> {
+      String expected = /*language=MySQL*/ String.format(
+          "\nselect * from %s %s\n",
+          _table,
+          _alias
+      );
+
+      String actual = act(selecting(_table).select());
+
+      asserting(expected)
+          .is(actual);
+    });
   }
 
   @Test
   void canSelectAllDatabaseFields() {
-    String selections = Arrays.stream(TestItems.Instance.class.getDeclaredFields())
-        .map(field -> {
-          String column = field.getName().replace("_", "");
-          return String.format("testInstances.%s as testInstances._%s", column, column);
-        })
-        .collect(Collectors.joining(",\n\t"));
+    test(() -> {
+      String selections = Arrays.stream(Instance.class.getDeclaredFields())
+          .map(field -> {
+            String column = field.getName().replace("_", "");
+            return String.format("testInstances.%s as TestInstance._%s",
+                upperCasesToLowerCaseWithUnderscore(column),
+                column
+            );
+          })
+          .collect(Collectors.joining(",\n\t")),
+          expected = /*language=MySQL*/ String.format(
+              "\nselect\n\t%s\nfrom %s %s\n",
+              selections,
+              _table,
+              _alias
+          );
 
-    canSelect(
-        /*language=MySQL*/ String.format(
-            "\nselect\n\t%s\nfrom %s %s\n",
-            selections,
-            _table,
-            _alias
-        ),
-        null,
-        new Properties(TestItems.Instance.class)
-    );
+      String actual = act(selecting(new Properties(Instance.class))
+          .select()
+      );
+
+      asserting(expected)
+          .is(actual);
+    });
   }
 
-  private void canSelect(
-      String arrangement,
-      @Nullable String table,
-      @Nullable Properties properties
-  ) {
+  @Test
+  void canSelectAllVariablesOfFields() {
     test(() -> {
-      String expected = arrange(arrangement);
+      BiFunction<String, String, String> columnField = (clazz, column) -> String.format("%s.%s",
+          clazz,
+          column
+      );
+      String selections = Arrays.stream(Instance.Owner.class.getDeclaredFields())
+          .flatMap(field -> Arrays.stream(field.getType().getDeclaredFields())
+              .map(fieldOfType -> String.format("\t%s as %s\n",
+                  columnField.apply(
+                      "test_" + fieldOfType.getDeclaringClass().getSimpleName().toLowerCase(),
+                      fieldOfType.getName().substring(1)
+                  ),
+                  columnField.apply(fieldOfType.getDeclaringClass().getSimpleName(), fieldOfType.getName())
+              ))).collect(Collectors.joining()),
+          fromTable = /*language=MySQL*/ "from test_instance_owners testInstanceOwners",
+          innerJoin = /*language=MySQL*/ "left join test_instance testInstance on testInstance.owner_id = testInstanceOwners.id",
+          expected = String.format(
+              "\nselect\n%s%s\n%s\n",
+              selections,
+              fromTable,
+              innerJoin
+          );
 
-      String actual = act(ifNotNull(table)
-          .then(() -> selecting(table))
-          .orElse(() -> selecting(properties))
+      String actual = act(selecting(new Properties(Instance.Owner.class))
+          .addJoin(left("test_instance",
+              Condition.equals(
+                  DatabaseField.of(getField(Instance.Owner.class, Instance.Owner.Fields._id.name())),
+                  DatabaseField.of(getField(Instance.class, Instance.Fields._ownerId.name()))
+              )
+          ))
           .select()
       );
 
@@ -88,15 +125,15 @@ class SelectServiceTests extends BandwichTester {
           _alias
       );
       Properties properties = arrange(new Properties(
-          TestItems.Instance.class,
+          Instance.class,
           complying()
               .which(Condition.equals(
                   DatabaseField.of(databaseFieldConfiguration(
-                      TestItems.Instance.class,
-                      TestItems.Instance.Fields._amount
+                      Instance.class,
+                      Instance.Fields._amount.name()
                   )), DatabaseField.of(databaseFieldConfiguration(
-                      TestItems.Instance.class,
-                      TestItems.Instance.Fields._title
+                      Instance.class,
+                      Instance.Fields._title.name()
                   ))
               ))
       ));
@@ -121,24 +158,24 @@ class SelectServiceTests extends BandwichTester {
           _alias
       );
       Properties properties = arrange(new Properties(
-          TestItems.Instance.class,
+          Instance.class,
           complying()
               .which(Condition.equals(
                   DatabaseField.of(databaseFieldConfiguration(
-                      TestItems.Instance.class,
-                      TestItems.Instance.Fields._amount
+                      Instance.class,
+                      Instance.Fields._amount.name()
                   )), DatabaseField.of(databaseFieldConfiguration(
-                      TestItems.Instance.class,
-                      TestItems.Instance.Fields._title
+                      Instance.class,
+                      Instance.Fields._title.name()
                   ))
               ))
               .and(Condition.equals(
                   DatabaseField.of(databaseFieldConfiguration(
-                      TestItems.Instance.class,
-                      TestItems.Instance.Fields._title
+                      Instance.class,
+                      Instance.Fields._title.name()
                   )), DatabaseField.of(databaseFieldConfiguration(
-                      TestItems.Instance.class,
-                      TestItems.Instance.Fields._amount
+                      Instance.class,
+                      Instance.Fields._amount.name()
                   ))
               ))
       ));
@@ -165,17 +202,38 @@ class SelectServiceTests extends BandwichTester {
 
       String actual = act(selecting(_table)
           .addJoin(Join.inner(
-              TestItems.Instance.class,
+              Instance.class,
               DatabaseField.of(databaseFieldConfiguration(
-                  TestItems.Instance.class,
-                  TestItems.Instance.Fields._title
+                  Instance.class,
+                  Instance.Fields._title.name()
               )), DatabaseField.of(databaseFieldConfiguration(
-                  TestItems.Instance.class,
-                  TestItems.Instance.Fields._amount
+                  Instance.class,
+                  Instance.Fields._amount.name()
               ))
           ))
           .select()
       );
+
+      asserting(expected)
+          .is(actual);
+    });
+  }
+
+  @ParameterizedTest
+  @ValueSource(ints = {-1, 0, 1})
+  void canOrderGroupings(int expected) {
+    test(() -> {
+      Function<String[], DatabaseField[]> getDatabaseFields = fieldNames -> Arrays.stream(fieldNames)
+          .map(fieldName -> DatabaseField.of(getField(Instance.class, fieldName)))
+          .toArray(DatabaseField[]::new);
+      Liszt<DatabaseField> arrangement = arrange(Liszt.of(getDatabaseFields.apply(switch (expected) {
+        case -1 -> new String[]{Instance.Fields._id.name(), Instance.Fields._ownerId.name()};
+        case 0 ->  new String[]{Instance.Fields._id.name(), Instance.Fields._id.name()};
+        case 1 ->  new String[]{Instance.Fields._ownerId.name(), Instance.Fields._id.name()};
+        default -> throw new IllegalStateException("Unknown order grouping expected: " + expected);
+      })));
+
+      int actual = act(Properties.Selections.orderGroupings(arrangement.getFirst(), arrangement.getLast()));
 
       asserting(expected)
           .is(actual);

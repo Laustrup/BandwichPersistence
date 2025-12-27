@@ -43,17 +43,20 @@ class ModelServiceTests extends BandwichTester {
 
     test(() -> {
       Instance instance = arrange(new Instance(uuid, title, isActive, amount));
-      String expected = String.format("\n" + """
+      String expected = String.format("""
+          
           Instance{
               ids(
                   _id: %s
               ), elements(
+                  _ownerId: %s,
                   _title: %s,
                   _active: %s,
                   _amount: %s
               )
           }""",
           uuid,
+          null,
           title,
           isActive,
           amount

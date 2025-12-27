@@ -4,6 +4,7 @@ import laustrup.bandwichpersistence.core.persistence.DatabaseField;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Clause.Clausement;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition;
 import laustrup.bandwichpersistence.core.persistence.worm.models.DatabaseDefinition;
+import laustrup.bandwichpersistence.core.utilities.collections.Liszt;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
 
@@ -11,6 +12,8 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -83,7 +86,8 @@ public abstract class SelectService {
       return /*language=MySQL*/ format(
           "select%s%sfrom %s %s",
           _properties.is_distinct() ? " distinct" : "",
-          _properties.get_selections().apply(),
+          _properties.get_selections()
+              .apply(),
           _properties.get_table(),
           toAlias(_properties.get_table())
       );
@@ -181,10 +185,6 @@ public abstract class SelectService {
           _groupings = groupings;
         }
 
-        public Selections(DatabaseDefinition.Entity configurationData) {
-          _groupings = toSelections(configurationData.get_columns());
-        }
-
         public static Selections asterisk() {
           return new Selections(new Seszt<>());
         }
@@ -197,12 +197,38 @@ public abstract class SelectService {
           ));
         }
 
+        public static int orderGroupings(DatabaseField first, DatabaseField next) {
+          if (first.entity() != next.entity())
+            return 0;
+
+          Predicate<Class<?>> declaresOfFieldNameConstants = declared ->
+              declared.getSimpleName().equals("Fields") &&
+              declared.isEnum();
+
+          Function<DatabaseField, Integer> calculation = field ->
+            Arrays.stream(field.entity().getDeclaredClasses())
+                .filter(declaresOfFieldNameConstants)
+                .flatMap(declared -> Arrays.stream(declared.getEnumConstants())
+                    .map(constant -> (Enum<?>) constant)
+                ).filter(constant -> constant.name().equals(field.column().getTitle()))
+                .map(Enum::ordinal)
+                .findFirst()
+                .orElse(0);
+
+          return Liszt.of(first, next).stream()
+              .map(calculation)
+              .mapToInt(Integer::intValue)
+              .reduce((a, b) -> a - b)
+              .orElse(0);
+        }
+
         @Override
         public String apply() {
           return stating(_groupings.isEmpty())
               .then(" * ")
               .orElse(() -> String.format("\n\t%s\n",
                   _groupings.stream()
+                      .sorted(Properties.Selections::orderGroupings)
                       .map(this::generateSelectionRow)
                       .collect(Collectors.joining(",\n\t"))
               ));

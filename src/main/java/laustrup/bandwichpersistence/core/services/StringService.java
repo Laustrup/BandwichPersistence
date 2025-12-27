@@ -70,6 +70,18 @@ public class StringService {
     return false;
   }
 
+  public static String firstCharacterAsUppercase(String string) {
+    return string.substring(0, 1).toUpperCase() + string.substring(1);
+  }
+
+  public static String upperCasesToLowerCaseWithUnderscore(String string) {
+    for (char character : string.toCharArray())
+      if (Character.isUpperCase(character))
+        string = string.replace(String.valueOf(character), "_" + Character.toLowerCase(character));
+
+    return string;
+  }
+
   @Getter
   public static class Configuration {
 

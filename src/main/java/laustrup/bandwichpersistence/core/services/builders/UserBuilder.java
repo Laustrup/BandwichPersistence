@@ -18,7 +18,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import static laustrup.bandwichpersistence.core.managers.UserDetailsManager.getUserType;
-import static laustrup.bandwichpersistence.core.services.ClassFieldService.getDeclared;
+import static laustrup.bandwichpersistence.core.services.ClassFieldService.getField;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.getString;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -43,8 +43,8 @@ public class UserBuilder {
     JDBCService.build(
         resultSet,
         () -> logins.add(new Login(
-            getString(DatabaseField.of(getDeclared(Login.class, Login.Fields.password))),
-            getString(DatabaseField.of(getDeclared(ContactInfo.class, ContactInfo.DTO.Fields.email)))
+            getString(DatabaseField.of(getField(Login.class, Login.Fields.password))),
+            getString(DatabaseField.of(getField(ContactInfo.class, ContactInfo.DTO.Fields.email)))
         ))
     );
 

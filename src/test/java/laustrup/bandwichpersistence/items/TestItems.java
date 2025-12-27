@@ -70,25 +70,38 @@ public class TestItems {
 
   @Getter
   @Setter
-  @FieldNameConstants
+  @FieldNameConstants(asEnum = true)
   @Table("test_instances")
   public static class Instance {
+
+    @Table.Column(isPrimary = true)
+    private Id _id;
+
+    protected Owner.Id _ownerId;
 
     private String _title;
 
     private boolean _active;
 
-    @Table.Column(isPrimary = true)
-    private Id _id;
-
     private int _amount;
 
     @Table.Constructor
-    public Instance(Id id, String title, boolean active, int amount) {
+    public Instance(Owner.Id ownerId, Id id, String title, boolean active, int amount) {
+      _ownerId = ownerId;
       _id = id;
       _title = title;
       _active = active;
       _amount = amount;
+    }
+
+    public Instance(Id id, String title, boolean isActive, int amount) {
+      this(
+          null,
+          id,
+          title,
+          isActive,
+          amount
+      );
     }
 
     public Instance(Id id) {
@@ -203,6 +216,39 @@ public class TestItems {
       @Override
       public Class<Instance> getOwnerClassType() {
         return Instance.class;
+      }
+    }
+
+    @Getter
+    @Setter
+    @FieldNameConstants(asEnum = true)
+    @Table("test_instance_owners")
+    public static class Owner {
+
+      private Id _id;
+
+      private Instance _instance;
+
+      @Table.Constructor
+      public Owner(Id id, Instance instance) {
+        _id = id;
+        _instance = instance;
+      }
+
+      public static class Id extends CommonIdentity<Signature<UUID>> {
+
+        public Id(Signature.UUID signature) {
+          super(signature);
+        }
+
+        public Id(UUID signature) {
+          super(new Signature.UUID(signature));
+        }
+
+        @Override
+        public Class<?> getOwnerClassType() {
+          return this.getClass();
+        }
       }
     }
 

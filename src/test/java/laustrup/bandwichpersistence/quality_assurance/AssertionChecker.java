@@ -18,8 +18,6 @@ public interface AssertionChecker<EXPECTED> {
 
   AssertionChecker<EXPECTED> contains(EXPECTED actual);
 
-  <W> AssertionChecker<EXPECTED> anyMatches(Predicate<W> assertion);
-
   AssertionChecker<EXPECTED> inCase(boolean condition, Predicate<EXPECTED> assertion);
 
   AssertionChecker<EXPECTED> isNotNull();
@@ -32,7 +30,13 @@ public interface AssertionChecker<EXPECTED> {
 
     CollectiveAssertionChecker<EXPECTED, EXPECTED_ELEMENT> isEmpty();
 
+    Asserter.Checker.CollectiveChecker<EXPECTED, EXPECTED_ELEMENT> anyMatches(Predicate<EXPECTED_ELEMENT> assertion);
+
     Asserter.Checker.CollectiveChecker<EXPECTED, EXPECTED_ELEMENT> allMatches(Predicate<EXPECTED_ELEMENT> predication);
+
+    Asserter.Checker.CollectiveChecker<EXPECTED, EXPECTED_ELEMENT> isSameSize(Collection<EXPECTED_ELEMENT> actuals);
+
+    Asserter.Checker.CollectiveChecker<EXPECTED, EXPECTED_ELEMENT> isCorrectOrder(Collection<EXPECTED_ELEMENT> actuals);
   }
 
   enum Clearance {

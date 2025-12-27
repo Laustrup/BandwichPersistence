@@ -7,6 +7,7 @@ import laustrup.bandwichpersistence.core.models.Organisation.Employee;
 import laustrup.bandwichpersistence.items.OrganisationEmployeeTestItems;
 import org.junit.jupiter.api.Test;
 
+import static laustrup.bandwichpersistence.core.managers.UserDetailsManager.getUser;
 import static laustrup.bandwichpersistence.items.OrganisationEmployeeTestItems.OrganisationEmployeeTitle.JENS_JENSEN;
 import static laustrup.bandwichpersistence.quality_assurance.Asserter.asserting;
 
@@ -25,7 +26,7 @@ class UserDetailsManagerTests extends BandwichTester {
         throw new RuntimeException(e);
       }
 
-      Employee actual = act((Employee) UserDetailsManager.getUser(login).get_object());
+      Employee actual = act((Employee) getUser(login).get_object());
 
       asserting(expected)
           .compare(actual);
