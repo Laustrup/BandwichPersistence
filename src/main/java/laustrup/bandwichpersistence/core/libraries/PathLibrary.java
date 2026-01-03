@@ -26,6 +26,9 @@ public class PathLibrary {
   @Getter
   private static final String _injectionDirectoryFullPath = get_rootPath() + get_populationsDirectoryPath();
 
+  @Getter
+  private static final String _entitiesDirectoryPath = "laustrup/bandwichpersistence/core/models";
+
   private static String findSpringBootDirectory() {
     String rootPath = PathService.getRootPath();
     String directory = "/API";

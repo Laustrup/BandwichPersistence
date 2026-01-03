@@ -240,7 +240,10 @@ public class Asserter {
       //region super class' methods
       @Override
       public CollectiveChecker<EXPECTED, EXPECTED_ELEMENT> is(EXPECTED actual) {
-        return (CollectiveChecker<EXPECTED, EXPECTED_ELEMENT>) super.is(actual);
+        return (CollectiveChecker<EXPECTED, EXPECTED_ELEMENT>) check(() -> {
+          isSameSize(actual);
+          assertTrue(_expected.containsAll(actual));
+        });
       }
 
       @Override

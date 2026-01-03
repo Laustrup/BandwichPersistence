@@ -29,7 +29,6 @@ import java.util.logging.Logger;
 
 import static java.lang.Integer.parseInt;
 import static java.nio.file.Files.readAttributes;
-import static laustrup.bandwichpersistence.core.libraries.PathLibrary.get_migrationDirectoryFullPath;
 import static laustrup.bandwichpersistence.core.managers.ManagerService.databaseInteraction;
 import static laustrup.bandwichpersistence.core.persistence.queries.ScriptorianQueries.Parameter;
 import static laustrup.bandwichpersistence.core.scriptorian.repositories.ScriptorianRepository.*;
@@ -53,7 +52,7 @@ public class ScriptorianManager {
     try {
       _logger.log(Level.INFO, "Scriptorian started");
 
-      Seszt<File> scripts = prepareScripts(get_migrationDirectoryFullPath());
+      Seszt<File> scripts = prepareScripts(PathLibrary.get_migrationDirectoryFullPath());
 
       databaseInteraction(() -> {
         createDefaultSchemaIfNotExists();

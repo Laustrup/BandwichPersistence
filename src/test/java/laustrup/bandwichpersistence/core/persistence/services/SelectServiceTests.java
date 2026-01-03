@@ -21,6 +21,7 @@ import static laustrup.bandwichpersistence.core.persistence.services.SelectServi
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.complying;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.selecting;
 import static laustrup.bandwichpersistence.core.services.ClassFieldService.getField;
+import static laustrup.bandwichpersistence.core.services.StringService.firstCharacterAsUppercase;
 import static laustrup.bandwichpersistence.core.services.StringService.upperCasesToLowerCaseWithUnderscore;
 import static laustrup.bandwichpersistence.quality_assurance.Asserter.asserting;
 
@@ -52,7 +53,7 @@ class SelectServiceTests extends BandwichTester {
       String selections = Arrays.stream(Instance.class.getDeclaredFields())
           .map(field -> {
             String column = field.getName().replace("_", "");
-            return String.format("testInstances.%s as TestInstance._%s",
+            return String.format("testInstances.%s TestInstance._%s",
                 upperCasesToLowerCaseWithUnderscore(column),
                 column
             );
@@ -83,15 +84,15 @@ class SelectServiceTests extends BandwichTester {
       );
       String selections = Arrays.stream(Instance.Owner.class.getDeclaredFields())
           .flatMap(field -> Arrays.stream(field.getType().getDeclaredFields())
-              .map(fieldOfType -> String.format("\t%s as %s\n",
+              .map(fieldOfType -> String.format("\t%s %s\n",
                   columnField.apply(
-                      "test_" + fieldOfType.getDeclaringClass().getSimpleName().toLowerCase(),
+                      "test" + firstCharacterAsUppercase(fieldOfType.getDeclaringClass().getSimpleName().toLowerCase()) + "s",
                       fieldOfType.getName().substring(1)
                   ),
                   columnField.apply(fieldOfType.getDeclaringClass().getSimpleName(), fieldOfType.getName())
               ))).collect(Collectors.joining()),
           fromTable = /*language=MySQL*/ "from test_instance_owners testInstanceOwners",
-          innerJoin = /*language=MySQL*/ "left join test_instance testInstance on testInstance.owner_id = testInstanceOwners.id",
+          innerJoin = /*language=MySQL*/ "left join test_instances testInstances on testInstanceOwners.id = testInstances.owner_id",
           expected = String.format(
               "\nselect\n%s%s\n%s\n",
               selections,
@@ -100,7 +101,7 @@ class SelectServiceTests extends BandwichTester {
           );
 
       String actual = act(selecting(new Properties(Instance.Owner.class))
-          .addJoin(left("test_instance",
+          .addJoin(left("test_instances",
               Condition.equals(
                   DatabaseField.of(getField(Instance.Owner.class, Instance.Owner.Fields._id.name())),
                   DatabaseField.of(getField(Instance.class, Instance.Fields._ownerId.name()))

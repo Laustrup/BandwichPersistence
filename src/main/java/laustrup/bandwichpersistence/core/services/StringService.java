@@ -5,6 +5,8 @@ import lombok.Getter;
 import java.util.Collection;
 import java.util.Random;
 
+import static laustrup.bandwichpersistence.core.services.EternaryService.stating;
+
 public class StringService {
 
   private static final String _numerals = "0123456789";
@@ -71,7 +73,19 @@ public class StringService {
   }
 
   public static String firstCharacterAsUppercase(String string) {
-    return string.substring(0, 1).toUpperCase() + string.substring(1);
+    return firstCharacterCaseHandle(string, true);
+  }
+
+  public static String firstCharacterAsLowercase(String string) {
+    return firstCharacterCaseHandle(string, false);
+  }
+
+  private static String firstCharacterCaseHandle(String string, boolean asUppercase) {
+    String firstCharacter = string.substring(0, 1);
+
+    return stating(asUppercase)
+        .then(firstCharacter::toUpperCase)
+        .orElse(firstCharacter::toLowerCase) + string.substring(1);
   }
 
   public static String upperCasesToLowerCaseWithUnderscore(String string) {

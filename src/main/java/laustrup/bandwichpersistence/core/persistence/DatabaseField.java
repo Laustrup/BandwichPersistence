@@ -6,6 +6,7 @@ import laustrup.bandwichpersistence.core.utilities.collections.Liszt;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.util.Arrays;
 import java.util.Map;
@@ -44,6 +45,14 @@ public record DatabaseField(Table table, Column column, Class<?> entity) {
 
   public static DatabaseField of(Member member) {
     return new DatabaseField(new Table(member.getDeclaringClass()), new Column(member), member.getDeclaringClass());
+  }
+
+  public Field convertToField() {
+    try {
+      return entity.getDeclaredField(column().title());
+    } catch (NoSuchFieldException e) {
+      throw new RuntimeException(toString(), e);
+    }
   }
 
   public static DatabaseField idOf(Class<?> clazz) {

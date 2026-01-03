@@ -1,17 +1,18 @@
 package laustrup.bandwichpersistence.core.persistence.services;
 
+import laustrup.bandwichpersistence.core.libraries.PathLibrary;
 import laustrup.bandwichpersistence.core.persistence.DatabaseField;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Clause.Clausement;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition;
 import laustrup.bandwichpersistence.core.persistence.worm.models.DatabaseDefinition;
+import laustrup.bandwichpersistence.core.services.FileService;
 import laustrup.bandwichpersistence.core.utilities.collections.Liszt;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.Getter;
 
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.lang.reflect.Field;
+import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -65,6 +66,16 @@ public abstract class SelectService {
 
     private interface Selector {
       String apply();
+    }
+
+    private static final Seszt<Class<?>> _entityClasses;
+
+    static {
+      try {
+        _entityClasses = FileService.getClasses(PathLibrary.get_entitiesDirectoryPath());
+      } catch (ClassNotFoundException e) {
+        throw new RuntimeException("Couldn't get the entity classes for Selecting class!", e);
+      }
     }
 
     private final Properties _properties;
@@ -172,17 +183,20 @@ public abstract class SelectService {
 
         private final Seszt<DatabaseField> _groupings;
 
+        private final Seszt<Class<?>> _classesInSelection;
+
         private String generateSelectionRow(DatabaseField databaseField) {
           return String.format("%s%s",
               databaseField.get_tableColumn(),
               stating(!databaseField.get_tableColumn().equals(databaseField.get_entityColumn()))
-                  .then(" as " + databaseField.get_entityColumn())
+                  .then(" " + databaseField.get_entityColumn())
                   .orElse("")
           );
         }
 
         public Selections(Seszt<DatabaseField> groupings) {
           _groupings = groupings;
+          _classesInSelection = new Seszt<>(_groupings.stream().map(DatabaseField::entity));
         }
 
         public static Selections asterisk() {
@@ -217,9 +231,65 @@ public abstract class SelectService {
 
           return Liszt.of(first, next).stream()
               .map(calculation)
-              .mapToInt(Integer::intValue)
               .reduce((a, b) -> a - b)
               .orElse(0);
+        }
+
+        private Stream<DatabaseField> currentAndAdditionalFields(DatabaseField databaseField) {
+          return Seszt.of(databaseField)
+              .Add(additionalFields(databaseField).toArray(DatabaseField[]::new)).stream();
+        }
+
+        //TODO Improve performance
+        private Stream<DatabaseField> additionalFields(DatabaseField databaseField) {
+          Map<String, Field> fields = new HashMap<>();
+          Seszt<Class<?>> unaccepteds = Seszt.of(String.class);
+
+          Function<Field, String> generateFieldKey = field -> String.format("%s.%s",
+              field.getDeclaringClass().getSimpleName(),
+              field.getName()
+          );
+
+          Seszt<String> keysOfGroupings = new Seszt<>(_groupings.stream()
+              .map(group -> generateFieldKey.apply(group.convertToField()))
+          );
+
+          Function<Class<?>, Boolean> typeIsMissingAndAccepted = clazz ->
+              !(_classesInSelection.contains(clazz) && _entityClasses.contains(clazz)) && !unaccepteds.contains(clazz);
+
+          Consumer<Stream<DatabaseField>> putAll = databaseFields -> fields.putAll(databaseFields
+              .flatMap(databaseFieldEntry -> {
+                Field fieldOfDatabase = databaseFieldEntry.convertToField();
+
+                return Map.of(
+                    generateFieldKey.apply(fieldOfDatabase),
+                    fieldOfDatabase
+                ).entrySet().parallelStream()
+                    .filter(entry -> !keysOfGroupings.contains(entry.getKey()));
+              }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (first, second) -> first))
+          );
+
+          return Arrays.stream(databaseField.entity().getDeclaredFields()).flatMap(field -> {
+            putAll.accept(Stream.of(DatabaseField.of(field)));
+
+            Class<?> type = field.getType();
+
+            if (typeIsMissingAndAccepted.apply(type)) {
+              Liszt<Field> fieldsOfType = Liszt.of(Arrays.stream(type.getDeclaredFields()));
+              _classesInSelection.add(type);
+              putAll.accept(fieldsOfType.stream()
+                  .map(DatabaseField::of)
+              );
+              Arrays.stream(type.getDeclaredFields())
+                  .filter(typeField -> typeIsMissingAndAccepted.apply(typeField.getType()))
+                  .map(DatabaseField::of)
+                  .forEach(currentTypeField -> putAll.accept(additionalFields(currentTypeField))
+                  );
+            }
+
+            return fields.values().stream()
+                .map(DatabaseField::of);
+          });
         }
 
         @Override
@@ -228,6 +298,7 @@ public abstract class SelectService {
               .then(" * ")
               .orElse(() -> String.format("\n\t%s\n",
                   _groupings.stream()
+                      .flatMap(this::currentAndAdditionalFields)
                       .sorted(Properties.Selections::orderGroupings)
                       .map(this::generateSelectionRow)
                       .collect(Collectors.joining(",\n\t"))
