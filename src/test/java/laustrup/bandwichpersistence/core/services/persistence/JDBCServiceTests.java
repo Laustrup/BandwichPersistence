@@ -12,8 +12,10 @@ import java.sql.ResultSet;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static laustrup.bandwichpersistence.core.persistence.DatabaseField.Configuration.databaseFieldConfiguration;
+import static laustrup.bandwichpersistence.core.services.ClassFieldService.getField;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.DatabaseService.toDatabaseColumn;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService;
 import static laustrup.bandwichpersistence.core.services.persistence.JDBCService.ResultSetService.Configurations.Mode.PEEK;
@@ -46,19 +48,26 @@ class JDBCServiceTests extends BandwichTester {
       ResultSet resultSet = getResultSetGenerator().generate("select * from organisations _organisations");
       AtomicReference<String> reference = isBinary ? null : arrange(new AtomicReference<>());
       AtomicReference<UUID> uuidReference = isBinary ? arrange(AtomicReference::new) : null;
+      Function<AtomicReference<?>, AtomicReference<?>> acting = atomicReference -> {
+        String fieldName = isBinary
+            ? Model.Fields._identity
+            : Organisation.Fields._title;
+
+        return ResultSetService.set(
+            new Configurations(
+                DatabaseField.of(databaseFieldConfiguration(
+                    getField(Organisation.class, fieldName),
+                    fieldName
+                )),
+                resultSet,
+                PEEK
+            ),
+            atomicReference
+        );
+      };
 
       Consumer<AtomicReference<?>> action = atomicReference ->
-          act(() -> ResultSetService.set(
-              new Configurations(
-                  DatabaseField.of(databaseFieldConfiguration(
-                      Organisation.class,
-                      isBinary ? Model.Fields._identity : "_title"
-                  )),
-                  resultSet,
-                  PEEK
-              ),
-              atomicReference
-          ));
+          act(acting.apply(atomicReference));
       action.accept(isBinary ? uuidReference : reference);
 
       asserting((isBinary ? uuidReference : reference).get())

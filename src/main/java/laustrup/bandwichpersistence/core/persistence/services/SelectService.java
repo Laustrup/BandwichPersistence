@@ -1,6 +1,7 @@
 package laustrup.bandwichpersistence.core.persistence.services;
 
 import laustrup.bandwichpersistence.core.libraries.PathLibrary;
+import laustrup.bandwichpersistence.core.models.identification.CommonIdentity;
 import laustrup.bandwichpersistence.core.persistence.DatabaseField;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Clause.Clausement;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition;
@@ -181,6 +182,17 @@ public abstract class SelectService {
 
       public static class Selections implements Selector {
 
+        @SuppressWarnings("unchecked")
+        private static final Seszt.Immutable<Class<?>> SELECTION_WHITELIST = Seszt.of(
+            CommonIdentity.class,
+            String.class,
+            Integer.class,
+            Boolean.class,
+            UUID.class,
+            Long.class,
+            Float.class
+        ).immutable();
+
         private final Seszt<DatabaseField> _groupings;
 
         private final Seszt<Class<?>> _classesInSelection;
@@ -196,7 +208,7 @@ public abstract class SelectService {
 
         public Selections(Seszt<DatabaseField> groupings) {
           _groupings = groupings;
-          _classesInSelection = new Seszt<>(_groupings.stream().map(DatabaseField::entity));
+          _classesInSelection = new Seszt<>(_groupings.stream().map(DatabaseField::getEntity));
         }
 
         public static Selections asterisk() {
@@ -212,7 +224,7 @@ public abstract class SelectService {
         }
 
         public static int orderGroupings(DatabaseField first, DatabaseField next) {
-          if (first.entity() != next.entity())
+          if (first.getEntity() != next.getEntity())
             return 0;
 
           Predicate<Class<?>> declaresOfFieldNameConstants = declared ->
@@ -220,7 +232,7 @@ public abstract class SelectService {
               declared.isEnum();
 
           Function<DatabaseField, Integer> calculation = field ->
-            Arrays.stream(field.entity().getDeclaredClasses())
+            Arrays.stream(field.getEntity().getDeclaredClasses())
                 .filter(declaresOfFieldNameConstants)
                 .flatMap(declared -> Arrays.stream(declared.getEnumConstants())
                     .map(constant -> (Enum<?>) constant)
@@ -235,15 +247,26 @@ public abstract class SelectService {
               .orElse(0);
         }
 
-        private Stream<DatabaseField> currentAndAdditionalFields(DatabaseField databaseField) {
-          return Seszt.of(databaseField)
-              .Add(additionalFields(databaseField).toArray(DatabaseField[]::new)).stream();
+        //TODO Improve performance
+        private Stream<DatabaseField> includeChildFields(DatabaseField databaseField) {
+          Predicate<DatabaseField> filtering = field -> {
+            Class<?> type = ((Field) field.member()).getType();
+
+            return type.isPrimitive() || SELECTION_WHITELIST.stream()
+                .anyMatch(clazz -> clazz.isAssignableFrom(type));
+          };
+
+          Seszt<DatabaseField> unfilteredFields = new Seszt<>(Seszt.of(databaseField)
+              .Add(getChildFields(databaseField).toArray(DatabaseField[]::new)).stream()
+              .filter(filtering)
+          ).immutable();
+
+          return unfilteredFields.stream();
         }
 
         //TODO Improve performance
-        private Stream<DatabaseField> additionalFields(DatabaseField databaseField) {
+        private Stream<DatabaseField> getChildFields(DatabaseField databaseField) {
           Map<String, Field> fields = new HashMap<>();
-          Seszt<Class<?>> unaccepteds = Seszt.of(String.class);
 
           Function<Field, String> generateFieldKey = field -> String.format("%s.%s",
               field.getDeclaringClass().getSimpleName(),
@@ -251,11 +274,12 @@ public abstract class SelectService {
           );
 
           Seszt<String> keysOfGroupings = new Seszt<>(_groupings.stream()
-              .map(group -> generateFieldKey.apply(group.convertToField()))
-          );
+              .map(group -> generateFieldKey.apply((Field) group.member()))
+          ).immutable();
 
-          Function<Class<?>, Boolean> typeIsMissingAndAccepted = clazz ->
-              !(_classesInSelection.contains(clazz) && _entityClasses.contains(clazz)) && !unaccepteds.contains(clazz);
+          Function<Class<?>, Boolean> typeIsMissingOrAccepted = clazz ->
+              !(_classesInSelection.contains(clazz) && _entityClasses.contains(clazz))
+                  && !SELECTION_WHITELIST.contains(clazz);
 
           Consumer<Stream<DatabaseField>> putAll = databaseFields -> fields.putAll(databaseFields
               .flatMap(databaseFieldEntry -> {
@@ -269,22 +293,21 @@ public abstract class SelectService {
               }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (first, second) -> first))
           );
 
-          return Arrays.stream(databaseField.entity().getDeclaredFields()).flatMap(field -> {
+          return Arrays.stream(databaseField.getEntity().getDeclaredFields()).flatMap(field -> {
             putAll.accept(Stream.of(DatabaseField.of(field)));
 
             Class<?> type = field.getType();
 
-            if (typeIsMissingAndAccepted.apply(type)) {
+            if (typeIsMissingOrAccepted.apply(type)) {
               Liszt<Field> fieldsOfType = Liszt.of(Arrays.stream(type.getDeclaredFields()));
               _classesInSelection.add(type);
               putAll.accept(fieldsOfType.stream()
                   .map(DatabaseField::of)
               );
               Arrays.stream(type.getDeclaredFields())
-                  .filter(typeField -> typeIsMissingAndAccepted.apply(typeField.getType()))
+                  .filter(typeField -> typeIsMissingOrAccepted.apply(typeField.getType()))
                   .map(DatabaseField::of)
-                  .forEach(currentTypeField -> putAll.accept(additionalFields(currentTypeField))
-                  );
+                  .forEach(currentTypeField -> putAll.accept(getChildFields(currentTypeField)));
             }
 
             return fields.values().stream()
@@ -298,9 +321,10 @@ public abstract class SelectService {
               .then(" * ")
               .orElse(() -> String.format("\n\t%s\n",
                   _groupings.stream()
-                      .flatMap(this::currentAndAdditionalFields)
+                      .flatMap(this::includeChildFields)
                       .sorted(Properties.Selections::orderGroupings)
                       .map(this::generateSelectionRow)
+                      .distinct()
                       .collect(Collectors.joining(",\n\t"))
               ));
         }
@@ -670,15 +694,9 @@ public abstract class SelectService {
           }
         }
 
-        @Getter
-        public static class Selection {
+        public record Selection(Set<String> _items) implements Selector {
 
-          private final Set<String> _items;
-
-          public Selection(Set<String> items) {
-            _items = items;
-          }
-
+          @Override
           public String apply() {
             return format(
                 "(%s)",

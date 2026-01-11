@@ -82,15 +82,16 @@ class SelectServiceTests extends BandwichTester {
           clazz,
           column
       );
-      String selections = Arrays.stream(Instance.Owner.class.getDeclaredFields())
-          .flatMap(field -> Arrays.stream(field.getType().getDeclaredFields())
-              .map(fieldOfType -> String.format("\t%s %s\n",
-                  columnField.apply(
-                      "test" + firstCharacterAsUppercase(fieldOfType.getDeclaringClass().getSimpleName().toLowerCase()) + "s",
-                      fieldOfType.getName().substring(1)
-                  ),
-                  columnField.apply(fieldOfType.getDeclaringClass().getSimpleName(), fieldOfType.getName())
-              ))).collect(Collectors.joining()),
+      String selections = "\ttestInstanceOwners.id TestInstanceOwner._id,\n" +
+          Arrays.stream(Instance.Owner.class.getDeclaredFields())
+              .flatMap(field -> Arrays.stream(field.getType().getDeclaredFields())
+                  .map(fieldOfType -> String.format("\t%s Test%s",
+                      columnField.apply(
+                          "test" + firstCharacterAsUppercase(fieldOfType.getDeclaringClass().getSimpleName().toLowerCase()) + "s",
+                          upperCasesToLowerCaseWithUnderscore(fieldOfType.getName().substring(1))
+                      ),
+                      columnField.apply(fieldOfType.getDeclaringClass().getSimpleName(), fieldOfType.getName())
+                  ))).collect(Collectors.joining(",\n")) + "\n",
           fromTable = /*language=MySQL*/ "from test_instance_owners testInstanceOwners",
           innerJoin = /*language=MySQL*/ "left join test_instances testInstances on testInstanceOwners.id = testInstances.owner_id",
           expected = String.format(
@@ -130,10 +131,10 @@ class SelectServiceTests extends BandwichTester {
           complying()
               .which(Condition.equals(
                   DatabaseField.of(databaseFieldConfiguration(
-                      Instance.class,
+                      getField(Instance.class, Instance.Fields._amount.name()),
                       Instance.Fields._amount.name()
                   )), DatabaseField.of(databaseFieldConfiguration(
-                      Instance.class,
+                      getField(Instance.class, Instance.Fields._title.name()),
                       Instance.Fields._title.name()
                   ))
               ))
@@ -163,19 +164,19 @@ class SelectServiceTests extends BandwichTester {
           complying()
               .which(Condition.equals(
                   DatabaseField.of(databaseFieldConfiguration(
-                      Instance.class,
+                      getField(Instance.class, Instance.Fields._amount.name()),
                       Instance.Fields._amount.name()
                   )), DatabaseField.of(databaseFieldConfiguration(
-                      Instance.class,
+                      getField(Instance.class, Instance.Fields._title.name()),
                       Instance.Fields._title.name()
                   ))
               ))
               .and(Condition.equals(
                   DatabaseField.of(databaseFieldConfiguration(
-                      Instance.class,
+                      getField(Instance.class, Instance.Fields._title.name()),
                       Instance.Fields._title.name()
                   )), DatabaseField.of(databaseFieldConfiguration(
-                      Instance.class,
+                      getField(Instance.class, Instance.Fields._amount.name()),
                       Instance.Fields._amount.name()
                   ))
               ))
@@ -205,10 +206,10 @@ class SelectServiceTests extends BandwichTester {
           .addJoin(Join.inner(
               Instance.class,
               DatabaseField.of(databaseFieldConfiguration(
-                  Instance.class,
+                  getField(Instance.class, Instance.Fields._title.name()),
                   Instance.Fields._title.name()
               )), DatabaseField.of(databaseFieldConfiguration(
-                  Instance.class,
+                  getField(Instance.class, Instance.Fields._amount.name()),
                   Instance.Fields._amount.name()
               ))
           ))

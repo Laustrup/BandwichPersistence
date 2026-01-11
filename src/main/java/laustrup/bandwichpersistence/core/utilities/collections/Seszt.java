@@ -48,7 +48,11 @@ public class Seszt<E> extends Coollection<E> implements ISeszt<E>, Set<E>, ICool
    * @param isLinked Will initialize the map as linked if true, else as hash.
    */
   public Seszt(boolean isLinked) {
-    super(isLinked);
+    this(isLinked, true);
+  }
+
+  protected Seszt(boolean isLinked, boolean isMutable) {
+    super(isLinked, isMutable);
   }
 
   /**
@@ -70,6 +74,10 @@ public class Seszt<E> extends Coollection<E> implements ISeszt<E>, Set<E>, ICool
     this(data, false);
   }
 
+  protected Seszt(boolean isLinked, boolean isMutable, E... data) {
+    super(isLinked, isMutable, data);
+  }
+
   /**
    * The Seszt will contain data at initialization.
    *
@@ -77,7 +85,7 @@ public class Seszt<E> extends Coollection<E> implements ISeszt<E>, Set<E>, ICool
    * @param isLinked Will initialize the map as linked if true, else as hash.
    */
   public Seszt(E[] data, boolean isLinked) {
-    super(isLinked);
+    super(isLinked, true);
     add(data);
   }
 
@@ -383,7 +391,7 @@ public class Seszt<E> extends Coollection<E> implements ISeszt<E>, Set<E>, ICool
 
   @Override
   public Stream<E> stream() {
-    return new HashSet(Set.of(_data)).stream();
+    return Set.super.stream();
   }
 
   @Override
@@ -435,5 +443,16 @@ public class Seszt<E> extends Coollection<E> implements ISeszt<E>, Set<E>, ICool
   public static <T> Seszt<T> of(T... contents) {
     Seszt<T> seszt = new Seszt<>();
     return seszt.Add(contents);
+  }
+
+  public Immutable<E> immutable() {
+    return new Immutable<>(this);
+  }
+
+  public static class Immutable<E> extends Seszt<E> {
+
+    private Immutable(Seszt<E> seszt) {
+      super(seszt.is_linked(), false, seszt.get_data());
+    }
   }
 }

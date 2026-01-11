@@ -44,7 +44,7 @@ public class Liszt<E> extends Coollection<E> implements ILiszt<E>, List<E>, ICoo
    * @param isLinked Decides if the map should be linked or hash type.
    */
   public Liszt(boolean isLinked) {
-    super(isLinked);
+    super(isLinked, true);
   }
 
   /**
@@ -63,7 +63,7 @@ public class Liszt<E> extends Coollection<E> implements ILiszt<E>, List<E>, ICoo
    * @param isLinked Decides if the map should be linked or hash type.
    */
   public Liszt(E[] data, boolean isLinked) {
-    super(isLinked);
+    super(isLinked, true);
     add(data);
   }
 

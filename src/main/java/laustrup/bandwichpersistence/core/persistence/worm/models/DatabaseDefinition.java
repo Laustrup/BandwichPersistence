@@ -22,6 +22,7 @@ import java.util.function.Supplier;
 import static laustrup.bandwichpersistence.core.persistence.exceptions.DatabaseDefinitionException.noIdReference;
 import static laustrup.bandwichpersistence.core.persistence.models.EntityDataCollection.Key.conjunctionKeyOf;
 import static laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService.*;
+import static laustrup.bandwichpersistence.core.services.ClassFieldService.getField;
 import static laustrup.bandwichpersistence.core.services.collections.MapService.collectMap;
 
 public interface DatabaseDefinition {
@@ -48,11 +49,12 @@ public interface DatabaseDefinition {
     Class<?> clazz = get_class();
     String idReference = getIdReference(clazz)
         .orElseThrow(() -> noIdReference(clazz));
+    Member member = getField(clazz, idReference);
 
     return new DatabaseField(
         new DatabaseField.Table(clazz),
         new DatabaseField.Column(idReference, toAlias(idReference)),
-        clazz
+        member
     );
   }
 
@@ -165,11 +167,17 @@ public interface DatabaseDefinition {
     @Override
     public Map<? extends Member, DatabaseField> get_columns() {
       return collectMap(Arrays.stream(get_metaDataColumns())
-          .map(column -> new DatabaseField(
-              new DatabaseField.Table(get_title(), toAlias(get_title())),
-              new DatabaseField.Column(TableColumnData.of(get_class(), column).member()),
-              get_class()
-          )).map(field -> new AbstractMap.SimpleImmutableEntry<>(new SimpleField(get_class(), field), field))
+          .map(column -> {
+            Member member = TableColumnData.of(get_class(), column).member();
+
+            DatabaseField field = new DatabaseField(
+                new DatabaseField.Table(get_title(), toAlias(get_title())),
+                new DatabaseField.Column(member),
+                member
+            );
+
+            return new AbstractMap.SimpleImmutableEntry<>(new SimpleField(get_class(), field), field);
+          })
       );
     }
 

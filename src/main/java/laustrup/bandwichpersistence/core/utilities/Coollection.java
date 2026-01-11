@@ -26,6 +26,9 @@ public abstract class Coollection<E> extends Utility<E> implements java.util.Col
    */
   protected Map<String, E> _map;
 
+  @Getter
+  private boolean _linked;
+
   /**
    * The destinations for the map, before being inserted into the map
    */
@@ -36,19 +39,16 @@ public abstract class Coollection<E> extends Utility<E> implements java.util.Col
    */
   protected String[] _destinationKeys;
 
-  /**
-   * Creates the Utility with empty data.
-   *
-   * @param isLinked Decides if the map should be linked or hash type.
-   */
-  protected Coollection(boolean isLinked) {
-    _data = convert(new Object[0]);
-    _destinationKeys = new String[0];
+  protected final boolean _mutable;
 
-    if (isLinked) _map = new LinkedHashMap<>();
-    else _map = new HashMap<>();
-    if (isLinked) _destinations = new LinkedHashMap<>();
-    else _destinations = new HashMap<>();
+  protected Coollection(boolean isLinked, boolean isMutable, E... data) {
+    _data = data;
+    _destinationKeys = new String[0];
+    _map = isLinked ? new LinkedHashMap<>() : new HashMap<>();
+    _destinations = isLinked ? new LinkedHashMap<>() : new HashMap<>();
+    _linked = isLinked;
+    addElements(data);
+    _mutable = isMutable;
   }
 
   /**
@@ -85,6 +85,13 @@ public abstract class Coollection<E> extends Utility<E> implements java.util.Col
    * @param index The index of the data that will be removed.
    */
   protected void handleRemove(int index) {
+    if (!_mutable)
+      return;
+
+    remove(index);
+  }
+
+  private void remove(int index) {
     E[] storage = convert(new Object[_data.length - 1]);
     int storageIndex = 0;
 
@@ -118,6 +125,13 @@ public abstract class Coollection<E> extends Utility<E> implements java.util.Col
    * @param elements The elements to add.
    */
   protected void handleAdd(E[] elements) {
+    if (!_mutable)
+      return;
+
+    addElements(elements);
+  }
+
+  private void addElements(E[] elements) {
     elements = filterElements(elements);
     E[] storage = convert(new Object[_data.length + elements.length]);
 
@@ -184,8 +198,10 @@ public abstract class Coollection<E> extends Utility<E> implements java.util.Col
     String[] storage = new String[_destinationKeys.length + 1];
 
     for (int i = 0; i < storage.length; i++) {
-      if (i < _destinationKeys.length) storage[i] = _destinationKeys[i];
-      else storage[i] = key;
+      if (i < _destinationKeys.length)
+        storage[i] = _destinationKeys[i];
+      else
+        storage[i] = key;
     }
     _destinationKeys = storage;
 
@@ -205,7 +221,7 @@ public abstract class Coollection<E> extends Utility<E> implements java.util.Col
   }
 
   protected E handleSet(int index, E element) {
-    if (element != null)
+    if (_mutable && element != null)
       try {
         _map.remove(_data[index].toString());
         _data[index] = element;
