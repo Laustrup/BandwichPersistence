@@ -30,13 +30,14 @@ class DatabaseColumnServiceTests extends BandwichTester {
       );
       Map<? extends Member, DatabaseField> expected = arrange(members.collect(Collectors.toMap(
           Function.identity(),
-          DatabaseField::of
+          member -> DatabaseField.of(clazz, member)
       )));
 
       Map<? extends Member, DatabaseField> actual = act(get_columns(clazz));
 
-      expected.forEach((key, value) -> asserting(value.equals(actual.get(key)))
-          .isTrue()
+      expected.forEach((key, value) ->
+          asserting(value.equals(actual.get(key)))
+            .isTrue()
       );
     });
   }

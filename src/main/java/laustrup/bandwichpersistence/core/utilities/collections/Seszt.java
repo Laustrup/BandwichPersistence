@@ -440,6 +440,7 @@ public class Seszt<E> extends Coollection<E> implements ISeszt<E>, Set<E>, ICool
         .collect(Collectors.toSet());
   }
 
+  @SafeVarargs
   public static <T> Seszt<T> of(T... contents) {
     Seszt<T> seszt = new Seszt<>();
     return seszt.Add(contents);

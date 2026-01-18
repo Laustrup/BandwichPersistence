@@ -250,7 +250,7 @@ public abstract class SelectService {
         //TODO Improve performance
         private Stream<DatabaseField> includeChildFields(DatabaseField databaseField) {
           Predicate<DatabaseField> filtering = field -> {
-            Class<?> type = ((Field) field.member()).getType();
+            Class<?> type = (field.getReflectedField().getType());
 
             return type.isPrimitive() || SELECTION_WHITELIST.stream()
                 .anyMatch(clazz -> clazz.isAssignableFrom(type));
@@ -274,7 +274,7 @@ public abstract class SelectService {
           );
 
           Seszt<String> keysOfGroupings = new Seszt<>(_groupings.stream()
-              .map(group -> generateFieldKey.apply((Field) group.member()))
+              .map(group -> generateFieldKey.apply(group.getReflectedField()))
           ).immutable();
 
           Function<Class<?>, Boolean> typeIsMissingOrAccepted = clazz ->
@@ -283,7 +283,7 @@ public abstract class SelectService {
 
           Consumer<Stream<DatabaseField>> putAll = databaseFields -> fields.putAll(databaseFields
               .flatMap(databaseFieldEntry -> {
-                Field fieldOfDatabase = databaseFieldEntry.convertToField();
+                Field fieldOfDatabase = databaseFieldEntry.getReflectedField();
 
                 return Map.of(
                     generateFieldKey.apply(fieldOfDatabase),

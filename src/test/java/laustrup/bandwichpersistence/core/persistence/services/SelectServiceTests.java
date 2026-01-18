@@ -16,7 +16,6 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static laustrup.bandwichpersistence.core.persistence.DatabaseField.Configuration.databaseFieldConfiguration;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Join.left;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.complying;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.selecting;
@@ -130,13 +129,13 @@ class SelectServiceTests extends BandwichTester {
           Instance.class,
           complying()
               .which(Condition.equals(
-                  DatabaseField.of(databaseFieldConfiguration(
-                      getField(Instance.class, Instance.Fields._amount.name()),
-                      Instance.Fields._amount.name()
-                  )), DatabaseField.of(databaseFieldConfiguration(
-                      getField(Instance.class, Instance.Fields._title.name()),
-                      Instance.Fields._title.name()
-                  ))
+                  DatabaseField.of(
+                      Instance.class,
+                      getField(Instance.class, Instance.Fields._amount.name())
+                  ), DatabaseField.of(
+                      Instance.class,
+                      getField(Instance.class, Instance.Fields._title.name())
+                  )
               ))
       ));
 
@@ -163,22 +162,22 @@ class SelectServiceTests extends BandwichTester {
           Instance.class,
           complying()
               .which(Condition.equals(
-                  DatabaseField.of(databaseFieldConfiguration(
-                      getField(Instance.class, Instance.Fields._amount.name()),
-                      Instance.Fields._amount.name()
-                  )), DatabaseField.of(databaseFieldConfiguration(
-                      getField(Instance.class, Instance.Fields._title.name()),
-                      Instance.Fields._title.name()
-                  ))
+                  DatabaseField.of(
+                      Instance.class,
+                      getField(Instance.class, Instance.Fields._amount.name())
+                  ), DatabaseField.of(
+                      Instance.class,
+                      getField(Instance.class, Instance.Fields._title.name())
+                  )
               ))
               .and(Condition.equals(
-                  DatabaseField.of(databaseFieldConfiguration(
-                      getField(Instance.class, Instance.Fields._title.name()),
-                      Instance.Fields._title.name()
-                  )), DatabaseField.of(databaseFieldConfiguration(
-                      getField(Instance.class, Instance.Fields._amount.name()),
-                      Instance.Fields._amount.name()
-                  ))
+                  DatabaseField.of(
+                      Instance.class,
+                      getField(Instance.class, Instance.Fields._title.name())
+                  ), DatabaseField.of(
+                      Instance.class,
+                      getField(Instance.class, Instance.Fields._amount.name())
+                  )
               ))
       ));
 
@@ -205,13 +204,13 @@ class SelectServiceTests extends BandwichTester {
       String actual = act(selecting(_table)
           .addJoin(Join.inner(
               Instance.class,
-              DatabaseField.of(databaseFieldConfiguration(
-                  getField(Instance.class, Instance.Fields._title.name()),
-                  Instance.Fields._title.name()
-              )), DatabaseField.of(databaseFieldConfiguration(
-                  getField(Instance.class, Instance.Fields._amount.name()),
-                  Instance.Fields._amount.name()
-              ))
+              DatabaseField.of(
+                  Instance.class,
+                  getField(Instance.class, Instance.Fields._title.name())
+              ), DatabaseField.of(
+                  Instance.class,
+                  getField(Instance.class, Instance.Fields._amount.name())
+              )
           ))
           .select()
       );

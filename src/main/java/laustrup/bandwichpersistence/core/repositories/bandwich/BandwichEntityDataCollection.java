@@ -88,8 +88,8 @@ public class BandwichEntityDataCollection implements EntityDataCollection {
             inCase(classes.size() == 3)
                 .then(() -> DatabaseDefinition.Conjunction.of(classes.Get(1), classes.Get(2), classes.Get(3)))
         )).orElseThrow(new IllegalArgumentException("At the moment Database Definition only supports 1 -> 3 classes for entities."));
-      } catch (Exception e) {
-        throw new RuntimeException(e);
+      } catch (Exception exception) {
+        throw new RuntimeException(exception);
       }
     }
   }

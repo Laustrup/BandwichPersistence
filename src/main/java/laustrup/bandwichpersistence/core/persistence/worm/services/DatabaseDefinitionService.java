@@ -30,6 +30,9 @@ import static laustrup.bandwichpersistence.core.services.EternaryService.stating
 public abstract class DatabaseDefinitionService {
 
   public static Optional<Annotation> get_databaseDefinition(Class<?> clazz) {
+    if (clazz == null)
+      throw new NullPointerException("Class can't be null when getting its database definition!");
+
     return stating(Liszt.of(
         Property.inCase(clazz.isAnnotationPresent(Table.class))
             .then(() -> get_table(clazz)),

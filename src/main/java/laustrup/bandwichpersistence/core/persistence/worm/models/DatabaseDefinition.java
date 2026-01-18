@@ -51,11 +51,7 @@ public interface DatabaseDefinition {
         .orElseThrow(() -> noIdReference(clazz));
     Member member = getField(clazz, idReference);
 
-    return new DatabaseField(
-        new DatabaseField.Table(clazz),
-        new DatabaseField.Column(idReference, toAlias(idReference)),
-        member
-    );
+    return new DatabaseField(clazz, member);
   }
 
   @Getter
@@ -170,11 +166,7 @@ public interface DatabaseDefinition {
           .map(column -> {
             Member member = TableColumnData.of(get_class(), column).member();
 
-            DatabaseField field = new DatabaseField(
-                new DatabaseField.Table(get_title(), toAlias(get_title())),
-                new DatabaseField.Column(member),
-                member
-            );
+            DatabaseField field = new DatabaseField(get_class(), member);
 
             return new AbstractMap.SimpleImmutableEntry<>(new SimpleField(get_class(), field), field);
           })
