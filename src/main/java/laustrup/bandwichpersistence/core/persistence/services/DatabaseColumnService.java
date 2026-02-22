@@ -63,7 +63,7 @@ public abstract class DatabaseColumnService {
     return getFields(clazz).values().stream()
         .filter(field -> !field.isAnnotationPresent(Table.ExcludedColumn.class))
         .map(field -> DatabaseField.of(clazz, field))
-        .collect(Collectors.toMap(field -> field.column().member(), Function.identity()));
+        .collect(Collectors.toMap(DatabaseField::getMember, Function.identity()));
   }
 
   public static Optional<String> getIdColumnOf(Class<?> entity) {

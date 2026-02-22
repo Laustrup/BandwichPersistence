@@ -442,8 +442,11 @@ public class Seszt<E> extends Coollection<E> implements ISeszt<E>, Set<E>, ICool
 
   @SafeVarargs
   public static <T> Seszt<T> of(T... contents) {
-    Seszt<T> seszt = new Seszt<>();
-    return seszt.Add(contents);
+    return new Seszt<T>().Add(contents);
+  }
+
+  public static <T> Seszt<T> of(Stream<T> stream) {
+    return new Seszt<>(stream);
   }
 
   public Immutable<E> immutable() {

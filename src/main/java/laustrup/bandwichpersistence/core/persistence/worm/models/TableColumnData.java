@@ -1,7 +1,6 @@
 package laustrup.bandwichpersistence.core.persistence.worm.models;
 
 import laustrup.bandwichpersistence.core.persistence.worm.annotations.Table;
-import laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService;
 
 import java.lang.reflect.Member;
 
@@ -23,9 +22,5 @@ public record TableColumnData(Table.Column column, Member member) {
         .orElseThrow();
 
     return of(column, member);
-  }
-
-  public String getColumnTitle() {
-    return DatabaseDefinitionService.getColumnTitle(member);
   }
 }

@@ -4,11 +4,12 @@ import laustrup.bandwichpersistence.BandwichTester;
 import laustrup.bandwichpersistence.core.models.Album;
 import laustrup.bandwichpersistence.core.models.Organisation;
 import laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService;
+import laustrup.bandwichpersistence.items.TestItems;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static laustrup.bandwichpersistence.core.persistence.exceptions.DatabaseDefinitionException.noIdReference;
-import static laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService.getIdReference;
+import static laustrup.bandwichpersistence.core.persistence.worm.services.IdReferenceService.getIdReferenceTitle;
 import static laustrup.bandwichpersistence.quality_assurance.Asserter.asserting;
 
 class DatabaseDefinitionServiceTests extends BandwichTester {
@@ -31,15 +32,12 @@ class DatabaseDefinitionServiceTests extends BandwichTester {
   }
 
   @ParameterizedTest
-  @ValueSource(classes = {Organisation.class})
+  @ValueSource(classes = {TestItems.Instance.class})
   void canGetIdReference(Class<?> clazz) {
     test(() -> {
-      String expected = arrange(switch (clazz.getSimpleName()) {
-        case "Organisation" -> "organisation_id";
-        default -> throw new IllegalStateException("Unexpected value: " + clazz.getSimpleName());
-      });
+      String expected = arrange("instance_id");
 
-      String actual = act(getIdReference(clazz)
+      String actual = act(getIdReferenceTitle(clazz)
           .orElseThrow(() -> noIdReference(clazz))
       );
 

@@ -4,7 +4,9 @@ import laustrup.bandwichpersistence.BandwichTester;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-import static laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseTableService.*;
+import static laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseTableService.defineTableTitle;
+import static laustrup.bandwichpersistence.core.persistence.worm.services.NamingService.pluralToSingular;
+import static laustrup.bandwichpersistence.core.persistence.worm.services.NamingService.singularToPlural;
 import static laustrup.bandwichpersistence.quality_assurance.Asserter.asserting;
 
 public class DatabaseTableServiceTests extends BandwichTester {

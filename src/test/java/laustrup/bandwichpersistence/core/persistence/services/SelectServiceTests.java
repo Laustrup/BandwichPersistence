@@ -19,9 +19,9 @@ import java.util.stream.Collectors;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Join.left;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.complying;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.selecting;
+import static laustrup.bandwichpersistence.core.persistence.worm.services.NamingService.toColumnTitle;
 import static laustrup.bandwichpersistence.core.services.ClassFieldService.getField;
 import static laustrup.bandwichpersistence.core.services.StringService.firstCharacterAsUppercase;
-import static laustrup.bandwichpersistence.core.services.StringService.upperCasesToLowerCaseWithUnderscore;
 import static laustrup.bandwichpersistence.quality_assurance.Asserter.asserting;
 
 class SelectServiceTests extends BandwichTester {
@@ -50,14 +50,10 @@ class SelectServiceTests extends BandwichTester {
   void canSelectAllDatabaseFields() {
     test(() -> {
       String selections = Arrays.stream(Instance.class.getDeclaredFields())
-          .map(field -> {
-            String column = field.getName().replace("_", "");
-            return String.format("testInstances.%s TestInstance._%s",
-                upperCasesToLowerCaseWithUnderscore(column),
-                column
-            );
-          })
-          .collect(Collectors.joining(",\n\t")),
+          .map(field -> String.format("testInstances.%s TestInstance.%s",
+              toColumnTitle(field),
+              field.getName()
+          )).collect(Collectors.joining(",\n\t")),
           expected = /*language=MySQL*/ String.format(
               "\nselect\n\t%s\nfrom %s %s\n",
               selections,
@@ -87,7 +83,7 @@ class SelectServiceTests extends BandwichTester {
                   .map(fieldOfType -> String.format("\t%s Test%s",
                       columnField.apply(
                           "test" + firstCharacterAsUppercase(fieldOfType.getDeclaringClass().getSimpleName().toLowerCase()) + "s",
-                          upperCasesToLowerCaseWithUnderscore(fieldOfType.getName().substring(1))
+                          toColumnTitle(fieldOfType)
                       ),
                       columnField.apply(fieldOfType.getDeclaringClass().getSimpleName(), fieldOfType.getName())
                   ))).collect(Collectors.joining(",\n")) + "\n",

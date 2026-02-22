@@ -1,17 +1,20 @@
 package laustrup.bandwichpersistence.core.persistence;
 
-import laustrup.bandwichpersistence.core.persistence.worm.models.TableColumnData;
 import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 
 import static laustrup.bandwichpersistence.core.persistence.DatabaseField.SelectionHandlingConfiguration.pluralTableNameAndColumnOfKey;
 import static laustrup.bandwichpersistence.core.persistence.DatabaseField.SelectionHandlingConfiguration.singularTableName;
-import static laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService.*;
-import static laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseTableService.pluralToSingular;
+import static laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService.get_databaseDefinitionTitle;
+import static laustrup.bandwichpersistence.core.persistence.worm.services.NamingService.*;
 import static laustrup.bandwichpersistence.core.services.EternaryService.ifNotNull;
 import static laustrup.bandwichpersistence.core.services.EternaryService.stating;
 import static laustrup.bandwichpersistence.core.services.StringService.firstCharacterAsUppercase;
@@ -24,7 +27,7 @@ public record DatabaseField(Table table, Column column) {
 
     String getKey();
 
-    String getTitle();
+    String get_title();
   }
 
   private static final String[] _idIndicators = new String[]{"id", "_id"};
@@ -52,11 +55,15 @@ public record DatabaseField(Table table, Column column) {
   }
 
   public Class<?> getEntity() {
-    return table.entity();
+    return table.get_entity();
   }
 
   public Field getReflectedField() {
-     return (Field) column.member();
+     return (Field) getMember();
+  }
+
+  public Member getMember() {
+    return column.get_member();
   }
 
   public String get_tableColumn() {
@@ -80,7 +87,8 @@ public record DatabaseField(Table table, Column column) {
   }
 
   public boolean is_key() {
-    return Arrays.stream(_idIndicators).anyMatch(column::contains);
+    return Arrays.stream(_idIndicators)
+        .anyMatch(column::contains);
   }
 
   record SelectionHandlingConfiguration(String delimiter, boolean tableAsPlural, boolean ofKey) {
@@ -102,59 +110,115 @@ public record DatabaseField(Table table, Column column) {
     public String keyOrTitle(Unit unit) {
       return stating(ofKey)
           .then(unit::getKey)
-          .orElse(unit::getTitle);
+          .orElse(unit::get_title);
     }
   }
 
-  public record Column(Member member, String title, String alias) implements Unit {
+  @Getter
+  @AllArgsConstructor(access = AccessLevel.PRIVATE)
+  public static final class Column implements Unit {
+
+    private final Member _member;
+    private final String _columnTitle;
 
     public Column(Member member) {
-      this(member, member.getName(), getColumnTitle(member));
-    }
-
-    public static Column of(TableColumnData columnData) {
-      return new Column(columnData.member());
+      this(member, toColumnTitle(member));
     }
 
     @Override
     public boolean contains(String value) {
-      return title.contains(value) || alias.contains(value);
+      return get_title().contains(value) || _columnTitle.contains(value);
     }
 
     @Override
     public String getKey() {
-      return ifNotNull(alias).otherwise(title);
+      return ifNotNull(_columnTitle).otherwise(get_title());
     }
 
     @Override
-    public String getTitle() {
-      return title();
+    public String get_title() {
+        return _member.getName();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (obj == this) return true;
+      if (obj == null || obj.getClass() != this.getClass()) return false;
+      var that = (Column) obj;
+      return Objects.equals(this._member, that._member) &&
+          Objects.equals(get_title(), that.get_title()) &&
+          Objects.equals(this._columnTitle, that._columnTitle);
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(_member, get_title(), _columnTitle);
+    }
+
+    @Override
+    public String toString() {
+      return "Column[" +
+          "member=" + _member + ", " +
+          "title=" + get_title() + ", " +
+          "alias=" + _columnTitle + ']';
     }
   }
 
-  public record Table(Class<?> entity, String title, String alias) implements Unit {
+  @Getter
+  @AllArgsConstructor(access = AccessLevel.PRIVATE)
+  public static final class Table implements Unit {
+    private final Class<?> _entity;
+    private final String _title;
+    private final String _alias;
 
     public Table(Class<?> entity) {
       this(entity, get_databaseDefinitionTitle(entity));
     }
 
     private Table(Class<?> entity, String title) {
-      this(entity, title, toAlias(title));
+      this(entity, title, toTableAlias(title));
     }
 
     @Override
     public boolean contains(String value) {
-      return title.contains(value) || alias.contains(value);
+      return _title.contains(value) || _alias.contains(value);
     }
 
     @Override
     public String getKey() {
-      return ifNotNull(alias).otherwise(title);
+      return ifNotNull(_alias).otherwise(_title);
     }
 
     @Override
-    public String getTitle() {
-      return title();
+    public String get_title() {
+      return _title;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (obj == this)
+        return true;
+      if (obj == null || obj.getClass() != this.getClass())
+        return false;
+
+      var that = (Table) obj;
+
+      return Objects.equals(this._entity, that._entity) &&
+          Objects.equals(this._title, that._title) &&
+          Objects.equals(this._alias, that._alias);
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(_entity, _title, _alias);
+    }
+
+    @Override
+    public String toString() {
+      return "Table[" +
+          "entity=" + _entity + ", " +
+          "title=" + _title + ", " +
+          "alias=" + _alias + ']';
     }
   }
 }

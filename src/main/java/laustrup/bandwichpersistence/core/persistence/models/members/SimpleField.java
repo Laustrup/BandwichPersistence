@@ -20,7 +20,7 @@ public class SimpleField implements Member {
   }
 
   public SimpleField(Class<?> clazz, DatabaseField databaseField) {
-    this(clazz, databaseField.column().title());
+    this(clazz, databaseField.column().get_title());
   }
 
   @Override

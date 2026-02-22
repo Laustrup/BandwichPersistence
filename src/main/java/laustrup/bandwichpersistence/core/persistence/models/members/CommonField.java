@@ -25,7 +25,7 @@ public class CommonField extends SimpleField {
   }
 
   public CommonField(Class<?> clazz, DatabaseField databaseField, Field field) {
-    this(clazz, databaseField.column().title(), field);
+    this(clazz, databaseField.column().get_title(), field);
   }
 
   @Override

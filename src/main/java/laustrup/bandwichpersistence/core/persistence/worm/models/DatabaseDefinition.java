@@ -2,6 +2,7 @@ package laustrup.bandwichpersistence.core.persistence.worm.models;
 
 import laustrup.bandwichpersistence.core.persistence.DatabaseField;
 import laustrup.bandwichpersistence.core.persistence.models.EntityDataCollection;
+import laustrup.bandwichpersistence.core.persistence.models.members.IdReferenceMember;
 import laustrup.bandwichpersistence.core.persistence.models.members.SimpleField;
 import laustrup.bandwichpersistence.core.persistence.services.DatabaseColumnService;
 import laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where;
@@ -16,13 +17,12 @@ import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.BiFunction;
-import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import static laustrup.bandwichpersistence.core.persistence.exceptions.DatabaseDefinitionException.noIdReference;
 import static laustrup.bandwichpersistence.core.persistence.models.EntityDataCollection.Key.conjunctionKeyOf;
 import static laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService.*;
-import static laustrup.bandwichpersistence.core.services.ClassFieldService.getField;
+import static laustrup.bandwichpersistence.core.persistence.worm.services.IdReferenceService.getIdReferenceTitle;
 import static laustrup.bandwichpersistence.core.services.collections.MapService.collectMap;
 
 public interface DatabaseDefinition {
@@ -35,7 +35,7 @@ public interface DatabaseDefinition {
 
   Seszt<Member> get_primaries();
 
-  Where.Condition joinOf(DatabaseDefinition external);
+  Stream<Where.Condition> joinOf(DatabaseDefinition external);
 
   Map.Entry<String, DatabaseDefinition> toEntry();
 
@@ -47,11 +47,19 @@ public interface DatabaseDefinition {
 
   default DatabaseField get_databaseFieldWithReference() {
     Class<?> clazz = get_class();
-    String idReference = getIdReference(clazz)
+    String idReference = getIdReferenceTitle(clazz)
         .orElseThrow(() -> noIdReference(clazz));
-    Member member = getField(clazz, idReference);
+    Member member = new IdReferenceMember(clazz, idReference);
 
     return new DatabaseField(clazz, member);
+  }
+
+  default Stream<DatabaseField> get_primaryDatabaseFields(Map<? extends Member, DatabaseField> columns) {
+    return columns.entrySet().stream()
+        .filter(entry -> getTableColumn(entry.getKey())
+            .map(Table.Column::isPrimary)
+            .orElse(false)
+        ).map(Map.Entry::getValue);
   }
 
   @Getter
@@ -81,7 +89,7 @@ public interface DatabaseDefinition {
       this(
           clazz,
           get_databaseDefinitionTitle(clazz),
-          getIdReference(clazz)
+          getIdReferenceTitle(clazz)
               .orElseThrow(() -> noIdReference(clazz)),
           DatabaseColumnService.get_columns(clazz)
       );
@@ -101,15 +109,9 @@ public interface DatabaseDefinition {
     }
 
     @Override
-    public Where.Condition joinOf(DatabaseDefinition external) {
-      BiFunction<Class<?>, Boolean, Supplier<IllegalArgumentException>> exception = (c, isInternal) -> () ->
-          new IllegalArgumentException(String.format("No id found for '%s' when creating join of %s class",
-              c.getSimpleName(),
-              isInternal ? "internal" : "external"
-          ));
-
+    public Stream<Where.Condition> joinOf(DatabaseDefinition external) {
       return Where.Condition.equals(
-          get_databaseFieldWithReference(),
+          get_primaryDatabaseFields(_columns),
           external.get_databaseFieldWithReference()
       );
     }
@@ -184,10 +186,19 @@ public interface DatabaseDefinition {
     }
 
     @Override
-    public Where.Condition joinOf(DatabaseDefinition external) {
+    public Stream<Where.Condition> joinOf(DatabaseDefinition external) {
       return Where.Condition.equals(
-          get_databaseFieldWithReference(),
+          getColumns()
+              .map(Map.Entry::getValue),
           external.get_databaseFieldWithReference()
+      );
+    }
+
+    private Stream<Map.Entry<? extends Member, DatabaseField>> getColumns() {
+      return Stream.concat(Stream.concat(
+              target.get_columns().entrySet().stream(),
+              common.get_columns().entrySet().stream()
+          ), Arrays.stream(relations).flatMap(relation -> relation.get_columns().entrySet().stream())
       );
     }
 

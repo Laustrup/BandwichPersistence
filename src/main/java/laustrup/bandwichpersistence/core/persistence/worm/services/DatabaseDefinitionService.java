@@ -7,9 +7,7 @@ import laustrup.bandwichpersistence.core.persistence.worm.annotations.Junction;
 import laustrup.bandwichpersistence.core.persistence.worm.annotations.Table;
 import laustrup.bandwichpersistence.core.persistence.worm.models.TableColumnData;
 import laustrup.bandwichpersistence.core.services.ClassFieldService;
-import laustrup.bandwichpersistence.core.services.EternaryService.Operator.Property;
 import laustrup.bandwichpersistence.core.utilities.collections.Liszt;
-import laustrup.bandwichpersistence.core.utilities.collections.Seszt;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.annotation.Annotation;
@@ -18,11 +16,12 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.function.Predicate;
 
 import static laustrup.bandwichpersistence.core.persistence.services.DatabaseColumnService.fieldToColumnName;
-import static laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseTableService.*;
+import static laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseTableService.defineTableTitle;
+import static laustrup.bandwichpersistence.core.persistence.worm.services.NamingService.pluralToSingular;
 import static laustrup.bandwichpersistence.core.services.ClassFieldService.getFields;
+import static laustrup.bandwichpersistence.core.services.EternaryService.Operator.Property.inCase;
 import static laustrup.bandwichpersistence.core.services.EternaryService.ifNotEmpty;
 import static laustrup.bandwichpersistence.core.services.EternaryService.stating;
 
@@ -34,15 +33,15 @@ public abstract class DatabaseDefinitionService {
       throw new NullPointerException("Class can't be null when getting its database definition!");
 
     return stating(Liszt.of(
-        Property.inCase(clazz.isAnnotationPresent(Table.class))
+        inCase(clazz.isAnnotationPresent(Table.class))
             .then(() -> get_table(clazz)),
-        Property.inCase(clazz.isAnnotationPresent(Junction.class))
+        inCase(clazz.isAnnotationPresent(Junction.class))
             .then(() -> get_junction(clazz)),
-        Property.inCase(clazz.isAnnotationPresent(Table.Enum.class))
+        inCase(clazz.isAnnotationPresent(Table.Enum.class))
             .then(() -> get_tableEnum(clazz)),
-        Property.inCase(clazz.isAnnotationPresent(Table.Constructor.class))
+        inCase(clazz.isAnnotationPresent(Table.Constructor.class))
             .then(() -> get_constructor(clazz)),
-        Property.inCase(clazz.isAnnotationPresent(Table.Skeleton.class))
+        inCase(clazz.isAnnotationPresent(Table.Skeleton.class))
             .then(() -> clazz.getAnnotation(Table.Skeleton.class))
     )).orEmpty();
   }
@@ -153,11 +152,11 @@ public abstract class DatabaseDefinitionService {
         )));
 
     return stating(Liszt.of(
-        Property.inCase(clazz.isAnnotationPresent(Table.class))
+        inCase(clazz.isAnnotationPresent(Table.class))
             .then(() -> ((Table) annotation).value()),
-        Property.inCase(clazz.isAnnotationPresent(Junction.class))
+        inCase(clazz.isAnnotationPresent(Junction.class))
             .then(() -> ((Junction) annotation).title()),
-        Property.inCase(clazz.isAnnotationPresent(Table.Enum.class))
+        inCase(clazz.isAnnotationPresent(Table.Enum.class))
             .then(() -> ((Table.Enum) annotation).title())
     )).orElseNull();
   }
@@ -173,102 +172,17 @@ public abstract class DatabaseDefinitionService {
     return column != null && column.isPrimary();
   }
 
-  public static Table.IdReference handleIdReference(Class<?> clazz) {
-    Annotation annotation = get_databaseDefinition(clazz)
-        .orElseThrow(() -> new IllegalStateException("Couldn't define database definition for " + clazz.getSimpleName()));
-
-    return stating(Liszt.of(
-        Property.inCase(clazz.isAnnotationPresent(Table.class))
-            .then(() -> ((Table) annotation).idReference()),
-        Property.inCase(clazz.isAnnotationPresent(Junction.class))
-            .then(() -> ((Junction) annotation).idReference()),
-        Property.inCase(clazz.isAnnotationPresent(Table.Enum.class))
-            .then(() -> ((Table.Enum) annotation).idReference())
-    )).orElseNull();
-  }
-
-  public static Optional<String> getIdReference(Class<?> entity) {
-    if (entity == null)
-      return Optional.empty();
-
-    Table.IdReference idReference = handleIdReference(entity);
-
-    if (idReference == null)
-      return Optional.empty();
-
-    return Optional.of(defineColumnTitle(ifNotEmpty(idReference.value())
-        .otherwise(String.join("_", pluralToSingular(get_databaseDefinitionTitle(entity)), "id"))
-    ));
-  }
-
-  public static Seszt<TableColumnData> getTableColumns(Field[] fields) {
-    return new Seszt<>(Arrays.stream(fields)
-        .filter(field -> field.isAnnotationPresent(Table.Column.class))
-        .map(TableColumnData::of)
-    );
-  }
-
-  public static String getColumnTitle(Member member) {
+  public static String intendedNameOf(Member member) {
     Field field = getField(member);
 
-    if (!field.isAnnotationPresent(Table.Column.class))
-      return defineColumnTitle(member.getName());
+    if (field == null)
+      return "";
 
-    String value = field.getAnnotation(Table.Column.class).value();
+    Table.Column tableColumn = field.getAnnotation(Table.Column.class);
 
-    return value.isEmpty() ? defineColumnTitle(member.getName()) : value;
-  }
-
-  public static Optional<String> getColumnTitle(Class<?> clazz, Table.Column column) {
-    Predicate<Field> filtering = field ->
-        field.isAnnotationPresent(Table.Column.class) &&
-        field.getAnnotation(Table.Column.class).equals(column);
-
-    return getFields(clazz).values().stream()
-        .filter(filtering)
-        .map(DatabaseDefinitionService::getColumnTitle)
-        .findFirst();
-  }
-
-  public static String getTableTitle(Class<?> clazz, String tableName) {
-    try {
-      return getColumnTitle(clazz.getDeclaredField(tableName));
-    } catch (NoSuchFieldException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  public static String toAlias(String tableName) {
-    if (tableName == null || tableName.isEmpty()) {
-      log.warn(
-          "Table name is {} when creating alias, which it should not be!",
-          tableName == null ? "null" : "empty"
-      );
-      return null;
-    }
-
-    boolean underscoreReached = false;
-    String alias = tableName;
-
-    for (int i = 0; i < alias.length(); i++) {
-      char character = alias.charAt(i);
-      if (character == '_') {
-        underscoreReached = true;
-        alias = alias.substring(0, i) + alias.substring(i + 1);
-        i -= 1;
-      } else if (underscoreReached) {
-        alias = alias.substring(0, i) + String.valueOf(character).toUpperCase() + alias.substring(i + 1);
-        underscoreReached = false;
-      }
-    }
-
-    if (alias.equals(tableName)) {
-      char[] chars = alias.toCharArray();
-      chars[0] = Character.toLowerCase(chars[0]);
-      alias = "_" + new String(chars);
-    }
-
-    return alias;
+    return tableColumn != null
+        ? tableColumn.value()
+        : field.getName();
   }
 
   private static Table.Column ifAnnotationIsPresent(Member member, Table.Column element) {

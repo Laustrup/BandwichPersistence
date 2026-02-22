@@ -54,7 +54,7 @@ public class ClassFieldService {
     }
 
     return fields.stream()
-        .collect(Collectors.toMap(DatabaseDefinitionService::getColumnTitle, Function.identity()));
+        .collect(Collectors.toMap(DatabaseDefinitionService::intendedNameOf, Function.identity()));
   }
 
   public static Optional<Field> getField(Class<?> clazz, Table.Column column) {

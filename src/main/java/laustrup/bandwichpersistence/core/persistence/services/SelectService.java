@@ -25,7 +25,7 @@ import static laustrup.bandwichpersistence.core.persistence.DatabaseField.toSele
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition.Equation.EQUALS;
 import static laustrup.bandwichpersistence.core.persistence.services.SelectService.Selecting.Where.Condition.Equation.IS_NULL;
 import static laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService.get_databaseDefinitionTitle;
-import static laustrup.bandwichpersistence.core.persistence.worm.services.DatabaseDefinitionService.toAlias;
+import static laustrup.bandwichpersistence.core.persistence.worm.services.NamingService.toTableAlias;
 import static laustrup.bandwichpersistence.core.services.EternaryService.stating;
 
 public abstract class SelectService {
@@ -101,7 +101,7 @@ public abstract class SelectService {
           _properties.get_selections()
               .apply(),
           _properties.get_table(),
-          toAlias(_properties.get_table())
+          toTableAlias(_properties.get_table())
       );
     }
 
@@ -236,7 +236,7 @@ public abstract class SelectService {
                 .filter(declaresOfFieldNameConstants)
                 .flatMap(declared -> Arrays.stream(declared.getEnumConstants())
                     .map(constant -> (Enum<?>) constant)
-                ).filter(constant -> constant.name().equals(field.column().getTitle()))
+                ).filter(constant -> constant.name().equals(field.column().get_title()))
                 .map(Enum::ordinal)
                 .findFirst()
                 .orElse(0);
@@ -360,7 +360,7 @@ public abstract class SelectService {
 
         _area = area;
         _table = table;
-        _alias = toAlias(table);
+        _alias = toTableAlias(table);
         _products = products;
       }
 
@@ -395,7 +395,7 @@ public abstract class SelectService {
         return left(
             external.get_title(),
             data.stream()
-                .map(datum -> datum.joinOf(external))
+                .flatMap(definition -> definition.joinOf(external))
         );
       }
 
@@ -597,6 +597,10 @@ public abstract class SelectService {
 
         public static Condition equals(DatabaseField thiz, String thing) {
           return of(thiz, EQUALS, thing);
+        }
+
+        public static Stream<Condition> equals(Stream<DatabaseField> these, DatabaseField that) {
+          return these.map(thiz -> of(thiz, EQUALS, that));
         }
 
         public static Condition equals(DatabaseField thiz, DatabaseField that) {
